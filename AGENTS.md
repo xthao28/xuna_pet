@@ -86,6 +86,7 @@ Status vocabulary:
 - **Existing prototype board:** LILYGO T-Display-S3, standard LCD variant presumed; verify exact board revision and peripherals before pin mapping.
 - **Development environment:** **VS Code + PlatformIO IDE**.
 - **Mobile framework:** Flutter/Dart as the companion-app direction.
+- **Local MVP through M05 (owner-approved 2026-10-11):** device owns MVP state/memory/preference; idle/happy preference learning from explicit feedback in quiet/play contexts; local template-based conversation text V1 without an LLM. Voice, evolution and sensors remain deferred.
 - **Delivery strategy:** proceed incrementally with existing hardware, then Flutter/BLE, then Digital Life systems.
 - **Conversation belongs alongside Learning:** speech/conversation is a source of learning events; it must not be postponed until all evolution work finishes.
 - **Future display exploration:** **HoloCubic-style optical beam-splitter prism** is preferred over the simple flat-sheet Pepper's Ghost approach, but it is **not part of MVP**.
@@ -96,7 +97,7 @@ Status vocabulary:
 - Arduino Framework with PlatformIO **for initial hardware bring-up**; long-term Arduino versus ESP-IDF remains open.
 - Start with a small modular C++ design, hardware abstraction, testable core; no full-scale Clean Architecture ceremony.
 - A Flutter push-to-talk interaction for early Conversation V1; STT/LLM/TTS integration selected by later research and evaluation.
-- ESP32 as authoritative owner of local pet life state, with Flutter as companion UI. Confirm detailed storage, sync and ownership policies before implementation.
+- Future cloud/mobile synchronization beyond the approved local MVP remains open; do not infer account/backup/sync policies from device ownership in MVP.
 - Local event-driven Life Engine + FSM/Utility AI, adaptive preference learning and trait-based evolution.
 - Python/FastAPI as a possible backend stack **when a concrete backend use case justifies it**.
 
@@ -124,7 +125,7 @@ Only work on the requested milestone; do not build later milestones speculativel
 | **M07 — Physical Experience** | External sensors and meaningful environment events | Sensor readings translate to validated events affecting behavior and memory |
 | **Later** | Advanced voice, new displays, cloud, new hardware | Only after validation and explicit priority change |
 
-**Immediate development focus:** M01. Do not start a backend, production-ready voice pipeline or custom PCB to complete M01.
+**Immediate development focus:** owner-approved local MVP through M05 (2026-10-11), with physical BLE/device validation next. Keep M01 PCB revision/final validation open. Do not add backend, LLM, voice, evolution or sensors to this local MVP.
 
 ## 5. Device / mobile / cloud responsibilities
 
@@ -251,7 +252,7 @@ Do not equate more chat history with model intelligence. Prefer measurable learn
 ## 9. Flutter engineering guidelines
 
 - Flutter/Dart companion app; modular architecture and clean separation of device transport, domain state and presentation.
-- GetX or BLoC are possible; **no app state-management choice is approved yet**. Do not treat the owner's prior experience as a decision.
+- **Owner-confirmed on 2026-10-11:** retain the imported mobile Clean architecture and GetX base for subsequent Flutter development. Preserve reusable base controllers, bindings, navigation, data/domain contracts and shared utilities; remove unrelated demo features and prior product branding only.
 - Treat BLE as a versioned protocol with reconnect, disconnect, timeouts, idempotent commands and capability checks.
 - Keep device authoritative for pet-life state until an explicit synchronization strategy is approved.
 - Add unit tests for parsing/protocol/domain logic; integrate widget/integration tests when valuable.

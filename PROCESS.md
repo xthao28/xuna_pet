@@ -1,9 +1,9 @@
 # XUNA — Process and Session Handoff
 
 Last updated: **2026-10-11** (Asia/Ho_Chi_Minh).
-Current milestone: **M01 — Hardware Bring-up**.
-Current status: **Implemented; software build/tests passed; physical validation pending**.
-Next action: finish the local PlatformIO IDE setup, connect the standard LCD board, identify its revision/USB port, then build and flash M01.
+Current milestone: **Local MVP through M05**, explicitly selected and scoped by owner on 2026-10-11.
+Current status: **Development implementation/build/tests PASS; LILYGO build/upload/startup and owner LCD/buttons PASS; real-phone acceptance pending**.
+Next action: review [local MVP record](docs/roadmap/MVP-local.md), validate uploaded board and real iPhone BLE/learning/reboot persistence. M01 PCB revision/P07 remain open; no later evolution/voice/sensor scope.
 
 ## 1. Read order and authority
 
@@ -128,7 +128,7 @@ Those temporary directories may disappear. VS Code's PlatformIO installation is 
 - [CHANGELOG.md](CHANGELOG.md): dated implementation, fixes, validation outcomes and session changes. This includes uncommitted work, not only Git commits.
 - [M01 validation record](docs/roadmap/M01-bring-up.md): detailed physical checklist and measurement evidence.
 
-Current next task: **P01 — confirm PlatformIO IDE tooling and build in the owner's normal environment**, followed by board identification and physical checks. Keep the task list in PLAN.md and the dated history in CHANGELOG.md; this file owns the current context snapshot.
+Current run (2026-10-11): owner confirmed continuing after connection checkpoint. Normal IDE Core 6.2.0 build/upload PASS; host tests PASS. Board model read by owner: T-Display-S3, PCB revision unknown. Basic LCD/animation/buttons passed by owner observation. A false PSRAM warning was fixed in firmware diagnostics and the corrected build uploaded; Flash 16 MiB, PSRAM chip 8 MiB confirmed. More than 10 minutes of stable diagnostics passed; owner confirmed RST/USB startup and buttons with Monitor closed. PCB revision/final P07 review remain open; see [physical run](docs/roadmap/M01-bring-up.md#build-upload-and-physical-run--2026-10-11). Root HEAD remains `3dda411`, firmware HEAD `be5829d`; firmware now has uncommitted diagnostics/README changes, parent handoff docs uncommitted. Mobile/backend unchanged; no commit/push. Firmware gitlink still points to committed `be5829d`, not the uncommitted uploaded fix.
 
 ## 8. Session update procedure
 
@@ -149,4 +149,28 @@ Do not store credentials, tokens or other secrets here. Use links to detailed re
 
 ## 9. Copyable prompt for the next AI/session
 
-> Read AGENTS.md, PROCESS.md, PLAN.md and the latest CHANGELOG.md entries first, then inspect Git status and the M01 validation record. Continue the first incomplete authorized M01 task. Preserve all existing uncommitted work and submodule boundaries. M01 compiled and passed host tests in the previous session, but has not been flashed or physically validated. Confirm PlatformIO IDE/tooling and actual board connection before claiming new results. Report in Vietnamese, update PROCESS.md, task statuses in PLAN.md, CHANGELOG.md and the M01 record with evidence, and do not start M02 or commit/push unless requested.
+> Read AGENTS.md, PROCESS.md, PLAN.md, latest CHANGELOG.md and docs/roadmap/MVP-local.md; inspect root/child Git. Owner-approved local MVP through M05 is implemented; board build/upload/LCD/buttons passed, real-phone BLE/learning/persistence acceptance remains pending. Keep Clean/GetX and pinned firmware baseline. M01 PCB revision/P07 remain open. Simulator requires XUNA_SIMULATOR=true; default mobile transport is physical BLE. Preserve existing work and verify actual Git delivery; do not infer validation from commits/builds.
+
+## Mobile base update — 2026-10-11
+
+Owner explicitly confirmed retaining the imported Clean/GetX architecture for future mobile work. Scoped cleanup removed login/product-detail demos, province data/mappers, old backend URL and business-specific locale/constants; splash/home and generic core/shared infrastructure, packages and generators remain. Package/labels renamed to XUNA; network clients require explicit base URLs and are not initialized at startup. Mobile remains uncommitted at HEAD `310e69f`; no gitlink update or M02 implementation. Analyzer PASS after dependency resolution; no native build/device validation claimed for this final cleanup. Earlier minimal-scaffold results do not apply. Firmware changes and M01 status remain unchanged.
+
+## M02 inspection — 2026-10-11
+
+All repositories verified on dev; HEADs unchanged (root 3dda411, firmware be5829d, mobile 310e69f, backend 0032828). Root/firmware/mobile dirty; backend clean. No child edits, build/upload, commit/push or gitlink change during proposal work. Flutter 3.32.8/Dart 3.8.1, Xcode 14.2, booted iPhone 13/iOS 16.2 simulator, PlatformIO 6.2.0 and board USB detected. No real phone detected. Protocol/library trade-offs and future validation matrix are recorded in M02 proposal, all Proposed. Historical M01 snapshots above retain their original context; this current section supersedes older claims that mobile is unchanged or M02 must wait for M01 validation.
+
+## Mobile simulator delivery — 2026-10-11
+
+Owner approved proposal and explicitly requested simulator-first mobile commit/push. Mobile commit `24026b2` pushed successfully to `origin/dev`; mobile working tree clean. Includes previously uncommitted approved Clean/GetX base plus fake M02 feature/tests. Analyzer/4 tests/native simulator build PASS; flutter run opened Home on iPhone 13/iOS 16.2, screenshot inspected. Full interaction flow exercised in widget test, not native automated taps. CocoaPods locale failure fixed by command-local UTF-8 environment. No BLE dependency/physical adapter or firmware change in this slice. Root remains 3dda411 with uncommitted docs and changed mobile working HEAD; root gitlink remains 310e69f until an explicitly requested root commit. Firmware HEAD be5829d with earlier dirty changes preserved; backend clean. Physical BLE, Android native build and M01 PCB revision/P07 remain open.
+
+## Local MVP implementation — 2026-10-11
+
+Owner approved local MVP through M05, board ownership of state/memory/preference and template-based text without LLM. Firmware adds bundled BLE, LifeEngine, two-slot NVS snapshots, bounded confirmed feedback episodes and local learned quiet routine; mobile adds physical BLE repository, request correlation and learning/text/memory UI while retaining Clean/GetX. Simulator is explicit via XUNA_SIMULATOR=true; real transport is default. Flutter analyzer/10 tests/simulator build/run and host core/life tests with life sanitizers PASS. See local MVP record for exact scope, protocol extensions and unverified physical cases. Existing root/firmware changes preserved; new work is uncommitted. HEADs remain root3dda411/firmwarebe5829d/mobile24026b2/backend0032828. No new commit/push; previous mobile simulator commit remains published. Old Proposed/device-ownership snapshots above are historical and superseded only for the owner-approved local MVP.
+
+## Uploaded board checkpoint — 2026-10-11
+
+LILYGO now runs corrected 0.2.0-mvp; build/upload/hashes PASS, 22-second startup diagnostics captured; owner confirmed LCD and both buttons. Fixed first-boot NVS missing-key noise by isKey checks and reuploaded; corrected log clean. See MVP record for measured resource figures and limits. Physical iPhone BLE/learning/reboot persistence and M01 PCB revision/P07 remain pending. Owner now explicitly requested commit/push of current code; deliver child commits before root gitlinks.
+
+## Current Git delivery — 2026-10-11
+
+Owner requested publishing current code. Firmware `be58099980a316a5ebfe8e621fe68a31eb8dcff6` and mobile `3846880ea3fb3a2cc26f5b41469f62a1f7d85316` committed and pushed successfully to their origin/dev branches; both child working trees clean. Root snapshot commit containing this section records both updated gitlinks and all scoped handoff documents. Backend remains `0032828`, unchanged. This delivery supersedes historical uncommitted/old-pointer snapshots above. No force push, reset or unrelated repository edits. Physical iPhone BLE/learning/NVS acceptance and M01 PCB revision/P07 remain pending.
