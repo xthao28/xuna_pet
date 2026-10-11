@@ -12,6 +12,8 @@
 
 **Language:** Discuss with the project owner in Vietnamese; retain established English technical terms. Source code identifiers and technical documentation should generally use English.
 
+**Session handoff:** After reading this guide, read [PROCESS.md](PROCESS.md) for current progress, validation evidence and next actions. Follow its links to [PLAN.md](PLAN.md) for tasks and [CHANGELOG.md](CHANGELOG.md) for change history. Inspect actual repository state and update the relevant handoff documents after meaningful work. This guide remains the canonical source for product decisions and operating instructions.
+
 ---
 
 ## 1. Mission and product boundaries
