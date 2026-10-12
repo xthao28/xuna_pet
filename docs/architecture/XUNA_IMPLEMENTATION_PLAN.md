@@ -1,7 +1,7 @@
 # XUNA — Technical Implementation Plan
 
 **Document ID:** XUNA-TIP-001
-**Version:** 0.1.0 (first revision of the technical plan)
+**Version:** 0.1.1. Same-day audit corrections to 0.1.0; see [XUNA_PLAN_AUDIT.md](XUNA_PLAN_AUDIT.md). Every sequencing change in 0.1.1 is **Proposed** pending owner approval (D17, D15).
 **Status:** **Proposed / planning only.** No application code has been written for this plan. Nothing here is Approved unless it cites an existing Approved decision.
 **Date:** 2026-10-12
 **Inputs:** root [AGENTS.md](../../AGENTS.md) (canonical), [XUNA_DIGITAL_LIFE_SPEC.md](../product/XUNA_DIGITAL_LIFE_SPEC.md) v0.3.0 (Proposed spec), [PROCESS.md](../../PROCESS.md), [PLAN.md](../../PLAN.md), [MVP-local.md](../roadmap/MVP-local.md), [M02-ble.md](../roadmap/M02-ble.md), and the source at firmware `be58099`, mobile `3846880`, backend `0032828`.
@@ -47,8 +47,14 @@ The owner-approved local MVP already contains the seed of the Digital Life loop.
    - Build a deterministic **Life Lab** host simulator with golden traces and host↔target parity.
 2. **M05a: Learner v2.** Use a fixed-point discounted Beta estimator, hierarchical context with day parts, seeded bounded exploration, reaction-ID credit assignment with an expiry window, and an explanation API. Prove learning against random, static and no-learning baselines over many seeds.
 3. **M05b: Memory and Journal.** Add provenance-tagged episodes, facts and journal records, with salience, consolidation and deletion tombstones. Storage is NVS for identity and life, plus LittleFS on the existing `spiffs` partition [E]. Add BLE v2 paging and bonding before personal facts are stored.
-4. **M05c: Conversation V1.5.** Use a local rule grammar, with no LLM, that produces **candidate events** requiring confirmation (teach nickname, state a preference, correct, recall). Add replaceable Dart provider interfaces modelled on Xiaozhi's server provider split. STT/LLM stays a gated spike.
-5. **M05d: Cognitive gates.** Add a habit predictor with prequential (online held-out) scoring, and skill records whose acquisition is evidence-based. Run a dual-history Life Lab evaluation (spec §23.10).
+4. **Conversation in two layers [P, D17].** This keeps approved decision A6, "Conversation belongs alongside Learning".
+   - **Layer A, Conversation Foundation (M05c-A).** It is developed **together with M05a** and needs no MemoryStore, BLE v2 or bonding.
+     - A local rule grammar (vi/en, no LLM) produces candidate learning signals: rate the last reaction, state a preference, ask why.
+     - The user confirms each candidate.
+     - The signals reach the learner through v1-additive commands (§11.6).
+   - **Layer B, Conversation + long-term memory (M05c-B).** It follows M05b and covers personal facts, correction, forgetting and grounded recall.
+   - **Providers and STT/LLM.** Replaceable Dart provider interfaces follow Xiaozhi's server provider split. STT/LLM stays a gated spike (D11a/D11).
+5. **M05d: Cognitive gates.** Add a habit predictor with prequential (online held-out) scoring, and skill records whose acquisition is evidence-based. Run a dual-history Life Lab evaluation (spec §23.10). Whether M05d runs before an Evolution MVP is a product checkpoint after M05c-B (D15).
 6. **M06/M07** keep the roadmap: growth stages, layered palette-indexed traits with an evidence journal, then sensor events with hysteresis.
 
 ---
@@ -67,7 +73,7 @@ The owner-approved local MVP already contains the seed of the Digital Life loop.
 | A6 | Conversation belongs alongside Learning (M05) | AGENTS §3 |
 | A7 | Incremental delivery M01→M07 | AGENTS §3–4 |
 | A8 | Prototype BLE experiment: bundled Arduino BLE + FlutterBluePlus 1.35.5 + compact binary v1, foreground and unbonded | M02-ble, MVP-local |
-| A9 | Pinned toolchain retained: `espressif32@6.5.0`, Arduino-ESP32 2.0.14, `TFT_eSPI@2.5.43` | MVP-local "pinned firmware toolchain remain" |
+| A9 | Pinned toolchain retained **for the local MVP scope**: `espressif32@6.5.0`, Arduino-ESP32 2.0.14, `TFT_eSPI@2.5.43`. It is the current adapter framework, **not** a permanent architecture commitment: Arduino versus ESP-IDF long-term stays open (AGENTS §3 Proposed). | MVP-local "pinned firmware toolchain remain" |
 | A10 | HoloCubic prism display, custom PCB and dual-processor hardware are future backlog | AGENTS §3 |
 
 Arduino is authorized and in use for bring-up. **The long-term choice between Arduino and ESP-IDF is still open** (AGENTS §3 Proposed). This plan stays on Arduino. Xiaozhi needs ESP-IDF ≥ 6.0.1 and ePet uses ESP-IDF v5.5 (Section 19), but neither fact is a reason to migrate.
@@ -179,7 +185,7 @@ Risk: **H** blocks a milestone or risks data loss / false claims; **M** causes r
 | G13 | Explainability (§8.3, §16.1) | Life characteristic shows the current choice | No evidence counts, confidence or evidence IDs | M05a | M |
 | G14 | Memory (§7, §23.3) | 8 feedback episodes, no IDs or time | No facts, episodes with provenance, salience, consolidation or journal | M05b | H |
 | G15 | Phone memory (§23.4) | none | No local journal or fact store; Hive unused | M05b | M |
-| G16 | Conversation (§11, §23.9) | 4 exact intents [A5] | No candidate events; no teach/correct/recall; no provider boundary | M05c | M |
+| G16 | Conversation (§11, §23.9) | 4 exact intents [A5] | No candidate events; no teach/correct/recall; no provider boundary | M05c-A / M05c-B | M |
 | G17 | Single source of truth (§15) | Dart simulator duplicates the C++ learner | Silent divergence between UI tests and firmware | M04.6 | M |
 | G18 | Security (§17) | Unbonded; any nearby central can send `forget` | Personal facts must not be added before bonding or authorization | M05b [E] | H once facts exist |
 | G19 | Test infrastructure (§18) | Manual `c++` command; no CI or native env | No `pio test -e native`; no sanitizer job; no Windows toolchain | M04.1 | M |
@@ -282,6 +288,24 @@ Keep the Arduino single loop. BLE callbacks run on the Bluedroid task and only e
 5. **Publish:** send projections.
 
 A separate storage task is **not** introduced until measurements show flash commits causing visible render hitches (E7).
+
+### 5.6 AI technique taxonomy — what XUNA may claim [P]
+
+The product claims must match the mechanism (AGENTS §6, spec §8.1).
+
+| Technique class | Used in M04–M07? | Where in XUNA | What may be claimed |
+|---|---|---|---|
+| Rule-based / scripted | Yes | Instincts, request validator, LocalRuleExtractor, idle routines, stage repertoire unlocks | "Instinct" or "rule". **Never** "learning". |
+| Finite state machines | Yes | ActivityFsm, lifecycle stage, clock quality, reaction and fact lifecycles | Control and safety only |
+| Behavior trees | **No** | — | Not needed for the current small repertoire. Revisit only if multi-step behaviors (C8) or more than ~20 interacting behaviors appear. |
+| Utility AI | Yes | `BehaviorSelector` scores allowed actions; the learned preference is one score term | "Decision scoring". Not learning by itself. |
+| Adaptive online learning | Yes | `PreferenceLearner` (discounted Beta + bounded exploration; a contextual-bandit family), `HabitPredictor` (decayed frequency) | "Learned from your feedback/routine", **only** with evidence counts and the §9.9 baseline comparison |
+| Instructed adaptation | Yes (M05c-A) | Stated preferences (`user_stated` evidence, capped weight, §11.6) | "You told me…". Kept distinct from learned evidence in explanations. |
+| Trained ML models (NN, etc.) | **No** on the device | — | None |
+| Generative AI / LLM | Optional, phone or proxy only, after D11 | `ConversationProvider` phrasing | Wording only. Never a source of facts, traits or actions. |
+| AI agents / autonomous tool use | **No** | The `ActionRegistry` (T13) is a validated allowlist, not an agent | "XUNA chose X among allowed actions" |
+
+Stage progression is **scripted progression** (spec §8.1-1) and is labeled as such. Only `SkillAcquired` backed by metrics counts as developmental evidence.
 
 ---
 
@@ -636,7 +660,7 @@ Build facts:
 - **Data model:** `ActionDescriptor` (§14.3) + `ParamSpec {type u8, min i16, max i16, maxLen u8}` + `PermissionTier u8`.
 - **Tests:** table-driven cases: unknown action, wrong type, out of range, missing parameter, insufficient tier (an unbonded `ForgetAll`), an AI-source attempt at a privileged action, cooldown. Also Scenario F.
 - **Resource risk:** the table is under 1 KB of flash.
-- **Status:** [P]. The basic validator comes in M04.5, tiers in M05b, and the AI source tier in M05c V2.
+- **Status:** [P]. The basic validator comes in M04.5, tiers in M05b, and the AI source tier in M05c-B V2.
 
 #### T14 — On-device audio pipeline (deferred)
 
@@ -733,7 +757,7 @@ Build facts:
   - **Memory is not a provider.** XUNA's memory truth is device-confirmed facts (§10). An LLM summary is `generated_summary` and is never stored as a device fact, which is the opposite of `mem_local_short`.
   - Intent output is an untrusted `CandidateEvent`.
 - **Fit:** not applicable to firmware; idiomatic in Flutter.
-- **Dependencies:** M05b facts; M05c.
+- **Dependencies:** M05c-A (interfaces, local provider); M05b facts for Layer B.
 - **Tests:**
   - One contract-test suite runs against every provider implementation (local plus a fake remote).
   - A provider failure falls back to local rules.
@@ -755,7 +779,12 @@ Build facts:
 - **Adaptation:**
   - One header defines every key, with a `static_assert` that NVS key names are ≤ 15 characters.
   - The storage adapter commits **explicitly** before the ACK, not in a destructor.
-  - OTA and an assets partition are [F]. Rollback under PlatformIO's prebuilt Arduino bootloader needs an experiment. An assets partition changes the partition table, so it is considered only with a D2 repartition.
+  - OTA and an assets partition are [F].
+  - Arduino-ESP32 2.0.14 is already prepared for health-checked rollback (verified 2026-10-12):
+    - its ESP32-S3 SDK config sets `CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y`;
+    - `initArduino()` exposes the weak hooks `verifyRollbackLater()` / `verifyOta()`.
+  - A future OTA could therefore delay `esp_ota_mark_app_valid_cancel_rollback()` until snapshot restore or migration succeeds. That remains to be tested on the board.
+  - An assets partition changes the partition table, so it is considered only with a D2 repartition.
 - **Fit:** the key registry is trivial; OTA rollback is [E] later.
 - **Tests:** key-registry uniqueness and length; per-key migration fixtures.
 - **Status:** key registry [P] in M04.4; OTA/assets [F].
@@ -798,9 +827,9 @@ This table is the input for ADR-0001 in slice M04.0.
 | T12 | Single-owner loop, marshalled callbacks | Xiaozhi | **Adopt, bounded** | M04.3 |
 | T13 | Typed tool registry (MCP concept) | Xiaozhi | Adapt (+ permission tiers enforced at dispatch) | M04.5 / M05b |
 | T14 | Audio, VAD, wake-word pipeline | Xiaozhi | **Defer [F]** | — |
-| T15 | Closed expression vocabulary with fallback | Xiaozhi (fw + server) | Adapt (enum, allowlisted hints) | M04.5 / M05c |
+| T15 | Closed expression vocabulary with fallback | Xiaozhi (fw + server) | Adapt (enum, allowlisted hints) | M04.5 / M05c-A |
 | T16 | Hello, versioned framing, sequence dedup | Xiaozhi | Adapt (binary LE over GATT) | M05b |
-| T17 | Pluggable ASR/LLM/TTS providers | Xiaozhi server | Adapt (Dart interfaces; memory stays on the device) | M05c |
+| T17 | Pluggable ASR/LLM/TTS providers | Xiaozhi server | Adapt (Dart interfaces; memory stays on the device) | M05c-A |
 | T18 | Keys as API, health-checked OTA, assets partition | Xiaozhi | Key registry: adopt; OTA/assets: **[F]** | M04.4 |
 | T19 | Host-compiled protocol tests, change-scoped CI | Xiaozhi | Adopt (no stubs needed) | M04.1 |
 
@@ -913,7 +942,7 @@ The schema version lives in each log segment header (Section 7.6), not in each r
 
 ### 7.5 `LifeSnapshot` v2 fields
 
-**Snapshot v2 is sectioned [P]:** a header followed by typed sections `{sectionId u8, sectionVersion u8, length u16, data}` and a single CRC-32 trailer. Each core module owns the codec for its section. A later milestone can add or resize a section, for example M05a's learner cells, with a per-section migration instead of a new top-level schema. A missing optional section loads its defaults. An unknown section marked *required* yields `TooNew`. Exact offsets are frozen in session S12 of the [session plan](../roadmap/XUNA_SESSION_PLAN.md).
+**Snapshot v2 is sectioned [P]:** a header followed by typed sections `{sectionId u8, sectionVersion u8, length u16, data}` and a single CRC-32 trailer. Each core module owns the codec for its section. A later milestone can add or resize a section, for example M05a's learner cells, with a per-section migration instead of a new top-level schema. A missing optional section loads its defaults. An unknown section marked *required* yields `TooNew`. Exact offsets are frozen in session S12a of the [session plan](../roadmap/XUNA_SESSION_PLAN.md).
 
 | Group | Field | Type | Bounds / rule |
 |---|---|---|---|
@@ -985,8 +1014,9 @@ stateDiagram-v2
 
 ```mermaid
 stateDiagram-v2
-  [*] --> S0_Egg: identity created (hatch command or migration)
-  S0_Egg --> S1_Newborn: HatchCompleted
+  [*] --> S0_Egg: fresh device (no identity, no v1 snapshot)
+  [*] --> S1_Newborn: migrated MVP pet (v1 snapshot, bornAt unknown)
+  S0_Egg --> S1_Newborn: HatchCompleted (device gesture or app opcode 7)
   S1_Newborn --> S2_Infant: gates(age?, experiences, skills) pass
   S2_Infant --> S3_Juvenile: gates pass
   S3_Juvenile --> S4_Mature: gates pass
@@ -1087,7 +1117,7 @@ explore with probability ε: choose the least-rated allowed non-greedy action (t
 emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 ```
 
-- **Alternative B [E]:** Thompson sampling from Beta. It needs float gamma sampling, which makes parity harder. Compare in Life Lab only. Adopt it only if it shows meaningfully lower regret at equal reversal speed.
+- **Alternative B [E, optional]:** Thompson sampling from Beta. It needs float gamma sampling, which breaks the bit-exact parity principle. Run it in Life Lab only if ε-greedy and UCB both show a regret problem. **It is not required for E10.**
 - **Alternative C [E]:** UCB1-style bonus. Deterministic and integer-friendly; compare in the same benchmark.
 - **Stage-scaled `ε_stage`** (young XUNA explores more) is **gameplay design** and is labeled as such. It is not evidence of learning (D4).
 
@@ -1105,6 +1135,8 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 `Explanation{ctx, greedyAction, ε, cells[A]{action, p Q0.16, nEff Q8.8, posMass, negMass, lastEvidenceEventId}}`, where `lastEvidenceEventId` is resolved from the experience log. It is `0` if the record has been compacted away; the counts remain.
 
 The phone renders "XUNA chọn *vẫy tay* vì bạn đã thích 12/15 lần buổi tối". The text is built **only** from these fields.
+
+Each cell also reports `statedMass` separately from rated mass. The explanation can then say "bạn đã nói với mình…" (instructed) apart from "bạn đã thích…" (learned from feedback) (§5.6, §11.6).
 
 ### 9.7 Habit predictor (C3, M05d)
 
@@ -1146,6 +1178,7 @@ Rules:
 | Isolation | Rate only `quiet/evening` | Fine cells of other interactions unchanged; coarse transfer measured separately | Exact for other interactions; documented transfer |
 | E reboot parity | Same trace with 10 reboots, host vs target | Snapshot hashes and decisions | Bit-identical |
 | Spam | 1,000 feedback attempts in 60 s | Applied count, commits/hour | ≤ 1 per reaction; commit guard holds |
+| Stated vs rated (M05c-A) | Owner states "like wave in the evening" 20 times, then rates wave negatively 10 times | Stated mass, greedy action over time | Stated mass stays within its cap; explicit ratings can override it; the explanation separates the two kinds |
 
 The report lists the parameter set, seeds, CIs and CPU time per `step`. **No target accuracy is claimed before the experiment runs** (spec §8.3).
 
@@ -1218,28 +1251,36 @@ Phrasing rule: a `user_stated` memory is rendered as "Bạn đã kể với mìn
 
 ---
 
-## 11. Conversation design (M05c) [P]
+## 11. Conversation design (M05c-A with M05a, M05c-B after M05b) [P]
 
 ### 11.1 Staged capability
 
-| Stage | Scope | Status |
-|---|---|---|
-| V1 | Exact local intents: play/quiet/approve/reject; text feedback needs confirmation; no storage of prose | **[A5] Implemented** |
-| V1.5 | Local rule grammar (vi + en), **no network, no LLM**; produces typed `CandidateEvent`s that need confirmation | [P] M05c |
-| V2 | Push-to-talk via platform STT and/or an LLM `ConversationProvider` behind an authenticated proxy; proposals only | [E] spike after D11; not part of the approved local MVP |
+Conversation is a **learning input channel** (A6, spec §23.9). It is split by dependency, not by importance.
 
-### 11.2 V1.5 intents (allowlist)
-
-| Intent | Example (vi) | Candidate → device command | Confirmation |
+| Stage | Scope | Depends on | Status |
 |---|---|---|---|
-| `TeachNickname` | "Gọi bạn là Mây nhé" | `TeachFact(xuna_nickname, "Mây")` | required |
-| `TeachCallName` | "Hãy gọi mình là Thảo" | `TeachFact(owner_call_name, …)` | required |
-| `StatePreference` | "Mình thích khi bạn vẫy tay buổi tối" | `SubmitStatedPreference(ctx=evening, action=wave)`, a prior-shaping event with provenance `user_stated` and weight < explicit rating [P] | required; must map to the action vocabulary |
-| `RateLastReaction` | "thích" / "không thích" | `SubmitFeedback(reactionId)` (V1 behavior) | required (V1) |
-| `Correct` | "Không phải Mây, là Mưa" | `SupersedeFact(old, new)` | required |
-| `Recall` | "Bạn nhớ gì về mình?" | `ReadFacts` + `ReadJournal` → grounded template | none (read-only) |
-| `Forget` | "Quên tên đó đi" | `ForgetFact(factId)` | required, destructive |
-| unknown | anything else | none; nothing stored | — |
+| V1 | Exact local intents: play/quiet/approve/reject; text feedback needs confirmation; no storage of prose | — | **[A5] Implemented** |
+| **Layer A, Conversation Foundation (M05c-A)** | Local rule grammar (vi + en), **no network, no LLM**. Learning intents only (`RateLastReaction`, `StatePreference`, `AskWhy`, context requests) → `CandidateEvent` → confirmation → v1-additive commands (§11.6) → learner → behavior. Works offline once learned. | M05a learner + explanation; **not** MemoryStore, BLE v2 or bonding | [P, D17]; developed together with M05a |
+| Layer A voice (optional) | Push-to-talk using the phone mic and **on-device** platform STT for the same intents; phone TTS optional | E13 (vi-VN on-device STT availability), **D16** | [P/E]; outside the approved local MVP until D16 (A5 deferred voice) |
+| **Layer B, Conversation + long-term memory (M05c-B)** | Personal facts: `TeachFact` / `SupersedeFact` / `ForgetFact` / `ReadFacts` / `Recall`, provenance, grounded replies, privacy and sync | M05b (MemoryStore, BLE v2, bonding D10) | [P] |
+| V2 | Cloud STT and/or an LLM `ConversationProvider` behind an authenticated proxy; proposals only | D11a (authorize the research spike), E12, then D11 | [E] |
+
+### 11.2 Intent allowlist by layer
+
+| Intent | Layer | Example (vi) | Candidate → device command | Confirmation |
+|---|---|---|---|---|
+| `RateLastReaction` | V1 / A | "thích" / "không thích" | `SubmitFeedback(reactionId)` (opcode 3, source 2 = confirmed text) | required (V1) |
+| `StatePreference` | **A** | "Mình thích khi bạn vẫy tay buổi tối" | `StatedPreference(ctx=evening, action=wave, like)` (opcode 6, §11.6): `user_stated` evidence with a capped weight | required; must map to the action and context vocabulary (D5) |
+| `RequestContext` | V1 / A | "chơi nhé", "yên tĩnh" | `RequestReaction(ctx)` (opcode 2) | none |
+| `AskWhy` | **A** | "Sao bạn chọn vẫy tay?" | Read the explanation (§9.6) → grounded template | none (read-only) |
+| `TeachNickname` | B | "Gọi bạn là Mây nhé" | `TeachFact(xuna_nickname, "Mây")` | required |
+| `TeachCallName` | B | "Hãy gọi mình là Thảo" | `TeachFact(owner_call_name, …)` | required |
+| `Correct` | B | "Không phải Mây, là Mưa" | `SupersedeFact(old, new)` | required |
+| `Recall` | B | "Bạn nhớ gì về mình?" | `ReadFacts` + `ReadJournal` → grounded template | none (read-only) |
+| `Forget` | B | "Quên tên đó đi" | `ForgetFact(factId)` | required, destructive |
+| unknown | — | anything else | none; nothing stored | — |
+
+In Layer A, Layer-B phrases are recognized but answered with "mình chưa ghi nhớ được điều này". **Nothing is stored.**
 
 Hypotheticals, quotes and jokes ("giả sử…", "nếu…", quoted text) are rejected by the rules. The tests include prompt-injection strings.
 
@@ -1290,7 +1331,23 @@ text or (V2) push-to-talk → Transcript (not retained by default)
 - Unconfirmed candidates never reach the device.
 - Correction supersedes without losing history.
 - Forget propagates to both stores.
-- Offline: provider unavailable → V1.5 still works.
+- Offline: provider unavailable → the local rule layer still works.
+
+### 11.6 Layer A minimum command contract [P, D17]
+
+This is the smallest safe addition that lets conversation change learned behavior **without** MemoryStore, BLE v2 or bonding.
+
+| Item | Contract |
+|---|---|
+| Existing | Opcode 3 feedback with `source = 2` (confirmed text) is already the conversation-derived rating path [A5] |
+| New: opcode 6 `StatedPreference`, 12 bytes | Header: version, opcode 6, `requestId` u32, `arg` = polarity (0 dislike / 1 like), `source` (2 confirmed text; 3 confirmed voice only after D16). Payload: `contextKey u8 @8`, `actionId u8 @9`, `reserved u16 @10 = 0`. |
+| Capability | Command-mask bit 5 (`0x20`). The app enables `StatePreference` only when the bit is present. Old firmware simply lacks it. |
+| Device validation | The context and action exist in the current repertoire, the source is allowed, and per-session dedup applies (v1 cache). Otherwise the result is 4. |
+| Learning effect | Add `w_s` ∈ [0.25, 1.0] (default 0.5 [P]) of a positive or negative rating to the fine and coarse cells as **`user_stated` evidence**. **Cap** the stated mass per cell at the equivalent of 2 explicit ratings [P]. It decays with γ like other evidence, so explicit feedback can always override it. |
+| Provenance | `FeedbackApplied`-like event with provenance `user_stated` and an `instructed` flag. The explanation reports `statedMass` separately (§9.6). |
+| Retry safety | No automatic resend after a timeout (existing v1 rule). After a timeout the app reads the explanation to see whether `statedMass` changed before offering to resend. The durable `CommandId` ring (§7.5) is used once snapshot v2 exists. |
+| Trust level | Same as opcode 3 under the approved unbonded prototype (A8). A behavioral preference is **not** a personal fact. Personal facts stay in Layer B behind bonding (G18). |
+| Data minimization | Only typed codes cross BLE. No text, transcript or audio leaves the phone. |
 - Scenario F: no `sensor_observed` from text, no actuation.
 
 ---
@@ -1302,10 +1359,17 @@ text or (V2) push-to-talk → Transcript (not retained by default)
   - `activeLifetime = activeSeconds`.
   - `developmentProgress` = stage + skills, independent of time.
 - **TimeSync request** (v1-additive opcode 5 [P], 16 bytes: header 8 + `utcSeconds` u32 + `tzOffsetMin` i16 + `source` u8 + reserved) or the v2 equivalent. The phone sends it after connect and every 6 h while connected [P].
-- **`bornAt` policy [P]:**
-  - A new pet hatches through the app with a TimeSync first, so `bornAt` is exact (Synced).
-  - A pet hatched while the clock is `Unknown` gets `bornAt = unknown` permanently. The UI shows active lifetime instead.
-  - Migrated MVP pets get `bornAt = unknown` (D7).
+- **Hatch and `bornAt` policy ([A] D7, 2026-10-12; mechanics [P]):**
+  - **Egg.** A fresh device (no identity, no v1 snapshot) starts as an **Egg**. It shows a placeholder egg visual until real art exists.
+  - **Hatch on the device**, with no phone needed: a deliberate local gesture.
+    - Proposed: hold GPIO14 for 3 s while in the Egg state. The gesture is frozen in S06.
+    - The gesture must be distinct from normal presses and from BOOT/GPIO0, which is the download-mode pin at reset.
+  - **Hatch via the app:** the v1-additive opcode 7 `Hatch` (8 bytes, `arg = 0`, capability bit 6, only valid in the Egg state; frozen in S10). The app sends `TimeSync` first.
+  - **`bornAt` is exact** when trusted time exists in the **same boot session** as the hatch:
+    - either the clock was already Synced at hatch time,
+    - or a sync arrives later in that boot. Then `bornAt = syncUtc − (syncMono − hatchMono)`, using the monotonic anchor.
+  - **Otherwise `bornAt = unknown` permanently.** The UI shows active lifetime instead. A later sync never back-fills it, because offline time between boots is unknown.
+  - **The existing MVP pet** (v1 snapshot present) migrates as Newborn (`origin = migratedFromV1`) with `bornAt = unknown`, keeping its learned preferences.
 - **Day part** requires `clockQuality ≥ Approximate`. Otherwise `dayPart = unknown` and the coarse learner cells are used.
 - **Time zone and DST:** the phone sends the current offset with each sync; storage stays UTC (spec §12.3).
 - **No penalties:** downtime never reduces needs below defaults or creates negative events (spec §16.3).
@@ -1338,7 +1402,10 @@ text or (V2) push-to-talk → Transcript (not retained by default)
 
 v1 (20-byte values, opcodes 1–4) stays working until the mobile app requires v2. New features are added **additively**:
 
-- **v1-compatible additions:** opcode 5 `TimeSync`.
+- **v1-compatible additions:**
+  - opcode 5 `TimeSync` (capability bit 4);
+  - opcode 6 `StatedPreference` (capability bit 5, §11.6, M05c-A);
+  - opcode 7 `Hatch` (capability bit 6, Egg state only, §12, M04.2).
 - **New characteristics:**
 
   | UUID | Properties | Purpose |
@@ -1392,15 +1459,24 @@ How to read the slices:
 ### 15.1 Overview and dependencies
 
 ```text
-M04.0 ─► M04.1 ─► M04.2 ─► M04.3 ─► M04.4 ─► M04.5 ─► M04.6 ─┬─► M05a ─► M05d ─► M06 ─► M07
- (MVP acceptance,  core     clock/   events/  persist  FSM/     Life Lab │
-  ADR scaffolding) extract  identity command  v2       needs    parity   ├─► M05b ─► M05c
-                                                                         │   (memory, (conversation
-                                                                         │   BLE v2,   V1.5)
-                                                                         │   bonding)
+M04.0 ─► M04.1 ─► M04.2 ─► M04.3 ─► M04.4 ─► M04.5 ─► M04.6 ─┬─► [ M05a learner ⇄ M05c-A conversation foundation ] ─┐
+ (MVP acceptance,  core     clock/   events/  persist  FSM/     Life Lab │      one joint acceptance (S28)                 │
+  ADR scaffolding) extract  identity command  v2       needs    parity   └─► M05b memory, BLE v2, bonding ─► M05c-B ──┤
+                                                                                                                       ▼
+                                                              product checkpoint S42a (D15): M05d first  OR  M06 Evolution MVP first
+                                                                                                                       ▼
+                                                                                         the other one ─► M06 (rest) ─► M07
 ```
 
-M05b can run in parallel with M05a after M04.6. M05c needs M05b (facts, bonding). M05d needs M05a and M04.2.
+Dependencies:
+
+- M05c-A is developed **together with** M05a and shares its acceptance. It needs only M05a's learner and explanation plus two v1-additive opcodes.
+- M05b can run in parallel with M05a after M04.6.
+- M05c-B needs M05b (facts, bonding).
+- M05d needs M05a and M04.2.
+- An Evolution MVP needs M05a evidence plus a minimal `associateReactionFeedback` skill, pulled forward from M05d if D15 picks it first.
+
+All sequencing changes in this diagram are **Proposed (D17, D15)**.
 
 ### 15.2 Slices
 
@@ -1409,7 +1485,7 @@ M05b can run in parallel with M05a after M04.6. M05c needs M05b (facts, bonding)
 - **Goal:** do not refactor unvalidated behavior.
 - **Scope:**
   - Complete PLAN MVP-07 physical checks (iPhone BLE, learning, reboot, forget). M01 P07 stays the owner's call.
-  - Commit the spec to Git.
+  - ~~Commit the spec to Git~~. Done in root commit `e3d3485` (2026-10-12).
   - Create `docs/decisions/` with ADR-0001 "Reference reuse policy (ePet/Xiaozhi)", turning Section 6.3 into a decision record per spec §24.8-4.
 - **Acceptance:** MVP physical matrix recorded (pass/fail with evidence); ADR merged.
 - **Effort:** 1–2 days plus the owner's physical time.
@@ -1447,7 +1523,8 @@ M05b can run in parallel with M05a after M04.6. M05c needs M05b (facts, bonding)
 #### M04.3 — Experience events, bounded queue and core command handling (C0; T3, T12)
 
 - **Scope:**
-  - Event envelope (§7.2) and registry (§7.3).
+  - In-RAM event struct with the §7.2 fields, and the registry (§7.3).
+  - The persisted 40-byte binary codec and CRC-16 arrive with the experience log in M05b (session S32). The log format then follows the storage decision D2 and is not frozen early.
   - `EventQueue` with drop counters.
   - Move the opcode semantics (suggest/feedback/forget/decision tracking) from `BleManager` into the core's `RequestValidator`/`LifeCore`. `BleManager` becomes transport-only.
 - **Acceptance:**
@@ -1537,23 +1614,49 @@ M05b can run in parallel with M05a after M04.6. M05c needs M05b (facts, bonding)
 - **Effort:** 7–10 days.
 - **Rollback:** the memory store is a separate file; deleting it restores the M05a state.
 
-#### M05c — Conversation V1.5 (C5; T15, T17)
+#### M05c-A — Conversation Foundation, developed with M05a (C5 part; T15, T17) [P, D17]
 
 - **Scope:**
-  - §11.2 rule grammar.
+  - Dart conversation domain and provider interfaces (§11.3), with the local implementation only.
+  - `LocalRuleExtractor` (vi/en) for the Layer A intents (§11.2).
   - `CandidateEvent` + confirmation UI.
-  - `TeachFact`/`Supersede`/`Forget`/`Recall`; grounded replies.
-  - Dart provider interfaces with the local implementation only.
+  - Opcode 6 `StatedPreference` (§11.6) in the core and firmware.
+  - `AskWhy` via the explanation.
+  - Optional push-to-talk with on-device STT, only after E13 and D16.
+- **Acceptance (joint with M05a, session S28):**
+  - "Mình thích khi bạn vẫy tay buổi tối" → candidate → confirm → the explanation shows `statedMass` → the evening choice shifts.
+  - The shift persists after a reboot and is used with the phone off.
+  - Explicit ratings can override a stated preference (cap).
+  - Unknown, hypothetical and injection inputs store nothing.
+  - No text leaves the phone.
+- **Depends:** M05a learner + explanation (S23–S26), D5 vocabulary. **Not** M05b.
+- **Effort:** 4–6 days (estimate).
+
+#### M05c-B — Conversation with long-term memory (C5 rest; T15, T17)
+
+- **Scope:**
+  - `TeachFact` / `SupersedeFact` / `ForgetFact` / `ReadFacts`.
+  - `Recall` with grounded replies.
+  - Privacy controls and sync, reusing the M05c-A confirmation and extractor.
 - **Acceptance:**
   - A taught nickname is shown by the device after a reboot.
-  - A stated preference shifts the learner prior with `user_stated` provenance.
   - A correction supersedes the old fact.
-  - Unknown, joke and injection inputs store nothing.
+  - Forget propagates to both stores.
+  - Personal facts are refused over an unbonded link.
   - Offline operation works.
   - Scenario F passes.
-- **Depends:** M05b (facts, bonding).
-- **Effort:** 5–7 days.
-- **V2 spike [E]:** only after D11. It compares platform STT vs cloud STT for privacy/latency/cost and an optional LLM proxy. No keys in the app; spec §17.
+- **Depends:** M05b (facts, BLE v2, bonding D10), M05c-A.
+- **Effort:** 4–6 days.
+- **V2 spike [E]:** runs only after **D11a** (authorization to run a research spike with test data; cost and privacy). It compares on-device vs cloud STT and an optional LLM proxy. No keys in the app (spec §17). The final D11 is taken **after** E12.
+
+#### Product checkpoint after M05c-B — D15
+
+Choose the next step:
+
+- **Option A:** M05d (cognitive gates) → M06.
+- **Option B:** an **Evolution MVP** first → M05d. The Evolution MVP is one stage transition, two traits and journal entries, with gates built on M05a evidence, interaction days and a minimal `associateReactionFeedback` skill.
+
+The trade-offs are in [XUNA_PLAN_AUDIT.md](XUNA_PLAN_AUDIT.md) §E. Inputs to the decision: the S28/S38/S42 acceptance records and art readiness.
 
 #### M05d — Cognitive development gates (C3 + C6)
 
@@ -1574,7 +1677,7 @@ M05b can run in parallel with M05a after M04.6. M05c needs M05b (facts, bonding)
 
 - **Scope:** stage FSM + `GrowthConfig`; trait eligibility; palette-indexed layered assets and the generator; journal.
 - **Acceptance:** Scenario A with justified differences; exactly one transition under repeated reboots.
-- **Depends:** M05d, art decisions (spec §21.9).
+- **Depends:** checkpoint D15 (M05d first, or an Evolution MVP first), art decisions (spec §21.9).
 - **Effort:** estimate after art scope (≥ 10 days).
 
 #### M07 — Physical perception (T3, T10)
@@ -1615,9 +1718,10 @@ Short-horizon planning in Life Lab only; on-device audio (Xiaozhi pipeline study
 | E7 | Commit-induced hitches | Render/loop gap during commits | No visible animation stall; else consider a storage task | M04.4 |
 | E8 | BLE MTU on the owner's iPhone | Negotiated MTU + heap | ≥ 185 B with tolerable heap | M05b |
 | E9 | Bonding with LCD passkey (Bluedroid) | Pair, reconnect, forget-bond, unbonded rejection | Works on iOS; recoverable UX | M05b |
-| E10 | Learner alternatives | Beta-greedy-ε vs UCB vs Thompson in Life Lab | Pick the simplest within 5% regret | M05a |
+| E10 | Learner alternatives | Beta-greedy-ε vs UCB in Life Lab (Thompson only if both show a regret problem) | Pick the simplest within 5% regret | M05a |
 | E11 | Palette sprite render | 4 bpp layered vs current per-cell fill | ≤ current render time | M06 |
-| E12 | STT/LLM spike | Latency, cost, privacy review | Decision input for D11 only | M05c (V2) |
+| E12 | Cloud STT/LLM research spike (after D11a; test data only) | Latency, cost, privacy review | Decision input for D11 only | M05c-B (V2) |
+| E13 | On-device speech recognition for vi-VN and en | Check iOS (and Android if used) on-device recognition support for Vietnamese, accuracy on the Layer A phrases, latency, offline behavior | Feasible on the owner's phone without network; otherwise voice stays deferred | M05c-A (optional, before D16) |
 
 ---
 
@@ -1653,6 +1757,8 @@ Short-horizon planning in Life Lab only; on-device audio (Xiaozhi pipeline study
 | R10 | Copying upstream code or licenses carelessly | M | Concepts only; ADR-0001; MIT notices if any copy | M04.0 |
 | R11 | Scope creep into voice, VM or cloud | M | [F] tags; owner approval per slice | all |
 | R12 | Dart and C++ learners diverge | M | Golden-vector conformance | M04.6 |
+| R13 | Stated preferences (conversation) overwhelm learned feedback, or are mistaken for learning | M (product trust) | Capped `user_stated` mass, decay, separate `statedMass` in explanations, "Stated vs rated" scenario (§9.9) | M05c-A |
+| R14 | Validation not reproducible (manual power cuts miss the write window; transcript derived from code reading only) | M | Write-storm test build with sequence logging; host torn-write simulation at every byte offset; S01 captures real characteristic bytes | M04.3–M04.4 |
 
 ---
 
@@ -1664,19 +1770,24 @@ The following need the owner:
 
 | ID | Decision | Recommendation | Needed before |
 |---|---|---|---|
-| D1 | Approve the M04 foundation sequence (M04.0–M04.6) before new M05 features | Approve; it reduces rework and data-loss risk | M04.1 |
-| D2 | Storage layout | NVS (identity + life A/B) + LittleFS on the existing `spiffs` partition, subject to E4/E5 | M04.4 |
+| D1 | **[A] 2026-10-12: complete M04 first.** Approve the M04 foundation sequence (M04.0–M04.6) before new M05 features | Approved | M04.1 |
+| D2 | Storage layout — decided **after** E4/E5 evidence and the ADR-0002 draft (session S11), not before | Hypothesis: NVS (identity + life A/B) + LittleFS on the existing `spiffs` partition | M04.4 (S12a) |
 | D3 | Feedback window and invalidation | 120 s window; keep "direct input invalidates pending reaction" | M05a |
 | D4 | Visible exploration: should XUNA sometimes choose a non-preferred action, more when young? | Yes, bounded (ε 0.03–0.30), labeled as exploration in the explanation | M05a |
 | D5 | First trainable contexts and actions: day parts? GPIO0 greeting as a learning context? Which animations beyond idle/happy? | Add day parts; make the GPIO0 greeting learnable; 3–4 actions aligned with the art | M05a |
 | D6 | Implicit feedback | Off by default | M05a |
-| D7 | Hatch and `bornAt`: hatch via the app with time sync; MVP pets migrate as Newborn with `bornAt` unknown | Approve | M04.2 |
+| D7 | **[A] 2026-10-12: hatch on the device or via the app.** Exact `bornAt` only with trusted time in the hatch boot session; otherwise unknown. The existing MVP pet migrates as Newborn with `bornAt` unknown (§12) | Approved (owner chose the local-first variant over app-only hatch) | M04.2 |
 | D8 | Facts on the device: predicate allowlist, nickname ≤ 16 bytes on the device, capacity 32 | Approve the allowlist in §10.4 | M05b |
 | D9 | `ForgetAll` scope: reset skills, stage and protected journal? | Reset learner/memory/skills; keep identity, active lifetime and stage | M05b |
-| D10 | BLE security: bonding with an LCD passkey; destructive actions need button confirmation; replaces the unbonded prototype model (A8) | Approve the experiment E9 | M05b |
-| D11 | Conversation V2: if and when STT/LLM; which data may leave the phone; is a proxy (first backend use case) acceptable? | Stay on V1.5 for the local MVP; run E12 as research only | M05c V2 |
-| D12 | Keep C++11 for the core (vs an ADR for `gnu++17`) | Keep C++11 | M04.1 |
+| D10 | BLE security model (bonding method, owner list, destructive-action confirmation; replaces the unbonded prototype model A8) — decided **after** experiment E9 and ADR-0005 (session S35) | Pending evidence; hypothesis: LE Secure Connections with an LCD passkey + button confirmation for destructive actions | M05b (S36) |
+| D11a | Authorize a cloud STT/LLM **research spike** (E12) with test data only: cost, accounts, privacy | Optional; only if the owner wants V2 evaluated | E12 |
+| D11 | Conversation V2: if and when cloud STT/LLM; which data may leave the phone; is a proxy (first backend use case) acceptable? Decided **after** E12 | Stay on the local rule layers for now | M05c-B V2 |
+| D12 | **[A] 2026-10-12: keep C++11.** Core language standard (vs an ADR for `gnu++14/17`) | Approved | M04.1 |
 | D13 | Growth gates, stage names and trait art | Defer to M06 with Life Lab data | M06 |
+| D14 | **[A] 2026-10-12: pin Flutter 3.32.8 via `mobile/.fvmrc`.** Flutter toolchain: pin the SDK for reproducible builds. Evidence: no `.fvmrc`; `pubspec.lock` requires Flutter ≥ 3.27.0 / Dart ≥ 3.7.0; validation is recorded only on 3.32.8 (macOS); this Windows machine has 3.41.1 | Pin **3.32.8** via `mobile/.fvmrc` (matches recorded evidence); any upgrade (e.g. 3.41.x) becomes its own validated session | S00 (mobile work) |
+| D15 | Order after M05c-B: M05d first (A) or an Evolution MVP first (B) | Decide at checkpoint S42a with acceptance evidence and art readiness; lean B if art for one stage change + two traits is ready and S28 shows stable learning | S42a |
+| D16 | Voice in Conversation Foundation: push-to-talk with **on-device** STT (phone mic), optional phone TTS. This changes the A5 MVP scope, which deferred voice. | Text first; voice only if E13 shows vi-VN on-device recognition works offline | S27b |
+| D17 | **[A] 2026-10-12: approved, text-first; voice stays with D16; `w_s` and cap values remain [P] until S25.** Approve the Conversation Layer A/B restructure (M05c-A with M05a; M05c-B after M05b) and the opcode 6 contract (§11.6) | Approve; it aligns sequencing with A6 without new infrastructure | S22 |
 
 ---
 
@@ -1699,7 +1810,7 @@ Method:
 
 ## 20. Next actions
 
-0. Execution is broken into small sessions in [XUNA_SESSION_PLAN.md](../roadmap/XUNA_SESSION_PLAN.md) (S00–S46).
-1. Owner reviews this plan and answers D1–D13; at minimum D1, D2 and D7 to start M04.
-2. Execute M04.0: physical MVP acceptance, commit the spec, ADR-0001 reference reuse policy.
+0. Execution is broken into small sessions in [XUNA_SESSION_PLAN.md](../roadmap/XUNA_SESSION_PLAN.md) (S00–S46 plus suffixed sub-sessions).
+1. Owner reviews this plan and answers the decision requests (§18). To start M04 only D1, D7 and D14 are needed (D12 has a safe default). D2 is decided after experiment S11; D10 after S35; D11 after E12.
+2. Execute M04.0: physical MVP acceptance and ADR-0001 reference reuse policy (the spec was committed in `e3d3485`).
 3. On approval, start M04.1 and update PROCESS.md, PLAN.md (new task IDs `M04.x`, `M05x`) and CHANGELOG.md per the session procedure.

@@ -1,9 +1,86 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-11** (Asia/Ho_Chi_Minh).
-Current milestone: **Local MVP through M05**, explicitly selected and scoped by owner on 2026-10-11.
-Current status: **Development implementation/build/tests PASS; LILYGO build/upload/startup and owner LCD/buttons PASS; real-phone acceptance pending**.
-Next action: review [local MVP record](docs/roadmap/MVP-local.md), validate uploaded board and real iPhone BLE/learning/reboot persistence. M01 PCB revision/P07 remain open; no later evolution/voice/sensor scope.
+Last updated: **2026-10-12** (Asia/Ho_Chi_Minh).
+Current milestone: **Planning for M04–M05 complete; M04 not started.** The local MVP through M05 is implemented, but its physical acceptance is pending.
+Current status:
+
+- Technical plan, session plan rev. 2 and audit written: status Proposed.
+- Owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
+- No M04 code exists.
+
+Next action: session **S02 → S00 → S01**; see §0 below.
+
+## 0. Start here — next work (updated 2026-10-12)
+
+**Read first.** AGENTS.md (canonical) → this section → [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md):
+
+- §2 rules;
+- §3 session map;
+- the entry for the session you run.
+
+Then read only the sections of [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md) that the session cites. The rationale for the current plan is in [XUNA_PLAN_AUDIT.md](docs/architecture/XUNA_PLAN_AUDIT.md).
+
+**Where things stand:**
+
+- **Local MVP through M05:**
+  - Implemented: firmware `be58099`, mobile `3846880`; backend `0032828` is a README only.
+  - Build, upload, LCD and buttons PASS.
+  - **Pending:** real-phone BLE, learning, reboot, power-loss and forget acceptance (PLAN MVP-07). M01 PCB revision/P07 also remain open.
+- **Approved on 2026-10-12** (AGENTS.md §3):
+  - **D1:** M04 before new M05 features.
+  - **D7:** hatch on the device or via the app (opcode 7); exact `bornAt` only with trusted time in the hatch boot; the MVP pet migrates as Newborn.
+  - **D12:** C++11 core.
+  - **D14:** Flutter 3.32.8 pinned via `mobile/.fvmrc` (file not created yet).
+  - **D17:** Conversation Layer A with M05a, text-first; Layer B after M05b.
+- **This Windows machine (2026-10-12):**
+  - no PlatformIO, no host C++ compiler, no real Python (Store alias only), no WSL distribution;
+  - Flutter 3.41.1 via fvm, with 3.32.8 not installed.
+  - iOS builds and runs need the Mac.
+
+**Next sessions, in order** (full steps in the session plan §6):
+
+| # | Session | Work | Owner input needed | Done when |
+|---|---|---|---|---|
+| 1 | **S02** (S, no tooling) | Create `docs/decisions/README.md` (index of approved D-decisions + ADR template) and `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3 | Accept ADR-0001 or not | Both files exist; Git state reported |
+| 2 | **S00** (M) | Install the PlatformIO IDE extension; install a host compiler; `fvm install 3.32.8` + `mobile/.fvmrc`. Baselines: host tests; `pio run` (expect static RAM 47,504 B, image 964,333 B); `flutter analyze` + `flutter test` (10 tests); `pubspec.lock` unchanged | Choose MSYS2 or WSL for the compiler; OK to commit `.fvmrc` | Versions and baselines recorded in this file |
+| 3 | **S01** (Owner) | MVP physical acceptance with the phone, plus observed v1 bytes from a BLE inspector. **Verified NVS backup first** (session plan §5) | Board, phone and Mac time | MVP-local.md updated; MVP-07 status set |
+
+After that, follow the session map:
+
+- S03 → S04 → S05/S07 → S06 → S08a → S08b → S09 → S10 → S11 …
+- S03–S05 and S07 are host-only and may run after S00 while S01 waits for the phone.
+- No refactored or storage-changing firmware goes onto the owner's board before S01.
+
+**Open decisions:**
+
+| Decision | When |
+|---|---|
+| D2 | After experiment S11 |
+| D10 | After experiment S35 |
+| D15 | At checkpoint S42a |
+| D3–D6, optional D16 | Session S22, before S23 |
+| D8, D9 | Session S29, before S30 |
+| D11a / D11 | Only if cloud STT/LLM is to be evaluated |
+| D13 | M06 |
+
+**Working rules to keep:**
+
+- Start a session only when the owner asks.
+- One session at a time; respect its preconditions and done criteria.
+- Discuss in Vietnamese; keep docs and code in English.
+- Commit or push only on the owner's request:
+  - follow the existing format: a single-line conventional message such as `docs: ...` or `feat: ...`;
+  - **no AI attribution or trailers anywhere**;
+  - child repo first, then the parent gitlink.
+- Update this section, PLAN.md and CHANGELOG.md at the end of every session.
+
+**Git when this section was written:** the root repo had uncommitted documentation changes:
+
+- `AGENTS.md`, `CHANGELOG.md`, `PLAN.md`, `PROCESS.md`;
+- the plan and the session plan;
+- the new audit file.
+
+Check `git status` before starting.
 
 ## 1. Read order and authority
 
@@ -149,7 +226,26 @@ Do not store credentials, tokens or other secrets here. Use links to detailed re
 
 ## 9. Copyable prompt for the next AI/session
 
-> Read AGENTS.md, PROCESS.md, PLAN.md, latest CHANGELOG.md and docs/roadmap/MVP-local.md; inspect root/child Git. Owner-approved local MVP through M05 is implemented; board build/upload/LCD/buttons passed, real-phone BLE/learning/persistence acceptance remains pending. Keep Clean/GetX and pinned firmware baseline. M01 PCB revision/P07 remain open. Simulator requires XUNA_SIMULATOR=true; default mobile transport is physical BLE. Preserve existing work and verify actual Git delivery; do not infer validation from commits/builds.
+> Read AGENTS.md, then PROCESS.md §0 "Start here", then docs/roadmap/XUNA_SESSION_PLAN.md (§2 rules, §3 map, and the entry of the next session), and only the cited sections of docs/architecture/XUNA_IMPLEMENTATION_PLAN.md. Check the latest CHANGELOG.md entries. Inspect root and submodule Git.
+>
+> Current state:
+>
+> - Planning is complete. The owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
+> - No M04 code has started.
+> - Local MVP physical acceptance (MVP-07) is pending.
+>
+> The next sessions are S02 → S00 → S01 unless PROCESS §0 says otherwise.
+>
+> Working rules:
+>
+> - Ask the owner before starting a session.
+> - Follow that session's preconditions, steps and done criteria.
+> - Never put refactored or storage-changing firmware on the owner's board before S01 and a verified NVS backup.
+> - Report in Vietnamese.
+> - Commit only on request, as single-line conventional messages with no AI attribution.
+> - Keep Clean/GetX and the pinned firmware baseline.
+> - The simulator requires `XUNA_SIMULATOR=true`.
+> - Do not infer validation from commits or builds.
 
 ## Mobile base update — 2026-10-11
 
@@ -198,3 +294,43 @@ Environment observed on this Windows machine:
 - WSL has no distribution.
 
 Recommended next sessions: S00 (toolchain and baseline), then S02 (decisions D1, D2, D7, D12 and ADR-0001), then S01 (MVP physical acceptance).
+
+## Plan audit — 2026-10-12
+
+Reviewed the plan against the owner-forwarded external checklist; report in [XUNA_PLAN_AUDIT.md](docs/architecture/XUNA_PLAN_AUDIT.md). There were 17 findings, none Critical.
+
+Main corrections, all **Proposed**:
+
+- Conversation Foundation (Layer A) now develops together with M05a through the v1-additive opcode 6 `StatedPreference`, with joint acceptance S28. Personal facts stay in Layer B after M05b (D17).
+- D2, D10 and D11 are decided after their experiments; D11a only authorizes the E12 spike.
+- The Flutter SDK pin is decision D14. There is no `.fvmrc`; the lock requires Flutter ≥ 3.27.0. 3.32.8 is evidence only, not an approval.
+- The NVS backup now verifies the partition table read from the device.
+- S01 captures observed v1 bytes as the refactor baseline.
+- S08, S12 and S19 are split into a/b sessions.
+- Power-cut tests use write-storm builds.
+- M05d versus an Evolution MVP is decided at checkpoint S42a (D15).
+
+Approved decisions are unchanged. No firmware, mobile or backend change; no build, test or flash; no commit or push.
+
+Next: S02 → S00 → S01.
+
+## Owner decisions — 2026-10-12
+
+The owner approved:
+
+- **D1:** complete M04 (S03–S21) before new M05 features.
+- **D7:** a pet hatches on the device (local gesture) **or** via the app (opcode 7). `bornAt` is exact only with trusted time in the hatch boot; otherwise it stays unknown. The existing MVP pet migrates as Newborn.
+- **D12:** C++11 core.
+- **D14:** pin Flutter 3.32.8 via `mobile/.fvmrc`.
+- **D17:** Conversation Layer A with M05a, text-first; Layer B after M05b; voice still depends on D16.
+
+These are recorded in AGENTS.md §3 and plan §18. The plan (§12, §8.2, §14.1) and sessions S02, S06 and S10 were amended accordingly.
+
+Still open:
+
+- D2, after S11; D10, after S35; D15, at S42a;
+- D3–D6, D8, D9, D11a/D11, D13 and D16.
+
+No code changes and no commit or push.
+
+Next: S02 (ADR-0001 + decisions index) → S00 → S01.

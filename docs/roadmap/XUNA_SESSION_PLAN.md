@@ -1,7 +1,7 @@
 # XUNA — Implementation Session Plan
 
 **Status:** Proposed. This file breaks [XUNA_IMPLEMENTATION_PLAN.md](../architecture/XUNA_IMPLEMENTATION_PLAN.md) (XUNA-TIP-001) into small, independently verifiable work sessions. **It does not approve any session.** Each session starts only after the owner asks for it, and after its listed decisions are answered.
-**Date:** 2026-10-12
+**Date:** 2026-10-12 · **Revision:** 2. Audit corrections; see [XUNA_PLAN_AUDIT.md](../architecture/XUNA_PLAN_AUDIT.md). Sequencing changes are Proposed (D17, D15).
 **Audience:** the owner, plus the coding agent or engineer who runs each session.
 
 Plan references:
@@ -13,22 +13,23 @@ Plan references:
 
 ## 1. Is the technical plan detailed enough to implement?
 
-**Short answer:** it is detailed enough to **start M04 now** (sessions S00–S10) once D1 is approved. It is **not** a complete line-by-line specification for M05+. The missing details are intentionally deferred: they depend on earlier measurements and decisions, and specifying them now would produce work that has to be redone.
+**Short answer:** it is detailed enough to **start M04 now** (sessions S00–S10). The owner approved D1, D7, D12, D14 and D17 on 2026-10-12 (AGENTS.md §3). It is **not** a complete line-by-line specification for M05+. The missing details are intentionally deferred: they depend on earlier measurements and decisions, and specifying them now would produce work that has to be redone.
 
 | Area | Ready? | What is still missing | Closed in |
 |---|---|---|---|
 | Architecture, module boundaries, principles | Yes | — | — |
 | M04.1 core extraction | Yes | Toolchain on this machine (below) | S00, S03–S04 |
-| M04.2 clock/RNG/identity | Mostly | D7; exact TimeSync bytes | S02, S05–S06, S10 |
-| M04.3 events + command handler | Mostly | The v1 behavior transcript must be written first | S07–S09 |
-| M04.4 persistence v2 | **No** | D2 depends on measurements E4/E5; byte offsets not frozen | S11–S13 |
+| M04.2 clock/RNG/identity | Mostly | Exact TimeSync/Hatch bytes, hatch gesture and Egg-state exposure (D7 approved) | S05–S06, S10 |
+| M04.3 events + command handler | Mostly | The v1 transcript must come from **observed** bytes (S01) as well as code reading | S01, S07–S09 |
+| M04.4 persistence v2 | **No** | D2 is decided only after measurements E4/E5; byte offsets not frozen | S11–S13 |
 | M04.5 FSM/needs/visuals | Yes for pure logic | Threshold values are placeholders, tuned in Life Lab | S14–S17 |
 | M04.6 Life Lab | Partly | Trace grammar and golden-file format | S18–S21 |
 | M05a learner v2 | Algorithm yes | D3–D6, action vocabulary aligned with art, E10 parameter choice | S22–S28 |
-| M05b memory/journal/BLE v2 | Partly | D8–D10, E8 MTU, E9 bonding, v2 payload layouts | S29–S38 |
-| M05c conversation V1.5 | Partly | D8, full phrase grammar; V2 needs D11 | S39–S42 |
-| M05d cognitive gates | Algorithm yes | Thresholds are hypotheses until Life Lab data | S43–S46 |
-| M06 / M07 | Outline only | Broken down when M05d ends (rolling-wave planning) | later |
+| **M05c-A conversation foundation** (with M05a) | Contract yes (§11.6) | D17 (restructure), phrase table, optional voice (E13, D16) | S22, S24a, S26, S39, S27a, S27b, S28 |
+| M05b memory/journal/BLE v2 | Partly | D8, D9; E8 MTU; E9 bonding → D10; v2 payload layouts | S29–S38 |
+| M05c-B conversation + memory | Partly | D8, D10; V2 needs D11a → E12 → D11 | S40–S42 |
+| M05d cognitive gates | Algorithm yes | Thresholds are hypotheses until Life Lab data; order vs Evolution MVP (D15) | S42a, S43–S46 |
+| M06 / M07 | Outline only | Broken down after checkpoint S42a (rolling-wave planning) | later |
 
 **Missing prerequisites observed on this Windows machine (2026-10-12):**
 
@@ -36,7 +37,11 @@ Plan references:
 - No host C/C++ compiler (`gcc`/`clang`).
 - `python` is only the Microsoft Store alias.
 - WSL is present but has no Linux distribution.
-- Flutter is **3.41.1** (fvm default), while recorded project evidence used **3.32.8** / Dart 3.8.1.
+- **Flutter:**
+  - fvm default is 3.41.1, and there is **no `mobile/.fvmrc`**.
+  - `pubspec.lock` requires Flutter ≥ 3.27.0 / Dart ≥ 3.7.0.
+  - Validation evidence exists only for 3.32.8 / Dart 3.8.1 (macOS).
+  - **D14 approved 2026-10-12:** pin 3.32.8 via `mobile/.fvmrc` (not yet created; S00).
 - iOS builds and runs need macOS with Xcode. Earlier sessions used a Mac.
 
 How the missing detail gets handled:
@@ -54,10 +59,10 @@ How the missing detail gets handled:
    - Run `git status --short` in the root and in the affected submodules.
    - Confirm the preconditions. **If a precondition is not met, stop and report it.**
 2. **Scope:** one goal per session, mostly in one repository. Do not start the next session's work. Do not refactor unrelated code.
-3. **Characterize before refactoring.** Capture current behavior as golden bytes or transcripts before moving code (S03, S08).
+3. **Characterize before refactoring.** Capture current behavior as golden bytes or transcripts before moving code (S01, S03, S08a). **S01 is the behavioral baseline: no refactored or storage-changing firmware is uploaded to the owner's board before S01 is recorded.**
 4. **Tests first** for core logic: add failing tests, implement, then make them pass.
 5. **Keep the build green.** At the end of every session the firmware builds, host tests pass, and protocol v1 still works, unless the session says otherwise.
-6. **Protect the owner's pet data.** Before any upload that changes storage code, back up the NVS partition (S13, procedure in §5). Benchmarks use a separate NVS namespace and never touch `xuna_life`.
+6. **Protect the owner's pet data.** Before any upload that changes storage code, take a verified NVS backup (§5). Benchmarks use a separate NVS namespace, never touch `xuna_life`, and clean up afterwards.
 7. **Report honestly.**
    - Separate *ran and passed*, *ran and failed* and *not run*.
    - Never claim board or phone behavior that was not observed.
@@ -71,12 +76,19 @@ How the missing detail gets handled:
    - hardware or the phone is unavailable for a required check;
    - tests fail for reasons outside the session's scope;
    - the work would exceed the session's size estimate by more than about 2×.
+10. **Evidence before decisions.** The order is experiment → evidence → ADR → owner decision → implementation.
+    - An experiment may need the owner's *authorization to run* it (cost, privacy, hardware risk). For example, D11a authorizes E12.
+    - That authorization is not the decision the experiment informs.
+11. **Framework boundary.**
+    - Arduino-ESP32 2.0.14 on the LILYGO T-Display-S3 is the current adapter framework. It is authorized for bring-up and pinned for the local MVP (A9). The long-term Arduino versus ESP-IDF choice stays open (AGENTS §3).
+    - Nothing in `lib/xuna_core` may depend on it (purity check, S04).
+    - Custom PCB, HoloCubic and other hardware remain Future.
 
 Session size estimates (one focused AI-assisted sitting = 2–4 h):
 
 - **S** — about half a sitting.
 - **M** — one sitting.
-- **L** — two sittings; split it if possible.
+- **L** — avoided; split into suffixed sessions.
 - **Owner** — needs the owner's physical action or decision.
 
 **Branches:** keep the current practice of working on `dev` in each repository unless the owner asks for per-session branches (`feat/sNN-...`).
@@ -85,57 +97,71 @@ Session size estimates (one focused AI-assisted sitting = 2–4 h):
 
 ## 3. Session map
 
+Session IDs are kept stable. Suffixes (`a`, `b`) mark splits or additions from the audit. Rows are in recommended execution order.
+
 | ID | Slice | Title | Repo(s) | Needs | Size |
 |---|---|---|---|---|---|
-| S00 | prep | Development environment and baseline | all (no code) | — | M + Owner |
-| S01 | M04.0 | MVP physical acceptance (regression reference) | firmware, mobile | S00, Mac or Android decision | Owner |
-| S02 | M04.0 | Decisions and documentation housekeeping, ADR-0001 | root | S00 | S + Owner |
+| S02 | M04.0 | ADR-0001 + decisions index (D1, D7, D12, D14, D17 already approved 2026-10-12) | root | — | S |
+| S00 | prep | Development environment and baseline | all (no code) | D14 for the Flutter pin | M + Owner |
+| S01 | M04.0 | MVP physical acceptance + observed v1 byte capture (behavioral baseline) | firmware, mobile | S00, phone path | Owner |
 | S03 | M04.1 | Characterization tests and golden v1 fixtures | firmware | S00, D1 | M |
 | S04 | M04.1 | `xuna_core` library and native test environment | firmware | S03 | M |
 | S05 | M04.2 | Fixed-point, PCG32, ClockModel (pure) | firmware | S04 | M |
-| S06 | M04.2 | Identity record, `bootc`, hatch/migration | firmware | S05, D7 | M |
-| S07 | M04.3 | Event envelope, registry, ring buffer, queue (pure) | firmware | S04 | M |
-| S08 | M04.3 | v1 protocol transcript and core `CommandHandler` | firmware | S03, S07 | L |
-| S09 | M04.3 | `BleManager` becomes transport-only | firmware | S08, S01 | M + Owner check |
-| S10 | M04.2 | TimeSync end-to-end (opcode 5) | firmware, mobile | S05, S06, S09 | M + Owner check |
-| S11 | M04.4 | Storage experiment E4/E5, ADR-0002 → D2 | firmware (bench) | S04 | M + Owner |
-| S12 | M04.4 | Sectioned snapshot v2 codec + v1→v2 migration | firmware | S03, D2 | L |
-| S13 | M04.4 | Persistence v2 wiring, safe mode, commit budget | firmware | S12, S06 | M + Owner check |
+| S06 | M04.2 | Identity record, `bootc`, hatch/migration | firmware | S05, D7; **board step: S01 + §5 backup** | M + Owner check |
+| S07 | M04.3 | In-RAM events, registry, ring buffer, queue (pure) | firmware | S04 | S |
+| S08a | M04.3 | v1 transcript fixture (from S01 observed bytes + code) | firmware | S03, S01 | S |
+| S08b | M04.3 | Core `CommandHandler` reproducing v1 byte-exactly | firmware | S07, S08a | M |
+| S09 | M04.3 | `BleManager` becomes transport-only | firmware | S08b, S01 | M + Owner check |
+| S10 | M04.2 | TimeSync + app hatch (opcodes 5, 7) | firmware, mobile | S05, S06, S09, D14 | M + Owner check |
+| S11 | M04.4 | Storage experiment E4/E5 → ADR-0002 → **D2** | firmware (bench) | S04, §5 backup | M + Owner |
+| S12a | M04.4 | Snapshot v2 layout freeze + sectioned codec | firmware | S06, D2 | M |
+| S12b | M04.4 | v1→v2 migration + torn-write simulation | firmware | S12a, S03 | M |
+| S13 | M04.4 | Persistence v2 wiring, safe mode, commit budget | firmware | S12b, S09, S06, §5 backup | M + Owner check |
 | S14 | M04.5 | ActivityFsm (pure) | firmware | S07 | M |
 | S15 | M04.5 | Needs, mood, bounded catch-up (pure) | firmware | S05 | S |
 | S16 | M04.5 | Action registry, request validator, VisualIntent, idle selector (pure) | firmware | S14, S15 | M |
-| S17 | M04.5 | Wire FSM and visuals into firmware; renderer fallback | firmware | S16, S13 | M + Owner check |
-| S18 | M04.6 | `LifeCore::step` composition; thin `main.cpp` | firmware | S17 | M |
-| S19 | M04.6 | Life Lab CLI, trace DSL, Scenarios D/E, 100-day run | firmware | S18 | L |
-| S20 | M04.6 | Golden vectors and Dart conformance | firmware, mobile | S19 | M |
+| S17 | M04.5 | Wire FSM and visuals into firmware; renderer fallback | firmware | S16, S09 | M + Owner check |
+| S18 | M04.6 | `LifeCore::step` composition; thin `main.cpp` | firmware | S17, S13, S10 | M |
+| S19a | M04.6 | Life Lab CLI + trace DSL + runner | firmware | S18 | M |
+| S19b | M04.6 | Scenarios D/E + 100-day invariants | firmware | S19a | M |
+| S20 | M04.6 | Golden vectors and Dart conformance | firmware, mobile | S19b, D14 | M |
 | S21 | M04.6 | Target parity build and M04 acceptance review | firmware, root | S20 | M + Owner |
-| S22 | M05a | Learning decisions D3–D6, action vocabulary | root | S21 | Owner |
-| S23 | M05a | PreferenceLearner v2 + section migration (pure) | firmware | S22 | M |
+| S22 | M05a/c-A | Learning + conversation decisions: D3–D6, D17, vocabulary, phrase scope (D16 optional) | root | can run any time after S02; must precede S23/S39 | Owner |
+| S23 | M05a | PreferenceLearner v2 + section migration (pure) | firmware | S22, S21 | M |
 | S24 | M05a | Policy + ReactionTable (pure) | firmware | S23 | M |
-| S25 | M05a | Proof-of-learning experiments + report (E10) | firmware, docs | S24 | L |
-| S26 | M05a | Firmware wiring: contexts, day part, explanation | firmware | S25 | M |
+| S24a | M05c-A | Stated-preference evidence + opcode 6 handling (pure) | firmware | S24, D17 | S |
+| S25 | M05a | Proof-of-learning experiments + report (E10, incl. stated vs rated) | firmware, docs | S24a | M |
+| S26 | M05a/c-A | Firmware wiring: contexts, day part, explanation, opcode 6 + capability bit 5 | firmware | S25 | M |
+| S39 | M05c-A | Conversation domain + LocalRuleExtractor (Dart), Layer A intents | mobile | S22, S20 (can run in parallel with S23–S26) | M |
 | S27 | M05a | Mobile: reaction-referenced feedback, "Why?" view | mobile | S26 | M |
-| S28 | M05a | M05a board + phone acceptance | all | S27 | Owner |
-| S29 | M05b | Memory decisions D8–D10 | root | S28 | Owner |
-| S30 | M05b | MemoryStore, salience, consolidation (pure) | firmware | S29 | M |
+| S27a | M05c-A | Mobile: conversation foundation wiring (candidate → confirm → opcode 3/6 → explanation) | mobile | S27, S39 | M |
+| S27b | M05c-A | *Optional:* push-to-talk with on-device STT (E13 → D16) | mobile | S27a, D16 | M |
+| S28 | M05a/c-A | **Joint** M05a + Conversation Foundation acceptance | all | S27a (S27b if approved) | Owner |
+| S29 | M05b | Memory decisions D8, D9 | root | can run any time; must precede S30 | Owner |
+| S30 | M05b | MemoryStore, salience, consolidation (pure) | firmware | S29, S21 | M |
 | S31 | M05b | Journal, provenance, tombstones, ForgetAll scope (pure) | firmware | S30 | M |
-| S32 | M05b | LittleFS log/memory adapters + recovery | firmware | S31, D2 | M + Owner check |
+| S32 | M05b | Persisted event codec + LittleFS log/memory adapters + recovery | firmware | S31, D2, §5 backup | M + Owner check |
 | S33 | M05b | BLE v2 codec (core + Dart) with shared vectors | firmware, mobile | S20 | M |
 | S34 | M05b | BLE v2 transport + MTU experiment E8 | firmware, mobile | S33 | M + Owner check |
-| S35 | M05b | Bonding spike E9 → ADR-0005 | firmware, mobile | S34 | M + Owner |
+| S35 | M05b | Bonding experiment E9 → ADR-0005 → **D10** | firmware, mobile | S34 | M + Owner |
 | S36 | M05b | Permission tiers + destructive confirmation | firmware, mobile | S35, D10 | M |
-| S37 | M05b | Mobile Journal / Memory & Privacy (Hive), deletion sync | mobile | S32, S36 | L |
+| S37 | M05b | Mobile Journal / Memory & Privacy (Hive), deletion sync | mobile | S32, S36 | M (split if needed) |
 | S38 | M05b | M05b acceptance | all | S37 | Owner |
-| S39 | M05c | Conversation domain + LocalRuleExtractor (Dart) | mobile | S29 | M |
-| S40 | M05c | Device facts and fact commands | firmware | S38 | M |
-| S41 | M05c | Confirmation UI, grounded replies, recall | mobile | S39, S40 | M |
-| S42 | M05c | M05c acceptance (+ optional V2 spike after D11) | all | S41 | Owner |
-| S43 | M05d | HabitPredictor + prequential scoring (pure) | firmware | S26 | M |
+| S40 | M05c-B | Device facts and fact commands | firmware | S38, D8 | M |
+| S41 | M05c-B | Fact confirmation, grounded replies, recall (mobile) | mobile | S40, S27a | M |
+| S42 | M05c-B | M05c-B acceptance (+ optional V2 spike after D11a) | all | S41 | Owner |
+| S42a | checkpoint | Product checkpoint **D15**: M05d first or Evolution MVP first | root | S28, S38, S42 | Owner |
+| S43 | M05d | HabitPredictor + prequential scoring (pure) | firmware | S26, S42a | M |
 | S44 | M05d | SkillBook and competency bands (pure) | firmware | S43 | M |
 | S45 | M05d | Dual-history Life Lab evaluation report | firmware, docs | S44 | M |
 | S46 | M05d | Wiring, mobile projection, M05d acceptance | all | S45 | M + Owner |
 
-M05a (S22–S28) and the M05b preparation (S29–S33) may interleave after S21. M05c depends on M05b's facts and bonding.
+Parallelism:
+
+- After S21, the M05a/M05c-A track (S22–S28) and the M05b preparation (S29–S33) may interleave.
+- S39 (pure Dart) can run alongside S23–S26.
+- M05c-B depends on M05b's facts and bonding.
+- If D15 chooses the Evolution MVP first, its sessions are inserted after S42a and S43–S46 move after it.
 
 ---
 
@@ -155,32 +181,84 @@ c++ -std=c++11 -Wall -Wextra -Werror -Ifirmware/include firmware/test/test_life.
 pio test -d firmware -e native
 pio test -d firmware -e native_asan      # macOS/Linux/WSL only
 
-# Mobile (after S00 pins Flutter)
+# Mobile — after D14 pins the SDK in mobile/.fvmrc
 cd mobile && fvm flutter analyze && fvm flutter test
 ```
 
 ---
 
-## 5. NVS backup and restore procedure (protect the owner's pet)
+## 5. Verified NVS backup and restore (protect the owner's pet)
 
-Run this **before** uploading any firmware that changes storage (S11, S13, S32). Confirm the serial port first with `pio device list`.
+Take a backup **before** any upload that changes storage code or replaces the firmware (S06 board step, S11, S13, S32). Do not run any of this as part of a documentation or audit task.
+
+**Facts this relies on** (verified 2026-10-12 against Arduino-ESP32 2.0.14):
+
+- The ESP32-S3 SDK sets `CONFIG_PARTITION_TABLE_OFFSET=0x8000`.
+- `tools/gen_esp32part.py` ships with the framework.
+- The project uses `board_build.partitions = default_16MB.csv`, which contains `nvs 0x9000 0x5000`.
+
+**Never trust the hard-coded numbers.** Always read the table from the device.
 
 ```sh
-pio pkg exec -p tool-esptoolpy -- esptool.py --chip esp32s3 --port <PORT> read_flash 0x9000 0x5000 nvs-backup-YYYYMMDD.bin
-# restore if needed:
-pio pkg exec -p tool-esptoolpy -- esptool.py --chip esp32s3 --port <PORT> write_flash 0x9000 nvs-backup-YYYYMMDD.bin
+pio device list                                   # identify <PORT>
+ESPTOOL="pio pkg exec -p tool-esptoolpy -- esptool.py --chip esp32s3 --port <PORT>"
+PIOPY="$HOME/.platformio/penv/Scripts/python.exe" # macOS/Linux: ~/.platformio/penv/bin/python
+GEN="$HOME/.platformio/packages/framework-arduinoespressif32/tools/gen_esp32part.py"
+
+# 1. Read and decode the partition table that is ACTUALLY on the device
+$ESPTOOL read_flash 0x8000 0xC00 ptable-device-YYYYMMDD.bin
+"$PIOPY" "$GEN" ptable-device-YYYYMMDD.bin        # prints CSV; note the nvs row (offset, size)
+
+# 2. Cross-check with the table of the firmware you are about to flash
+"$PIOPY" "$GEN" firmware/.pio/build/xuna_t_display_s3/partitions.bin
+#    If the nvs rows differ, STOP: a partition change needs its own approved migration plan (D2).
+
+# 3. Back up exactly the device's nvs range (today expected 0x9000 / 0x5000)
+$ESPTOOL read_flash <NVS_OFFSET> <NVS_SIZE> nvs-backup-YYYYMMDD.bin
+#    Optional, most robust: full 16 MiB image
+$ESPTOOL read_flash 0x0 0x1000000 full-backup-YYYYMMDD.bin
+
+# 4. Record the SHA-256 of each file, the firmware version and the decoded table in the session notes
 ```
 
-The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-12). Check the `pio pkg exec` syntax on first use. Store backups outside the repositories; they may contain personal data later.
+Notes:
+
+- The ESP32-S3 native USB may need manual download mode: hold BOOT, tap RST, release BOOT.
+- Reading flash resets the board.
+- Check the `pio pkg exec` syntax on first use.
+- Store backups outside the repositories; they may contain personal data later.
+
+**Restore, only on an explicit owner decision:**
+
+1. Re-read and decode the device's table.
+2. Proceed only if its `nvs` row equals the row recorded with the backup.
+3. Flash firmware that can read that NVS content (the version recorded with the backup, or a later one with a migration path).
+4. Then `write_flash <NVS_OFFSET> nvs-backup-YYYYMMDD.bin`.
+5. **Never use `erase_flash`.**
 
 ---
 
 ## 6. Session details — Preparation and M04 (fully detailed)
 
+### S02 — Decisions and documentation housekeeping (M04.0)
+
+- **Goal:** record the decision index and ADR-0001.
+- **Preconditions:** none.
+- **Already done (2026-10-12):**
+  - The owner approved D1, D7, D12, D14 and D17. They are recorded in AGENTS.md §3 and plan §18.
+  - The plan amendments for D7 are applied: device or app hatch, opcode 7, the Egg state and the `bornAt` rule (§12).
+- **Remaining steps:**
+  1. Create `docs/decisions/README.md`: an index of the approved D-decisions with dates and links, plus a short ADR template (Context, Options, Decision, Consequences, Status).
+  2. Create `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3. Status is *Accepted* only if the owner approves it.
+  3. On owner request, commit the ADR, the index and the decision updates.
+
+  **Do not ask for D2 or D10.** Those are decided after their experiments (S11, S35).
+- **Done when:** the index and ADR-0001 exist; Git state is reported.
+
 ### S00 — Development environment and baseline
 
 - **Goal:** a working, recorded toolchain on the machine(s) that will be used, with baseline results that match the recorded evidence.
-- **Preconditions:** none.
+- **Preconditions:** D14 for the Flutter part; the rest has none.
 - **Steps:**
   1. **Choose the work machines with the owner:**
      - Windows (this machine) for firmware build/upload, host tests and Flutter unit tests.
@@ -191,43 +269,45 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
      - **A:** MSYS2 UCRT64 `mingw-w64-ucrt-x86_64-gcc`, added to PATH. Fast, but no AddressSanitizer.
      - **B:** a WSL Ubuntu distribution with `g++`. Supports ASan/UBSan.
      - Recommendation: A for daily tests, B (or the Mac) for sanitizer runs.
-  4. **Flutter:** `fvm install 3.32.8`.
-     - Propose adding `mobile/.fvmrc` pinned to 3.32.8. That file is an owner decision.
-     - Until then, run mobile commands with `fvm spawn 3.32.8 ...`. Do not let 3.41.1 rewrite `pubspec.lock`.
+  4. **Flutter, per D14 (approved 2026-10-12: 3.32.8):**
+     - `fvm install <version>`.
+     - Add `mobile/.fvmrc`. This is a mobile repo change, so commit it on request.
+     - On every machine, verify that `fvm flutter pub get` leaves `pubspec.lock` **unchanged**. A changed lock means the SDK differs from the one that produced it: stop and report.
+     - A later SDK upgrade (e.g. 3.41.x) is its own validated session, not a side effect.
   5. **Install Python 3** (python.org or winget). It is not needed until asset tooling (M06), so this step is optional now.
   6. **Baseline runs. Record each result; do not change any source:**
-     - Host tests with the manual commands in §4, if a compiler is available.
+     - Host tests with the manual commands in §4.
      - `pio run -d firmware -e xuna_t_display_s3`: compare static RAM and image size with the recorded **47,504 B** and **964,333 B**.
      - Mobile `flutter analyze` and `flutter test`: expect 10 tests passing.
   7. Add a short "Development environment" section to PROCESS.md: machines, versions, PATH notes and baseline results.
-- **Done when:** all three baselines pass on at least one machine, or their blockers are recorded; versions are recorded.
+- **Done when:** all three baselines pass on at least one machine, or their blockers are recorded; versions are recorded; the lock is unchanged.
 - **Out of scope:** source edits, dependency upgrades.
 
-### S01 — MVP physical acceptance (regression reference)
+### S01 — MVP physical acceptance and behavioral baseline
 
-- **Goal:** turn the pending local MVP checks (PLAN MVP-07) into recorded evidence. The refactors in S03–S21 are compared against this.
-- **Preconditions:** S00; a phone path decided (iPhone through the Mac, or Android, whose native build is unverified).
+- **Goal:**
+  - Turn the pending local MVP checks (PLAN MVP-07) into recorded evidence.
+  - Capture **observed protocol bytes**.
+
+  The refactors in S03–S21 are compared against this baseline.
+- **Preconditions:** S00; a phone path decided (iPhone through the Mac, or Android, whose native build is unverified). A generic BLE inspector app (e.g. nRF Connect) is recommended for step 3.
 - **Steps:**
-  1. Back up NVS (§5) before anything else.
+  1. Take the verified NVS backup (§5) before anything else.
   2. Run items 1–10 of "Physical acceptance still open" in [MVP-local.md](MVP-local.md) and record pass/fail with short evidence (serial excerpt, screenshot, observation).
-  3. Capture three diagnostics windows with the serial monitor: idle; BLE connected; immediately after a feedback write. Note `loop_gap_max_us` during the feedback write. It is the first real data point for E7.
-  4. Do 5 manual power cuts while idle and 5 just after feedback (unplug USB). After each, verify that the preference and episodes are restored.
-  5. Record any bug as a new scoped fix session `S01-fix-N`. Fix inline only if it is trivial and the owner approves.
-- **Done when:** MVP-local.md has a dated physical-results section and PLAN MVP-07 status is updated.
+  3. **Observed v1 transcript.** With the BLE inspector, run a scripted sequence and record the raw hex of every write and of the status, life and memory values after each step:
+     - read capabilities, status and life;
+     - suggest quiet, then approve;
+     - replay a duplicate ID, then the same ID with a different payload;
+     - send feedback without a decision;
+     - press the button during a pending decision;
+     - forget.
+
+     These bytes are the ground truth for S08a.
+  4. Capture three diagnostics windows with the serial monitor: idle; BLE connected; immediately after a feedback write. Note `loop_gap_max_us` during the feedback write. It is the first real data point for E7.
+  5. Do 5 manual power cuts while idle and 5 just after feedback (unplug USB). After each, verify that the preference and episodes are restored. Record these as *smoke* evidence. A manual cut cannot reliably land inside a write; S11 and S13 use a write-storm build for that.
+  6. Record any bug as a new scoped fix session `S01-fix-N`. Fix inline only if it is trivial and the owner approves.
+- **Done when:** MVP-local.md has a dated physical-results section and the observed-byte transcript (a text/hex appendix); PLAN MVP-07 status is updated.
 - **Out of scope:** new features, refactors.
-
-### S02 — Decisions and documentation housekeeping (M04.0)
-
-- **Goal:** record the decisions that unblock M04 and put the planning documents under version control.
-- **Preconditions:** S00. Can run in parallel with S01.
-- **Steps:**
-  1. Walk the owner through D1, D2 (provisional until S11), D7 and D12. Optionally preview D3–D6.
-  2. For each decision the owner explicitly approves, add a dated line under AGENTS.md §3 "Approved". Leave the rest Proposed.
-  3. Create `docs/decisions/README.md` (index plus a short ADR template: Context, Options, Decision, Consequences, Status).
-  4. Create `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3. Status is *Accepted* only if the owner approves it.
-  5. Apply any plan amendments that follow from the decisions, and mark them in the plan header ("0.1.x — amended").
-  6. On owner request, commit the spec, the plan, this file and the ADR in the root repo.
-- **Done when:** decisions are recorded with status; ADR-0001 exists; Git state is reported.
 
 ### S03 — Characterization tests and golden v1 fixtures (M04.1a)
 
@@ -293,61 +373,87 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
 
 ### S06 — Identity record, `bootc`, hatch/migration (M04.2b; T2, T10, T18)
 
-- **Preconditions:** S05; **D7 answered.**
+- **Preconditions:** S05; D7 (approved 2026-10-12). The **board step** additionally needs S01 recorded and a verified backup (§5), because this session adds NVS writes.
 - **Steps:**
   1. **Pure CRC-32** (IEEE, reflected) with the standard check value `"123456789" → 0xCBF43926`.
   2. **Pure `IdentityRecord` codec:**
-     - magic `XI`, schema 1, `petId[16]`, `seed`, `hatchBootCounter`, `hatchActiveSecond`, `bornAtUtcMs`, `bornAtQuality`, `hatchContentVersion`, `origin {hatched, migratedFromV1}`, CRC-32.
+     - magic `XI`, schema 1, `petId[16]`, `seed`, `hatchBootCounter`, `hatchActiveSecond`, `hatchMonoMs`, `bornAtUtcMs`, `bornAtQuality`, `hatchContentVersion`, `origin {hatchedOnDevice, hatchedViaApp, migratedFromV1}`, CRC-32.
      - Tests: roundtrip, corruption, too-new schema.
-  3. **Pure `IdentityService::ensure(...)`:**
-     - No identity + v1 snapshot present → `migratedFromV1` (S1 Newborn, `bornAt` unknown).
-     - No identity and no snapshot → `hatched` (`bornAt` set only if the clock is trusted).
-     - Identity present → unchanged. Corrupt identity → **do not regenerate silently**: report `StorageError` and enter the safe path.
-     - Unit tests for each branch.
-  4. **Firmware `src/storage/StorageKeys.h`:** one registry for all NVS keys (`slot0`, `slot1`, `bootc`, `ident`, and the future `life0`/`life1`), with `static_assert(len ≤ 15)`.
-  5. **Firmware boot sequence:**
+  3. **Pure `IdentityService`** (plan §12, D7):
+     - **No identity + v1 snapshot present** → `migratedFromV1`: S1 Newborn, `bornAt` unknown, learned state kept.
+     - **No identity and no snapshot** → **Egg**: no identity written yet; it waits for a hatch trigger.
+     - **Hatch trigger** (device gesture now; app opcode 7 in S10) → create the identity:
+       - `bornAt` is exact if the clock is Synced at hatch time;
+       - if a sync arrives later in the **same boot**, `bornAt` is filled once from the monotonic anchor;
+       - otherwise it stays unknown permanently.
+     - **Identity present** → unchanged.
+     - **Corrupt identity** → **do not regenerate silently**: report `StorageError` and enter the safe path.
+     - Unit tests for each branch, including "a sync in a later boot never back-fills `bornAt`".
+  4. **Design freeze — hatch gesture:**
+     - Proposed: hold GPIO14 for 3 s in the Egg state. The gesture must not use GPIO0/BOOT, which selects download mode at reset.
+     - Pick a placeholder egg visual (simple shape, no new art required).
+     - Record both in plan §12.
+  5. **Firmware `src/storage/StorageKeys.h`:** one registry for all NVS keys (`slot0`, `slot1`, `bootc`, `ident`, and the future `life0`/`life1`), with `static_assert(len ≤ 15)`.
+  6. **Firmware boot sequence:**
      - Read `bootc`, increment it and commit it before any event.
-     - Call `BLEDevice::init`, then use `esp_fill_random` for a new `petId`/`seed` when hatching.
-     - Log `petId` (first 8 hex characters), `bootCounter` and origin on serial.
-  6. **Board check (owner):** 3 reboots keep the `petId` and increase `bootc` by one each time; `forget` (opcode 4) leaves the identity unchanged.
+     - Call `BLEDevice::init`, then use `esp_fill_random` for a new `petId`/`seed` at hatch.
+     - Log `petId` (first 8 hex characters), `bootCounter`, origin and Egg state on serial.
+  7. **Test-only fresh-device mode:**
+     - A compile flag selects a separate NVS namespace (e.g. `xuna_test`).
+     - This exercises Egg → device hatch on the owner's board **without touching the real pet** in `xuna_life`.
+     - Erase that namespace after the test.
+- **Board check (owner):**
+  - The real pet migrates (origin `migratedFromV1`) with its learned preference unchanged.
+  - 3 reboots keep the `petId` and increase `bootc` by one each time.
+  - `forget` (opcode 4) leaves the identity unchanged.
+  - In the test-only mode: Egg → hold gesture → hatched, with `bornAt` unknown (no phone).
 - **Done when:** native tests pass, the firmware builds, and the board check is recorded (or marked *not run*).
 
-### S07 — Event envelope, registry, ring buffer, queue (pure; M04.3a; T3)
+### S07 — In-RAM events, registry, ring buffer, queue (pure; M04.3a; T3)
 
 - **Preconditions:** S04. Can run in parallel with S05/S06.
+- **Scope note (audit):** the persisted 40-byte codec and CRC-16 move to **S32**, where the log is written. Its format then follows D2. This session only covers the in-RAM event model.
 - **Steps:**
-  1. **CRC-16/CCITT-FALSE** with the check value `"123456789" → 0x29B1`.
-  2. **`xuna/event/EventTypes.h`:** the registry from plan §7.3, with category and persistence-class flags, and a `static_assert` that codes are unique.
-  3. **`xuna/event/Event.h` + `EventCodec.h`:** the 40-byte layout of plan §7.2. Encode and decode field by field, never with `memcpy`.
-  4. **`xuna/base/RingBuffer.h`:** template `RingBuffer<T, N>` with no heap.
-  5. **`EventIdGenerator(bootCounter)`:** monotonic per-boot sequence. Tests show uniqueness across a simulated reboot.
-  6. **`EventQueue`:** `push` (best-effort events are dropped and counted when full; feedback/teach-class events are **rejected** when full) and `drain(sink, budget)`.
-- **Tests:** codec roundtrip and CRC detection of single-bit flips; queue overflow counting; drain budget; FIFO ordering; feedback-class rejection.
+  1. **`xuna/event/EventTypes.h`:** the registry from plan §7.3, with category and persistence-class flags, and a `static_assert` that codes are unique.
+  2. **`xuna/event/Event.h`:** an in-RAM struct with the plan §7.2 fields (`eventId`, `causationId`, `activeSecond`, `utcMinute`, `type`, `source`, `provenance`, `clockQuality`, `confidence`, `privacyClass`, 8-byte payload).
+  3. **`xuna/base/RingBuffer.h`:** template `RingBuffer<T, N>` with no heap.
+  4. **`EventIdGenerator(bootCounter)`:** monotonic per-boot sequence. Tests show uniqueness across a simulated reboot.
+  5. **`EventQueue`:** `push` (best-effort events are dropped and counted when full; feedback/teach-class events are **rejected** when full) and `drain(sink, budget)`.
+- **Tests:** queue overflow counting; drain budget; FIFO ordering; feedback-class rejection; ID uniqueness across boots.
 - **Done when:** native tests are green. No firmware wiring.
 
-### S08 — v1 protocol transcript and core `CommandHandler` (M04.3b)
+### S08a — v1 transcript fixture (M04.3b-1)
 
-- **Goal:** move the v1 command semantics out of `BleManager` into pure code, proven byte-identical.
-- **Preconditions:** S03, S07.
+- **Preconditions:** S03, **S01** (observed bytes).
 - **Steps:**
-  1. **Write a transcript fixture** describing the v1 contract (MVP-local + the current `BleManager::update` code). Each entry has: input packet bytes, session epoch, local events in the same loop (button), display-ready flag, store success/failure → expected result code, expected 16-byte status, expected 20-byte life value, and expected memory pages. Cover:
+  1. Encode a transcript fixture describing the v1 contract. Each entry has: input packet bytes, session epoch, local events in the same loop (button), display-ready flag, store success/failure → expected result code, expected 16-byte status, expected 20-byte life value, and expected memory pages.
+  2. **Every case observed in S01 uses the observed bytes.** Cases that cannot be produced physically are derived from the `BleManager::update` code and the MVP-local protocol, and are marked `derived`:
+     - display not ready → 7;
+     - a storage write failure → 7 with RAM unchanged;
+     - queue overflow with no reply.
+  3. Required cases:
      - connect → suggest quiet → feedback approve → life/memory;
      - an identical duplicate (cached result, no re-trigger);
      - the same ID with a different payload → 6;
      - feedback without a decision → 4;
      - a direct button press invalidates a pending decision;
      - a session change clears the cache and the decision;
-     - display not ready → 7;
-     - a storage write failure → 7 with RAM unchanged;
      - forget → empty, with active seconds kept;
-     - queue overflow (no reply).
-  2. **Implement `xuna/protocol/CodecV1.h`** (status/life/memory encoders) and **`xuna/life/CommandHandler.h`** using `LifeEngine`, `CommandCache` and an `IStore` interface (in-memory fake for tests). Emit typed events (`BehaviorChosen`, `FeedbackApplied`, `RequestRejected`) into an `EventSink`.
-  3. **Make the transcript pass byte-for-byte.**
+     - the derived cases above.
+- **Done when:** the fixture compiles and is reviewed. The cases are not yet executed against anything.
+
+### S08b — Core `CommandHandler` (M04.3b-2)
+
+- **Preconditions:** S07, S08a.
+- **Steps:**
+  1. Implement `xuna/protocol/CodecV1.h` (status/life/memory encoders) and `xuna/life/CommandHandler.h` using `LifeEngine`, `CommandCache` and an `IStore` interface (in-memory fake for tests).
+  2. Emit typed events (`BehaviorChosen`, `FeedbackApplied`, `RequestRejected`) into an `EventSink`.
+  3. Make the S08a transcript pass byte-for-byte.
 - **Done when:** the transcript and all earlier suites are green. `BleManager` is untouched in this session.
 
 ### S09 — `BleManager` becomes transport-only (M04.3c; T12)
 
-- **Preconditions:** S08; S01 completed (the physical reference).
+- **Preconditions:** S08b; S01 completed (the physical reference).
 - **Steps:**
   1. `src/ble/BleTransport`:
      - GATT setup.
@@ -359,30 +465,52 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
   4. Delete the logic now duplicated in `BleManager`.
 - **Verify:**
   - Native tests pass; the firmware builds; record the size delta.
-  - **Owner regression subset of S01:** connect, the four animations, suggest/feedback/learned choice, reboot persistence, forget + reboot, duplicate/invalid command handling.
-- **Done when:** the regression subset is identical to S01. Otherwise stop and fix within the session, or revert.
+  - **Owner:** repeat the S01 BLE-inspector sequence; the bytes must equal the S01 recording.
+  - **Owner regression subset of S01:** connect, the four animations, suggest/feedback/learned choice, reboot persistence, forget + reboot.
+- **Done when:** the bytes and the regression subset are identical to S01. Otherwise stop and fix within the session, or revert.
 
-### S10 — TimeSync end-to-end (M04.2c)
+### S10 — TimeSync and app hatch end-to-end (M04.2c)
 
-- **Preconditions:** S05, S06, S09.
+- **Preconditions:** S05, S06, S09; D14 for the mobile part.
 - **Steps:**
   1. **Design freeze:** append to the MVP-local protocol section:
-     - Opcode 5, length 16: header `[ver=1, op=5, requestId u32, arg=source (1 = phone), reserved=0]` + `utcSeconds u32 @8` + `tzOffsetMin i16 @12` + `reserved u16 @14`.
+     - **TimeSync:** opcode 5, length 16: header `[ver=1, op=5, requestId u32, arg=source (1 = phone), reserved=0]` + `utcSeconds u32 @8` + `tzOffsetMin i16 @12` + `reserved u16 @14`.
      - A rollback or implausible value returns result 4 (stay within result codes 0–7 so existing parsers keep working).
      - Capability command mask bit 4 (0x10). Mobile keeps requiring bits 0–3 and treats bit 4 as optional.
-  2. **Core:** parse opcode 5 in `BleProtocol`, handle it in `CommandHandler` → `ClockModel.onSync` → `TimeSynchronized`/`ClockRejected` event. Persist `lastTrustedUtcMinute` lazily (snapshot v2 arrives later; until then keep it in RAM and log it).
-  3. **Tests:** parse table; transcript entries for sync, rollback and the capability bit.
-  4. **Firmware:** capability mask `0x001f`; serial log of clock quality, local time and day part every diagnostics window.
+     - **Hatch (D7):** opcode 7, length 8, `arg = 0`, capability bit 6. Valid only in the Egg state; otherwise result 4.
+     - **Egg-state exposure:** how the app learns that the device is an Egg, with `clockQuality` and `bornAt` quality. Use a small additive read value that old apps simply ignore. Do not reuse the full 20-byte life value or add status values that old parsers reject.
+     - The app hatch flow is TimeSync, then Hatch, so `bornAt` is exact.
+  2. **Core:**
+     - Parse opcodes 5 and 7 in `BleProtocol`.
+     - Handle them in `CommandHandler`:
+       - opcode 5 → `ClockModel.onSync` → `TimeSynchronized`/`ClockRejected`, then fill `bornAt` if the pet hatched earlier in this boot;
+       - opcode 7 → `IdentityService` hatch.
+     - Persist `lastTrustedUtcMinute` lazily. Snapshot v2 arrives later; until then keep it in RAM and log it.
+  3. **Tests:**
+     - Parse table.
+     - Transcript entries for sync, rollback, Hatch in the Egg state, Hatch when already hatched (→ 4), and the capability bits.
+     - `bornAt` exact for "sync then hatch" and for "hatch then sync in the same boot".
+     - `bornAt` stays unknown for "hatch, reboot, then sync".
+  4. **Firmware:**
+     - Capability mask `0x005f` (bits 0–4 and 6; bit 5 is reserved for opcode 6 in M05c-A).
+     - Serial log of clock quality, local time and day part every diagnostics window.
   5. **Mobile:**
-     - `ProtocolCodec.encode` supports opcode 5.
+     - `ProtocolCodec.encode` supports opcodes 5 and 7.
      - The repository sends TimeSync right after a successful connect when the capability bit is set, and every 6 h while connected.
-     - Tests: codec bytes; sent after connect in the simulator repository; skipped without the capability.
-  6. **Board + phone check (owner):** after connect, serial shows `Synced` with the correct local time and day part; after a reset it shows `Unknown` until the phone reconnects.
+     - When the device reports Egg, show a "Nở" (hatch) action that sends TimeSync and then Hatch.
+     - Tests:
+       - codec bytes;
+       - TimeSync sent after connect in the simulator repository and skipped without the capability;
+       - the hatch flow order.
+  6. **Board + phone check (owner):**
+     - After connect, serial shows `Synced` with the correct local time and day part.
+     - After a reset it shows `Unknown` until the phone reconnects.
+     - In the S06 test-only fresh-device mode, the app hatch gives an exact `bornAt`.
 - **Done when:** all tests are green and the owner check is recorded.
 
 ### S11 — Storage experiment E4/E5 → ADR-0002 → D2 (M04.4a)
 
-- **Preconditions:** S04. The NVS backup (§5) is taken first.
+- **Preconditions:** S04. A verified backup (§5) is taken first.
 - **Steps:**
   1. Add a separate `[env:xuna_storage_bench]` with `build_src_filter` selecting `bench/storage_bench.cpp` only. Get owner approval before merging bench code; otherwise keep it on a branch.
   2. **Bench A, NVS:** namespace `xuna_bench` (never `xuna_life`). Do 1,000 A/B writes of a 1,536 B blob. Record write µs p50/p99/max, free heap before and after, and NVS free entries (`nvs_get_stats`).
@@ -392,45 +520,65 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
      - 200 temp-write + `rename` cycles of a 16 KiB file.
      - Record mount time, write µs p50/p99/max, heap and flash usage.
   4. **Bench C:** rendering the current animation while writing. Record render time and loop gap (E7).
-  5. **Power-cut procedure (owner):** 25 cuts per mode during writes. After each reboot, verify A/B newest-valid, log truncation at the first bad CRC, and atomic rename.
-  6. Write `docs/research/E4-E5-storage.md` (raw tables, method, limits) and the draft `docs/decisions/ADR-0002-storage-layout.md`, comparing options (b), (c) and (d) of plan §15 M04.4.
-  7. The owner decides D2.
-- **Done when:** measurements are recorded and D2 is answered.
+  5. **Reproducible power-cut test:**
+     - The bench runs a **write storm**: back-to-back writes, each record carrying a sequence number and CRC, so most of the time is spent inside writes.
+     - The owner does 25 random cuts per mode.
+     - After each reboot the bench logs the last intact sequence, whether a torn record was detected and truncated, and A/B newest-valid selection.
+     - Report how many cuts landed mid-write (detected torn records) rather than assuming all did.
+  6. **Cleanup:**
+     - Erase only the `xuna_bench` namespace (and leave LittleFS formatted or reformat it, per the ADR).
+     - Reflash the current XUNA firmware.
+     - Confirm the pet's `xuna_life` state is unchanged against S01.
+  7. Write `docs/research/E4-E5-storage.md` (raw tables, method, limits) and the draft `docs/decisions/ADR-0002-storage-layout.md`, comparing options (b), (c) and (d) of plan §15 M04.4.
+  8. **The owner decides D2 on that evidence.**
+- **Done when:** measurements are recorded, the pet state is intact, and D2 is answered.
 
-### S12 — Sectioned snapshot v2 codec + v1→v2 migration (M04.4b; T6, T18)
+### S12a — Snapshot v2 layout freeze + sectioned codec (M04.4b-1; T6, T18)
 
-- **Preconditions:** D2 answered; S03 fixtures; S06 CRC-32.
+- **Preconditions:** S06 (CRC-32), D2 answered.
 - **Steps:**
   1. **Design freeze:** write the exact v2 layout into plan §7.5:
      - Header: magic, schema, size, generation, flags.
-     - Section table: section IDs for counters, clock, lifecycle, needs, learner, habit, skills, dedup, pointers.
+     - Section table: section IDs for counters, clock, lifecycle, needs, learner (reserve `statedMass` for M05c-A), habit, skills, dedup, pointers.
      - Per-section version and length, plus a CRC-32 trailer.
      - The budget is ≤ 1,536 B.
      - In M04 only the sections already backed by code are populated. The rest load defaults.
   2. **`xuna/persist/SnapshotCodec.h`:** `encode`/`decode` returning `LoadResult {Ok, Missing, Corrupt, TooNew, Migrated, MigrationFailed}`.
-  3. **`xuna/persist/Migrations.h`:** `fromV1(bytes96)` maps:
-     - counts → coarse learner cells (`alpha = 1 + pos`, `beta = 1 + neg` in Q16.16);
-     - the 8 episodes → a pending migration list for M05b (or a temporary episodes section);
-     - `activeSeconds`, `eventCount`, `generation`.
-  4. **Tests:**
-     - Every S03 golden v1 fixture migrates with the expected field values.
+  3. **Tests:**
      - v2 roundtrip; flipped bit → Corrupt; truncated → Corrupt.
      - Header schema 3 or an unknown required section → TooNew.
+     - A missing optional section loads defaults.
      - Size ≤ budget.
 - **Done when:** native tests are green and the plan §7.5 offsets are frozen.
 
+### S12b — v1→v2 migration + torn-write simulation (M04.4b-2)
+
+- **Preconditions:** S12a, S03 fixtures.
+- **Steps:**
+  1. **`xuna/persist/Migrations.h`:** `fromV1(bytes96)` maps:
+     - counts → coarse learner cells (`alpha = 1 + pos`, `beta = 1 + neg` in Q16.16);
+     - the 8 episodes → a temporary episodes section, consumed by M05b (S31);
+     - `activeSeconds`, `eventCount`, `generation`.
+  2. **Torn-write simulation** in the in-memory `IStore` fake: for every byte offset of a v2 write, simulate a cut (prefix written, rest old or erased) in either A/B slot. Recovery must select the newest **valid** slot and never mix the two.
+  3. **Tests:**
+     - Every S03 golden v1 fixture migrates with the expected field values.
+     - Migration is idempotent: running it twice gives the same result.
+     - The full torn-write sweep passes.
+- **Done when:** native tests are green.
+
 ### S13 — Persistence v2 wiring, safe mode, commit budget (M04.4c)
 
-- **Preconditions:** S12, S06. **NVS backup taken (§5).**
+- **Preconditions:** S12b, **S09** (`NvsStore` exists), S06. A **verified backup (§5)** is taken first.
 - **Steps:**
   1. `NvsStore` writes v2 A/B under `life0/life1`. On the first boot after the upgrade it reads `slot0/slot1`, migrates once, and **leaves `slot0/slot1` untouched** for one release (rollback point).
   2. `TooNew`/`Corrupt` identity → `ERROR_SAFE` read-only mode: safe face on the LCD, error code on serial and in BLE status, no writes.
   3. Commit classes (plan §7.6) and a commit-budget counter. The counter writes are logged in the diagnostics line, and an over-budget event raises `StorageError(budget)`.
   4. Mount LittleFS if D2 chose it (no data yet). Log the result.
+  5. A **test-only write-storm mode** (compile flag, never in release) for the power-cut check.
 - **Owner checks:**
   - Upgrade the owner's **real MVP pet**: the learned choices are identical after the upgrade (the key acceptance).
   - Reboot ×3; forget + reboot.
-  - 20 power cuts during feedback writes: no identity loss and no double-applied feedback.
+  - Write-storm power cuts ×20: no identity loss, no double-applied feedback; report the count of detected mid-write cuts.
   - Downgrade test (flash 0.2.0-mvp): it still reads its v1 slots, as documented.
 - **Done when:** the checks are recorded and PROCESS.md notes the new storage keys.
 
@@ -465,6 +613,7 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
 
 ### S17 — Wire FSM and visuals into firmware (M04.5d)
 
+- **Preconditions:** S16, S09. S13 is not required: if S13 is not done yet, needs reset at boot, which is the plan's default policy.
 - **Steps:**
   1. Remote animation requests go through `RequestValidator`. A rejection returns `busy (5)`. Check that mobile shows a clear message for result 5; add a mobile test if missing.
   2. `AnimationManager` becomes renderer-side frame timing, driven by `VisualIntent`. `DisplayManager` renders through the expression map and falls back to idle for unknown intents.
@@ -474,29 +623,36 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
 
 ### S18 — `LifeCore::step` composition (M04.6a)
 
+- **Preconditions:** S17, S13, S10.
 - **Steps:**
   1. Compose ClockModel, Identity, EventQueue, CommandHandler, ActivityFsm, Needs/Mood, RequestValidator, BehaviorSelector and LifeEngine (v1 learner, still) behind `LifeCore::step(StepInput) → StepOutput` (plan T1 interface).
   2. `main.cpp` keeps only the adapters, the loop order and diagnostics.
-  3. Persist through `PersistRequest` outputs.
+  3. Persist through `PersistRequest` outputs, including the needs section.
 - **Done when:** the transcript, all suites and the firmware build are green, and a short owner smoke test (connect, feedback, reboot) passes.
 
-### S19 — Life Lab CLI, trace DSL, Scenarios D/E, 100-day run (M04.6b; T5)
+### S19a — Life Lab CLI, trace DSL, runner (M04.6b-1; T5)
 
 - **Steps:**
   1. **Design freeze:** document the trace grammar in `firmware/sim/README.md`. Lines are `@+<ms> <verb> <args>`, with these verbs:
      - `button A|B`, `cmd <hex>`, `sync <utc> <tz>`, `reboot`, `powercut`, `day <n>`, `expect <path> <op> <value>`.
      - Comments start with `#`.
      - No JSON parser is needed.
-  2. `firmware/sim/lifelab.cpp`, built through `[env:lifelab]` (native, `build_src_filter` = `sim/`) or a documented host command. It uses an in-memory store that simulates A/B and power cuts.
+  2. `firmware/sim/lifelab.cpp`, built through `[env:lifelab]` (native, `build_src_filter` = `sim/`) or a documented host command. It uses an in-memory store that simulates A/B and power cuts (reusing the S12b fake).
   3. Outputs: a metrics CSV, a final snapshot hash and an explanation dump.
-  4. Scenarios:
-     - **D**, no feedback for 100 days: the learner is bit-identical to a fresh one.
-     - **E**, 10 reboots and 5 power cuts: no duplicate feedback, identity stable, no negative age.
-     - **Stability**, 100 days with invariants checked every step.
-- **Done when:** the scenarios pass in CI-style runs; runtime is reported (it should take seconds).
+  4. Parser tests: malformed lines, unknown verbs, ordering.
+- **Done when:** a trivial trace runs and produces deterministic output twice.
+
+### S19b — Scenarios D/E + 100-day invariants (M04.6b-2)
+
+- **Scenarios:**
+  - **D**, no feedback for 100 days: the learner is bit-identical to a fresh one.
+  - **E**, 10 reboots and 5 power cuts: no duplicate feedback, identity stable, no negative age.
+  - **Stability**, 100 days with invariants checked every step.
+- **Done when:** all scenarios pass in repeatable runs; runtime is reported (it should take seconds).
 
 ### S20 — Golden vectors and Dart conformance (M04.6c; G17)
 
+- **Preconditions:** S19b; D14 for the mobile part.
 - **Steps:**
   1. `lifelab golden` writes `firmware/sim/golden/learning_v1.json`: command sequences with expected device results and life bytes.
   2. Copy the vectors into `mobile/test/fixtures/` with a documented update procedure (no cross-repo symlinks).
@@ -506,7 +662,7 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
 ### S21 — Target parity and M04 acceptance review (M04.6d; E2, E6)
 
 - **Steps:**
-  1. `[env:xuna_parity]` embeds 3 traces, replays them at boot without BLE or display, prints the snapshot hashes and `step()` timing histograms, then halts.
+  1. `[env:xuna_parity]` embeds 3 traces, replays them at boot without BLE or display, prints the snapshot hashes and `step()` timing histograms, then halts. It must not write to `xuna_life`: it uses an in-RAM store.
   2. Compare with the Life Lab hashes, which must be bit-identical.
   3. Write `docs/roadmap/M04-foundation.md`: acceptance table per slice, measurements (RAM, image, heap, render, loop gap, commit counts, `step()` p99), open issues and the decision log.
   4. Owner review: M04 is Implemented; it is **Validated** only for the rows that have evidence.
@@ -518,14 +674,40 @@ The offsets come from Arduino-ESP32 2.0.14 `default_16MB.csv` (verified 2026-10-
 
 Every session below starts with a **design-freeze step**: write the exact payloads, constants or APIs into the plan or a roadmap record, then write tests, then implement.
 
-### S22 — Learning decisions and action vocabulary (Owner)
+**Default "done when"** for every M05 session, unless a session states more:
 
-- Answer D3 (feedback window), D4 (exploration), D5 (contexts and actions: day parts, GPIO0 as a learning context, 3–4 actions aligned with real animations) and D6 (implicit feedback).
-- Output: the action list with animation IDs, an art to-do list if new animations are needed, and approved parameter ranges, recorded in AGENTS §3 / plan §9.
+- The design freeze is recorded.
+- The listed tests are added and green: native, and `flutter test` where mobile is touched.
+- The firmware builds.
+- The handoff documents are updated.
+- Owner checks are recorded or marked *not run*.
 
-### S23 — PreferenceLearner v2 (pure)
+### Track M05a + M05c-A — Learning with Conversation Foundation
 
-- Fixed-point discounted Beta, coarse and fine cells, hierarchical prior (plan §9.3); learner section v2 with a migration from the M04 coarse cells.
+The track is developed together and accepted together in S28. This implements A6, "Conversation belongs alongside Learning", without waiting for MemoryStore, BLE v2 or bonding. **The restructure is Proposed (D17).**
+
+#### S22 — Learning and conversation decisions (Owner)
+
+- **Timing:** this session can run as early as right after S02. Early action-vocabulary decisions give the art work lead time. It must precede S23 and S39.
+- **Decisions:**
+  - D3: feedback window.
+  - D4: exploration.
+  - D5: contexts and actions: day parts, GPIO0 as a learning context, 3–4 actions aligned with real animations.
+  - D6: implicit feedback.
+  - **D17:** Layer A/B restructure, opcode 6 contract and the stated-preference weight/cap defaults.
+  - Optional: D16 (voice), which needs E13 first.
+- **Output:**
+  - the action list with animation IDs;
+  - the context list;
+  - **the Layer A phrase table** (vi/en phrases per intent, including negative examples);
+  - an art to-do list if new animations are needed;
+  - parameter ranges, recorded in AGENTS §3 / plan §9 and §11.
+
+#### S23 — PreferenceLearner v2 (pure)
+
+- Fixed-point discounted Beta, coarse and fine cells, hierarchical prior (plan §9.3).
+- The cell layout reserves `statedMass` (zero until S24a).
+- Learner section v2 with a migration from the M04 coarse cells.
 - Tests:
   - Discount only touches the rated cell.
   - Silence leaves values unchanged.
@@ -533,7 +715,7 @@ Every session below starts with a **design-freeze step**: write the exact payloa
   - Prior transfer to an unseen day part.
   - Saturation bounds.
 
-### S24 — Policy + ReactionTable (pure)
+#### S24 — Policy + ReactionTable (pure)
 
 - Masked ε-greedy with confidence scaling and least-rated exploration; PCG32 tie-breaks (plan §9.4).
 - ReactionTable: 4 entries, expiry window (D3), invalidation, consumed state, durable rating via `PersistRequest`.
@@ -544,135 +726,222 @@ Every session below starts with a **design-freeze step**: write the exact payloa
   - Expired, consumed, invalidated and unknown reactions are rejected.
   - A duplicate `CommandId` is applied once.
 
-### S25 — Proof-of-learning experiments (E10)
+#### S24a — Stated-preference evidence + opcode 6 (pure; M05c-A)
 
-- Life Lab scenarios B, C, D, isolation, E and spam (plan §9.9), each over 200 seeds, against random, static and no-learning baselines. Compare ε-greedy, UCB and Thompson (Thompson is host-only).
-- Output: `docs/research/M05a-learning-report.md` with CIs, convergence and reversal curves (CSV), and the chosen defaults.
+- Implement plan §11.6 in the core:
+  - `CodecV1` parses opcode 6 (12 bytes).
+  - `CommandHandler` validates context, action and source.
+  - The learner applies `w_s`-weighted `user_stated` evidence with a per-cell cap and the same decay.
+  - The explanation reports `statedMass` separately.
+- Tests:
+  - Parse table.
+  - The cap holds under 100 repeated statements.
+  - Explicit ratings override a stated preference.
+  - The provenance is recorded.
+  - An unknown action or context → result 4.
+  - In-session duplicate requests are applied once.
+
+#### S25 — Proof-of-learning experiments (E10)
+
+- Life Lab scenarios B, C, D, isolation, E, spam, plus **stated vs rated** (plan §9.9), each over 200 seeds, against random, static and no-learning baselines.
+- Compare ε-greedy and UCB. Thompson is optional (plan §9.4).
+- **Output:** `docs/research/M05a-learning-report.md` with CIs, convergence and reversal curves (CSV), and the chosen defaults, including `w_s` and the cap.
 - The owner reviews the defaults.
 
-### S26 — Firmware wiring
+#### S26 — Firmware wiring (learning + Layer A device side)
 
 - Day-part contexts (needs S10). GPIO0 greeting as a learning context, if D5 approves it.
-- A v1-additive explanation read characteristic (20 bytes, last decision's context), with its payload frozen in this session.
+- A v1-additive explanation read characteristic (20 bytes, last decision's context, including `statedMass`), with its payload frozen in this session.
+- Opcode 6 enabled, capability bit 5.
 - The board demo script is prepared for S28.
 
-### S27 — Mobile
+#### S39 — Conversation domain + LocalRuleExtractor (Dart; M05c-A)
 
-- Feedback refers to the reaction. A "Why did XUNA do that?" view renders only the explanation fields. Day-part display.
+- **Moved from M05c by the audit; the ID is kept.** It is pure Dart and can run in parallel with S23–S26 after S22.
+- Dart interfaces from plan §11.3; `CandidateEvent`.
+- `LocalRuleExtractor` for the **Layer A** intents (`RateLastReaction`, `StatePreference`, `RequestContext`, `AskWhy`) from the S22 phrase table.
+- Layer B phrases are recognized but produce no candidate ("not available yet").
+- The existing V1 `parseTextIntent` behavior is preserved: its tests still pass.
+- Tests: table tests including negative, hypothetical and injection cases. Unknown input produces nothing.
+
+#### S27 — Mobile: reaction-referenced feedback and "Why?"
+
+- Feedback refers to the reaction. A "Why did XUNA do that?" view renders only the explanation fields, showing *learned* (rated) and *told* (stated) evidence separately. Day-part display.
 - Golden vectors are updated through S20's procedure. Tests are green.
 
-### S28 — M05a acceptance (Owner)
+#### S27a — Mobile: Conversation Foundation wiring (M05c-A)
 
-- Board + phone:
+- **Pipeline:** text input → `LocalRuleExtractor` → `CandidateEvent` → confirmation screen → command.
+  - The confirmation screen shows exactly what will change and its provenance.
+  - The command is opcode 3 (rating the last reaction) or opcode 6 (stated preference, only when capability bit 5 is present).
+  - The app then reads the explanation and replies from the explanation fields only.
+- **Timeouts:** no automatic resend; read the explanation to check the outcome.
+- **Tests:**
+  - An unconfirmed candidate sends nothing.
+  - Firmware without bit 5 disables `StatePreference` with a clear message.
+  - A reply never claims learning that the explanation does not show.
+  - No text leaves the phone.
+
+#### S27b — *Optional:* push-to-talk with on-device STT (E13 → D16)
+
+- **E13 first:**
+  - Check that the owner's phone offers **on-device** recognition for vi-VN (and en) without network.
+  - Measure accuracy on the S22 phrase table, plus latency.
+  - If it is unavailable, voice stays deferred.
+- **Only after D16:**
+  - Push-to-talk button, clear microphone permission UX, no background listening, no audio or transcript retention.
+  - The transcript feeds the same `LocalRuleExtractor`.
+  - Optional phone TTS for replies.
+- Opcode `source = 3` (confirmed voice).
+
+#### S28 — Joint M05a + Conversation Foundation acceptance (Owner)
+
+- **Board + phone, learning:**
   - A preference forms in one context and stays isolated from the others.
   - It survives a reboot and works offline (phone off).
   - The explanation counts match the actual feedback.
   - Reversal adapts.
+- **Board + phone, conversation:**
+  - "Mình thích khi bạn vẫy tay buổi tối" → confirm → the explanation shows the stated evidence → the evening choice shifts.
+  - The shift persists after a reboot and is used with the phone off.
+  - Explicit ratings can override it.
+  - Unknown, joke and injection inputs change nothing.
 - Record in `docs/roadmap/M05a-learning.md`.
 
-### S29 — Memory decisions (Owner)
+### Track M05b — Memory, Journal, BLE v2, bonding
 
-- D8 (fact allowlist and capacities, a nickname on the device), D9 (ForgetAll scope), D10 (bonding approach).
+#### S29 — Memory decisions (Owner)
 
-### S30 — MemoryStore, salience, consolidation (pure)
+- D8 (fact allowlist and capacities, a nickname on the device) and D9 (ForgetAll scope).
+- **D10 is not asked here.** It follows experiment E9 in S35.
+- This session can run any time; it must precede S30.
+
+#### S30 — MemoryStore, salience, consolidation (pure)
 
 - Records from plan §10.4, integer salience, promotion and eviction rules, pattern merge, and protected classes.
 - Tests: a bounded store after 10,000 events; protected records survive; determinism.
 
-### S31 — Journal, provenance, tombstones (pure)
+#### S31 — Journal, provenance, tombstones (pure)
 
-- Journal records cite evidence IDs; enforcement of the provenance enum; tombstones; ForgetAll per D9; migration of the 8 v1 episodes kept from S12.
+- Journal records cite evidence IDs; enforcement of the provenance enum; tombstones; ForgetAll per D9; migration of the 8 v1 episodes kept from S12b.
 - Tests:
   - A `user_stated` fact is never rendered as observed.
   - The `simulated` provenance is rejected in production builds.
   - Deletion leaves a tombstone.
 
-### S32 — LittleFS adapters + recovery (firmware)
+#### S32 — Persisted event codec + LittleFS adapters + recovery (firmware)
 
+- **Moved here from S07:** the 40-byte persisted event codec (plan §7.2) with CRC-16/CCITT-FALSE (check value `"123456789" → 0x29B1`). Its format follows D2.
 - Segmented log, truncation at the first bad CRC, memory file with temp+rename and a generation cross-check against the snapshot.
-- Owner: 25 power cuts during appends and renames.
+- Verified backup (§5) first.
+- **Owner:** write-storm power cuts ×25 during appends and renames.
 
-### S33 — BLE v2 codec (core + Dart)
+#### S33 — BLE v2 codec (core + Dart)
 
 - Freeze the `Hello`, frame header and payload layout of every v2 request (plan §14.1) in the protocol record.
 - Shared test vectors are consumed by both the C++ and Dart tests.
 - Fragmentation, resume and CRC tests.
 
-### S34 — BLE v2 transport + E8
+#### S34 — BLE v2 transport + E8
 
 - Characteristics `7a6e0008`–`000A`.
 - Mobile repository v2 with v1 fallback.
 - Measure the negotiated MTU and the heap on the owner's phone.
 
-### S35 — Bonding spike (E9) → ADR-0005
+#### S35 — Bonding experiment (E9) → ADR-0005 → D10 (Owner)
 
-- Arduino `BLESecurity`, LE Secure Connections with the passkey shown on the LCD; iOS pairing, reconnect, removed bond, unbonded rejection.
-- Recommendation for D10 confirmation.
+- **Experiment:** Arduino `BLESecurity`, LE Secure Connections with the passkey shown on the LCD; iOS pairing, reconnect, removed bond, unbonded rejection, owner-recovery UX.
+- **Output:** `docs/research/E9-bonding.md` and the ADR-0005 draft.
+- **The owner decides D10 at the end of this session, on that evidence.** If bonding proves impractical, D10 records the alternative (e.g. button-confirm-only for destructive actions), and S36 is re-scoped.
 
-### S36 — Permission tiers + destructive confirmation
+#### S36 — Permission tiers + destructive confirmation
 
-- Validator tiers enforced at dispatch. ForgetAll and ForgetFact require a bonded link plus a button press within 10 s.
+- **Preconditions:** S35, **D10 answered**.
+- Validator tiers enforced at dispatch. ForgetAll and ForgetFact require the D10-approved authorization (e.g. a bonded link plus a button press within 10 s).
 - Mobile UX for the confirmation.
 
-### S37 — Mobile Journal and Memory & Privacy
+#### S37 — Mobile Journal and Memory & Privacy
 
 - Hive boxes; journal timeline; fact list with delete; forget all; reconnect sync after the last `EventId`; tombstones applied.
 - Tests: no resurrection from a stale cache.
+- Split into S37a/S37b if the design freeze shows more than one sitting.
 
-### S38 — M05b acceptance (Owner)
+#### S38 — M05b acceptance (Owner)
 
 - Plan §15 M05b acceptance items on the board and phone. Record in `docs/roadmap/M05b-memory.md`.
 
-### S39 — Conversation domain + LocalRuleExtractor (Dart)
+### Track M05c-B — Conversation with long-term memory
 
-- Dart interfaces from plan §11.3; `CandidateEvent`; the vi/en rule grammar from plan §11.2, frozen with a phrase table.
-- Tests: table tests including negative, hypothetical and injection cases.
+#### S40 — Device facts and commands
 
-### S40 — Device facts and commands
+- `TeachFact`, `SupersedeFact`, `ForgetFact`, `ReadFacts` (v2), FactRecord store with the D8 allowlist, `CommandId` dedup, and the D10 authorization tier.
+- Tests: validation table; supersede chain; tombstone; unbonded rejection.
 
-- `TeachFact`, `SupersedeFact`, `ForgetFact`, `ReadFacts` (v2), FactRecord store with the allowlist, `CommandId` dedup, and a bonded-only tier.
-- Tests: validation table; supersede chain; tombstone.
+#### S41 — Fact confirmation, grounded replies, recall (mobile)
 
-### S41 — Confirmation UI, grounded replies, recall (mobile)
-
-- The confirmation screen shows exactly what will be stored and its provenance.
-- Replies are built only from device-confirmed data.
+- Reuses the S27a confirmation component and the S39 extractor; the Layer B intents become active.
+- Replies are built only from device-confirmed data, phrased per provenance ("bạn đã kể với mình…").
 - Offline: local rules still work.
 - Scenario F test.
 
-### S42 — M05c acceptance (Owner) + optional V2 spike
+#### S42 — M05c-B acceptance (Owner) + optional V2 spike
 
-- Nickname taught → shown after a reboot; stated preference → prior shift with `user_stated` provenance; correction; forget.
-- The V2 STT/LLM spike (E12) only runs after D11. It is research output, not product code.
+- Nickname taught → shown after a reboot; correction; forget in both stores; personal facts refused unbonded.
+- **V2 spike (E12)** runs only after **D11a** authorizes it, with test data only. It is research output, not product code. D11 is decided after it.
 
-### S43 — HabitPredictor + prequential scoring (pure)
+### Checkpoint
+
+#### S42a — Product checkpoint D15 (Owner)
+
+- **Inputs:**
+  - S28, S38 and S42 acceptance records;
+  - art readiness: assets for one stage change and two traits;
+  - Life Lab evidence of stable learning.
+- **Choose:**
+  - **A:** M05d → M06.
+  - **B:** Evolution MVP → M05d. The Evolution MVP is one stage transition, two traits and journal entries, with gates from M05a evidence and interaction days plus a minimal `associateReactionFeedback` skill.
+- The trade-offs are in [XUNA_PLAN_AUDIT.md](../architecture/XUNA_PLAN_AUDIT.md) §E.
+- **Output:** the decision recorded, and the next milestone split into sessions.
+
+### Track M05d — Cognitive development gates (order per D15)
+
+#### S43 — HabitPredictor + prequential scoring (pure)
 
 - Plan §9.7. Tests: decay only on trusted days; sparse-data uncertainty; prequential baselines.
 
-### S44 — SkillBook and competency bands (pure)
+#### S44 — SkillBook and competency bands (pure)
 
 - Plan §9.8 skills with hysteresis.
 - Test: a pet with age but no feedback has no learning skill.
 
-### S45 — Dual-history Life Lab evaluation
+#### S45 — Dual-history Life Lab evaluation
 
 - Spec §23.10 report: same seed, two histories, held-out contexts, restart parity, routine change.
 - Output: `docs/research/M05d-cognitive-report.md`.
 
-### S46 — Wiring, mobile projection, M05d acceptance
+#### S46 — Wiring, mobile projection, M05d acceptance
 
 - Anticipation pose gated by settings; competency view in the app; owner acceptance record.
 
 ---
 
-## 8. After M05d
+## 8. After the S42a checkpoint
 
-M06 (growth/evolution: art scope, layered assets, `GrowthConfig`) and M07 (sensors) are split into sessions **when M05d is accepted**, using that milestone's measurements. Pre-splitting them now would conflict with AGENTS.md §4, which says not to build later milestones speculatively.
+The milestone chosen second in D15 (M05d or the Evolution MVP), the rest of M06 (growth/evolution: art scope, layered assets, `GrowthConfig`), and M07 (sensors) are split into sessions **when they become next**, using the measurements available then. Pre-splitting them now would conflict with AGENTS.md §4, which says not to build later milestones speculatively.
 
 ## 9. Recommended next three sessions
 
-1. **S00** — toolchain and baseline on this machine.
-2. **S02** — decisions D1, D2 (provisional), D7, D12 and ADR-0001. This can share a sitting with the S00 owner steps.
-3. **S01** — MVP physical acceptance with the phone. It must finish before S09 changes the BLE path.
+Actual status (2026-10-12):
 
-S03–S08 are pure host work and can proceed while S01 waits for the phone, as long as S00 and D1 are done.
+- No M04 work has started.
+- MVP physical acceptance is still pending.
+- This machine has no firmware toolchain.
+- The planning documents are committed (`e3d3485`).
+
+Recommended order:
+
+1. **S02** — ADR-0001 and the decisions index (S). D1, D7, D12, D14 and D17 were approved on 2026-10-12. This needs no tooling.
+2. **S00** — toolchain and baseline on this machine, with the approved Flutter 3.32.8 pin (`mobile/.fvmrc`).
+3. **S01** — MVP physical acceptance plus the observed-byte capture. It must finish before S06's board step, S08a and S09.
+
+S03–S05 and S07 are pure host work and can proceed while S01 waits for the phone, once S00 is done (D1 is approved).

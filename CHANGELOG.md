@@ -4,6 +4,34 @@ Last updated: **2026-10-11** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
 
+## 2026-10-12 — Owner decisions D1, D7, D12, D14, D17
+
+- The owner chose among the presented options and picked the recommended option for all five.
+- D7: the local-first hatch variant (on the device or via the app) instead of app-only hatch.
+- Recorded in AGENTS.md §3 (Approved) and plan §18.
+- Amended plan §12 (Egg state, device gesture, opcode 7 `Hatch`, same-boot `bornAt` rule), §8.2 and §14.1.
+- Session plan: S02 reduced to ADR-0001 and a decisions index; S06 (Egg/hatch logic, test-only fresh-device namespace); S10 (opcodes 5 and 7, app hatch flow).
+- Audit report section D notes the update.
+- No code, build, commit or push.
+
+## 2026-10-12 — Plan audit (documentation only)
+
+- Owner forwarded an external review checklist and asked for a re-check, adopting points only where they are technically and product-wise sound.
+- Added [docs/architecture/XUNA_PLAN_AUDIT.md](docs/architecture/XUNA_PLAN_AUDIT.md): 17 findings (no Critical), milestone flow, decision register and over-engineering review.
+- Plan updated to 0.1.1:
+  - Conversation Layer A/B with the opcode 6 contract (§11.6);
+  - AI technique taxonomy (§5.6);
+  - instructed vs learned evidence;
+  - D2/D10/D11 timing, D11a and new D14–D17;
+  - E13 and risks R13/R14;
+  - corrected A9 scope and T18 rollback facts, verified against Arduino-ESP32 2.0.14 sources.
+- Session plan updated to rev. 2:
+  - dependency fixes (S13, S17, S18, S02, S22, S29) and splits S08a/b, S12a/b, S19a/b;
+  - new S24a, S27a, S27b (optional) and S42a;
+  - verified NVS backup procedure;
+  - S01 observed-byte baseline and write-storm power-cut method.
+- Verification: cross-reference check of session/decision/experiment IDs and relative links; `git diff --check`. Submodules unchanged (firmware `be58099`, mobile `3846880`, backend `0032828`, clean). No build, test, flash, commit or push.
+
 ## 2026-10-12 — Technical implementation plan (planning only)
 
 - Request: the owner asked to clone all submodules, then to produce a technical implementation plan from AGENTS.md and spec v0.3.0 (§23 Cognitive Development, §24 ePet/Xiaozhi references), without implementing code.

@@ -91,6 +91,18 @@ Status vocabulary:
 - **Conversation belongs alongside Learning:** speech/conversation is a source of learning events; it must not be postponed until all evolution work finishes.
 - **Future display exploration:** **HoloCubic-style optical beam-splitter prism** is preferred over the simple flat-sheet Pepper's Ghost approach, but it is **not part of MVP**.
 - **Future hardware:** custom PCB and potentially more powerful/dual-processor hardware are deferred, not current development tasks.
+- **Implementation-plan decisions (owner-approved 2026-10-12; IDs from [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md) §18):**
+  - **D1:** complete the M04 foundation (sessions S03–S21) before new M05 features.
+  - **D7:**
+    - A pet can hatch **on the device** (no phone needed) or **via the app**.
+    - `bornAt` is exact only when trusted time is available in the hatch boot session; otherwise it stays unknown and active lifetime is shown.
+    - The existing MVP pet is kept and migrates as Newborn with `bornAt` unknown.
+  - **D12:** `xuna_core` stays C++11.
+  - **D14:** mobile pins Flutter **3.32.8** via fvm (`mobile/.fvmrc`). Any SDK upgrade is a separate, validated session.
+  - **D17:** Conversation is split into two layers.
+    - **Layer A** (text-first, developed and accepted with M05a, opcode 6 `StatedPreference`).
+    - **Layer B** (personal facts and recall, after M05b).
+    - Voice remains deferred pending D16. Stated-preference weight and cap values stay Proposed until tuned in Life Lab.
 
 ### Proposed — not yet fixed
 

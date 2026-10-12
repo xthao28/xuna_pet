@@ -104,3 +104,6 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | TIP-01 | Done — 2026-10-12 | Proposed plan [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md). Slices M04.0–M07 are defined there and **not started** |
 | TIP-02 | Pending owner | Answer decision requests D1–D13 (plan §18) before any M04.x slice |
 | TIP-03 | Done — 2026-10-12 | Session breakdown [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md): S00–S46, Proposed; recommended next S00 → S02 → S01 |
+| TIP-04 | Done — 2026-10-12 | Plan audit [XUNA_PLAN_AUDIT.md](docs/architecture/XUNA_PLAN_AUDIT.md). Plan 0.1.1 and session plan rev. 2: Conversation Layer A/B (D17), decisions after evidence (D2, D10, D11a/D11), D14 Flutter pin, D15 checkpoint S42a. All Proposed |
+| TIP-05 | Pending owner | Next: S02 (D1, D7, D12, D14, D17 + ADR-0001) → S00 → S01 |
+| TIP-06 | Done — 2026-10-12 | Owner approved D1, D7 (hatch on the device or via the app), D12, D14 (Flutter 3.32.8 pin) and D17 (Conversation A/B, text-first). Recorded in AGENTS.md §3 and plan §18; plan §12 and S06/S10 amended. Next: S02 (ADR-0001 + index) → S00 → S01 |
