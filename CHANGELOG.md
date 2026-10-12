@@ -4,6 +4,26 @@ Last updated: **2026-10-11** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
 
+## 2026-10-12 — Technical implementation plan (planning only)
+
+- Request: the owner asked to clone all submodules, then to produce a technical implementation plan from AGENTS.md and spec v0.3.0 (§23 Cognitive Development, §24 ePet/Xiaozhi references), without implementing code.
+- Submodules: `git submodule update --init --recursive` checked out the recorded gitlinks: backend `0032828`, firmware `be58099`, mobile `3846880`. No gitlink or child changes.
+- Plan: added [docs/architecture/XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md), status **Proposed**. It contains:
+  - repository inventory and gap analysis G1–G23;
+  - target architecture;
+  - 19 technique cards (ePet T1–T9, Xiaozhi T10–T19);
+  - data model, state machines, and the learning, memory, conversation and time designs;
+  - independently testable slices M04.0–M07;
+  - experiments E1–E12, a resource budget, risks R1–R12 and owner decisions D1–D13.
+- Upstream sources were read only from shallow clones in the session scratchpad; nothing was built or executed:
+  - ePet `347ceaf` (MIT);
+  - xiaozhi-esp32 `aef2ab0` (MIT);
+  - xiaozhi-esp32-server `4576e39` (MIT).
+- Verified the Arduino-ESP32 2.0.14 `default_16MB.csv`: NVS 20 KiB; unused `spiffs` partition 3.375 MiB.
+- No build, test or upload was run. This Windows session has no `pio` or host C++ compiler in its PATH. No commit or push. The product spec remains untracked.
+- Follow-up: added the session breakdown [docs/roadmap/XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md) (S00–S46, readiness assessment). Plan amendments: own `bootc` key, sectioned snapshot v2, TimeSync after the core command handler. Observed: Flutter 3.41.1 via fvm (recorded 3.32.8); WSL has no distribution.
+- Owner requested committing the new documents. The spec, plan and session plan are now tracked in the root repository. Submodules are unchanged and nothing was pushed.
+
 ## 2026-10-11 — Publish local MVP checkpoint
 
 - Owner requested commit/push of current code. Firmware `be58099` (`feat: implement local XUNA MVP life and BLE runtime`) and mobile `3846880` (`feat: add BLE learning and local text MVP companion`) pushed successfully to origin/dev, child working trees clean.

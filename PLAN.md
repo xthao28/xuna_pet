@@ -96,3 +96,11 @@ Mobile simulator checkpoint delivered: `24026b2` pushed to `mobile` origin/dev o
 ## Git checkpoint — 2026-10-11
 
 Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are committed/pushed to origin/dev; parent snapshot records their gitlinks. Git delivery is complete in this snapshot; MVP-08 physical acceptance review remains pending. No backend change. Next: real iPhone BLE/learning/persistence matrix in MVP-local.md.
+
+## Technical plan checkpoint — 2026-10-12
+
+| ID | Status | Evidence / next step |
+| --- | --- | --- |
+| TIP-01 | Done — 2026-10-12 | Proposed plan [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md). Slices M04.0–M07 are defined there and **not started** |
+| TIP-02 | Pending owner | Answer decision requests D1–D13 (plan §18) before any M04.x slice |
+| TIP-03 | Done — 2026-10-12 | Session breakdown [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md): S00–S46, Proposed; recommended next S00 → S02 → S01 |

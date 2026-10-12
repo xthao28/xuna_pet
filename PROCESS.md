@@ -174,3 +174,27 @@ LILYGO now runs corrected 0.2.0-mvp; build/upload/hashes PASS, 22-second startup
 ## Current Git delivery — 2026-10-11
 
 Owner requested publishing current code. Firmware `be58099980a316a5ebfe8e621fe68a31eb8dcff6` and mobile `3846880ea3fb3a2cc26f5b41469f62a1f7d85316` committed and pushed successfully to their origin/dev branches; both child working trees clean. Root snapshot commit containing this section records both updated gitlinks and all scoped handoff documents. Backend remains `0032828`, unchanged. This delivery supersedes historical uncommitted/old-pointer snapshots above. No force push, reset or unrelated repository edits. Physical iPhone BLE/learning/NVS acceptance and M01 PCB revision/P07 remain pending.
+
+## Technical plan proposal — 2026-10-12
+
+Submodules were initialized at the recorded gitlinks; nothing changed in the children.
+
+Added [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md), status **Proposed / planning only**. It integrates spec v0.3.0 §23–24 and the read-only ePet/Xiaozhi audits.
+
+No code changes and no build, test, commit or push. The plan does not approve any slice.
+
+Next action: the owner reviews decisions D1–D13, at minimum D1, D2 and D7. Then complete M04.0, which includes the pending MVP-07 physical acceptance, committing the spec, and ADR-0001. Only after that, start M04.1 if approved. MVP physical acceptance and M01 PCB revision/P07 remain open.
+
+Session breakdown (2026-10-12): [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md) splits the plan into sessions S00–S46 and assesses readiness. The plan was amended for three things:
+
+- `bootc` uses its own NVS key;
+- snapshot v2 is sectioned;
+- TimeSync wiring happens after the command handler moves into the core.
+
+Environment observed on this Windows machine:
+
+- Flutter 3.41.1 via fvm (the project recorded 3.32.8);
+- no PlatformIO, no host C++ compiler, no real Python;
+- WSL has no distribution.
+
+Recommended next sessions: S00 (toolchain and baseline), then S02 (decisions D1, D2, D7, D12 and ADR-0001), then S01 (MVP physical acceptance).
