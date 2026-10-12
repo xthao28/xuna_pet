@@ -83,6 +83,7 @@ Status vocabulary:
 ### Approved / owner-confirmed direction
 
 - **Name:** XUNA (renamed from MOCHI).
+- **Device-first Conversation, Flutter-assisted Experience (owner-requested 2026-10-12):** the physical device is the primary interaction/conversation experience; Flutter is optional for ordinary direct voice once implemented and validated. Device owns core life; cloud offers optional cognitive services. This is long-term product direction, not approval of audio hardware, providers or a voice MVP. Preserve the accepted local MVP and D17 text-first scope; evaluate [device voice architecture](docs/architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md) through separately gated VOICE-01–04.
 - **Existing prototype board:** LILYGO T-Display-S3, standard LCD variant presumed; verify exact board revision and peripherals before pin mapping.
 - **Development environment:** **VS Code + PlatformIO IDE**.
 - **Mobile framework:** Flutter/Dart as the companion-app direction.
@@ -117,7 +118,7 @@ Status vocabulary:
 
 - HoloCubic/Crystal display R&D: optical prism, suitable high-contrast display (evaluate LCD versus AMOLED), viewing geometry, mechanical housing, thermal and cost constraints.
 - Custom PCB and potentially higher-performance MCU, compute module or dual-processor architecture.
-- Direct on-device microphone/speaker, wake-word, low-latency streaming voice, rich speech output.
+- Direct-device voice implementation remains gated by Proposed VOICE-01–04; continuous listening, wake-word and rich streaming speech remain future options, not MVP requirements.
 - Light/Nature/Motion/Social docks, Home Assistant/MQTT integration, inter-pet interactions, more sophisticated ML and cloud features.
 
 **Never promote Proposed or Idea to Approved solely because it appears in this document.** If a new choice conflicts with an Approved decision, explain impact and request a decision.
@@ -132,7 +133,7 @@ Only work on the requested milestone; do not build later milestones speculativel
 | **M02 — Flutter + BLE** | Device pairing, command/state exchange | App discovers/connects, requests animation, receives status |
 | **M03 — Pixel Pet & Animation** | Original character, basic reactions | Idle/happy/sleep/curious animations driven by input/state |
 | **M04 — Digital Life Foundation** | Time, state, event schema, behavior, persistence | Pet state survives reboot; deterministic event processing and tests |
-| **M05 — Memory + Learning + Conversation V1** | Learn from interaction, feedback and dialogue | Show a measured change in future behavior due to prior feedback; phone-based conversation prototype |
+| **M05 — Memory + Learning + Conversation V1** | Learn from interaction, feedback and dialogue | Show a measured change in future behavior due to prior feedback; source-independent Conversation Foundation, initially tested with Flutter text/simulation; device voice separately gated |
 | **M06 — Growth & Evolution** | Experience-linked growth, appearance, Journal | Two histories produce explainable behavior/appearance differences |
 | **M07 — Physical Experience** | External sensors and meaningful environment events | Sensor readings translate to validated events affecting behavior and memory |
 | **Later** | Advanced voice, new displays, cloud, new hardware | Only after validation and explicit priority change |
@@ -152,7 +153,7 @@ Only work on the requested milestone; do not build later milestones speculativel
 
 - Discovery/pairing, BLE communication and device management.
 - Display current state, historical development and Evolution Journal.
-- Interaction UI; use the phone's microphone/speaker for **early conversation prototypes**, not mandatory on-device audio hardware.
+- Interaction UI and optional phone text/voice for early Conversation Foundation testing; device voice is the long-term primary pathway after feasibility validation. Flutter supports provisioning, diagnostics and privacy without becoming a required conversation gateway.
 - Local storage/configuration and user controls over what is remembered.
 
 ### Backend / AI services (optional until justified)
@@ -239,7 +240,9 @@ Conversation is not only a chatbot feature: useful, consented facts become candi
 
 Learn from Xiaozhi's audio pipeline, wake-word/VAD, Opus streaming, server/provider integration and voice-device constraints. Learn from ePet's simulator, modular rendering and persistence. Learn from HoloCubic's optics/mechanics in future R&D. **Do not clone these projects, copy their characters/gameplay or assume compatibility with XUNA's PlatformIO build.** Check original licenses, library licenses, hardware requirements and maintenance before reusing code.
 
-For early conversation:
+For the accepted text-first Foundation, Flutter and simulation provide early inputs. The long-term proposed direct path is device mic → Wi-Fi/local interpretation → validated candidate/confirmation → device Learning/Memory → speaker + pixel expression (see linked voice architecture). No integrated mic/speaker is assumed.
+
+For phone-assisted conversation testing:
 
 ```text
 Phone mic / text → Flutter → optional ASR/LLM/TTS service
@@ -273,6 +276,8 @@ Do not equate more chat history with model intelligence. Prefer measurable learn
 ## 10. Agent execution rules
 
 Before implementing a feature:
+
+**Session communication (owner-requested 2026-10-12):** before starting each session, explain its purpose and overall scope briefly in clear Vietnamese. State what will be built/tested and whether board/app operations are included; avoid implementation detail in the opening update.
 
 1. Read this file and relevant docs/ADRs/source in the actual repository or submodule.
 2. Confirm current milestone and existing implementation; **inspect before changing**.

@@ -1,14 +1,14 @@
 # XUNA — Process and Session Handoff
 
 Last updated: **2026-10-12** (Asia/Ho_Chi_Minh).
-Current milestone: **Planning for M04–M05 complete; M04 not started.** The local MVP through M05 is implemented, but its physical acceptance is pending.
+Current milestone: **M04 pure-core work partially implemented; animated LCD UI uploaded and provisionally accepted.** The local MVP through M05 is implemented, but its physical acceptance is pending.
 Current status:
 
-- Technical plan, session plan rev. 2 and audit written: status Proposed.
+- Technical plan 0.1.2 and session plan rev. 3 updated for device-first Conversation; implementation remains Proposed. Product direction is owner-requested/Approved; ADR-0006 and VOICE-01–04 remain Proposed/not started.
 - Owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
-- No M04 code exists.
+- Firmware S03/S04/S05/S07 and S05-fix-01 complete; S06 pure core only. Current firmware commit c84d4e3 includes animated UI; M04 physical/full acceptance remains pending.
 
-Next action: session **S02 → S00 → S01**; see §0 below.
+Next action: **Animated UI provisionally accepted; await owner’s next request. S11 remains paused.** S01 Android acceptance and full S06 remain pending.
 
 ## 0. Start here — next work (updated 2026-10-12)
 
@@ -30,19 +30,19 @@ Then read only the sections of [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/X
   - **D1:** M04 before new M05 features.
   - **D7:** hatch on the device or via the app (opcode 7); exact `bornAt` only with trusted time in the hatch boot; the MVP pet migrates as Newborn.
   - **D12:** C++11 core.
-  - **D14:** Flutter 3.32.8 pinned via `mobile/.fvmrc` (file not created yet).
+  - **D14:** Flutter 3.32.8 pinned via `mobile/.fvmrc` (created and baseline verified in S00; committed as mobile 77d27ec).
   - **D17:** Conversation Layer A with M05a, text-first; Layer B after M05b.
-- **This Windows machine (2026-10-12):**
+- **Historical Windows inspection (2026-10-12; not this session’s Mac environment):**
   - no PlatformIO, no host C++ compiler, no real Python (Store alias only), no WSL distribution;
   - Flutter 3.41.1 via fvm, with 3.32.8 not installed.
   - iOS builds and runs need the Mac.
 
-**Next sessions, in order** (full steps in the session plan §6):
+**Preparation sequence** (full steps in the session plan §6; latest results below):
 
 | # | Session | Work | Owner input needed | Done when |
 |---|---|---|---|---|
-| 1 | **S02** (S, no tooling) | Create `docs/decisions/README.md` (index of approved D-decisions + ADR template) and `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3 | Accept ADR-0001 or not | Both files exist; Git state reported |
-| 2 | **S00** (M) | Install the PlatformIO IDE extension; install a host compiler; `fvm install 3.32.8` + `mobile/.fvmrc`. Baselines: host tests; `pio run` (expect static RAM 47,504 B, image 964,333 B); `flutter analyze` + `flutter test` (10 tests); `pubspec.lock` unchanged | Choose MSYS2 or WSL for the compiler; OK to commit `.fvmrc` | Versions and baselines recorded in this file |
+| 1 | **S02 — documentation complete** (S, no tooling) | Review/extend existing `docs/decisions/README.md` and create `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3 | Accept ADR-0001 or not | Both files exist; Git state reported |
+| 2 | **S00 — PASS on Mac** (M) | Install the PlatformIO IDE extension; install a host compiler; `fvm install 3.32.8` + `mobile/.fvmrc`. Baselines: host tests; `pio run` (expect static RAM 47,504 B, image 964,333 B); `flutter analyze` + `flutter test` (10 tests); `pubspec.lock` unchanged | Choose MSYS2 or WSL for the compiler; OK to commit `.fvmrc` | Versions and baselines recorded in this file |
 | 3 | **S01** (Owner) | MVP physical acceptance with the phone, plus observed v1 bytes from a BLE inspector. **Verified NVS backup first** (session plan §5) | Board, phone and Mac time | MVP-local.md updated; MVP-07 status set |
 
 After that, follow the session map:
@@ -334,3 +334,119 @@ Still open:
 No code changes and no commit or push.
 
 Next: S02 (ADR-0001 + decisions index) → S00 → S01.
+
+## Device-first documentation update — 2026-10-12
+
+Owner requested architecture/roadmap documentation only. Approved long-term direction: physical XUNA is primary; Flutter assists; optional cloud never owns life state. A5 local MVP and D17 text-first are retained. Proposed ADR-0006, D18–D20 and VOICE-01–04 require evidence/approval; no voice scope silently added. See [architecture](docs/architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md) and session plan §9.
+
+Before edits root/firmware/mobile/backend were clean; child HEADs remain be58099/3846880/0032828. This session runs on `/Users/xthao28/xuna_pet` (Mac path); historical Windows tool availability is not a current toolchain check. No SDK install, code/config/dependency change, build/test, flash, wiring, commit/push or gitlink change. Validation is documentation-only: diff/whitespace, local Markdown references, session/decision consistency, changed-path and unchanged child checks.
+
+Next remains **S02 → S00 → S01**. S02 has a prepared index but ADR-0001 is still pending; it is not Done. S00 remains the next coding/toolchain preparation session, with machine/tool availability rechecked rather than copied from historical Windows notes. S01 physical acceptance and verified NVS backup remain mandatory before refactored/storage-changing uploads. Voice does not block M04 or M05a. D15 stays at S42a.
+
+Documentation verification results: `git diff --check` PASS; scripted relative Markdown path check PASS; all 54 existing session-map rows/dependencies identical to HEAD; no duplicate detailed session IDs; changed/untracked paths are Markdown only; root gitlinks unchanged and all child working trees clean. Builds/runtime tests were not run because implementation was untouched.
+
+## S02 documentation delivery — 2026-10-12
+
+Owner requested incremental execution. Decision index and Proposed ADR-0001 now exist; S02 documentation done criteria are met. ADR acceptance remains pending, no decision silently approved. Preserved prior uncommitted documentation. Corrected T14 table to match separately gated voice research; no implementation/dependency/hardware changes or commit/push. Next: S00 environment and baseline verification on the current Mac.
+
+## S00 — Development environment and baseline (2026-10-12)
+
+Current work machine: owner's Mac at `/Users/xthao28/xuna_pet`, authorized by incremental execution request; existing macOS compiler replaces the historical Windows MSYS2/WSL setup choices. VS Code extension `platformio.platformio-ide` is installed. PlatformIO Core 6.2.0 at `~/.platformio/penv/bin/pio` (not on shell PATH); Apple Clang 14.0.0; FVM 3.2.1; Flutter 3.32.8 / Dart 3.8.1. Added `mobile/.fvmrc` per approved D14, no SDK/dependency upgrade or global SDK change.
+
+| Check actually run | Result |
+|---|---|
+| `c++ -std=c++11 -Wall -Wextra -Werror -Ifirmware/include firmware/test/test_core.cpp -o /tmp/xuna-s00-core` + binary | PASS |
+| Same flags for `test_life.cpp` + binary `/tmp/xuna-s00-life` | PASS |
+| `~/.platformio/penv/bin/pio run -d firmware -e xuna_t_display_s3` | PASS; static RAM 47,504 B; image 964,333 B — matches recorded baseline |
+| `fvm flutter pub get` (mobile) | PASS; existing versions resolved, lock unchanged |
+| `git -C mobile diff --exit-code -- pubspec.lock` | PASS, no diff |
+| `fvm flutter analyze` (mobile) | PASS, no issues |
+| `fvm flutter test` (mobile) | PASS, 10 tests |
+| `pio device list` | No ESP32 USB device detected |
+| `xcrun xctrace list devices` | Mac and iOS simulators only; no real iPhone |
+
+S00 is complete. S01 awaits board USB and a real phone; no verified NVS backup, BLE transcript, physical acceptance, upload or power-cut work performed. Session rules require stopping S01 when hardware prerequisites are missing. S03–S05/S07 remain eligible host-only follow-ups, but no M04 code session started in this preparation run.
+
+Git: previous root documentation edits preserved; new ADR-0001 draft and handoff changes uncommitted. Mobile has only new `.fvmrc`; firmware/backend clean; parent gitlinks unchanged. No commit/push. Next: connect board and real phone for S01; ADR-0001 remains Proposed until explicitly accepted.
+
+## S01 partial — ESP32-only preparation (2026-10-12)
+
+Owner deferred real-phone acceptance and requested ESP32 work first. Device detected at `/dev/cu.usbmodem14101` (Espressif USB 303A:1001). Serial inspection caused USB/UART reset; boot reports XUNA 0.2.0-mvp, 16 MiB Flash and 8 MiB PSRAM. Chip read by esptool: ESP32-S3 silicon revision v0.2; this is **not** the unknown PCB revision. Two idle diagnostic windows: render averages 3507/3491 us, maxima 3693/3527 us; loop-gap maxima 4543/3540 us. This brief observation is not stability or BLE acceptance; LCD was not visually confirmed in this session.
+
+Read actual partition table with esptool 4.5.1 (`read_flash 0x8000 0xC00`); decode verified NVS at 0x9000/0x5000 and complete table matches current build. Read NVS (`read_flash 0x9000 0x5000`), verified file length 20,480 B and recorded SHA-256. Backup files and manifest are outside the repositories at `/Users/xthao28/xuna_backups/2026-10-12-s01/`. Table SHA-256: `bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce`; NVS SHA-256: `f941a8b3398788301c87902e293c8ab8ab6dc629f5b47d8946f1e05787f7e822`. Restore was not tested; no erase/write_flash/firmware upload, pet commands or power-cut tests. Flash reads reset the board; esptool's temporary RAM stub does not replace installed firmware.
+
+S01 remains **In progress — phone-dependent acceptance deferred**. BLE transcript/feedback/reboot/forget and owner visual checks are unvalidated. Backup does not waive S01 gates on S06/S09/S13 etc. S11 additionally needs S04 and owner-operated power-cut evidence. Eligible next firmware work without phone: S03 → S04, then S05/S07; these run on host, with board build verification where specified, and no refactored firmware upload before S01 acceptance. No later session implemented in this partial run; code/submodule state unchanged.
+
+## S03 complete — firmware first / Android later (2026-10-12)
+
+Owner selected Android for future app acceptance and requested the next ESP32/firmware step. S03 is Done; evidence in [S03 record](docs/roadmap/S03-v1-characterization.md). Three frozen host snapshot fixtures and characterization tests added; production code/config unchanged. New tests PASS with C++11/-Werror; all three host suites PASS with ASan/UBSan; ESP32 build PASS at unchanged 47,504 B RAM / 964,333 B image. No upload, runtime interaction, commit/push or gitlink update.
+
+Current firmware working tree contains uncommitted test fixtures/test/README changes. Previous root documentation and mobile .fvmrc preserved. Next S04, then S05/S07 host work as appropriate; S01 remains a gate on later board refactor/storage uploads. Phone path is Android (owner-selected), not iPhone; no Android native/physical BLE success claimed.
+
+## S04 — Portable core delivery (2026-10-12)
+
+[Evidence and changed paths](docs/roadmap/S04-portable-core.md). Five pure headers moved under firmware/lib/xuna_core/include/xuna without production logic changes; BoardConfig/CoreConfig split, Unity suites and native/native_asan environments added. Firmware tools/check_core_purity.py runs for every environment. Native and sanitizer runs PASS (8/8 each); ESP32 build PASS, unchanged RAM 47,504 B / image 964,333 B. Native 1.2.1 and Unity 2.6.1 installed by PlatformIO for this test setup; firmware pins/partitions unchanged.
+
+Current commands: `~/.platformio/penv/bin/pio test -d firmware -e native` / `-e native_asan`; build with `pio run -d firmware -e xuna_t_display_s3`. Earlier manual test paths in historical sections no longer exist after this move. Core library has no Arduino dependencies. Mobile's earlier .fvmrc and all previous root/S03 edits retained; no new mobile/backend work. Firmware refactor is uncommitted; parent gitlink unchanged. No flash/upload or physical acceptance.
+
+Next S05 (pure fixed-point/RNG/ClockModel); S07 also eligible after S04. Device for future app validation is Android. S01 remains partial and required before refactored/storage-changing board uploads.
+
+S04 negative guard check: PASS in native, native_asan and ESP32; temporary Arduino.h include removed. Clean build after restoration PASS.
+
+## S05 — Foundation primitives complete (2026-10-12)
+
+Owner resumed work after reporting board warmth under Mac USB power. S05 ran entirely on host; no serial/flash/board operation or thermal measurement. [Detailed contracts/evidence](docs/roadmap/S05-foundation-primitives.md): fixed-point Q0.16/Q16.16 arithmetic with saturation/rounding; deterministic Pcg32/IRandom with official vectors; ClockModel with unknown-on-boot, rollback protection, quality/day-part logic and 64-bit monotonic inputs. Defaults 24 h/5 min remain Proposed tuning values. PCG adaptation is Apache-2.0, with notice/license and exact source SHA recorded in firmware README.
+
+Tests-first missing-header build failure observed; then all native and native_asan suites PASS (12/12 each). ESP32 cross-compile smoke for all new headers PASS; normal ESP32 build/purity guard PASS at unchanged 47,504 B RAM / 964,333 B image. Primitives are not wired into firmware yet; no host-target runtime parity or physical acceptance claimed. Root/firmware whitespace checks and updated document paths PASS.
+
+Next prefer S07 since it requires S04 only and is fully host-side; this is allowed by the existing session map, not a milestone reorder. S06 pure identity work is eligible but its full completion includes gated board steps (S01). Android app work stays deferred. Firmware/root changes remain uncommitted, mobile has only prior .fvmrc, backend unchanged; no gitlink update or push.
+
+## S07 — Event foundation complete (2026-10-12)
+
+Owner requested a plain-language overview before each session; rule recorded in AGENTS §10 for future sessions. [S07 evidence](docs/roadmap/S07-events.md): 25-kind registry with compile-time uniqueness, in-RAM event envelope, fixed-capacity ring, no-wrap boot/sequence IDs and bounded queue with explicit critical rejection and drop counters. No persisted codec or firmware wiring.
+
+Tests-first failure for missing header, then new tests PASS. Full native and native_asan regression PASS, 18/18 each; Xtensa compile smoke PASS; ESP32 build/purity guard PASS at unchanged 47,504 B RAM / 964,333 B image. Existing upstream warnings unchanged. No board/serial/Flash operation, app change, commit/push or gitlink update; earlier edits retained.
+
+Open finding: S05 ClockModel currently returns Unix-epoch minutes while event/plan §7.1 specifies minutes since 2020. Models are not wired; do not assign between them yet. Next focused S05-fix-01 corrects the internal conversion and tests before identity/time-event integration, without changing deployed protocol/state. Then continue eligible firmware sessions; S08a requires S01 observed bytes, and S06 board steps remain gated. Android app work remains deferred.
+
+## S05-fix-01 — Compact time epoch corrected (2026-10-12)
+
+[Fix record](docs/roadmap/S05-fix-01-time-epoch.md). ClockModel compact minutes and persisted watermark now use the planned 2020 epoch; UTC milliseconds remain Unix. Reboot still yields unknown time; watermark conversion and u32 range checks are consistent. The S07 integration finding is resolved, with no deployed state or BLE protocol migration (new clock remains unwired).
+
+Tests-first regression failed against the old implementation, then native and native_asan PASS 19/19 each; no sanitizer diagnostics. Pinned Xtensa compile-only smoke PASS; ESP32 build/purity PASS at unchanged 47,504 B RAM / 964,333 B image. Whitespace/link checks PASS. No serial/Flash operation, upload, app change, thermal measurement, commit/push or gitlink update. Previous uncommitted edits retained.
+
+Next S06 pure identity/hatch/migration work; board tests/NVS writes remain pending S01 Android acceptance and backup gate. Do not infer physical identity/persistence validation from host-only delivery.
+
+## S06 partial — Pure identity/hatch/migration (2026-10-12)
+
+[Scope and codec layout](docs/roadmap/S06-identity-core.md). CRC32, explicit 64-byte IdentityRecord and pure IdentityService implemented. Core stages candidates separately from successful storage acceptance; retains existing identity, never regenerates corrupt/too-new data, migrates valid MVP snapshot identity with birth unknown, and backfills birth only from Synced time in the hatch boot. Service does not change old learning/lifetime state. Hardware entropy/committed boot-counter come from future adapter, not this core.
+
+Tests-first missing-header failure observed; native/ASan/UBSan full regression PASS 23/23 each. Xtensa compile smoke and ESP32 target build/purity PASS; unchanged 47,504 B RAM / 964,333 B image. Whitespace and local-link checks PASS. No board/Flash/serial operation, upload, app edit, commit/push or gitlink update; previous changes preserved.
+
+S06 remains In progress: StorageKeys, bootc persistence, radio/RNG adapter, gesture/egg rendering, isolated namespace and board checks not implemented/run. S01 physical baseline still gates board steps. Next eligible S14 ActivityFsm (S07 prerequisite met); this does not satisfy S10/S12 dependencies on full S06. Android app work remains deferred.
+
+## S11 preparation — isolated benchmark and restore (2026-10-12)
+
+Owner requested S11. [E4/E5 record](docs/research/E4-E5-storage.md) contains concrete external source/config paths and pending measurement gates. Benchmark project /Users/xthao28/xuna_experiments/s11-storage built PASS (159,840 B static RAM / 365,053 B image); original-MVP restore project s11-mvp-restore built PASS (47,504 B RAM / 964,333 B image). Source uses committed be58099 display/config, not uncommitted refactor. Nothing merged into firmware. Runtime sample buffers add 120 KB static RAM; no BLE coexistence or wear claim.
+
+Correction to earlier recommendation: S11 itself lists S04+backup, but global session rule §2.3 and cleanup baseline require S01 for storage-changing upload. Preparation is possible now; runtime requires S01 or explicit owner exception after reviewing isolated scope/backups/restore. No exception was silently recorded. USB device listing currently shows no ESP32. Fresh verified NVS/full-image backup required before filesystem experiment. Old backup alone is insufficient to validate new writes/restoration.
+
+Draft ADR-0002 created, Proposed, no layout option/D2 approved. Serial-controlled NVS/FS benchmarks and storms/recovery are build-checked only; no format/flash/readback/cuts performed. Both current repositories and earlier uncommitted changes preserved; no source edit inside firmware in this preparation, commit/push or gitlink update. Source/firmware artifact hashes in external artifact-manifest.json. Documentation whitespace/local-link checks PASS. S11 In progress, E4/E5 unmeasured.
+
+## Static pet UI — owner-requested priority (2026-10-12)
+
+Owner paused S11 and requested direct reference-image UI in firmware, including upload when connected. [Static scene record](docs/roadmap/UI-static-scene.md) contains complete configuration, generation, validation and file paths. Source preserved, nearest-neighbor contain conversion to 320×170, no crop; RGB565 108,800 B in Flash. Display uploads image once, no loop repaint or sprite buffer; life/BLE/storage logic unchanged. Existing toolchain/pins/rotation retained, PCB revision unknown.
+
+Build PASS: RAM 46,072 B (−1,432), image 1,062,793 B (+98,460). Deterministic generation/Flash ELF placement and native 23/23 PASS. Board appeared again; fresh actual-table comparison/NVS backup PASS, then owner-authorized UI upload PASS. Startup draw 31,663 us; 25-second serial observation with no spontaneous reset/error. Owner confirmed “Ảnh đúng, màu đúng, ổn định”. NVS after upload equals backup byte-for-byte. Full-image benchmark/format/power-cut work was not run. Backup/log outside repo in xuna_backups/2026-10-12-static-ui.
+
+Current board runs static UI from the uncommitted working tree (includes prior portable core extraction). No persistence format changes; S01 app/BLE full acceptance remains pending and is not satisfied by visual confirmation. S11 remains paused, not completed; no benchmark exception granted. No commit/push/gitlink update. Mobile/backend unchanged in this session. Next UI work only on owner request; no automatic resume of paused S11.
+
+## Animated UI and Git delivery — 2026-10-12
+
+Owner requested room/pet palette redesign, independent idle/blink/wiggle and upload, then provisionally accepted final corrected version and requested committing today's work. [Animated UI record](docs/roadmap/UI-animated-scene.md) has current assets, implementation and physical evidence. Initial art/motion feedback incorporated; subsequent torso-foot seam and missing dark tips fixed with overlapped layers/immutable foot pieces/explicit tip color.
+
+Final assets: 320×170 background plus 20 fixed 96×72 frames, 385,280 B in Flash; one 13,824 B startup region buffer. Pet visible height 65 px (~38%). No frame allocations/delay; palette masks/seam checks PASS. Native and ASan/UBSan 25/25 PASS; final build/upload PASS at RAM 46,144 B / image 1,340,569 B. Final 25-second log: draw max 4,754 us / loop gap max 4,767 us, stable heap, no spontaneous reset/error. GPIO0 Happy observed in v2 log; GPIO14 full physical check not separately logged. Owner: “tạm thời đã ổn có gì cần sửa tôi sẽ nói sau”. Not long-run/thermal/BLE validation.
+
+NVS differs only in the newest valid snapshot generation/active-lifetime checkpoint (4/1200 → 5/1500); learning/episodes unchanged. Fresh partition/NVS backups and raw logs remain outside Git under xuna_backups/2026-10-12-animated-ui. S11 remains paused; source-only benchmark archive now versioned under docs/research/artifacts, no experiment performed.
+
+Authorized Git delivery (no push): firmware **c84d4e3** contains today's core/tests/assets/UI; mobile **77d27ec** contains approved Flutter pin. Parent commit containing this entry records updated gitlinks and all today's root docs/research source archive. Backend unchanged. ADR-0001/0002/0006 remain Proposed; committing drafts does not accept them. S01 Android/full S06 and later M04 integration remain open. Earlier historical “uncommitted/not uploaded” entries describe their original sessions; this section is the current delivery.

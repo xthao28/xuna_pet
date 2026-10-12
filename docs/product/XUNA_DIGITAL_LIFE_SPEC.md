@@ -32,8 +32,9 @@ This is a **product/game/AI-system specification for planning**, not an instruct
 | IDE | **Approved** | VS Code + PlatformIO IDE |
 | Mobile framework | **Direction established** | Flutter companion app |
 | Delivery sequence | **Approved direction** | M01 display/input → M02 BLE Flutter → M03 expressive pet → M04 life core → M05 learning/memory/conversation → M06 evolution → M07 sensor experience |
-| Conversation participates in learning | **Owner-confirmed** | Flutter voice/text initially; learning events influence pet over time |
-| Digital Life state authority | **Proposed** | Device authoritative; Flutter projects state and stores permitted history/cache |
+| Conversation participates in learning | **Owner-confirmed** | Foundation alongside M05a, text-first under D17; device-first long-term interaction with Flutter optional after voice validation |
+| Device-first Conversation / Flutter-assisted Experience | **Approved direction — 2026-10-12** | Physical device is primary; voice implementation remains Proposed in VOICE-01–04; local MVP unchanged |
+| Digital Life state authority | **Approved direction** | Device owns core life; Flutter projects state/cache; sync and storage implementation policies remain Proposed |
 | Behavioral AI | **Proposed** | FSM for mode constraints + Utility AI for choices |
 | Learning | **Proposed** | Online preference estimator/contextual bandit; benchmark offline |
 | Evolution renderer | **Proposed** | Composable pixel traits; no giant fixed evolution tree |
@@ -154,7 +155,7 @@ stateDiagram-v2
 - **Interaction:** button/touch or BLE command produces a typed input event. XUNA chooses an allowed reaction, exposes that reaction, and opens a bounded feedback window.
 - **Feedback:** owner explicitly approves/disapproves or provides another clearly defined feedback cue; learner updates behavior choice probability without instantly overriding personality.
 - **Calm period:** idle behaviors vary according to energy, mood, current context and learned preferences. The pet does not require constant tapping to remain healthy.
-- **Conversation (when Flutter available):** owner speaks or types; AI response can reference **validated** local memory, while conversation is also a candidate source of corrected preferences/milestones. Text/voice events are safely transported back to the device.
+- **Conversation (Flutter text initially; direct device voice after validation):** owner speaks or types; AI response can reference **validated** local memory, while conversation is also a candidate source of corrected preferences/milestones. Text/voice events are safely transported back to the device.
 - **Evening:** may settle into quiet behavior, influenced by actual schedule preferences; if time is uncertain, avoid firm claims that it is evening.
 - **After power-off:** pet resumes identity and last committed state. Trusted wall-clock recovery can advance calendar age, but cannot retroactively fabricate sensor events or training rewards.
 
@@ -441,9 +442,11 @@ Flutter can later render natural language explanation. Never allow a creative LL
 
 ### 11.1 Product approach
 
-Conversation is **an input channel to Memory and Learning**, plus an output channel for personality/behavior. It is not the complete XUNA brain. Owner-requested direction: develop basic conversation alongside M05 Learning, using the **phone microphone/speaker or text first**, without assuming direct ESP32 audio hardware.
+Conversation is **an input channel to Memory and Learning**, plus an output channel for personality/behavior. It is not the complete XUNA brain. Owner-requested direction (2026-10-12): **Device-first Conversation, Flutter-assisted Experience**. Develop Foundation alongside M05a Learning using text/simulation first (D17); evaluate direct-device voice through VOICE-01–04. Ordinary direct conversation must need no open app once implemented and validated. Hardware, cloud providers and offline Vietnamese speech remain unvalidated; the accepted local MVP stays unchanged. See [device voice architecture](../architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md).
 
 ### 11.2 Proposed data flow
+
+Direct-device target: microphone → capture/PTT → limited local command or secure Wi-Fi service → candidate semantics → device validation/confirmation → authoritative Learning/Memory → audio + pixel expression. Offline core behavior needs no STT/LLM. The following is the initial phone-assisted adapter, not a required long-term gateway:
 
 ```text
 Flutter push-to-talk / text
@@ -653,14 +656,16 @@ No artificial pet death, humiliation, guilt-based messages, compulsive daily str
 | **M02 — Flutter/BLE** | Discovery, pairing, command and status round-trip, reconnect | Flutter button causes device reaction and receives ACK/state |
 | **M03 — Pet Expression** | Original character, idle/happy/sleep/curious animation, small FSM | XUNA appears responsive and can idle without user |
 | **M04 — Digital Life Foundation** | Stable identity, time quality, state reducer, event envelope, snapshot, behavior selection | State survives reboot, no time double-count, deterministic host tests |
-| **M05a — Explicit Feedback Learning** | Contextual action learner, confidence, test simulation and state persistence | Pet demonstrably changes future decisions from feedback |
+| **M05a — Learning + Conversation Foundation (M05c-A)** | Contextual learner, structured candidate preference/feedback, confirmation, source-independent simulation/text testing and persistence | Confirmed teaching changes future behavior, persists after reboot and works without phone |
 | **M05b — Memory + Journal Foundation** | Episode salience, aggregates, provenance, first milestone records | Reliable memories and explanation trace, bounded storage |
-| **M05c — Flutter Conversation V1** | Push-to-talk/text, secure optional AI service, candidate events, confirmation/correction | User can teach preference; device learner changes behavior; no fake memory |
+| **M05c — Conversation + long-term Memory (M05c-B)** | Extend Foundation: TeachFact, SupersedeFact, ForgetFact, ReadFacts, grounded recall, privacy and sync; validated voice adapter optional | Confirmed facts survive reboot; correction/deletion and authorized recall work; no fake memory |
 | **M06 — Growth & Evolution** | Developmental gates, modular traits, transition and journal | Two life histories produce justified differentiated outcomes |
 | **M07 — Physical Perception** | Light/IMU (when purchased), filters, semantic events, gameplay impact | Physical observations can update learning/evolution; false positives measured |
-| **Future** | On-device audio, HoloCubic, custom PCB/AI hardware, docks, robust cloud sync | Research + explicit approval required |
+| **Separate voice workstream** | VOICE-01–04 hardware/audio/pipeline/learning feasibility | Evidence and owner gates; no dependency for M04/text M05a |
+| **M05d — Cognitive Capabilities** | Habit prediction, skills and dual-history evaluation | Proposed; order versus Evolution MVP decided at S42a/D15 |
+| **Future** | HoloCubic, custom PCB/AI hardware, docks, robust cloud sync | Research + explicit approval required |
 
-**Dependency warning:** M05 includes voice and learning as one product direction, but internal sub-slices M05a/M05b/M05c are intentionally separate to reduce rework. If firmware reality requires reordering, propose it explicitly.
+**Dependency warning:** Conversation Foundation (M05c-A) develops alongside M05a under Approved D17; M05c-B adds facts/recall after M05b. Device voice has separate Proposed gates and does not block text delivery. M05 includes conversation and learning as one product direction, but internal sub-slices M05a/M05b/M05c are intentionally separate to reduce rework. If firmware reality requires reordering, propose it explicitly.
 
 ## 20. Acceptance criteria for first meaningful "living pet" prototype
 
@@ -1005,11 +1010,11 @@ Use checksum/version/counter and a recoverable write strategy appropriate to cho
 
 ### 24.6 Voice/conversation architecture — lessons from Xiaozhi, without chatbot-first design
 
-**M05 baseline (proposal):** Flutter push-to-talk -> STT or typed text -> conversation provider -> constrained intent/fact extraction -> validation/consent -> `ExperienceEvent` -> device Memory/Learning -> context-aware reply + animation intent. The response must *not* be the only output: check that future local behavior actually changes when learning evidence is sufficient.
+**Initial companion adapter (proposal; D17 text-first):** Flutter optional push-to-talk -> STT or typed text -> conversation provider -> constrained intent/fact extraction -> validation/consent -> `ExperienceEvent` -> device Memory/Learning -> context-aware reply + animation intent. The response must *not* be the only output: check that future local behavior actually changes when learning evidence is sufficient.
 
 Keep provider interfaces replaceable: `SpeechInput`, `ConversationProvider`, `SpeechOutput`, `ConversationEventExtractor`, `ConversationMemoryRetriever` and `ActionProposalValidator` (illustrative names). Instrument latency, service failures, privacy/storage choices and cost per session; never embed cloud secrets in Flutter firmware binaries. A minimal authenticated proxy might be needed for cloud credentials, but a full Backend is not mandatory for the earliest learning experiments.
 
-**Future direct-device voice research:** examine Xiaozhi Opus buffering, VAD, wake-word, WebSocket vs MQTT/UDP, AEC needs, OTA/config and supported board mapping. Before reuse, confirm compatible ESP-IDF version, actual audio codec/microphone/speaker hardware, RAM/PSRAM usage, streaming latency and failure behavior. A framework move must be recorded as a new ADR and is not implied by referencing Xiaozhi.
+**Proposed direct-device voice workstream (VOICE-01–04; separately gated, outside accepted local MVP):** examine Xiaozhi Opus buffering, VAD, wake-word, WebSocket vs MQTT/UDP, AEC needs, OTA/config and supported board mapping. Before reuse, confirm compatible ESP-IDF version, actual audio codec/microphone/speaker hardware, RAM/PSRAM usage, streaming latency and failure behavior. A framework move must be recorded as a new ADR and is not implied by referencing Xiaozhi.
 
 **Tool/action safety contract:** every LLM suggestion is a proposal. Actions pass through allowlisted capabilities, ownership/permission checks, physical safety constraints, bounded execution and audit events. Deny by default for unavailable or unpaired devices. Disable or degrade cloud services gracefully while local life remains functional.
 

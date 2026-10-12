@@ -1,7 +1,7 @@
 # XUNA — Implementation Session Plan
 
 **Status:** Proposed. This file breaks [XUNA_IMPLEMENTATION_PLAN.md](../architecture/XUNA_IMPLEMENTATION_PLAN.md) (XUNA-TIP-001) into small, independently verifiable work sessions. **It does not approve any session.** Each session starts only after the owner asks for it, and after its listed decisions are answered.
-**Date:** 2026-10-12 · **Revision:** 2. Audit corrections; see [XUNA_PLAN_AUDIT.md](../architecture/XUNA_PLAN_AUDIT.md). Sequencing changes are Proposed (D17, D15).
+**Date:** 2026-10-12 · **Revision:** 3. Device-first direction update; audit history preserved. D17 is Approved; D15 and VOICE implementation choices remain Proposed. S00–S46 numbering is retained.
 **Audience:** the owner, plus the coding agent or engineer who runs each session.
 
 Plan references:
@@ -25,20 +25,20 @@ Plan references:
 | M04.5 FSM/needs/visuals | Yes for pure logic | Threshold values are placeholders, tuned in Life Lab | S14–S17 |
 | M04.6 Life Lab | Partly | Trace grammar and golden-file format | S18–S21 |
 | M05a learner v2 | Algorithm yes | D3–D6, action vocabulary aligned with art, E10 parameter choice | S22–S28 |
-| **M05c-A conversation foundation** (with M05a) | Contract yes (§11.6) | D17 (restructure), phrase table, optional voice (E13, D16) | S22, S24a, S26, S39, S27a, S27b, S28 |
+| **M05c-A conversation foundation** (with M05a) | Contract yes (§11.6) | D17 approved; phrase table, optional voice (E13, D16) | S22, S24a, S26, S39, S27a, S27b, S28 |
 | M05b memory/journal/BLE v2 | Partly | D8, D9; E8 MTU; E9 bonding → D10; v2 payload layouts | S29–S38 |
 | M05c-B conversation + memory | Partly | D8, D10; V2 needs D11a → E12 → D11 | S40–S42 |
 | M05d cognitive gates | Algorithm yes | Thresholds are hypotheses until Life Lab data; order vs Evolution MVP (D15) | S42a, S43–S46 |
 | M06 / M07 | Outline only | Broken down after checkpoint S42a (rolling-wave planning) | later |
 
-**Missing prerequisites observed on this Windows machine (2026-10-12):**
+**Historical prerequisites observed on Windows (2026-10-12; recheck on the actual session machine):**
 
 - No PlatformIO, so no `pio`.
 - No host C/C++ compiler (`gcc`/`clang`).
 - `python` is only the Microsoft Store alias.
 - WSL is present but has no Linux distribution.
 - **Flutter:**
-  - fvm default is 3.41.1, and there is **no `mobile/.fvmrc`**.
+  - fvm default is 3.41.1, and there is **no `mobile/.fvmrc`**.Í
   - `pubspec.lock` requires Flutter ≥ 3.27.0 / Dart ≥ 3.7.0.
   - Validation evidence exists only for 3.32.8 / Dart 3.8.1 (macOS).
   - **D14 approved 2026-10-12:** pin 3.32.8 via `mobile/.fvmrc` (not yet created; S00).
@@ -243,12 +243,13 @@ Notes:
 ### S02 — Decisions and documentation housekeeping (M04.0)
 
 - **Goal:** record the decision index and ADR-0001.
+- **Partial preparation (device-first documentation update):** decisions index now exists with approved decisions and Proposed ADR-0006. Inspect/extend it; do not overwrite it. ADR-0001 was drafted in S02 on 2026-10-12; documentation deliverables are complete, policy acceptance remains pending.
 - **Preconditions:** none.
 - **Already done (2026-10-12):**
   - The owner approved D1, D7, D12, D14 and D17. They are recorded in AGENTS.md §3 and plan §18.
   - The plan amendments for D7 are applied: device or app hatch, opcode 7, the Egg state and the `bornAt` rule (§12).
 - **Remaining steps:**
-  1. Create `docs/decisions/README.md`: an index of the approved D-decisions with dates and links, plus a short ADR template (Context, Options, Decision, Consequences, Status).
+  1. Review/extend `docs/decisions/README.md` (created by the device-first documentation update): an index of the approved D-decisions with dates and links, plus a short ADR template (Context, Options, Decision, Consequences, Status).
   2. Create `docs/decisions/ADR-0001-reference-reuse-policy.md` from plan §6.3. Status is *Accepted* only if the owner approves it.
   3. On owner request, commit the ADR, the index and the decision updates.
 
@@ -332,6 +333,7 @@ Notes:
 
 - **Goal:** pure code lives in a library that builds for both the board and the host, with standard tests.
 - **Preconditions:** S03.
+- **Delivery (2026-10-12):** implemented and verified; see [S04 record](S04-portable-core.md). Old flat header/test paths below describe the migration input; current core/test paths are the listed targets. No board upload.
 - **Steps:**
   1. Create `firmware/lib/xuna_core/library.json` (name `xuna_core`, no framework dependency).
   2. Move the pure headers to `lib/xuna_core/include/xuna/` unchanged: `DebouncedButton.h`, `AnimationManager.h`, `LifeEngine.h`, `BleProtocol.h`, `LocalBehavior.h`. Update the includes to `<xuna/...>`.
@@ -354,6 +356,8 @@ Notes:
 
 ### S05 — Fixed-point, PCG32 and ClockModel (pure; M04.2a; T2)
 
+- **Delivery (2026-10-12):** pure logic implemented, native/sanitizer suites verified; see [S05 evidence](S05-foundation-primitives.md). No firmware wiring or board upload.
+
 - **Preconditions:** S04.
 - **Steps (tests first for each item):**
   1. **`xuna/base/Fixed.h`.**
@@ -372,6 +376,8 @@ Notes:
 - **Done when:** native tests are green and the purity check passes. **No firmware wiring yet.**
 
 ### S06 — Identity record, `bootc`, hatch/migration (M04.2b; T2, T10, T18)
+
+- **Partial delivery (2026-10-12):** CRC32, identity codec/service and host tests implemented; [S06 core record](S06-identity-core.md). Storage keys/bootc/RNG/wiring/gesture/test namespace and board checks remain pending. Full S06 is not Done.
 
 - **Preconditions:** S05; D7 (approved 2026-10-12). The **board step** additionally needs S01 recorded and a verified backup (§5), because this session adds NVS writes.
 - **Steps:**
@@ -410,6 +416,8 @@ Notes:
 - **Done when:** native tests pass, the firmware builds, and the board check is recorded (or marked *not run*).
 
 ### S07 — In-RAM events, registry, ring buffer, queue (pure; M04.3a; T3)
+
+- **Delivery (2026-10-12):** implemented and host-tested; [S07 evidence](S07-events.md). No wiring. Follow-up [S05-fix-01](S05-fix-01-time-epoch.md) resolved the UTC-minute epoch mismatch on 2026-10-12.
 
 - **Preconditions:** S04. Can run in parallel with S05/S06.
 - **Scope note (audit):** the persisted 40-byte codec and CRC-16 move to **S32**, where the log is written. Its format then follows D2. This session only covers the in-RAM event model.
@@ -509,6 +517,8 @@ Notes:
 - **Done when:** all tests are green and the owner check is recorded.
 
 ### S11 — Storage experiment E4/E5 → ADR-0002 → D2 (M04.4a)
+
+- **Preparation (2026-10-12):** isolated bench source/build and restore project prepared; [E4/E5 record](../research/E4-E5-storage.md). No hardware measurements. Runtime upload still requires S01 under §2.3 or an explicit owner exception with a board-only preservation baseline. Reconnect board and refresh backup first.
 
 - **Preconditions:** S04. A verified backup (§5) is taken first.
 - **Steps:**
@@ -688,6 +698,8 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S22 — Learning and conversation decisions (Owner)
 
+- **Direction check:** A11 device-first is approved product intent. Keep D17 text-first; freeze candidate/preference semantics independent of text/voice/simulation. Do not require voice hardware. D18–D20 remain separate gates.
+
 - **Timing:** this session can run as early as right after S02. Early action-vocabulary decisions give the art work lead time. It must precede S23 and S39.
 - **Decisions:**
   - D3: feedback window.
@@ -728,6 +740,8 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S24a — Stated-preference evidence + opcode 6 (pure; M05c-A)
 
+- **Shared contract:** separate input channel from `user_stated`/`user_feedback` evidence; add simulated candidate fixtures without changing deployed source codes. No device audio work.
+
 - Implement plan §11.6 in the core:
   - `CodecV1` parses opcode 6 (12 bytes).
   - `CommandHandler` validates context, action and source.
@@ -750,12 +764,16 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S26 — Firmware wiring (learning + Layer A device side)
 
+- **Boundary check:** the validated learning command path must be reusable by a later device-local adapter; keep opcode 6/capability contract and C++11, with no raw audio/LLM output in core.
+
 - Day-part contexts (needs S10). GPIO0 greeting as a learning context, if D5 approves it.
 - A v1-additive explanation read characteristic (20 bytes, last decision's context, including `statedMass`), with its payload frozen in this session.
 - Opcode 6 enabled, capability bit 5.
 - The board demo script is prepared for S28.
 
 #### S39 — Conversation domain + LocalRuleExtractor (Dart; M05c-A)
+
+- **Foundation role:** define candidate/confirmation contracts shared conceptually with device and simulation adapters; Dart extraction is the first implementation. Layer B S40–S42 extends this Foundation. No mandatory interface hierarchy or voice dependency.
 
 - **Moved from M05c by the audit; the ID is kept.** It is pure Dart and can run in parallel with S23–S26 after S22.
 - Dart interfaces from plan §11.3; `CandidateEvent`.
@@ -770,6 +788,8 @@ The track is developed together and accepted together in S28. This implements A6
 - Golden vectors are updated through S20's procedure. Tests are green.
 
 #### S27a — Mobile: Conversation Foundation wiring (M05c-A)
+
+- **Confirmation contract:** explicit candidate review and provenance must be reusable by later device voice UX; this session implements the mobile text path only.
 
 - **Pipeline:** text input → `LocalRuleExtractor` → `CandidateEvent` → confirmation screen → command.
   - The confirmation screen shows exactly what will change and its provenance.
@@ -795,6 +815,8 @@ The track is developed together and accepted together in S28. This implements A6
 - Opcode `source = 3` (confirmed voice).
 
 #### S28 — Joint M05a + Conversation Foundation acceptance (Owner)
+
+- **Source independence:** include simulated validated/rejected candidates through the same learner; hardware voice is not required. Preserve all existing joint acceptance criteria.
 
 - **Board + phone, learning:**
   - A preference forms in one context and stays isolated from the others.
@@ -822,6 +844,8 @@ The track is developed together and accepted together in S28. This implements A6
 - Tests: a bounded store after 10,000 events; protected records survive; determinism.
 
 #### S31 — Journal, provenance, tombstones (pure)
+
+- **Voice provenance fixture:** a spoken claim is `user_stated`, never a physical/sensor observation; use synthetic fixtures, not assumed audio hardware.
 
 - Journal records cite evidence IDs; enforcement of the provenance enum; tombstones; ForgetAll per D9; migration of the 8 v1 episodes kept from S12b.
 - Tests:
@@ -874,10 +898,14 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S40 — Device facts and commands
 
+- **Reuse:** the authoritative fact command validator is shared with future authorized device voice; privacy/consent do not depend solely on BLE security. No audio dependency.
+
 - `TeachFact`, `SupersedeFact`, `ForgetFact`, `ReadFacts` (v2), FactRecord store with the D8 allowlist, `CommandId` dedup, and the D10 authorization tier.
 - Tests: validation table; supersede chain; tombstone; unbonded rejection.
 
 #### S41 — Fact confirmation, grounded replies, recall (mobile)
+
+- **Extension:** extend existing Foundation for facts/recall; device confirmation is a later D20/VOICE-04 adapter to the same semantics.
 
 - Reuses the S27a confirmation component and the S39 extractor; the Layer B intents become active.
 - Replies are built only from device-confirmed data, phrased per provenance ("bạn đã kể với mình…").
@@ -885,6 +913,8 @@ The track is developed together and accepted together in S28. This implements A6
 - Scenario F test.
 
 #### S42 — M05c-B acceptance (Owner) + optional V2 spike
+
+- **Conditional voice evidence:** include device-originated facts only if VOICE-03 and D20 are ready; otherwise record coverage as deferred and retain text acceptance. VOICE-04 fact extension additionally requires this session.
 
 - Nickname taught → shown after a reboot; correction; forget in both stores; personal facts refused unbonded.
 - **V2 spike (E12)** runs only after **D11a** authorizes it, with test data only. It is research output, not product code. D11 is decided after it.
@@ -945,3 +975,20 @@ Recommended order:
 3. **S01** — MVP physical acceptance plus the observed-byte capture. It must finish before S06's board step, S08a and S09.
 
 S03–S05 and S07 are pure host work and can proceed while S01 waits for the phone, once S00 is done (D1 is approved).
+
+## 9. Proposed device voice feasibility sessions — separate workstream
+
+All four are **Proposed / not started**. They do not renumber or block S00–S21, S22–S28 or text S39–S42. Starting an experiment requires the owner's session request and relevant approvals. See [device voice architecture](../architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md). E13/S27b remain optional **phone** recognition, separate from this track.
+
+| ID | Goal | Preconditions | Deliverable / acceptance |
+|---|---|---|---|
+| VOICE-01 | Hardware feasibility | Owner requests research; revision evidence available or explicitly marked missing | Revision-matched available/reserved GPIO and display/button/USB/PSRAM audit; I2S mic and amp/speaker vs codec options; voltage/current, RAM/Flash/framework, enclosure and future battery implications; verified quotes only, otherwise costs unknown; recommendation and D18 checkpoint |
+| VOICE-02 | Audio I/O prototype | VOICE-01 report, D18 approval, actual authorized peripherals/board; verified backup if firmware replaced | Real capture/playback stability, underruns/overruns, memory/internal DMA/PSRAM, CPU/loop/render latency vs baseline and power observations. Compile/simulation cannot pass this gate |
+| VOICE-03 | Device Conversation Pipeline | VOICE-02 measured pass; D19 research scope/security/spending authorization; D11a before cloud tests; authorized network/service | Device PTT → secure Wi-Fi → Vietnamese STT/LLM/TTS → speaker + expression with Flutter closed. Stage/end-to-end latency, bandwidth, quality/cost/retention and Wi-Fi stability; timeout/cancel/late reply/reconnect/offline fallback tests; recommended architecture, final D19/D11 if applicable and D20 checkpoint |
+| VOICE-04 | Conversation-to-Learning Integration | VOICE-03 validated path, D19 final/D11 if applicable, D20 scope/confirmation approval and S28 Foundation; S42 additionally for facts | Real device candidate → validate → explicitly confirm → same learner → changed future behavior → reboot → phone/cloud disconnected use; traceable source/provenance, dedup and rejection tests. Fact extension verifies recall/correction/deletion without resurrection |
+
+VOICE-01 documents missing PCB/peripheral evidence instead of guessing pins. No buying/wiring is part of research. VOICE-02/03 freeze measurement methods and owner acceptance thresholds before prototype code. Exact audio/network protocol, tasks/buffers and hardware configuration are chosen only from evidence; framework changes require a separate ADR. VOICE-04 validates integration and does not replace S28 or S42 acceptance history.
+
+## Completed focused fixes
+
+- **S05-fix-01 — compact time epoch:** align ClockModel minutes/watermark with 2020 epoch while preserving Unix millisecond input; [record](S05-fix-01-time-epoch.md). No session renumbering or board gate change.

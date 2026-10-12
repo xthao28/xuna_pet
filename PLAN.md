@@ -102,8 +102,111 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | ID | Status | Evidence / next step |
 | --- | --- | --- |
 | TIP-01 | Done — 2026-10-12 | Proposed plan [XUNA_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_IMPLEMENTATION_PLAN.md). Slices M04.0–M07 are defined there and **not started** |
-| TIP-02 | Pending owner | Answer decision requests D1–D13 (plan §18) before any M04.x slice |
-| TIP-03 | Done — 2026-10-12 | Session breakdown [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md): S00–S46, Proposed; recommended next S00 → S02 → S01 |
+| TIP-02 | Pending owner — remaining decisions | D1/D7/D12/D14/D17 approved; remaining decisions follow their evidence gates (plan §18), not a blanket prerequisite for M04 |
+| TIP-03 | Done — 2026-10-12 | Session breakdown [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md): S00–S46, Proposed; recommended next S02 → S00 → S01 |
 | TIP-04 | Done — 2026-10-12 | Plan audit [XUNA_PLAN_AUDIT.md](docs/architecture/XUNA_PLAN_AUDIT.md). Plan 0.1.1 and session plan rev. 2: Conversation Layer A/B (D17), decisions after evidence (D2, D10, D11a/D11), D14 Flutter pin, D15 checkpoint S42a. All Proposed |
-| TIP-05 | Pending owner | Next: S02 (D1, D7, D12, D14, D17 + ADR-0001) → S00 → S01 |
+| TIP-05 | In progress — preparation complete | S02 documentation delivered; S00 PASS on Mac. Next S01 awaits board USB + real phone; ADR-0001 acceptance pending |
 | TIP-06 | Done — 2026-10-12 | Owner approved D1, D7 (hatch on the device or via the app), D12, D14 (Flutter 3.32.8 pin) and D17 (Conversation A/B, text-first). Recorded in AGENTS.md §3 and plan §18; plan §12 and S06/S10 amended. Next: S02 (ADR-0001 + index) → S00 → S01 |
+
+## Device-first direction checkpoint — 2026-10-12
+
+| ID | Task status | Evidence / dependency |
+|---|---|---|
+| TIP-07 | Done — documentation only | [Device voice architecture](docs/architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md), plan 0.1.2/session rev. 3; owner direction recorded, implementation choices Proposed |
+| VOICE-01 | Pending — Proposed | Owner research request; hardware feasibility report, no purchase/wiring |
+| VOICE-02 | Conditional — Proposed | VOICE-01 + D18 + authorized real audio hardware |
+| VOICE-03 | Conditional — Proposed | VOICE-02 + D19 research scope + D11a for cloud |
+| VOICE-04 | Conditional — Proposed | VOICE-03 + final service/scope decisions D19/D20 (D11 if applicable) + S28; facts additionally S42 |
+
+M04 S00–S21 remain unchanged in implementation scope. M05a/Foundation text or simulation stays independent of voice hardware; M05b keeps memory/privacy/recovery; M05c extends Foundation; M05d vs Evolution order remains D15/S42a. M06/M07 may consume validated voice-originated evidence without treating spoken reports as sensor observations. Next coding session remains S00 after S02 documentation; no feature session started here.
+
+## S02 documentation delivery — 2026-10-12
+
+Owner requested incremental execution. Decision index and Proposed ADR-0001 now exist; S02 documentation done criteria are met. ADR acceptance remains pending, no decision silently approved. Preserved prior uncommitted documentation. Corrected T14 table to match separately gated voice research; no implementation/dependency/hardware changes or commit/push. Next: S00 environment and baseline verification on the current Mac.
+
+## Preparation execution — 2026-10-12
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S02 | Done — documentation deliverables | Decision index + Proposed ADR-0001; acceptance pending |
+| S00 | Done — baseline PASS | PROCESS latest S00 record; firmware/host/mobile PASS; Flutter 3.32.8 pinned; lock unchanged |
+| S01 | In progress — phone acceptance deferred | ESP32 connected; partition/NVS backup verified with hashes (PROCESS latest record). Phone-dependent transcript/acceptance pending |
+
+No M04 implementation session started; no upload, commit/push or gitlink update. Mobile `.fvmrc` is uncommitted.
+
+## Firmware-first checkpoint — 2026-10-12
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S03 | Done | [v1 characterization record](docs/roadmap/S03-v1-characterization.md); golden fixtures, host/sanitizer suites and ESP32 build PASS; production unchanged |
+| S04 | Done | [Portable core record](docs/roadmap/S04-portable-core.md); native/sanitizers/build PASS, zero size delta; no upload |
+| S01 | In progress — app work deferred | ESP32 backup prepared; owner chose Android for future native/BLE/physical acceptance, not yet validated |
+
+No commit/push or gitlink change; firmware tests/README are uncommitted.
+
+## S04 handoff — 2026-10-12
+
+S04 complete: portable core, Unity suites, native environments and purity guard. Next S05 fixed-point/RNG/ClockModel (pure firmware), with S07 also eligible. Keep Android app work deferred and S01 board-upload gates. Verification evidence: [S04 record](docs/roadmap/S04-portable-core.md). Changes uncommitted; gitlinks unchanged.
+
+## S05 checkpoint — 2026-10-12
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S05 | Done — pure logic | [Foundation evidence](docs/roadmap/S05-foundation-primitives.md); native/sanitizer 12/12 PASS; target compile smoke and ESP32 build PASS; no wiring/upload |
+| S06 | Pending — pure part eligible | Board/NVS steps still require S01; no work started |
+| S07 | Pending — recommended next | S04 prerequisite met; host-only event/registry/queue work while Android acceptance is deferred |
+
+This follows existing dependency order; M04 still precedes M05. No app/hardware work, commit/push or gitlink update.
+
+## S07 checkpoint — 2026-10-12
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S07 | Done | [Event foundation record](docs/roadmap/S07-events.md); native/sanitizer 18/18, Xtensa smoke and ESP32 build PASS |
+| S05-fix-01 | Done | [Time epoch fix](docs/roadmap/S05-fix-01-time-epoch.md); native/sanitizer 19/19 and target compile/build PASS; no deployed state migration |
+
+User preference: explain each session's purpose/scope in clear Vietnamese before starting. No firmware wiring/upload, commit/push or app work in S07.
+
+## S05-fix-01 handoff — 2026-10-12
+
+Compact UTC-minute epoch aligned with event contract; regression and target checks PASS. Next S06 pure identity/hatch/migration, leaving board/NVS acceptance gated on S01. No upload, commit/push or app work.
+
+## S06 partial checkpoint — 2026-10-12
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S06 | In progress — pure core implemented | [Identity core record](docs/roadmap/S06-identity-core.md); native/sanitizer 23/23 PASS; target smoke/build PASS. Storage/RNG/gesture/wiring/board checks pending S01 |
+| S14 | Pending — next eligible firmware session | ActivityFsm pure logic; S07 prerequisite met. Does not bypass S06/S01 integration gates |
+
+No board upload/NVS operation, app work, commit/push or gitlink change.
+
+## S11 preparation checkpoint — 2026-10-12
+
+| Item | Status | Evidence / next step |
+|---|---|---|
+| S11 harness/restore preparation | Done — builds only | [E4/E5 record](docs/research/E4-E5-storage.md); external isolated projects, no firmware merge |
+| S11 runtime E4/E5 | Pending prerequisites | Board USB absent; reconnect, refreshed NVS/full-image backup, S01 or explicit experiment exception; owner power-cut participation |
+| ADR-0002 / D2 | Proposed / undecided | Draft created; choose storage only after measurements |
+
+Earlier "S11 can run without Android" means the measurements do not need Android; it does not waive the S01 upload/baseline gate. S11 is not Done. No upload, format, commit/push or gitlink change.
+
+## Static UI priority — 2026-10-12
+
+| Item | Status | Evidence / next action |
+|---|---|---|
+| UI-static-01 reference scene | Done — build/upload/owner visual PASS | [Static scene record](docs/roadmap/UI-static-scene.md); RGB565 Flash, one-time draw, 23/23 host regression, fresh NVS preserved |
+| S11 runtime | Deferred — owner explicitly paused | Prepared harness retained; do not resume or upload benchmark without owner request/gates |
+| S01 Android acceptance | Pending | Static LCD acceptance does not validate BLE/learning/persistence matrix |
+
+Firmware UI upload specifically authorized by current user request; existing milestone/storage decisions remain unchanged. No commit/push or gitlink update. Exact PCB revision and long-run/thermal validation remain open.
+
+## Animated UI / publication checkpoint — 2026-10-12
+
+| Item | Status | Evidence |
+|---|---|---|
+| UI-animation-02 | Implemented; owner provisionally accepted | [Animated scene record](docs/roadmap/UI-animated-scene.md); final build/upload PASS, native/sanitizers 25/25, corrected seam/dark toes |
+| Today's Git delivery | Done in parent commit containing this entry | Firmware c84d4e3; mobile 77d27ec; parent docs and child gitlinks; no push |
+| S11 | Paused at owner's request | Source archive preserved; runtime/D2 not performed/approved |
+| S01 / full S06 | Pending | Android/BLE baseline and identity storage/wiring checks remain open |
+
+No automatic next feature session or S11 resume. Wait for owner's next UI/session request. PCB revision, long-run/thermal and full BLE regression remain unvalidated.

@@ -319,3 +319,7 @@ Based on the actual status: no M04 work has started, MVP physical acceptance is 
 1. **S02:** decisions D1, D7, D12, D14 and D17, plus ADR-0001.
 2. **S00:** toolchain and baseline, with the Flutter pin per D14.
 3. **S01:** MVP physical acceptance plus the observed v1 byte capture.
+
+## G. Device-first follow-up — 2026-10-12
+
+Owner requested device-first Conversation with Flutter assistance. The initial audit above is retained as history. Plan 0.1.2/session rev. 3 add an input-independent Foundation boundary and separately gated VOICE-01–04; no numbering or current coding order changes. D17 is Approved, D15 is still Proposed. [Device voice architecture](XUNA_DEVICE_VOICE_ARCHITECTURE.md) records the current source limitations (sources 1–2/opcodes 1–4), trust/failure contracts and unknown hardware/runtime/commercial feasibility. ADR-0006 remains Proposed; D18–D20 are open. No code or hardware validation occurred.

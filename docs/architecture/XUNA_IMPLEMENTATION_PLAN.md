@@ -1,7 +1,7 @@
 # XUNA — Technical Implementation Plan
 
 **Document ID:** XUNA-TIP-001
-**Version:** 0.1.1. Same-day audit corrections to 0.1.0; see [XUNA_PLAN_AUDIT.md](XUNA_PLAN_AUDIT.md). Every sequencing change in 0.1.1 is **Proposed** pending owner approval (D17, D15).
+**Version:** 0.1.2. Device-first direction update; preserves audit history. D17 was Approved on 2026-10-12; D15 and device voice implementation choices remain Proposed.
 **Status:** **Proposed / planning only.** No application code has been written for this plan. Nothing here is Approved unless it cites an existing Approved decision.
 **Date:** 2026-10-12
 **Inputs:** root [AGENTS.md](../../AGENTS.md) (canonical), [XUNA_DIGITAL_LIFE_SPEC.md](../product/XUNA_DIGITAL_LIFE_SPEC.md) v0.3.0 (Proposed spec), [PROCESS.md](../../PROCESS.md), [PLAN.md](../../PLAN.md), [MVP-local.md](../roadmap/MVP-local.md), [M02-ble.md](../roadmap/M02-ble.md), and the source at firmware `be58099`, mobile `3846880`, backend `0032828`.
@@ -47,13 +47,13 @@ The owner-approved local MVP already contains the seed of the Digital Life loop.
    - Build a deterministic **Life Lab** host simulator with golden traces and host↔target parity.
 2. **M05a: Learner v2.** Use a fixed-point discounted Beta estimator, hierarchical context with day parts, seeded bounded exploration, reaction-ID credit assignment with an expiry window, and an explanation API. Prove learning against random, static and no-learning baselines over many seeds.
 3. **M05b: Memory and Journal.** Add provenance-tagged episodes, facts and journal records, with salience, consolidation and deletion tombstones. Storage is NVS for identity and life, plus LittleFS on the existing `spiffs` partition [E]. Add BLE v2 paging and bonding before personal facts are stored.
-4. **Conversation in two layers [P, D17].** This keeps approved decision A6, "Conversation belongs alongside Learning".
+4. **Conversation in two layers [A: D17 sequencing; P: implementation details].** This keeps approved decision A6, "Conversation belongs alongside Learning".
    - **Layer A, Conversation Foundation (M05c-A).** It is developed **together with M05a** and needs no MemoryStore, BLE v2 or bonding.
      - A local rule grammar (vi/en, no LLM) produces candidate learning signals: rate the last reaction, state a preference, ask why.
      - The user confirms each candidate.
      - The signals reach the learner through v1-additive commands (§11.6).
    - **Layer B, Conversation + long-term memory (M05c-B).** It follows M05b and covers personal facts, correction, forgetting and grounded recall.
-   - **Providers and STT/LLM.** Replaceable Dart provider interfaces follow Xiaozhi's server provider split. STT/LLM stays a gated spike (D11a/D11).
+   - **Providers and STT/LLM.** Dart is the initial text adapter; later device voice reuses structured candidate/validation semantics. Optional cloud interpretation stays gated by D11a/D11/D19 and VOICE-01–04 (see §11.0).
 5. **M05d: Cognitive gates.** Add a habit predictor with prequential (online held-out) scoring, and skill records whose acquisition is evidence-based. Run a dual-history Life Lab evaluation (spec §23.10). Whether M05d runs before an Evolution MVP is a product checkpoint after M05c-B (D15).
 6. **M06/M07** keep the roadmap: growth stages, layered palette-indexed traits with an evidence journal, then sensor events with hysteresis.
 
@@ -75,12 +75,13 @@ The owner-approved local MVP already contains the seed of the Digital Life loop.
 | A8 | Prototype BLE experiment: bundled Arduino BLE + FlutterBluePlus 1.35.5 + compact binary v1, foreground and unbonded | M02-ble, MVP-local |
 | A9 | Pinned toolchain retained **for the local MVP scope**: `espressif32@6.5.0`, Arduino-ESP32 2.0.14, `TFT_eSPI@2.5.43`. It is the current adapter framework, **not** a permanent architecture commitment: Arduino versus ESP-IDF long-term stays open (AGENTS §3 Proposed). | MVP-local "pinned firmware toolchain remain" |
 | A10 | HoloCubic prism display, custom PCB and dual-processor hardware are future backlog | AGENTS §3 |
+| A11 | Device-first Conversation, Flutter-assisted Experience (2026-10-12). Device owns life; optional app/cloud extend it. Product direction only; A5/D17 scope retained. | Owner request; AGENTS §3; ADR-0006 Proposed |
 
 Arduino is authorized and in use for bring-up. **The long-term choice between Arduino and ESP-IDF is still open** (AGENTS §3 Proposed). This plan stays on Arduino. Xiaozhi needs ESP-IDF ≥ 6.0.1 and ePet uses ESP-IDF v5.5 (Section 19), but neither fact is a reason to migrate.
 
 ### 2.2 Still Proposed upstream (do not treat as decided)
 
-- Device authority beyond the MVP scope, and the conflict rules for synchronizing with the phone.
+- Conflict/reconciliation and backup rules beyond the MVP. Device authority for core life is owner-confirmed in the device-first direction; sync implementation policies remain Proposed.
 - FSM + Utility AI as the behavior design.
 - Contextual bandit learning.
 - Composable trait evolution.
@@ -302,7 +303,7 @@ The product claims must match the mechanism (AGENTS §6, spec §8.1).
 | Adaptive online learning | Yes | `PreferenceLearner` (discounted Beta + bounded exploration; a contextual-bandit family), `HabitPredictor` (decayed frequency) | "Learned from your feedback/routine", **only** with evidence counts and the §9.9 baseline comparison |
 | Instructed adaptation | Yes (M05c-A) | Stated preferences (`user_stated` evidence, capped weight, §11.6) | "You told me…". Kept distinct from learned evidence in explanations. |
 | Trained ML models (NN, etc.) | **No** on the device | — | None |
-| Generative AI / LLM | Optional, phone or proxy only, after D11 | `ConversationProvider` phrasing | Wording only. Never a source of facts, traits or actions. |
+| Generative AI / LLM | Optional service via phone or device Wi-Fi after D11/D19; no general-purpose ESP32 inference | `ConversationProvider` phrasing | Wording only. Never a source of facts, traits or actions. |
 | AI agents / autonomous tool use | **No** | The `ActionRegistry` (T13) is a validated allowlist, not an agent | "XUNA chose X among allowed actions" |
 
 Stage progression is **scripted progression** (spec §8.1-1) and is labeled as such. Only `SkillAcquired` backed by metrics counts as developmental evidence.
@@ -826,7 +827,7 @@ This table is the input for ADR-0001 in slice M04.0.
 | T11 | Validated state machine with observers | Xiaozhi | Adapt (table-driven activity FSM) | M04.5 |
 | T12 | Single-owner loop, marshalled callbacks | Xiaozhi | **Adopt, bounded** | M04.3 |
 | T13 | Typed tool registry (MCP concept) | Xiaozhi | Adapt (+ permission tiers enforced at dispatch) | M04.5 / M05b |
-| T14 | Audio, VAD, wake-word pipeline | Xiaozhi | **Defer [F]** | — |
+| T14 | Audio, VAD, wake-word pipeline | Xiaozhi | Audio research [P/E] via VOICE-01–04; wake-word deferred [F] | Separate voice workstream |
 | T15 | Closed expression vocabulary with fallback | Xiaozhi (fw + server) | Adapt (enum, allowlisted hints) | M04.5 / M05c-A |
 | T16 | Hello, versioned framing, sequence dedup | Xiaozhi | Adapt (binary LE over GATT) | M05b |
 | T17 | Pluggable ASR/LLM/TTS providers | Xiaozhi server | Adapt (Dart interfaces; memory stays on the device) | M05c-A |
@@ -870,6 +871,8 @@ All multi-byte integers are little-endian. Codecs serialize field by field and n
 | `utcMinute` | u32 | Minutes since 2020-01-01T00:00Z; `0` = unknown; set only when `clockQuality ≥ Approximate` |
 | `ClockQuality` | u8 | `0 Unknown, 1 Approximate, 2 Synced` (spec §12.2) |
 | `ClockSource` | u8 | `0 none, 1 phone_ble, 2 ntp [F], 3 rtc [F]` |
+
+S06 pure identity codec uses a 64-byte schema-1 layout recorded in [S06 core evidence](../roadmap/S06-identity-core.md). Storage and hardware entropy/boot-counter wiring remain pending; this record does not change storage-layout decision D2.
 
 ### 7.2 Experience event envelope (device binary, 40 bytes)
 
@@ -1044,6 +1047,8 @@ Recovery: on boot, if `stageEventId` exists but no journal entry references it, 
 | any | `TimeSync` with `utc < lastTrustedUtc − tolerance` (5 min [P]) | unchanged | `ClockRejected(rollback)`; no negative age; no repeated milestones |
 | any | forward jump | `Synced` | accepted, gap flagged "unknown activity"; **no** fabricated events or rewards |
 
+S05 pure ClockModel implementation contract is recorded in [S05 evidence](../roadmap/S05-foundation-primitives.md): tolerated small rollback clamps the UTC anchor; large forward jumps use the tolerance as gap threshold; unknown/overflow time yields no day part. Firmware wiring/time wire format remain deferred to S10; tuning values above remain [P].
+
 ### 8.4 Reaction and feedback lifecycle
 
 `Chosen(pending)` ends in exactly one terminal state:
@@ -1058,9 +1063,9 @@ The pending table lives in RAM (4 entries); the **rating** is durable. After a r
 
 ### 8.5 Fact lifecycle (conversation)
 
-1. **Phone only:**
+1. **Conversation adapter (phone initially; device voice after validation):**
    - `Candidate → Rejected` (user said no) or `Expired`.
-   - `Candidate → ConfirmRequested → (BLE) → Confirmed` on the device.
+   - `Candidate → ConfirmRequested → validated command (BLE initially; local device adapter later) → Confirmed` on the device.
 2. **Device:**
    - `Confirmed → Superseded` (a newer fact with the same `(subject, predicate)`).
    - `Confirmed → Deleted` (tombstone: the value is zeroed and the ID is kept).
@@ -1222,7 +1227,7 @@ The weights are [P], to be tuned in Life Lab.
 |---|---|---|
 | `device_observed` | Physical button/BLE interaction the device witnessed | device input |
 | `sensor_observed` | Filtered sensor experience | M07 adapters only |
-| `user_feedback` | Explicit rating of a specific reaction | app button, confirmed text |
+| `user_feedback` | Explicit rating of a specific reaction | app button, confirmed text; authorized confirmed voice only after its gate |
 | `user_stated` | Owner told XUNA a fact | confirmed conversation candidate |
 | `inferred` | Derived by learner, predictor or consolidation | core only |
 | `generated_summary` | Template/LLM wording | **phone only; never stored as a device fact** |
@@ -1241,7 +1246,7 @@ Phrasing rule: a `user_stated` memory is rendered as "Bạn đã kể với mìn
 
 ### 10.5 Privacy, deletion and recovery
 
-- **Consent:** facts exist only after explicit confirmation on the phone. Sensitive categories are not in the allowlist. Transcripts are not stored by default.
+- **Consent:** facts exist only after explicit confirmation through an authorized interaction adapter (phone initially; device confirmation UX gated by D20). Sensitive categories are not in the allowlist. Transcripts are not stored by default.
 - **`ForgetFact(factId)`:** device tombstone (value zeroed), then the phone deletes the note. The tombstone is kept so a stale phone cache cannot resurrect the fact.
 - **`ForgetAll`** (existing opcode 4) clears learner, episodes, facts, patterns and rolling journal entries. It keeps identity and active lifetime, as the MVP does today. Whether stage, skills and protected milestones reset is D9.
 - **Recovery:**
@@ -1253,6 +1258,12 @@ Phrasing rule: a `user_stated` memory is rendered as "Bạn đã kể với mìn
 
 ## 11. Conversation design (M05c-A with M05a, M05c-B after M05b) [P]
 
+### 11.0 Device-first direction and shared Foundation
+
+The long-term primary experience is direct interaction/conversation with the physical device (A11). Flutter text remains the accepted first implementation of Layer A under D17. Shared candidate semantics, confirmation, validation and authoritative learning are input-independent; Dart interfaces below describe the first mobile adapter, not the whole product boundary. Audio/network adapters stay outside C++11 `xuna_core`. See [device voice architecture](XUNA_DEVICE_VOICE_ARCHITECTURE.md) for responsibilities, offline/connected paths, trust boundaries, failure contracts and evidence gates; [ADR-0006](../decisions/ADR-0006-device-first-conversation.md) remains Proposed.
+
+VOICE-01–04 are a separate Proposed workstream, not M04/M05a prerequisites. Device voice needs no open Flutter app once validated; limited offline commands are conditional and natural Vietnamese offline is unproven. No pin/protocol/provider/framework choices are frozen here.
+
 ### 11.1 Staged capability
 
 Conversation is a **learning input channel** (A6, spec §23.9). It is split by dependency, not by importance.
@@ -1260,7 +1271,7 @@ Conversation is a **learning input channel** (A6, spec §23.9). It is split by d
 | Stage | Scope | Depends on | Status |
 |---|---|---|---|
 | V1 | Exact local intents: play/quiet/approve/reject; text feedback needs confirmation; no storage of prose | — | **[A5] Implemented** |
-| **Layer A, Conversation Foundation (M05c-A)** | Local rule grammar (vi + en), **no network, no LLM**. Learning intents only (`RateLastReaction`, `StatePreference`, `AskWhy`, context requests) → `CandidateEvent` → confirmation → v1-additive commands (§11.6) → learner → behavior. Works offline once learned. | M05a learner + explanation; **not** MemoryStore, BLE v2 or bonding | [P, D17]; developed together with M05a |
+| **Layer A, Conversation Foundation (M05c-A)** | Local rule grammar (vi + en), **no network, no LLM**. Learning intents only (`RateLastReaction`, `StatePreference`, `AskWhy`, context requests) → `CandidateEvent` → confirmation → v1-additive commands (§11.6) → learner → behavior. Works offline once learned. | M05a learner + explanation; **not** MemoryStore, BLE v2 or bonding | [A: D17 sequencing; P: implementation]; developed together with M05a |
 | Layer A voice (optional) | Push-to-talk using the phone mic and **on-device** platform STT for the same intents; phone TTS optional | E13 (vi-VN on-device STT availability), **D16** | [P/E]; outside the approved local MVP until D16 (A5 deferred voice) |
 | **Layer B, Conversation + long-term memory (M05c-B)** | Personal facts: `TeachFact` / `SupersedeFact` / `ForgetFact` / `ReadFacts` / `Recall`, provenance, grounded replies, privacy and sync | M05b (MemoryStore, BLE v2, bonding D10) | [P] |
 | V2 | Cloud STT and/or an LLM `ConversationProvider` behind an authenticated proxy; proposals only | D11a (authorize the research spike), E12, then D11 | [E] |
@@ -1617,6 +1628,7 @@ All sequencing changes in this diagram are **Proposed (D17, D15)**.
 #### M05c-A — Conversation Foundation, developed with M05a (C5 part; T15, T17) [P, D17]
 
 - **Scope:**
+  - Input-independent candidate/preference/confirmation contracts; Dart domain/provider interfaces (§11.3) are the initial local adapter. Simulation fixtures exercise the same device validation; no audio dependency.
   - Dart conversation domain and provider interfaces (§11.3), with the local implementation only.
   - `LocalRuleExtractor` (vi/en) for the Layer A intents (§11.2).
   - `CandidateEvent` + confirmation UI.
@@ -1682,13 +1694,13 @@ The trade-offs are in [XUNA_PLAN_AUDIT.md](XUNA_PLAN_AUDIT.md) §E. Inputs to th
 
 #### M07 — Physical perception (T3, T10)
 
-- **Scope:** sensor capability flags; filtered semantic events; summaries.
+- **Scope:** sensor capability flags; filtered semantic events; summaries. Voice-originated reports remain `user_stated`, separate from actual sensor observations; both may become permitted evidence for later Journal/evolution.
 - **Acceptance:** false-positive/negative rates measured on hardware.
 - **Depends:** sensor purchase/selection (Future).
 
 #### Future / research (C8, Xiaozhi audio, T9)
 
-Short-horizon planning in Life Lab only; on-device audio (Xiaozhi pipeline study, T14); a VM for user content (T9). All [F].
+Short-horizon planning in Life Lab only and a VM for user content (T9) remain [F]. Direct-device audio is a separately gated [P/E] workstream VOICE-01–04 (T14), not part of A5 or a prerequisite for M04/M05a.
 
 ---
 
@@ -1781,7 +1793,7 @@ The following need the owner:
 | D9 | `ForgetAll` scope: reset skills, stage and protected journal? | Reset learner/memory/skills; keep identity, active lifetime and stage | M05b |
 | D10 | BLE security model (bonding method, owner list, destructive-action confirmation; replaces the unbonded prototype model A8) — decided **after** experiment E9 and ADR-0005 (session S35) | Pending evidence; hypothesis: LE Secure Connections with an LCD passkey + button confirmation for destructive actions | M05b (S36) |
 | D11a | Authorize a cloud STT/LLM **research spike** (E12) with test data only: cost, accounts, privacy | Optional; only if the owner wants V2 evaluated | E12 |
-| D11 | Conversation V2: if and when cloud STT/LLM; which data may leave the phone; is a proxy (first backend use case) acceptable? Decided **after** E12 | Stay on the local rule layers for now | M05c-B V2 |
+| D11 | Conversation V2: if and when cloud STT/LLM; which data may leave the phone or device; is a proxy (first backend use case) acceptable? Decided **after** E12 | Stay on the local rule layers for now | M05c-B V2 |
 | D12 | **[A] 2026-10-12: keep C++11.** Core language standard (vs an ADR for `gnu++14/17`) | Approved | M04.1 |
 | D13 | Growth gates, stage names and trait art | Defer to M06 with Life Lab data | M06 |
 | D14 | **[A] 2026-10-12: pin Flutter 3.32.8 via `mobile/.fvmrc`.** Flutter toolchain: pin the SDK for reproducible builds. Evidence: no `.fvmrc`; `pubspec.lock` requires Flutter ≥ 3.27.0 / Dart ≥ 3.7.0; validation is recorded only on 3.32.8 (macOS); this Windows machine has 3.41.1 | Pin **3.32.8** via `mobile/.fvmrc` (matches recorded evidence); any upgrade (e.g. 3.41.x) becomes its own validated session | S00 (mobile work) |
@@ -1790,6 +1802,14 @@ The following need the owner:
 | D17 | **[A] 2026-10-12: approved, text-first; voice stays with D16; `w_s` and cap values remain [P] until S25.** Approve the Conversation Layer A/B restructure (M05c-A with M05a; M05c-B after M05b) and the opcode 6 contract (§11.6) | Approve; it aligns sequencing with A6 without new infrastructure | S22 |
 
 ---
+
+Additional open device-voice decisions (all **Proposed**, independent of D16 phone voice):
+
+| ID | Decision | Evidence / gate |
+|---|---|---|
+| D18 | External mic/amp/speaker or codec, pins, power/enclosure and authorize audio prototype | VOICE-01 report before VOICE-02; no purchase assumed |
+| D19 | Device authentication/provisioning/revocation, TLS, service/provider/transport, retention and spending limit | Research authorization before VOICE-03 (D11a for cloud); final architecture after measurements; D11 where cloud product adoption is involved |
+| D20 | Device voice product/MVP scope, confirmation/owner identity UX, offline limits and rollout | VOICE-03 evidence before VOICE-04; no expansion of A5/D17 by implication |
 
 ## 19. Upstream audit record (read-only, 2026-10-12)
 
@@ -1814,3 +1834,7 @@ Method:
 1. Owner reviews this plan and answers the decision requests (§18). To start M04 only D1, D7 and D14 are needed (D12 has a safe default). D2 is decided after experiment S11; D10 after S35; D11 after E12.
 2. Execute M04.0: physical MVP acceptance and ADR-0001 reference reuse policy (the spec was committed in `e3d3485`).
 3. On approval, start M04.1 and update PROCESS.md, PLAN.md (new task IDs `M04.x`, `M05x`) and CHANGELOG.md per the session procedure.
+
+## 21. Device voice workstream [P/E]
+
+VOICE-01 hardware feasibility → D18 → VOICE-02 real audio I/O → research authorization/D19 → VOICE-03 end-to-end device conversation → D19 final/D11 where applicable + D20 → VOICE-04 shared learning integration. VOICE-04 additionally requires S28; fact integration requires S42. See [session plan §9](../roadmap/XUNA_SESSION_PLAN.md) and [architecture feasibility matrix](XUNA_DEVICE_VOICE_ARCHITECTURE.md). All sessions are not started. None blocks M04, text M05a or text M05c acceptance. Existing E12/E13 keep their IDs and scope; E13 is phone STT, not device STT.
