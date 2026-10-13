@@ -1,8 +1,23 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-12** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-13** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+
+## 2026-10-13 — Mobile toolchain fix and Clean Architecture refactor
+
+- Owner approved restoring the lock with the pinned SDK and a refactor session, after adding a base widget rule (`mobile/AGENTS.md` §5.4: mandatory when UI repeats across screens, mandatory to use when one exists; none exist yet).
+- Installed Flutter 3.32.8 via fvm; machine-local VS Code setting points to it (ignored via `.git/info/exclude`). Restored `mobile/pubspec.lock`; `fvm flutter pub get` keeps it unchanged.
+- Refactored mobile `device`, `conversation` and `home` to the rules without protocol change: domain entities/contract/exceptions/use cases, wire models and explicit mappers, BLE data source contract with real and simulator implementations, repository error translation, use-case-only controller with `buildState`, localized strings via get_cli, feature widgets and `nav` confirm dialog. Rules gained clarifications found while applying them (cross-feature UI vocabulary, `codec/`, `AppTextStyle` maxLines, inline loading, test helper imports) and an updated §11 of known gaps.
+- Validation on 3.32.8: analyze clean; 16/16 tests (10 ported, 6 new). No native build, app run, phone or board operation. No commit or push.
+
+## 2026-10-13 — Mobile coding rules (documentation only)
+
+- Owner requested Clean Architecture coding rules for `mobile/`, derived from the existing GetX base, that agents read before writing any feature.
+- Added `mobile/AGENTS.md` (layer dependency rule, folder/naming conventions, domain/data/presentation rules, DI scopes, XUNA invariants, testing, toolchain, Definition of Done, and an inventory of current code that predates the rules), `mobile/docs/FEATURE_TEMPLATE.md` (feature skeleton) and `mobile/CLAUDE.md`. Linked from `mobile/README.md`, root `CLAUDE.md` and AGENTS.md §9.
+- Template validation: the skeleton code, added to a scratch copy of mobile outside the repository, passed `flutter analyze` with no new issues, 14/14 tests (10 existing + 4 template) and `dart format`. Run on Flutter 3.41.1, the only SDK on this machine, not the pinned 3.32.8.
+- No change to mobile source, tests or dependencies. Existing legacy deviations are documented, not refactored. No commit or push.
+- Found `mobile/pubspec.lock` modified at 11:28 by pub from Flutter 3.41.1 / Dart 3.11.0 (`.dart_tool/package_config.json`), outside this session's commands, most likely an automatic IDE `pub get` (3.32.8 is not installed here). Changes include `analyzer` 6.11.0 → 6.4.1 and removal of `_macros`. Not committed; restored in the next entry.
 
 ## 2026-10-12 — Device-first Conversation direction (documentation only)
 

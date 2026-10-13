@@ -210,3 +210,14 @@ Firmware UI upload specifically authorized by current user request; existing mil
 | S01 / full S06 | Pending | Android/BLE baseline and identity storage/wiring checks remain open |
 
 No automatic next feature session or S11 resume. Wait for owner's next UI/session request. PCB revision, long-run/thermal and full BLE regression remain unvalidated.
+
+## Mobile rules and refactor checkpoint — 2026-10-13
+
+| Item | Status | Evidence |
+|---|---|---|
+| MOB-RULES | Done — owner-requested | `mobile/AGENTS.md` (Clean Architecture rules, base widget rule), `mobile/docs/FEATURE_TEMPLATE.md`, `mobile/CLAUDE.md` |
+| MOB-TOOLCHAIN | Done on this Windows machine | Flutter 3.32.8 installed via fvm; VS Code workspace points to it; `pubspec.lock` restored and unchanged after `fvm flutter pub get` |
+| MOB-REFACTOR-01 | Implemented; host tests PASS | `features/device`, `conversation`, `home` migrated to the rules without protocol change; analyze clean, 16/16 tests on 3.32.8. Native build, real phone and board not run |
+| S20 golden vectors | Pending (unchanged) | Simulator fake transport still carries the Dart learner copy (G17) |
+
+Mobile changes are uncommitted; gitlink unchanged. Physical BLE/learning acceptance (S01, MVP-08) remains open and is not affected by host tests.

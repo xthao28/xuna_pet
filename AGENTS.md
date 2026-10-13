@@ -268,6 +268,7 @@ Do not equate more chat history with model intelligence. Prefer measurable learn
 
 - Flutter/Dart companion app; modular architecture and clean separation of device transport, domain state and presentation.
 - **Owner-confirmed on 2026-10-11:** retain the imported mobile Clean architecture and GetX base for subsequent Flutter development. Preserve reusable base controllers, bindings, navigation, data/domain contracts and shared utilities; remove unrelated demo features and prior product branding only.
+- **Mobile coding rules (owner-requested 2026-10-13):** [mobile/AGENTS.md](mobile/AGENTS.md) defines the Clean Architecture layering, GetX conventions, testing and Definition of Done; [mobile/docs/FEATURE_TEMPLATE.md](mobile/docs/FEATURE_TEMPLATE.md) is the feature skeleton. Read both before writing any mobile code.
 - Treat BLE as a versioned protocol with reconnect, disconnect, timeouts, idempotent commands and capability checks.
 - Keep device authoritative for pet-life state until an explicit synchronization strategy is approved.
 - Add unit tests for parsing/protocol/domain logic; integrate widget/integration tests when valuable.

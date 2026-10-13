@@ -450,3 +450,28 @@ Final assets: 320×170 background plus 20 fixed 96×72 frames, 385,280 B in Flas
 NVS differs only in the newest valid snapshot generation/active-lifetime checkpoint (4/1200 → 5/1500); learning/episodes unchanged. Fresh partition/NVS backups and raw logs remain outside Git under xuna_backups/2026-10-12-animated-ui. S11 remains paused; source-only benchmark archive now versioned under docs/research/artifacts, no experiment performed.
 
 Authorized Git delivery (no push): firmware **c84d4e3** contains today's core/tests/assets/UI; mobile **77d27ec** contains approved Flutter pin. Parent commit containing this entry records updated gitlinks and all today's root docs/research source archive. Backend unchanged. ADR-0001/0002/0006 remain Proposed; committing drafts does not accept them. S01 Android/full S06 and later M04 integration remain open. Earlier historical “uncommitted/not uploaded” entries describe their original sessions; this section is the current delivery.
+
+## Mobile coding rules — 2026-10-13
+
+Owner requested Clean Architecture coding rules for `mobile/`, based on the existing GetX base, to be read before any feature work. Added `mobile/AGENTS.md`, `mobile/docs/FEATURE_TEMPLATE.md` and `mobile/CLAUDE.md`; linked from `mobile/README.md`, root `CLAUDE.md` and AGENTS.md §9. The rules record current deviations in `features/device` and `features/home` (repository called from the controller, mixed data source/repository, hardcoded UI text, simulator as a fake repository) without refactoring them; a dedicated refactor session is not scheduled and needs owner approval.
+
+Template code compiled and tested in a scratch copy only (Flutter 3.41.1: analyze no new issues, 14/14 tests, format clean); not run on the pinned 3.32.8. Mobile source, tests and dependencies unchanged. Mobile and root changes are uncommitted; gitlinks unchanged. No build, device or board operation.
+
+Open item (resolved below): `mobile/pubspec.lock` was modified at 11:28 by pub from Flutter 3.41.1 / Dart 3.11.0, not by this session's commands (most likely an automatic IDE `pub get`; 3.32.8 was not installed on this Windows machine). Per D14 this lock must not be committed.
+
+## Mobile toolchain fix and Clean Architecture refactor — 2026-10-13
+
+Owner approved the recommended lock fix and the proposed refactor session, after adding a base widget rule to `mobile/AGENTS.md` §5.4: a base widget is mandatory once UI repeats across screens, existing base widgets must be used, and none exist yet because there is no XUNA design.
+
+Toolchain: `fvm install 3.32.8` (Dart 3.8.1) succeeded. A machine-local `.vscode/settings.json` at the root sets `dart.flutterSdkPath` to that SDK and is ignored through `.git/info/exclude`, not `.gitignore`. Reload the VS Code window so the Dart extension stops using 3.41.1. `mobile/pubspec.lock` was restored from HEAD; `fvm flutter pub get` left it unchanged. Baseline before the refactor on 3.32.8: analyze clean, 10/10 tests.
+
+Refactor (mobile, uncommitted), with no protocol, UUID, timeout or learning-rule change:
+
+- `device` split into domain entities, an `abstract interface` repository, `DeviceException` kinds and ten use cases. Data now has wire models, explicit enum↔code mappers, `ProtocolCodec` in `data/codec`, `ResultCorrelator`, the `DeviceBleDataSource` contract with the FlutterBluePlus implementation and `SimulatorDeviceBleDataSource` (a fake transport, replacing the fake repository), and `DeviceRepositoryImpl`, which translates every error.
+- `conversation`: `TextIntent` entity and `ParseTextIntentUseCase`.
+- `home`: the controller uses only use cases with `buildState`. The page is split into feature widgets and uses locales (generated with get_cli), tokens and `nav.showConfirmDialog` for forget. The feedback pending-suggestion pre-check moved to `SendFeedbackUseCase`.
+- Visible differences: localized error messages replace raw `e.toString()`; animation labels are capitalized; active time shows "giây"; the forget dialog uses the base confirm dialog style; text uses `AppTextStyle`; the simulator now rejects feedback whose target is not the pending suggestion (result 4).
+
+Validation on Flutter 3.32.8 (Windows): `fvm flutter analyze` no issues; `fvm flutter test` 16/16 PASS. The 10 previous tests were ported to a layout that mirrors `lib/`, and 6 were added: error translation, stream mapping, explicit codes, feedback pre-check, controller error messages and forget confirmation. A rules audit by grep found no hardcoded UI strings, relative imports, `enum.index` wire use, direct dialogs or presentation→data imports. The feature template was re-verified on 3.32.8 in a scratch copy. Not run: native Android/iOS build, simulator/device app run, real phone BLE, board. Real BLE adapter logic was ported line by line but is unvalidated physically, as before.
+
+Known gaps are listed in `mobile/AGENTS.md` §11: the simulator learner copy (S20), the route-scoped device repository, any stream error marking the UI disconnected (MVP behavior kept), and the inherited palette. Mobile and root changes are uncommitted; gitlinks unchanged.
