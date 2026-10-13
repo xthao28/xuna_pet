@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-12** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-13** (Asia/Ho_Chi_Minh).
 Current milestone: **M04 pure-core work partially implemented; animated LCD UI uploaded and provisionally accepted.** The local MVP through M05 is implemented, but its physical acceptance is pending.
 Current status:
 
@@ -8,7 +8,7 @@ Current status:
 - Owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
 - Firmware S03/S04/S05/S07 and S05-fix-01 complete; S06 pure core only. Current firmware commit c84d4e3 includes animated UI; M04 physical/full acceptance remains pending.
 
-Next action: **Animated UI provisionally accepted; await owner’s next request. S11 remains paused.** S01 Android acceptance and full S06 remain pending.
+Next action: **Owner deferred remaining S01 checks to a later session.** Android/BLE/learning/reboot/forget smoke and required raw inspector transcript complete; ten-cut matrix, diagnostics and pre-confirmation text evidence remain open. S01 In progress; full S06 pending; S11 paused.
 
 ## 0. Start here — next work (updated 2026-10-12)
 
@@ -475,3 +475,59 @@ Refactor (mobile, uncommitted), with no protocol, UUID, timeout or learning-rule
 Validation on Flutter 3.32.8 (Windows): `fvm flutter analyze` no issues; `fvm flutter test` 16/16 PASS. The 10 previous tests were ported to a layout that mirrors `lib/`, and 6 were added: error translation, stream mapping, explicit codes, feedback pre-check, controller error messages and forget confirmation. A rules audit by grep found no hardcoded UI strings, relative imports, `enum.index` wire use, direct dialogs or presentation→data imports. The feature template was re-verified on 3.32.8 in a scratch copy. Not run: native Android/iOS build, simulator/device app run, real phone BLE, board. Real BLE adapter logic was ported line by line but is unvalidated physically, as before.
 
 Known gaps are listed in `mobile/AGENTS.md` §11: the simulator learner copy (S20), the route-scoped device repository, any stream error marking the UI disconnected (MVP behavior kept), and the inherited palette. Mobile and root changes are uncommitted; gitlinks unchanged.
+
+## S01 Android acceptance — 2026-10-13 (in progress)
+
+Owner requested S01 with the newly connected Android and ESP32. Both detected: REDMI Note 15 (model 2510DRA23E), Android 15/API 35, ADB authorized; ESP32-S3 at /dev/cu.usbmodem14101. Bluetooth ON.
+
+Fresh actual partition table decoded: NVS 0x9000/0x5000. Verified backup outside Git at /Users/xthao28/xuna_backups/2026-10-13-s01/; NVS 20,480 B, SHA-256 866536762d74990c69db7254608620bcf4869af4aa3be8dcbc2e8b29465cc7e2; table SHA-256 bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce. Manifest records hashes/sizes. Restore not tested; flash reads and opening Serial caused USB/UART reset; no firmware write/erase/upload.
+
+Serial idle smoke confirms XUNA 0.2.0-mvp animated scene, 16 MiB Flash / 8 MiB PSRAM. Heap free 254,416 B; observed min 253,144 B; draw max 4,753 us; loop gap max 4,763 us. Short 12-second observation, not long-run/BLE/physical visual acceptance. Raw runtime-idle.log retained beside backup.
+
+S01-fix-01: missing Android BLE permissions discovered. Owner explicitly approved fix in chat. Added legacy permissions capped at API 30 and SCAN/CONNECT with neverForLocation; no protocol or firmware change. Reference: https://developer.android.com/develop/connectivity/bluetooth/bt-permissions . Pinned Flutter 3.32.8 analyze clean and 16/16 tests PASS. Native debug APK build PASS (408.1 s). ADB install rejected by phone: INSTALL_FAILED_USER_RESTRICTED / Install canceled by user. Await owner enabling Install via USB and accepting prompt; no app launch or physical BLE validation yet. BLE transcript/learning/reboot/forget/power cuts remain pending.
+
+Git inspection corrects old handoff: mobile refactor already committed at cebaf1c, firmware c84d4e3; initial root/children clean. Current permission fix uncommitted. No commit/push. S11 remains paused.
+
+## S01 Android install and BLE smoke — 2026-10-13
+
+Owner enabled Install via USB; adb install -r succeeded, XUNA launched on REDMI Note 15 / Android 15. Nearby devices permission granted through runtime dialog. Physical transport (not simulator) found 98:C3:77:A6:6F:D9, connected, read capabilities/life/two memory pages; Android GATT operations report success. APK permission dump confirms SCAN/CONNECT and legacy API-30 caps. S01-fix-01 native build/install/run PASS.
+
+Automated UI taps requested Happy/Sleep/Curious/Idle; UI reflected each via device status. Owner confirmed LCD reactions and physical buttons correct. Learning trace: quiet selected Idle; reject via feedback button changed quiet preference to Happy, feedback 1/memory 1 of 8 with button provenance; another quiet suggestion selected Happy. Play preference remained Idle (play behavior itself not tested here).
+
+Opening native USB Serial rebooted board (USB_UART_CHIP_RESET); app reported disconnect. Reconnect succeeded without rebuilding/flashing. Fresh reads retained quiet Happy, play Idle, feedback 1, memory 1/8; active time 2497 s; feedback buttons disabled because pre-reboot pending decision expired. Runtime-reboot.log and UI XMLs/Android BLE log retained outside Git in /Users/xthao28/xuna_backups/2026-10-13-s01/. These are decoded UI/GATT smoke evidence, not raw protocol-byte transcript.
+
+S01 still In progress: waiting owner first physical power cut; ten-cut matrix, forget/reboot, conversation confirmation, malformed/duplicate/conflict, Bluetooth deny/off/timeout, raw inspector transcript and workload diagnostics remain open. S11 paused. No firmware upload/erase, commit/push. Firmware unchanged; Android manifest and handoffs uncommitted.
+
+## S01 persistence smoke continuation — 2026-10-13
+
+Owner reported one USB power cut (approximately 3 s) and reconnect. Fresh BLE reads retained quiet Happy, play Idle, feedback 1 and memory 1/8. Active lifetime was 2485 s vs earlier live 2497 s; firmware main.cpp checkpoints every 300000 ms, so uncheckpointed active time can be lost. One cut only; not the specified five idle + five post-feedback matrix or write atomicity validation.
+
+Forget confirmation accepted for test-created data; fresh reads quiet/play Idle, feedback 0, memory 0/8, lifetime 2650 s. USB-UART reboot and reconnect confirmed same cleared preference/feedback/memory, lifetime 2657 s. Forget/reboot smoke PASS, life preserved. No firmware write/erase/upload. Text confirmation test awaiting owner input; raw-byte inspector transcript/error matrix and remaining power cuts still open. Current app connected; pending quiet suggestion exists after test preparation.
+
+## S01 text feedback checkpoint — 2026-10-13
+
+Owner sent like and subsequently confirmed (clarified explicitly in chat). Physical app reads feedback 1/memory 1 with quiet Idle approval and source text-confirmed. Screenshot android-text-candidate-owner.png records post-confirmation state. Text-confirmed command/provenance smoke PASS; no captured pre-confirmation counter, so no-learning-before-confirmation remains unvalidated physically. Test-created episode now remains on device after earlier forget/reboot test.
+
+nRF Connect not installed; requested owner installation to continue observed raw-byte/error transcript required by S01. No raw bytes inferred from UI or manufactured from fixtures. Remaining five-idle/five-post-feedback cut matrix, diagnostics during feedback, phone-free routine/standalone checks and text pre-confirmation evidence open. S01 stays In progress; S11 paused; no firmware change/upload or commit/push.
+
+## S01 observed read baseline — 2026-10-13
+
+nRF Connect installed and connected. Five physical characteristic reads captured as raw hex: capabilities 8 B, status 16 B, life and both memory pages 20 B each. Life feedback 1/memory 1/pending 0; confirmed-text episode observed. Evidence: [S01 observed transcript](docs/roadmap/S01-v1-observed-transcript.md) (root-relative path); raw XMLs outside Git. No writes/upload in this read step. Scripted writes/error matrix and power-cut matrix remain pending; S01 In progress, S11 paused. Docs uncommitted; no commit/push.
+
+S01 raw command follow-up: Notify enabled; observed 7-byte Suggest Quiet attempt returned invalid_length (2), request 1; no pending suggestion or memory/feedback changes. Recorded actual transmitted bytes/status/life in S01-v1-observed-transcript.md. Valid 8-byte command with fresh request 2 pending. No firmware/code changes, commit/push.
+
+S01 raw Suggest Quiet request 2: actual 8-byte write accepted (OK), choice Idle, pending ID 2/canFeedback 1. Feedback/memory remain 1; both memory pages unchanged. Raw hex and capture copies recorded in S01-v1-observed-transcript.md. Approval request 3 targeting 2 remains next; no firmware upload, code change, commit/push.
+
+## S01 automated inspector cases — 2026-10-13
+
+Owner requested direct operation. ADB drove nRF Connect Byte Array writes after verifying entered hex. Approval request 3/target 2 PASS: feedback/memory 1→2, episode source 1. Exact duplicate request 3 PASS: OK, counters remain 2. Reused ID 3 with rejection payload PASS: conflict 6, no learning. New feedback request 4 without active pending PASS: invalid_argument 4, no learning. Raw status/life/both memory pages for each case in S01-v1-observed-transcript.md and external case JSON/XML captures. Pending suggestion 5 created (OK/canFeedback 1); awaiting owner GPIO0 press before feedback invalidation test. No firmware upload, source change, commit/push; S01 In progress, S11 paused.
+
+## S01 raw inspector script complete — 2026-10-13
+
+Pending request 5 accepted. Owner pressed GPIO0; feedback request 6 targeting 5 rejected (invalid_argument 4), pending cleared and counters unchanged at 2. Forget request 7 OK; memory/feedback 0, both preferences Idle, active lifetime 5991 retained. Full required inspector script now captured as actual writes + status/life/both memory pages in S01-v1-observed-transcript.md. These satisfy the observed transcript portion, not full S01. Remaining: ten-cut matrix, feedback/connected diagnostics, pre-confirmation text observation, off/deny/timeout and standalone/routine checks. Device now cleared of test episodes. No firmware upload/source change, commit/push; S11 paused.
+
+Owner deferred remaining S01 physical matrix to a later session. Stop current device actions; next resume: fresh device/backup verification, controlled five-idle/five-post-feedback cut checks, BLE/feedback diagnostics and text pre-confirmation evidence. Required raw inspector sequence complete; S01 remains In progress, not Validated. Device has feedback 0/memory 0, preferences Idle after Forget; nRF connection may remain open. No commit/push requested.
+
+## S01 commit checkpoint — 2026-10-13
+
+Owner requested committing current changes. Mobile f756225 commits Android Bluetooth permissions; the parent commit containing this entry records its gitlink plus S01 validation/handoff and observed transcript. Firmware c84d4e3 and backend unchanged. Prior uncommitted descriptions are historical; no push. S01 remains In progress with remaining physical checks deferred by owner; S11 stays paused. Existing Flutter analyze/16 tests, native APK build/install and physical smoke/inspector evidence retained; commit checks: whitespace PASS. No new device operations or tests during commit-only delivery.
