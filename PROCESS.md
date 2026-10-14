@@ -682,3 +682,22 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Not run: real phone with the board, Android.
 - Git: mobile committed as `df7d2ee` (`feat: add XUNA design system and four-tab home`); parent commit records the gitlink and handoff docs. No push.
 - Next: owner visual check; export the original images; restyle base dialogs/snack bars.
+
+## S18 readiness audit — 2026-10-14
+
+- Source audit against S18/T1 confirms host LifeCore preparation only; production still owns business logic in main/BleManager. S10/S13 end-to-end and S17 owner checks remain unmet.
+- Missing composition: identity, canonical event queue, pure command dispatch, BehaviorSelector, typed persistence including needs, and thin main loop. Pending-feedback invalidation and commit-failure semantics need parity coverage before integration.
+- Evidence and next sequence: [S18 readiness review](docs/roadmap/S18-readiness-review.md). No code change, runtime test, board/app operation, commit or push in this audit. Prior 87/87 native/sanitizer and target build results are not full S18 acceptance.
+- Next without a phone: execute existing host trace/snapshot experiments and record evidence; keep production/storage integration gated.
+
+## S17 board upload smoke — 2026-10-14
+
+- Owner explicitly authorized backup and upload after connecting ESP32. Detected ESP32-S3 rev v0.2, MAC 98:C3:77:A6:6F:D8 at /dev/cu.usbmodem14101; chip revision does not establish PCB revision.
+- Device and target partition tables match: NVS 0x9000/0x5000. Backup outside Git: /Users/xthao28/xuna_backups/2026-10-14-s17/ (table, NVS, manifest, pre/post-upload Serial). NVS size 20,480 B, SHA-256 d7d12a9bebe95738bad48bdee08ce90f7de284bbd928ca24611286c5988ec52d; partition table SHA-256 bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce. Restore not tested.
+- Target aa2dbca build PASS (RAM 46,208 B, Flash 1,343,357 B, purity PASS); upload PASS with hash verification. Upload ranges exclude NVS; no erase-all or restore requested.
+- Serial boot smoke PASS: version 0.2.0-mvp (does not expose commit), Flash 16 MB, PSRAM chip 8 MB, display initialized; no storage/BLE init error in captured log. Opening USB Serial caused USB_UART_CHIP_RESET. Initial idle draw max 4,754 us and loop gap max 4,767 us; no mean timing logged, so S17 +20% render acceptance is not established.
+- Pending: owner LCD/buttons observation, sleep/wake and result 5 through BLE, rest/recovery, pet-state preservation through decoded reads, render baseline comparison. Full S17/S01 remain In progress. No source change, mobile operation, commit or push.
+
+- Follow-up Serial capture observed GPIO0 Happy twice and GPIO14 Idle once; subsequent diagnostics returned to idle after the first Happy. Input routing smoke PASS; LCD appearance remains owner-observed/pending confirmation. Capture: button-observation-serial.log in the same external backup directory.
+
+- S17 owner visual confirmation (2026-10-14): owner confirmed normal XUNA/Idle LCD, GPIO0 Happy and return to Idle, followed by GPIO14 Idle on firmware aa2dbca. Combined with captured button Serial logs, LCD/button smoke PASS. Full S17 remains In progress: BLE sleep/wake/result 5, rest/recovery and render timing acceptance still pending.

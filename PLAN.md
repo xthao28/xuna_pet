@@ -376,3 +376,19 @@ No board upload, mobile/backend work, commit or push in this checkpoint.
 ## Commit checkpoint — 2026-10-14 (review fixes + mobile UI)
 
 Owner requested committing. Firmware `aa2dbca` (review fixes) and mobile `df7d2ee` (XUNA design system, four-tab home, heading fixes); the parent commit records both gitlinks and the handoff/design docs. No push.
+
+## S18 readiness checkpoint — 2026-10-14
+
+| Item | Status | Evidence / next action |
+|---|---|---|
+| S18 composition | Partial host preparation; full session not complete | [Source audit](docs/roadmap/S18-readiness-review.md); dispatch, identity, queue and typed persistence integration missing |
+| S10 / S13 prerequisites | Not complete end-to-end | Trusted time/hatch and approved storage v2/migration/wiring required |
+| S17 prerequisite | In progress | Existing host/target checks PASS; owner board acceptance remains |
+| Offline next step | Available preparation | Execute existing host trace/snapshot experiments; do not claim full S19a |
+
+## S17 board checkpoint — 2026-10-14
+
+- Backup verified by size/hash and device/target NVS partition match; firmware aa2dbca build/upload and Serial boot smoke PASS. Evidence and external backup path in PROCESS.md, S17 board upload smoke.
+- Full S17 remains In progress: owner visual/button observations, BLE sleep/wake/rejection, rest/recovery and render timing acceptance pending. Device state preservation not yet checked through BLE.
+
+- S17 owner visual confirmation (2026-10-14): owner confirmed normal XUNA/Idle LCD, GPIO0 Happy and return to Idle, followed by GPIO14 Idle on firmware aa2dbca. Combined with captured button Serial logs, LCD/button smoke PASS. Full S17 remains In progress: BLE sleep/wake/result 5, rest/recovery and render timing acceptance still pending.
