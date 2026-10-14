@@ -255,3 +255,69 @@ Owner deferred remaining S01 physical matrix to a later session. Stop current de
 ## S01 commit checkpoint — 2026-10-13
 
 Owner requested committing current changes. Mobile f756225 commits Android Bluetooth permissions; the parent commit containing this entry records its gitlink plus S01 validation/handoff and observed transcript. Firmware c84d4e3 and backend unchanged. Prior uncommitted descriptions are historical; no push. S01 remains In progress with remaining physical checks deferred by owner; S11 stays paused. Existing Flutter analyze/16 tests, native APK build/install and physical smoke/inspector evidence retained; commit checks: whitespace PASS. No new device operations or tests during commit-only delivery.
+
+## M04 offline implementation checkpoint — 2026-10-14
+
+| Session | Status | Evidence / next action |
+|---|---|---|
+| S14 | In progress — implementation added; validation pending | [ActivityFsm record](docs/roadmap/S14-activity-fsm.md); native/sanitizer/ESP32 checks require the pinned toolchain |
+| S15 | In progress — implementation added; validation pending | [Needs/Mood record](docs/roadmap/S15-needs-mood.md); native/sanitizer/ESP32 checks require the pinned toolchain |
+| S16 | In progress — implementation added; validation pending | [Action policy record](docs/roadmap/S16-action-policy.md); native/sanitizer/ESP32 checks require the pinned toolchain |
+| S17 | In progress — implementation added; validation pending | [FSM/visual wiring record](docs/roadmap/S17-fsm-visual-wiring.md); native/sanitizer/ESP32 checks require the pinned toolchain |
+
+No board upload/NVS operation, app work, commit/push or gitlink change in these offline sessions.
+
+## Learning Engine upgrade checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| L1 bounded contextual preference | Implemented in isolation; validation pending | `firmware/lib/xuna_core/include/xuna/learning/PreferenceLearnerV2.h`, `firmware/test/test_learning_engine/test_main.cpp` |
+| L2 persistence v2 + v1 migration | Pending | Required before production wiring; preserve BLE payload and reboot semantics |
+| L3 feature context/action model | Proposed | Tune with Life Lab evidence; keep bounded and explainable |
+| L4 delayed credit/conversation provenance | Proposed | Candidate/confirmation/correction contract required |
+| L5 tiny RL/sequence experiment | Future experiment | Only if baseline/holdout data shows L1 is insufficient |
+
+L1 is not yet called validated learning: the local session lacks the pinned PlatformIO/C++ toolchain, and V2 is deliberately not connected to `LifeEngine` or production BLE. No board/mobile/backend operation, commit or push.
+
+## Learning Engine L1.5 checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| L1 bounded contextual preference | Implemented in isolation; validation pending | V2 learner + deterministic replay tests |
+| L1.5 prequential evaluation | Implemented in isolation; validation pending | `PrequentialEvaluator.h` and extended learner tests; integrate with Life Lab later |
+| L2 persistence v2 + v1 migration | Blocked by S12a/D2 sequencing | Do not freeze a competing snapshot layout before the approved sectioned codec |
+
+The evaluator is a measurement primitive, not a production learning claim. Snapshot/production wiring remains deferred until the existing M04 storage sequence is authorized and validated.
+
+## Learning Engine L1.6 checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| L1.6 v1/v2 shadow comparison | Implemented in isolation; validation pending | `LearningShadow.h` + deterministic synchronization tests |
+| Life Lab integration | Pending | Requires S18/S19a trace runner and native toolchain |
+| Production learner switch | Deferred | Requires shadow evidence, persistence sequence and owner acceptance |
+
+The shadow harness is intentionally not linked from `main.cpp`, `BleManager` or `LifeStorage`.
+
+## Learning Engine L1.7 checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| Bounded Choose/Feedback trace runner | Implemented in isolation; validation pending | `LearningTrace.h` + replay tests |
+| Full S19a Life Lab CLI/DSL | Pending | Requires S18/S19a sequencing and native toolchain |
+| Production event integration | Deferred | Keep `main.cpp`/BLE/persistence unchanged until LifeCore and storage gates |
+
+The current runner is intentionally smaller than the roadmap DSL: it proves learner replay mechanics without pretending M04 LifeCore is complete.
+
+## Learning Engine L1.8 checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| Numeric explanation contract | Implemented in isolation; validation pending | `LearningExplanation.h` + learner tests |
+| Journal/mobile rendering | Deferred | Requires approved mobile contract and production persistence/evidence IDs |
+| Causal prose generation | Deferred | Must be derived from numeric evidence; no free-form fabrication |
+## Commit checkpoint — 2026-10-14
+
+Firmware gitlink target: a518ede (`feat(firmware): add bounded digital life and learning layers`). Parent commit includes the handoff/roadmap records. No push.
+
+Next actions remain validation-first: native + ASan/UBSan + ESP32 builds, then Life Lab trace integration; persistence v2 and production learner switch remain gated by S12a/D2, shadow evidence and owner acceptance.

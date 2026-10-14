@@ -531,3 +531,99 @@ Owner deferred remaining S01 physical matrix to a later session. Stop current de
 ## S01 commit checkpoint — 2026-10-13
 
 Owner requested committing current changes. Mobile f756225 commits Android Bluetooth permissions; the parent commit containing this entry records its gitlink plus S01 validation/handoff and observed transcript. Firmware c84d4e3 and backend unchanged. Prior uncommitted descriptions are historical; no push. S01 remains In progress with remaining physical checks deferred by owner; S11 stays paused. Existing Flutter analyze/16 tests, native APK build/install and physical smoke/inspector evidence retained; commit checks: whitespace PASS. No new device operations or tests during commit-only delivery.
+
+## S14 — ActivityFsm implementation (2026-10-14)
+
+Owner requested continuing M04. This session is limited to pure firmware logic and host-test preparation; no board, mobile or backend operation was included.
+
+- Fact: added `xuna/life/ActivityFsm.h` and `test/test_activity_fsm/test_main.cpp` in firmware.
+- Contract: nine-state table (`BOOTING`, `IDLE`, `OBSERVING`, `REACTING`, `PLAYING`, `RESTING`, `SLEEPING`, `EVOLUTION_TRANSITION`, `ERROR_SAFE`), explicit illegal/guard reasons, monotonic wrap-safe dwell checks, energy/stage/restore/wake/reboot guards, and safe `ERROR_SAFE → BOOTING` recovery only.
+- Proposed values: play/rest/sleep thresholds and dwell limits are M04 placeholders; they remain tuning inputs, not product decisions.
+- Experiment: exhaustive 9×9 legal-pair assertions, guard reason assertions, wrap-around timeout assertions and guarded exits were authored.
+- Validation limit: this Windows session has no `pio`, PlatformIO environment, `c++`, `g++`, `clang++` or `cl` executable. Native, ASan/UBSan, Xtensa compile and ESP32 build therefore could not run; only whitespace/static structure checks passed. No upload or runtime claim is made.
+- Git: firmware changes are uncommitted/untracked; root/mobile/backend were not changed. No commit or push.
+- Next: run `pio test -d firmware -e native`, `native_asan`, then `pio run -d firmware -e xuna_t_display_s3` on the pinned toolchain; keep S15 behind S14 native-green evidence.
+## S15 — Needs/Mood implementation (2026-10-14)
+
+Owner allowed continued offline coding. This session added the pure M04.5b needs/mood slice; no mobile, board or backend operation was included.
+
+- Fact: added `xuna/life/Needs.h` and `test/test_needs_mood/test_main.cpp` in firmware.
+- Contract: `Needs` stores bounded Q0.16 energy/stimulation, uses monotonic uint32 milliseconds, applies closed-form linear decay with carried remainders, and resets on boot so offline power-off time is not fabricated.
+- Contract: `Mood` derives transient arousal/valence from needs and recent bounded signals, exposes Calm/Excited/Sleepy/Curious/Overwhelmed labels, and uses enter/exit hysteresis thresholds.
+- Proposed values: decay rates, label thresholds and signal deltas are M04 placeholders; they are not product decisions and require Life Lab tuning.
+- Experiment: tests were authored for partition-invariant catch-up, uint32 wrap, cold-boot reset, clamping and hysteresis behavior.
+- Validation limit: no `pio` or C++ compiler executable is available on this Windows session. Native, ASan/UBSan, Xtensa and ESP32 checks could not run; only static/whitespace checks are available. No runtime claim is made.
+- Git: firmware S14/S15 files are uncommitted/untracked; root handoff docs changed; mobile/backend untouched; no commit or push.
+- Next: run S14 and S15 native/sanitizer suites when the pinned toolchain is available, then continue S16 policy/visual boundary.
+## S16 — Action policy and visual boundary implementation (2026-10-14)
+
+Owner allowed continued offline coding. This session added the pure M04.5c action/visual slice; no mobile, board or backend operation was included.
+
+- Fact: added `ActionRegistry.h`, `RequestValidator.h`, `VisualIntent.h`, `BehaviorSelector.h` and `test/test_action_policy/test_main.cpp` in firmware.
+- Contract: four public M04 actions (`idle`, `happy`, `sleep`, `curious`) are described by a const table with parameter schema, stage, cooldown, energy cost, permission and visual intent.
+- Contract: validator is deny-by-default and checks unknown/parameter/stage/permission/activity/cooldown/energy/busy conditions without side effects.
+- Contract: visual intents resolve through a bounded fallback chain; unknown or stage-incompatible intents fall back to a safe known pose.
+- Contract: BehaviorSelector scores allowed, cooldown-ready candidates from novelty, needs and mood, then uses seeded PCG32 only for equal-score tie breaks.
+- Experiment: tests were authored for the action table, validator rejection matrix, every known intent across stages, unknown/fallback resolution and selector determinism/filtering.
+- Validation limit: no `pio` or C++ compiler executable is available on this Windows session. Native, ASan/UBSan, Xtensa and ESP32 checks could not run; only static/whitespace/purity checks are recorded. No runtime claim is made.
+- Git: firmware S14/S15/S16 files are uncommitted/untracked; root handoff docs changed; mobile/backend untouched; no commit or push.
+- Next: run S14–S16 native/sanitizer suites when the pinned toolchain is available; S17 wiring remains gated by these checks and later owner/board acceptance.
+## S17 — FSM and visual boundary wiring (2026-10-14)
+
+Owner requested continuing offline firmware coding; this session did not operate the board, mobile app or backend.
+
+- Fact: `BleManager` now routes BLE opcode 1/2 and local button/quiet actions through the shared `RequestValidator`, `ActivityFsm`, `Needs` energy context and cooldown memory before applying a visual intent.
+- Fact: `AnimationManager::setIntent` is the renderer boundary; unsupported stage intents and unknown values fall back to a safe existing `PetState` without changing the legacy animation timeout.
+- Fact: the main loop owns Activity/Needs ticking, maps sleep/rest/error-safe transitions to visuals, and explicitly wakes Sleeping before a non-sleep action.
+- Experiment: added a visual bridge regression test covering Happy, stage fallback, Sleep, ErrorSafe and unknown intent.
+- Validation limit: no `pio`, C++ compiler or ESP32 build is available in this Windows session. `git diff --check` and static source checks are the only validation performed; no native, sanitizer, Xtensa or board result is claimed.
+- Git: firmware S14–S17 files and root handoff docs remain uncommitted; no upload, mobile/backend operation, commit or push.
+- Next: run `pio test -d firmware -e native`, `native_asan`, then the ESP32 build; review transition/error codes and perform physical BLE/button acceptance before promoting S17 beyond In progress.
+
+## Learning Engine L1 — bounded contextual learner (2026-10-14)
+
+Owner requested a gradual upgrade toward a real learning engine. This session is code-only; no board, mobile or backend operation.
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/PreferenceLearnerV2.h` as an independent C++11, no-heap learner core. It keeps bounded posterior cells for context/action pairs, uncertainty-aware optimistic exploration, decision IDs/propensity, feedback provenance, duplicate protection, evidence/history caps, metrics and deterministic fingerprinting.
+- Fact: added `firmware/test/test_learning_engine/test_main.cpp` covering initial exploration, contextual isolation, idempotent feedback, policy change after feedback, evidence bounds and deterministic replay.
+- Proposal: keep `LifeEngine`/BLE on learner v1 until persistence v2 and migration from the 96-byte snapshot exist. The next integration should run V2 in shadow mode and compare decisions before changing production behavior.
+- Experiment: L1 is intentionally a bounded contextual preference learner, not a neural network or full RL engine. The staged roadmap is recorded in [Learning Engine upgrade](docs/roadmap/LEARNING-ENGINE-UPGRADE.md): L2 persistence/migration, L3 feature contexts, L4 delayed credit/conversation provenance, L5 optional sequence learning only if measured data justifies it.
+- Validation limit: no `pio`, C++ compiler, native test, sanitizer, ESP32 build or board test was available in this session. Only source/static review and whitespace checks are recorded; no runtime or learning-quality claim is made.
+- Git: firmware learner/test files and root handoff docs remain uncommitted; no upload, commit or push.
+- Next: add a versioned persistence codec/migration and golden vectors, then shadow-wire V2 behind a feature flag without changing BLE payloads.
+
+## Learning Engine L1.5 — prequential evaluation (2026-10-14)
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/PrequentialEvaluator.h` with fixed-point Brier loss, accuracy and gain against a uniform baseline. It must be called before feedback to remain prequential/out-of-sample.
+- Fact: extended `test_learning_engine` with a positive-gain-after-feedback case and invalid-decision rejection.
+- Proposal: use these metrics in the future Life Lab/shadow comparison; do not interpret two host cases as proof of product-level learning.
+- Validation limit: no native, sanitizer, ESP32 or board test; static checks only. No production wiring, commit or push.
+- Next: align evaluator output with the planned Life Lab trace/golden format after S18/S19a dependencies are available.
+
+## Learning Engine L1.6 — v1/v2 shadow harness (2026-10-14)
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/LearningShadow.h` for test/Life-Lab use. It compares v1 greedy decisions with V2 contextual decisions and preserves the baseline action in each shadow packet.
+- Contract: feedback is applied to v1 only after V2 accepts it, preventing duplicate/invalid candidate feedback from double-training the baseline.
+- Fact: added tests for synchronized feedback, duplicate rejection and deterministic replay/fingerprint.
+- Proposal: use this harness when the Life Lab trace runner exists; production remains on v1 until shadow evidence, persistence sequencing and owner acceptance are complete.
+- Validation limit: no native, sanitizer, ESP32 or board test; static checks only. No commit or push.
+
+## Learning Engine L1.7 — bounded trace runner (2026-10-14)
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/LearningTrace.h` with fixed-size Choose/Feedback events, an eight-decision window, prequential scoring and deterministic report fingerprint.
+- Fact: added tests for accepted feedback, duplicate rejection, unknown decision IDs and same-seed replay.
+- Proposal: use this as the learner kernel inside the future S19a Life Lab runner; do not present it as the full trace DSL or M04 validation.
+- Validation limit: no native/compiler/ESP32 run; static checks only. No production wiring, commit or push.
+- Next: when the toolchain is available, run this test first, then move the event model behind the planned `firmware/sim/lifelab.cpp` adapter.
+
+## Learning Engine L1.8 — bounded explanations (2026-10-14)
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/LearningExplanation.h` with numeric per-action evidence and reason codes.
+- Fact: added tests showing exploration is labeled separately from a posterior winner; invalid decisions yield no explanation.
+- Proposal: later map this numeric contract into Evolution Journal/Life Lab views. Do not generate user-facing causal prose until the evidence fields are available.
+- Validation limit: no native/compiler/ESP32 run; static checks only. No production or mobile wiring, commit or push.
+## Commit checkpoint — 2026-10-14
+
+- Firmware child repository committed as a518ede (`feat(firmware): add bounded digital life and learning layers`). It contains S14–S17 M04 logic, L1–L1.8 learning core/evaluation/shadow/trace/explanation layers and host-test preparation.
+- Parent repository commit records the handoff docs and roadmap. No push was performed.
+- Next steps: run `pio test -d firmware -e native`, `pio test -d firmware -e native_asan`, then `pio run -d firmware -e xuna_t_display_s3`; run the learner trace suite; continue S18/S19a only after required M04 storage/toolchain gates. Keep production learner v1 until shadow/persistence acceptance.

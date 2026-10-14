@@ -3,6 +3,24 @@
 Last updated: **2026-10-13** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-14 — S16 action policy and visual boundary
+
+- Added pure C++11 action registry, deny-by-default request validator, visual-intent fallback map and deterministic behavior selector for M04.5c.
+- Added tests for action descriptors, validator rejection paths, stage fallback and seeded selector filtering/tie-breaks.
+- Native/sanitizer/ESP32 validation is pending because this Windows environment has no PlatformIO or C++ compiler executable. No board/mobile/backend operation, commit or push.
+- Evidence: [S16 record](docs/roadmap/S16-action-policy.md).
+## 2026-10-14 — S15 Needs/Mood implementation
+
+- Added pure C++11 `Needs` and transient `Mood` models for M04.5b, with bounded Q0.16 needs, monotonic catch-up decay, cold-boot reset and hysteresis labels.
+- Added tests for partition-invariant catch-up, wrap/clamping and mood threshold behavior.
+- Native/sanitizer/ESP32 validation is pending because this Windows environment has no PlatformIO or C++ compiler executable. No board/mobile/backend operation, commit or push.
+- Evidence: [S15 record](docs/roadmap/S15-needs-mood.md).
+## 2026-10-14 — S14 ActivityFsm implementation
+
+- Implemented the pure C++11 ActivityFsm slice for M04.5a with nine states, table-driven legal transitions, explicit guard/rejection reasons and monotonic timeout handling.
+- Added exhaustive-pair, guard, reboot-only safe-mode, explicit-wake, energy and uint32 wrap tests.
+- Validation is pending: this Windows environment has no PlatformIO or C++ compiler executable. No board/mobile/backend operation, commit or push.
+- Evidence: [S14 record](docs/roadmap/S14-activity-fsm.md).
 
 ## 2026-10-13 — Mobile toolchain fix and Clean Architecture refactor
 
@@ -317,3 +335,44 @@ Owner deferred remaining S01 physical matrix to a later session. Stop current de
 ## S01 commit checkpoint — 2026-10-13
 
 Owner requested committing current changes. Mobile f756225 commits Android Bluetooth permissions; the parent commit containing this entry records its gitlink plus S01 validation/handoff and observed transcript. Firmware c84d4e3 and backend unchanged. Prior uncommitted descriptions are historical; no push. S01 remains In progress with remaining physical checks deferred by owner; S11 stays paused. Existing Flutter analyze/16 tests, native APK build/install and physical smoke/inspector evidence retained; commit checks: whitespace PASS. No new device operations or tests during commit-only delivery.
+
+## S17 — FSM and visual boundary wiring (2026-10-14)
+
+- Wired BLE opcode 1/2 plus local button/quiet actions through the shared RequestValidator and ActivityFsm; denied actions no longer call AnimationManager directly.
+- Added Needs energy context, cooldown tracking, Sleep wake routing and safe Sleep/ErrorSafe/unknown VisualIntent mapping into the existing four PetState renderer states.
+- Added visual bridge regression coverage. Native/sanitizer/ESP32 validation is pending because this Windows session has no PlatformIO/C++ toolchain; no board/mobile/backend operation or commit/push.
+
+## Learning Engine L1 scaffold — 2026-10-14
+
+- Added an independent bounded contextual learner with posterior-based preference, uncertainty-aware exploration, decision/propensity records, source-tagged idempotent feedback, bounded evidence/history, metrics and deterministic replay fingerprint.
+- Added host-test preparation for exploration, context isolation, feedback deduplication, policy adaptation and bounded replay.
+- Kept production learner v1 and its BLE/snapshot contract unchanged. Persistence v2, migration and shadow integration are the next gate; no neural network, cloud dependency or board/mobile change was introduced.
+- Toolchain limitation: no PlatformIO/C++ compiler available, so native/sanitizer/ESP32 tests and learning-quality claims remain pending. No commit/push.
+
+## Learning Engine L1.5 evaluation primitive — 2026-10-14
+
+- Added fixed-point prequential evaluator for Brier loss, accuracy and improvement over a uniform baseline.
+- Added learner tests for score-before-feedback behavior and invalid decision rejection.
+- Kept this as an isolated measurement primitive; no persistence, BLE contract or production learner switch was introduced. Native/ESP32 validation remains pending.
+
+## Learning Engine L1.6 shadow harness — 2026-10-14
+
+- Added a pure v1/v2 shadow comparison harness for future Life Lab use.
+- Candidate decisions and baseline decisions are recorded together; accepted feedback updates both once, while duplicate/invalid candidate feedback does not update v1.
+- Added deterministic replay and synchronization tests. No production wiring, storage format or BLE change.
+
+## Learning Engine L1.7 trace runner — 2026-10-14
+
+- Added a bounded Choose/Feedback trace runner for shadow replay and prequential metrics.
+- Added unknown-feedback, duplicate-feedback and deterministic fingerprint coverage.
+- Kept it host/test-only; full Life Lab DSL and production integration remain pending.
+
+## Learning Engine L1.8 explanations — 2026-10-14
+
+- Added bounded numeric explanations for learner choices: posterior cells, counts, margin, policy version and exploration/winner reason.
+- Added tests for exploration, posterior winner and invalid decisions.
+- No mobile UI, BLE payload or production wiring was changed.
+## Commit checkpoint — 2026-10-14
+
+- Firmware submodule committed at a518ede: `feat(firmware): add bounded digital life and learning layers`.
+- Parent documentation commit is complete; no push. Validation limits and next toolchain/Life Lab steps are recorded in PROCESS.md and PLAN.md.
