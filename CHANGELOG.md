@@ -386,3 +386,15 @@ Owner requested committing current changes. Mobile f756225 commits Android Bluet
 
 - Firmware child committed at `f784626`: `feat(firmware): add learning trace DSL and host runner`.
 - Parent handoff records the gitlink and remaining S18/S19a gates. No push.
+
+## M04 LifeCore composition and snapshot lab — 2026-10-14
+
+- Added pure C++11 `LifeCore`/`LifeCoreSession` composition, bounded trace replay and the `lifecore_lab` host CSV runner.
+- Added an in-memory A/B snapshot lab covering committed restore, simulated power cut and corrupt-latest fallback; V2 learner state remains shadow-only and resets on reboot.
+- Reset ActivityFsm/cooldown state on `LifeCore::begin()` and added a reboot regression test.
+- Static whitespace/include checks pass. Native, sanitizer, ESP32 and board/mobile validation remain unavailable because this session has no C++/PlatformIO toolchain. No commit or push.
+## M04 trace persistence experiment — 2026-10-14
+
+- Fact: `LifeCoreTraceRunner` now drives `LifeCoreSnapshotLab`; `reboot` recovers the newest valid slot, `powercut` fails the next requested commit, and feedback persistence requests are auto-committed in the host experiment.
+- Fact: CSV output and Unity coverage now include persist failures, reboot count, final event count and generation. `sync/day/expect` remain explicit unsupported verbs.
+- Validation limit unchanged: whitespace and include-resolution checks pass; no C++/PlatformIO toolchain, simulator execution or board/mobile operation was available. No production persistence decision was made.

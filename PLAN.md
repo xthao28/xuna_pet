@@ -334,3 +334,20 @@ This slice intentionally completes only the learner portion that can be develope
 ## L1.9 commit checkpoint — 2026-10-14
 
 Firmware child commit `f784626` contains the trace DSL, host runner and parser tests. The parent handoff commit records the updated gitlink; no push.
+
+## M04 LifeCore composition checkpoint — 2026-10-14
+
+| Slice | Status | Evidence / gate |
+|---|---|---|
+| LifeCore event step | Implemented as host/core preparation; validation pending | `firmware/lib/xuna_core/include/xuna/life/LifeCore.h`, `docs/roadmap/lifecore-step.md` |
+| Session FIFO + clock projections | Implemented as host/core preparation; validation pending | `LifeCoreSession.h`, `docs/roadmap/lifecore-session.md` |
+| Trace CLI | Implemented for choose/feedback/button/cmd subset; future verbs explicit unsupported | `LifeCoreTrace.h`, `firmware/sim/lifecore_lab.cpp` |
+| Snapshot/power-cut lab | Implemented as in-memory experiment; not a storage-layout decision | `LifeCoreSnapshotLab.h`, `docs/roadmap/lifecore-snapshot-lab.md` |
+| Production wiring / persistence v2 | Deferred | Requires native/toolchain evidence and approved S12a/S13/S19a sequencing |
+
+No mobile, board, BLE transport or backend work was included. No commit/push was made in this slice.
+## M04 trace persistence experiment — 2026-10-14
+
+- Fact: `LifeCoreTraceRunner` now drives `LifeCoreSnapshotLab`; `reboot` recovers the newest valid slot, `powercut` fails the next requested commit, and feedback persistence requests are auto-committed in the host experiment.
+- Fact: CSV output and Unity coverage now include persist failures, reboot count, final event count and generation. `sync/day/expect` remain explicit unsupported verbs.
+- Validation limit unchanged: whitespace and include-resolution checks pass; no C++/PlatformIO toolchain, simulator execution or board/mobile operation was available. No production persistence decision was made.

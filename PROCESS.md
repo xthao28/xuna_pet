@@ -640,3 +640,19 @@ Owner requested a gradual upgrade toward a real learning engine. This session is
 
 - Firmware child commit: `f784626` (`feat(firmware): add learning trace DSL and host runner`).
 - Parent handoff commit records the new child pointer, parser/runner roadmap and validation limits. No push.
+
+## M04 LifeCore composition and snapshot lab — 2026-10-14
+
+Owner requested continued offline implementation. This slice stayed within firmware core/simulator/docs; no mobile, board, BLE transport or backend operation.
+
+- Fact: added `LifeCore`, `LifeCoreSession`, `LifeCoreTraceRunner` and `LifeCoreSnapshotLab` as C++11 host/core preparation layers. The existing v1 `LifeEngine` remains authoritative; V2 learner remains a shadow candidate and resets on reboot.
+- Fact: added bounded FIFO/overflow reporting, ClockModel projections, deterministic trace replay, A/B snapshot/power-cut/corruption recovery fixtures and a `lifecore_lab` CSV CLI.
+- Fact: reboot now resets ActivityFsm, cooldown timestamps, pending decision and transient mood/needs state; a regression test covers action acceptance after reboot.
+- Validation: `git diff --check`, firmware whitespace check and internal include-resolution checks pass. No C++/PlatformIO toolchain exists in this session, so native, sanitizer, ESP32 and simulator execution were not run. No board/mobile result is claimed.
+- Git: firmware and root handoff changes remain uncommitted; no push.
+- Next: run native + ASan/UBSan + ESP32 builds when the pinned toolchain is available, then review S18/S19a storage and production-wiring gates before any BLE/main-loop integration.
+## M04 trace persistence experiment — 2026-10-14
+
+- Fact: `LifeCoreTraceRunner` now drives `LifeCoreSnapshotLab`; `reboot` recovers the newest valid slot, `powercut` fails the next requested commit, and feedback persistence requests are auto-committed in the host experiment.
+- Fact: CSV output and Unity coverage now include persist failures, reboot count, final event count and generation. `sync/day/expect` remain explicit unsupported verbs.
+- Validation limit unchanged: whitespace and include-resolution checks pass; no C++/PlatformIO toolchain, simulator execution or board/mobile operation was available. No production persistence decision was made.
