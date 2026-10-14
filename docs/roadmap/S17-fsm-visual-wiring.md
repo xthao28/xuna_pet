@@ -25,6 +25,10 @@ S17 connects the M04 action policy to the firmware loop without adding a new ren
 
 `git diff --check` and source/static checks were run. The Windows session has no `pio`, `c++`, `g++`, `clang++` or `cl`, so native, ASan/UBSan, Xtensa, ESP32 and board validation were not run. S17 remains **In progress — implementation added; validation pending**.
 
+## Update 2026-10-14 — review fixes
+
+Native, ASan/UBSan and ESP32 builds now PASS on the Mac toolchain. The action path moved into pure `ActionGate` (shared with `LifeCore`); opcode 2 context, Reacting timer restart and energy recovery were fixed. See [review fixes](M04-review-fixes-2026-10-14.md). S17 stays In progress until the owner board check.
+
 ## Next
 
 Run the pinned native and sanitizer suites, then the ESP32 build. After toolchain validation, exercise BLE malformed/duplicate/cooldown/busy cases and physical button wake/sleep behavior before marking S17 validated.

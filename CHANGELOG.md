@@ -1,8 +1,22 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-13** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-14** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-14 — Mobile UI: XUNA design system and four-tab home
+
+- Owner-requested UI from Claude Design "XUNA App": XUNA tokens, bundled OFL fonts (Anton, Be Vietnam Pro, JetBrains Mono), 11 base widgets, 24 SVG icons, and a four-tab home (Nhà, Trò chuyện, Nhật ký, Thiết bị) on the existing controller and device repository.
+- Real data only; growth, brightness, voice, image attach and device settings are shown locked as "SẮP CÓ". Chat transcript is in-memory only. No protocol, firmware, dependency or SDK change.
+- Validation: analyze clean; 29/29 tests; `pubspec.lock` unchanged. Image stand-ins used where the design export was truncated. No real phone/board run, commit or push.
+- Owner review: display headings no longer wrap/truncate and have looser line height for Vietnamese diacritics; UI design roadmap with Claude Design prompts added ([plan](docs/design/XUNA_UI_DESIGN_PLAN.md), Proposed).
+- Evidence: [mobile UI record](docs/roadmap/mobile-ui-design-system.md).
+## 2026-10-14 — M04 firmware review fixes (first compiled validation)
+
+- Owner-requested review of firmware `a518ede`/`f784626`/`6b1110e`, then fixes. First compilation of these slices: 5 of 16 native suites failed before the fixes.
+- Production fixes: energy now recovers while Resting/Sleeping (owner-chosen; `energyRecoveryPerMinute` Proposed) so the pet no longer stays in Resting forever after ~48 min; BLE opcode 2 commits `context_` only with an accepted decision; a new reaction restarts the Reacting timer.
+- Added pure `ActionGate` shared by `BleManager` and `LifeCore`; LifeCore visual expiry and accepted-only decisions; `GuardReboot` reason; C++11 compile fixes; corrected FSM/Needs tests; new `test_action_gate` regressions.
+- Validation on Mac: native and ASan/UBSan 87/87 PASS (17 suites); ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,357 B, purity PASS); both `sim/` programs build. No board/mobile/backend operation, commit or push.
+- Evidence: [review fixes record](docs/roadmap/M04-review-fixes-2026-10-14.md).
 ## 2026-10-14 — S16 action policy and visual boundary
 
 - Added pure C++11 action registry, deny-by-default request validator, visual-intent fallback map and deterministic behavior selector for M04.5c.

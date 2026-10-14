@@ -12,3 +12,5 @@ The pure model has two bounded Q0.16 needs (`energy`, `stimulation`). Decay is l
 Mood is derived, transient state. Arousal and valence are clamped axes; labels use separate enter/exit thresholds to avoid flicker. All numerical values are placeholders pending Life Lab tuning.
 
 The current Windows environment has no PlatformIO or C++ compiler executable, so native/sanitizer/ESP32 validation remains pending.
+
+Update 2026-10-14 (Mac): native and ASan/UBSan suites PASS after correcting the partition test. Energy now recovers while the caller reports Resting/Sleeping (`energyRecoveryPerMinute`, Proposed); see [review fixes](M04-review-fixes-2026-10-14.md).

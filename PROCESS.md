@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-13** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-14** (Asia/Ho_Chi_Minh).
 Current milestone: **M04 pure-core work partially implemented; animated LCD UI uploaded and provisionally accepted.** The local MVP through M05 is implemented, but its physical acceptance is pending.
 Current status:
 
@@ -656,3 +656,29 @@ Owner requested continued offline implementation. This slice stayed within firmw
 - Fact: `LifeCoreTraceRunner` now drives `LifeCoreSnapshotLab`; `reboot` recovers the newest valid slot, `powercut` fails the next requested commit, and feedback persistence requests are auto-committed in the host experiment.
 - Fact: CSV output and Unity coverage now include persist failures, reboot count, final event count and generation. `sync/day/expect` remain explicit unsupported verbs.
 - Validation limit unchanged: whitespace and include-resolution checks pass; no C++/PlatformIO toolchain, simulator execution or board/mobile operation was available. No production persistence decision was made.
+
+## M04 firmware review fixes — 2026-10-14
+
+Owner requested a careful review of today's firmware commits and approved fixing the findings. This was the first session with the pinned toolchain for these slices (macOS); no board, mobile or backend operation.
+
+- Fact: before the fixes 5/16 native suites failed (two C++11 compile errors, three incorrect test setups). The ESP32 target already built.
+- Fact: production defects fixed: energy never recovered, so the pet stayed in Resting forever after ~48 min uptime; BLE opcode 2 retargeted pending feedback after a rejected choice; a new reaction did not restart the Reacting timer.
+- Decision (owner, 2026-10-14): fix #1 by recovering energy while Resting/Sleeping. Recovery rate 2048/min is a **Proposed** placeholder.
+- Fact: `ActionGate` now holds the single action path for `BleManager` and `LifeCore`; LifeCore visual expiry and accepted-only decisions fixed; ErrorSafe reboot guard reports `GuardReboot`.
+- Validation: native and ASan/UBSan 87/87 PASS; ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,357 B, purity PASS); `sim/` programs build; `git diff --check` PASS. Details: [review fixes record](docs/roadmap/M04-review-fixes-2026-10-14.md).
+- Not run: board upload and physical acceptance. No storage-format change.
+- Git: firmware committed as `aa2dbca` (`fix(firmware): recover energy at rest and share the action gate`); parent commit records the gitlink. No push.
+- Next: owner S17 board check (sleep/wake, result 5 message, rest/recovery), then Life Lab tuning of Proposed values.
+
+## Mobile UI — XUNA design system and four-tab home (2026-10-14)
+
+Owner requested building the mobile UI from the Claude Design "XUNA App" project, adapted to the app and plan. Owner chose real data only, locked "SẮP CÓ" parts, and bundled fonts.
+
+- Fact: tokens, OFL fonts, 11 base widgets, 24 icons and a four-tab home shell replace the MVP single-screen home; all device logic still goes through the existing use cases and repository. No protocol, firmware, dependency or SDK change.
+- Fact: chat transcript is in memory only (max 40 lines); device errors also appear as snack bars.
+- Assumption: design images over 256 KiB could not be read through the connector; `rain.png`, `hero.png` and a redrawn pixel-book SVG stand in for `room`, `avatar`/growth sprites and `book`.
+- Validation: `pubspec.lock` unchanged; analyze clean; 29/29 tests. Details: [mobile UI record](docs/roadmap/mobile-ui-design-system.md).
+- iOS Simulator (iPhone 13, simulator transport): app launched, Nhà screenshot inspected; other tabs covered by widget tests.
+- Not run: real phone with the board, Android.
+- Git: mobile committed as `df7d2ee` (`feat: add XUNA design system and four-tab home`); parent commit records the gitlink and handoff docs. No push.
+- Next: owner visual check; export the original images; restyle base dialogs/snack bars.

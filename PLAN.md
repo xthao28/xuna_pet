@@ -351,3 +351,28 @@ No mobile, board, BLE transport or backend work was included. No commit/push was
 - Fact: `LifeCoreTraceRunner` now drives `LifeCoreSnapshotLab`; `reboot` recovers the newest valid slot, `powercut` fails the next requested commit, and feedback persistence requests are auto-committed in the host experiment.
 - Fact: CSV output and Unity coverage now include persist failures, reboot count, final event count and generation. `sync/day/expect` remain explicit unsupported verbs.
 - Validation limit unchanged: whitespace and include-resolution checks pass; no C++/PlatformIO toolchain, simulator execution or board/mobile operation was available. No production persistence decision was made.
+
+## M04 review fixes checkpoint — 2026-10-14
+
+| Item | Status | Evidence / next action |
+|---|---|---|
+| S14–S16 native validation | Done criteria met (native tests green); ASan/UBSan and ESP32 build PASS | [Review fixes record](docs/roadmap/M04-review-fixes-2026-10-14.md) |
+| S17 FSM/visual wiring | In progress — host/ESP32 validation PASS; owner board check pending | Exercise sleep/wake, rejected request (result 5), rest/recovery on the board |
+| Energy recovery while Resting/Sleeping | Implemented; values Proposed | Tune `energyRecoveryPerMinute`, decay and dwell values in Life Lab |
+| BLE opcode 2 context / Reacting timer restart | Implemented; host-covered via shared `ActionGate`/LifeCore tests | Physical BLE acceptance with S17 owner check |
+
+No board upload, mobile/backend work, commit or push in this checkpoint.
+
+## Mobile UI design system checkpoint — 2026-10-14
+
+| Item | Status | Evidence / next action |
+|---|---|---|
+| XUNA tokens, fonts, base widgets | Implemented; host tests pass | [Mobile UI record](docs/roadmap/mobile-ui-design-system.md) |
+| Four-tab home on real data | Implemented; simulator-transport tests pass | Owner visual check on a real phone with the board |
+| Original images (`room`, `avatar`, `book`, `lv1–3`) | Pending | Export from Claude Design into `mobile/assets/images/` and swap stand-ins |
+| Base dialogs/snack bars restyle | Pending | Separate small session (mobile AGENTS §11) |
+| Locked "SẮP CÓ" features | Deferred | Each needs its own approved session (M06, protocol, VOICE gates) |
+
+## Commit checkpoint — 2026-10-14 (review fixes + mobile UI)
+
+Owner requested committing. Firmware `aa2dbca` (review fixes) and mobile `df7d2ee` (XUNA design system, four-tab home, heading fixes); the parent commit records both gitlinks and the handoff/design docs. No push.
