@@ -85,3 +85,10 @@ Không chỉ tăng counter. Cần chứng minh bằng replay/golden data rằng:
 - Contract: explanations contain numeric evidence only; no generated prose, heap allocation or fabricated causes. Invalid decisions produce an invalid explanation.
 - Experiment: added tests for initial exploration, posterior-winner explanation and invalid decision handling.
 - Boundary: this is a core/Life-Lab data contract, not yet a mobile Journal UI or production BLE payload.
+
+## L1.9 — learning trace DSL + host runner preparation (2026-10-14)
+
+- Fact: added `xuna/learning/LearningTraceDsl.h` with bounded parsing for `@+<ms>` traces, learner verbs (`choose`, `feedback`) and reserved S19a verbs (`button`, `cmd`, `sync`, `reboot`, `powercut`, `day`, `expect`). It supports comments, decimal/hex values, signed timezone values and typed parse errors without heap allocation.
+- Fact: added `firmware/sim/lifelab.cpp` and `firmware/sim/README.md`. The host-only runner consumes the learner subset, feeds the existing trace/shadow/evaluator stack and emits one deterministic CSV metrics row.
+- Experiment: added parser tests for learner events, extended verbs, malformed lines and replay through `LearningTraceRunner`.
+- Boundary: this is a pre-S19a learning runner. Reserved non-learner verbs are counted as unsupported; it does not emulate LifeCore, NVS/LittleFS, persistence or board behavior.

@@ -627,3 +627,16 @@ Owner requested a gradual upgrade toward a real learning engine. This session is
 - Firmware child repository committed as a518ede (`feat(firmware): add bounded digital life and learning layers`). It contains S14–S17 M04 logic, L1–L1.8 learning core/evaluation/shadow/trace/explanation layers and host-test preparation.
 - Parent repository commit records the handoff docs and roadmap. No push was performed.
 - Next steps: run `pio test -d firmware -e native`, `pio test -d firmware -e native_asan`, then `pio run -d firmware -e xuna_t_display_s3`; run the learner trace suite; continue S18/S19a only after required M04 storage/toolchain gates. Keep production learner v1 until shadow/persistence acceptance.
+## Learning Engine L1.9 — trace DSL and host runner preparation (2026-10-14)
+
+- Fact: added `firmware/lib/xuna_core/include/xuna/learning/LearningTraceDsl.h` with bounded C++11 parsing and typed errors for the learning-focused trace subset plus reserved S19a verbs.
+- Fact: added `firmware/sim/lifelab.cpp` and `firmware/sim/README.md`. The runner emits prequential/shadow CSV metrics and a deterministic fingerprint; unsupported non-learning verbs are reported rather than silently executed.
+- Fact: extended learner tests for parser vectors, malformed input and parser-to-runner replay.
+- Proposal: use this binary as the learner kernel when the full S19a LifeCore simulator is authorized after S18; do not mark S19a complete from this preparation slice.
+- Validation limit: no C++ compiler/PlatformIO/native/ESP32 run is available in this session. Static/whitespace checks only; no mobile/board operation, commit or push.
+- Next: compile `sim/lifelab.cpp` when the toolchain is available, then add the S19a store/clock/FSM adapters only after S18 prerequisites are met.
+
+## L1.9 commit checkpoint — 2026-10-14
+
+- Firmware child commit: `f784626` (`feat(firmware): add learning trace DSL and host runner`).
+- Parent handoff commit records the new child pointer, parser/runner roadmap and validation limits. No push.

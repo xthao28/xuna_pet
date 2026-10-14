@@ -321,3 +321,16 @@ The current runner is intentionally smaller than the roadmap DSL: it proves lear
 Firmware gitlink target: a518ede (`feat(firmware): add bounded digital life and learning layers`). Parent commit includes the handoff/roadmap records. No push.
 
 Next actions remain validation-first: native + ASan/UBSan + ESP32 builds, then Life Lab trace integration; persistence v2 and production learner switch remain gated by S12a/D2, shadow evidence and owner acceptance.
+## Learning Engine L1.9 checkpoint — 2026-10-14
+
+| Layer | Status | Evidence / gate |
+|---|---|---|
+| Trace DSL parser | Implemented in isolation; validation pending | `LearningTraceDsl.h` + parser/error tests |
+| Learning-focused host runner | Implemented in isolation; validation pending | `firmware/sim/lifelab.cpp`, CSV contract in `firmware/sim/README.md` |
+| Full S19a Life Lab | Still pending | Requires S18 `LifeCore::step`, store/clock adapters and native toolchain |
+
+This slice intentionally completes only the learner portion that can be developed without mobile or board access. It does not bypass S10/S13/S18 gates.
+
+## L1.9 commit checkpoint — 2026-10-14
+
+Firmware child commit `f784626` contains the trace DSL, host runner and parser tests. The parent handoff commit records the updated gitlink; no push.

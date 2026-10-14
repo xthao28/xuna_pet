@@ -376,3 +376,13 @@ Owner requested committing current changes. Mobile f756225 commits Android Bluet
 
 - Firmware submodule committed at a518ede: `feat(firmware): add bounded digital life and learning layers`.
 - Parent documentation commit is complete; no push. Validation limits and next toolchain/Life Lab steps are recorded in PROCESS.md and PLAN.md.
+## Learning Engine L1.9 trace DSL/runner preparation — 2026-10-14
+
+- Added bounded learning trace DSL parsing and typed errors for deterministic Choose/Feedback traces plus reserved future S19a verbs.
+- Added a host-only `sim/lifelab.cpp` metrics runner and README; it emits prequential/shadow CSV output without persistence or board access.
+- Added parser and parser-to-runner tests. Full S19a LifeCore simulation remains gated by S18 and the native toolchain.
+
+## Learning Engine L1.9 commit checkpoint — 2026-10-14
+
+- Firmware child committed at `f784626`: `feat(firmware): add learning trace DSL and host runner`.
+- Parent handoff records the gitlink and remaining S18/S19a gates. No push.
