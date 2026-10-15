@@ -114,6 +114,12 @@ Status vocabulary:
   - **D21 (owner-approved 2026-10-15):** the plan §22.1 contract H1–H8 is a design rule. Offline-complete core; cloud sends only bounded, expiring, revertible suggestions; owner evidence wins; opt-in data classes with U0 by default; exit plan; per-device security.
   - **D22 (owner-approved 2026-10-15):** transport order is phone gateway (BLE → app → HTTPS) first, device MQTT over TLS only after experiment E14. Broker/provider choice remains open until E14 and a cost review.
 - **D5 (owner-approved 2026-10-15; plan §18):** XUNA learns to choose among **idle, happy and curious** (existing art). The **GPIO0 press becomes a learnable `button_greeting` context**: XUNA chooses how to answer and the owner rates it in the app within the feedback window. Day parts remain planned with trusted time (S10). A fourth action such as greet needs new art and a new decision.
+- **D3 (owner-approved 2026-10-15; plan §18):** the owner has **120 s** after XUNA shows a reaction to rate it; a later rating is rejected as expired and teaches nothing. Direct input (an app command or the GPIO14 idle button) still invalidates the pending reaction.
+- **S22 learning and conversation decisions (owner-approved 2026-10-15; [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md)):**
+  - **D4:** keep the E10 UCB exploration; the "Why?" view labels exploratory choices; no age dependence until M06.
+  - **D6:** implicit feedback is off. Only explicit ratings and confirmed statements teach preferences (L-D4 drive reduction stays separate `device_observed` evidence).
+  - **Layer A voice and scope:** XUNA replies as "mình – bạn"; Vietnamese first (English keeps the V1 words only); a statement without a context gets one follow-up question and nothing is sent until answered; the packet's phrase table is the S39 starting set.
+  - **D16:** deferred; Layer A is text-first, E13 later.
 - **E10 learner selection (owner-approved 2026-10-15; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md)):**
   - **E10-A:** learner v3 with policy C (UCB) is the M05a learner, replacing the plan default ε-greedy.
   - **E10-B:** starting parameters γ 0.90 (responsive), k 1, m 1, UCB bonus 0.15; to be re-checked by the owner on the board.

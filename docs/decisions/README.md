@@ -20,6 +20,9 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | D21 hybrid contract H1–H8 · D22 transport order (phone gateway → MQTT after E14) | Approved (broker/provider still open) | 2026-10-15, AGENTS §3 |
 | D23 data/consent/legal · D24 online business model | Proposed | Plan §18, §22 |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
+| D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
+| D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md) |
+| D16 phone voice (push-to-talk, on-device STT) | Deferred by owner (text first, E13 later) | 2026-10-15 |
 | E10-A/B/C: learner v3 + UCB for M05a, γ 0.90 / k 1 / m 1 / bonus 0.15, capped v1 migration | Approved (selection; board use gated) | 2026-10-15, AGENTS §3, [E10 packet](../roadmap/E10-review-packet-2026-10-15.md) |
 
 [ADR-0001 reference reuse policy](ADR-0001-reference-reuse-policy.md) is drafted (Proposed); owner acceptance remains pending. ADR-0002–0005 identifiers remain reserved by existing sessions. This index does not accept their decisions or promote other open D-decisions.

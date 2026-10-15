@@ -965,6 +965,8 @@ The 8 episodes in the current v1 snapshot migrate to v2 memory-store episodes wi
 
 **Approved amendment (E10-C, owner 2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md) slice 3.
 
+**Frozen layout (S12a, 2026-10-15; host codec, not yet wired):** header 12 B = `'X' 'U'`, `schema u8 = 2`, `flags u8 = 0`, `size u16` (incl. CRC), reserved `u16 = 0`, `generation u32`; then sections `{u8 id, u8 version, u16 length, data}`; then the CRC-32 trailer. Id bit 7 = required. Ids: 1 Counters (required, 16 B: `bootCounter`, `activeSeconds`, `eventSeqCommitted`, `feedbackCount` = v1 `eventCount`), 2 Clock, 3 Lifecycle, 4 Needs (4 B), 5 Personality, 6 Learner (required, `LearnerV3Codec` payload, 458 B for 3 × 5 × 3), 7 Habit, 8 Skills, 9 Dedup, 10 Pointers, 11 Episodes (34 B, the v1 ring until M05b), 12 StatedPreference. Ids 3, 5, 7–10 and 12 are reserved until their code exists. Id 2 Clock (6 B: `lastTrustedUtcMinute` u32, `tzOffsetMin` i16) is written after the first accepted sync (S10 host part, [record](../roadmap/S10-host-trusted-time-2026-10-15.md)). Product snapshot: 536 B, 544 B with needs, 554 B with needs and clock. Recovery and A/B rules: [S12 record](../roadmap/S12-snapshot-v2-2026-10-15.md). Done before D2 by owner choice; D2 still decides the medium and keys (S13).
+
 ### 7.6 Commit policy
 
 | Class | Examples | When committed | Expected frequency (hypothesis) |
@@ -1136,7 +1138,7 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 
 - Feedback must carry `reactionId` (v2) or the pending decision ID (v1 compatibility).
 - **Rejection reasons:**
-  - unknown, expired (window [P] 120 s, range 30–300 s, D3), already consumed, invalidated by direct input (MVP rule kept), action not in the current repertoire;
+  - unknown, expired (window 120 s, D3 approved 2026-10-15), already consumed, invalidated by direct input (MVP rule kept), action not in the current repertoire;
   - **unauthorized source** after bonding (M05b).
 - **Atomic apply:** learner update + `FeedbackApplied` log + reaction marked consumed, all in one urgent commit, then the ACK. If the commit fails, the ACK reports `not_ready` and RAM is not mutated (MVP behavior).
 - Duplicate `CommandId`s return the cached result and never train twice. Explicit feedback is human-paced and one per reaction; reactions requested from the app have a cooldown ([P] ≥ 1.5 s).
@@ -1314,6 +1316,8 @@ Conversation is a **learning input channel** (A6, spec §23.9). It is split by d
 | unknown | — | anything else | none; nothing stored | — |
 
 In Layer A, Layer-B phrases are recognized but answered with "mình chưa ghi nhớ được điều này". **Nothing is stored.**
+
+**S22 (owner-approved 2026-10-15):** Layer A is Vietnamese first (English keeps the V1 words only); XUNA replies as "mình – bạn"; a `StatePreference` without a context gets one follow-up question with quick replies and nothing is sent until it is answered; the starting phrase table, vocabulary, negative cases and reply templates are in the [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md). Action words map to D5 (idle/happy/curious); "wave" in the examples above is illustrative only.
 
 Hypotheticals, quotes and jokes ("giả sử…", "nếu…", quoted text) are rejected by the rules. The tests include prompt-injection strings.
 
@@ -1808,10 +1812,10 @@ The following need the owner:
 |---|---|---|---|
 | D1 | **[A] 2026-10-12: complete M04 first.** Approve the M04 foundation sequence (M04.0–M04.6) before new M05 features | Approved | M04.1 |
 | D2 | Storage layout — decided **after** E4/E5 evidence and the ADR-0002 draft (session S11), not before | Hypothesis: NVS (identity + life A/B) + LittleFS on the existing `spiffs` partition | M04.4 (S12a) |
-| D3 | Feedback window and invalidation | 120 s window; keep "direct input invalidates pending reaction" | M05a |
-| D4 | Visible exploration: should XUNA sometimes choose a non-preferred action, more when young? | Yes, bounded (ε 0.03–0.30), labeled as exploration in the explanation | M05a |
+| D3 | **[A] 2026-10-15:** feedback window **120 s** after the reaction is shown; a later rating is rejected as expired. Keep "direct input invalidates pending reaction" | Approved | M05a |
+| D4 | **[A] 2026-10-15:** exploration is the E10 UCB policy (bonus 0.15, replaces the ε range); exploratory choices are labelled in the "Why?" explanation; no age dependence until M06 | Approved | M05a |
 | D5 | **[A] 2026-10-15 (actions and GPIO0):** learnable actions are idle, happy and curious (existing art; learner index 0/1/2 → ActionId 0/1/3); the GPIO0 press becomes the learnable `button_greeting` context. Day parts stay as recommended and need trusted time (S10); a fourth action (e.g. greet) needs new art | Approved (actions, GPIO0); day parts per S10 | M05a |
-| D6 | Implicit feedback | Off by default | M05a |
+| D6 | **[A] 2026-10-15:** implicit feedback **off**; only explicit ratings and confirmed statements teach preferences (L-D4 drive reduction stays separate) | Approved | M05a |
 | D7 | **[A] 2026-10-12: hatch on the device or via the app.** Exact `bornAt` only with trusted time in the hatch boot session; otherwise unknown. The existing MVP pet migrates as Newborn with `bornAt` unknown (§12) | Approved (owner chose the local-first variant over app-only hatch) | M04.2 |
 | D8 | Facts on the device: predicate allowlist, nickname ≤ 16 bytes on the device, capacity 32 | Approve the allowlist in §10.4 | M05b |
 | D9 | `ForgetAll` scope: reset skills, stage and protected journal? | Reset learner/memory/skills; keep identity, active lifetime and stage | M05b |
@@ -1822,7 +1826,7 @@ The following need the owner:
 | D13 | Growth gates, stage names and trait art | Defer to M06 with Life Lab data | M06 |
 | D14 | **[A] 2026-10-12: pin Flutter 3.32.8 via `mobile/.fvmrc`.** Flutter toolchain: pin the SDK for reproducible builds. Evidence: no `.fvmrc`; `pubspec.lock` requires Flutter ≥ 3.27.0 / Dart ≥ 3.7.0; validation is recorded only on 3.32.8 (macOS); this Windows machine has 3.41.1 | Pin **3.32.8** via `mobile/.fvmrc` (matches recorded evidence); any upgrade (e.g. 3.41.x) becomes its own validated session | S00 (mobile work) |
 | D15 | Order after M05c-B: M05d first (A) or an Evolution MVP first (B) | Decide at checkpoint S42a with acceptance evidence and art readiness; lean B if art for one stage change + two traits is ready and S28 shows stable learning | S42a |
-| D16 | Voice in Conversation Foundation: push-to-talk with **on-device** STT (phone mic), optional phone TTS. This changes the A5 MVP scope, which deferred voice. | Text first; voice only if E13 shows vi-VN on-device recognition works offline | S27b |
+| D16 | Voice in Conversation Foundation: push-to-talk with **on-device** STT (phone mic), optional phone TTS. This changes the A5 MVP scope, which deferred voice. **Owner 2026-10-15: deferred — text first, E13 later** | Text first; voice only if E13 shows vi-VN on-device recognition works offline | S27b |
 | D17 | **[A] 2026-10-12: approved, text-first; voice stays with D16; `w_s` and cap values remain [P] until S25.** Approve the Conversation Layer A/B restructure (M05c-A with M05a; M05c-B after M05b) and the opcode 6 contract (§11.6) | Approve; it aligns sequencing with A6 without new infrastructure | S22 |
 
 ---

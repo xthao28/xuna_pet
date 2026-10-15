@@ -479,6 +479,7 @@ Notes:
 
 ### S10 — TimeSync and app hatch end-to-end (M04.2c)
 
+- **Host part done (2026-10-15):** `ClockModel` inside `LifeCore` with `LifeCore::sync`, day-part learning cells, LifeSnapshot v2 Clock section (watermark replaces "keep it in RAM and log it"), 64-bit monotonic extension. Protocol, CommandHandler, Hatch, firmware, mobile and owner checks remain. Evidence: [S10 host record](S10-host-trusted-time-2026-10-15.md).
 - **Preconditions:** S05, S06, S09; D14 for the mobile part.
 - **Steps:**
   1. **Design freeze:** append to the MVP-local protocol section:
@@ -545,6 +546,7 @@ Notes:
 
 ### S12a — Snapshot v2 layout freeze + sectioned codec (M04.4b-1; T6, T18)
 
+- **Status (2026-10-15):** done on host ahead of D2 (owner choice: the codec does not depend on the medium). Layout frozen in plan §7.5; evidence in the [S12 record](S12-snapshot-v2-2026-10-15.md). D2 still gates S13.
 - **Preconditions:** S06 (CRC-32), D2 answered.
 - **Steps:**
   1. **Design freeze:** write the exact v2 layout into plan §7.5:
@@ -563,6 +565,7 @@ Notes:
 
 ### S12b — v1→v2 migration + torn-write simulation (M04.4b-2)
 
+- **Status (2026-10-15):** done on host (`xuna/persist/Migrations.h`, `SnapshotStore.h` with `ISnapshotStore`; torn-write sweep at every byte offset). Migration uses the E10-C capped mapping instead of `alpha = 1 + pos`. Evidence in the [S12 record](S12-snapshot-v2-2026-10-15.md).
 - **Preconditions:** S12a, S03 fixtures.
 - **Steps:**
   1. **`xuna/persist/Migrations.h`:** `fromV1(bytes96)` maps:
@@ -633,6 +636,7 @@ Notes:
 
 ### S18 — `LifeCore::step` composition (M04.6a)
 
+- **Preparation (2026-10-15, host only):** `LifeCore` now uses the E10 learner v3 in the D5 product shape (incl. the GPIO0 `button_greeting` context and curious) through `ProductLearner`, with LifeSnapshot v2 as the durable record; this replaces "LifeEngine (v1 learner, still)" in step 1. Evidence: [S18 preparation record](S18-prep-product-learner-2026-10-15.md). Production wiring still needs S13, S10 and this session.
 - **Preconditions:** S17, S13, S10.
 - **Steps:**
   1. Compose ClockModel, Identity, EventQueue, CommandHandler, ActivityFsm, Needs/Mood, RequestValidator, BehaviorSelector and LifeEngine (v1 learner, still) behind `LifeCore::step(StepInput) → StepOutput` (plan T1 interface).
@@ -697,6 +701,8 @@ Every session below starts with a **design-freeze step**: write the exact payloa
 The track is developed together and accepted together in S28. This implements A6, "Conversation belongs alongside Learning", without waiting for MemoryStore, BLE v2 or bonding. **The restructure is Proposed (D17).**
 
 #### S22 — Learning and conversation decisions (Owner)
+
+- **Done (2026-10-15):** D3, D4, D5, D6 approved, D16 deferred, Layer A scope and phrase table approved ([S22 packet](S22-decision-packet-2026-10-15.md)). No new art needed. S39 may start.
 
 - **Direction check:** A11 device-first is approved product intent. Keep D17 text-first; freeze candidate/preference semantics independent of text/voice/simulation. Do not require voice hardware. D18–D20 remain separate gates.
 

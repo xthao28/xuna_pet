@@ -3,6 +3,27 @@
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — S22 learning and conversation decisions
+
+- Owner approved, all as recommended: D4 (E10 UCB exploration, labelled in "Why?"), D6 (implicit feedback off), Layer A replies as "mình – bạn", Vietnamese first, one follow-up question when a statement has no context, the Layer A phrase table as the S39 starting set; D16 deferred (text first). Recorded in AGENTS.md §3, plan §11/§18, the decision index and the [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md). Documentation only.
+## 2026-10-15 — D3 approved: 120 s feedback window
+
+- Owner approved D3 (AGENTS.md §3, plan §18, decision index): ratings are accepted for 120 s after a reaction is shown; direct input still invalidates. Implemented in `ProductLearner`/`LifeCore` (expiry, `feedbackExpired`, `decisionExpired`). 5 new tests; native 164/164 PASS; traces and ESP32 build unchanged. Production BLE path not yet changed.
+## 2026-10-15 — S10 host part: trusted time and day-part learning
+
+- `ClockModel` moved into `LifeCore` (`LifeCore::sync`, the future opcode 5 seam); decisions use day-part cells once time is trusted (coarse cell otherwise); LifeSnapshot v2 Clock section (id 2) persists the rollback watermark and offset; 32 → 64-bit monotonic extension for `millis()` wrap. Trace `sync` verb supported, new `c8_dayparts.trace`, CSV gains sync columns.
+- 7 new tests incl. morning/evening greeting preferences diverging. Native 159/159 PASS; ESP32 build unchanged; Xtensa smoke PASS; `life_timeline` identical to HEAD. Protocol/firmware/mobile parts of S10 not done. Evidence: [S10 host record](docs/roadmap/S10-host-trusted-time-2026-10-15.md).
+## 2026-10-15 — S18 preparation: product learner in LifeCore (host)
+
+- Owner chose to replace LifeCore's v1-decides/v3-shadow composition. `LifeCore` now uses `ProductLearner` (new): learner v3 in the D5 shape 3 × 5 × 3 decides, LifeSnapshot v2 is the durable record (commit-first through `ISnapshotCommit`). New `Greeting` event for GPIO0 with device decision IDs; choices limited to actions the FSM accepts; direct requests invalidate the pending decision; forget writes both slots. Snapshot lab and trace runner moved to v2 (`MemorySnapshotStore`). `SnapshotStore::recover`: lone torn v2 slot without v1 → Missing (was Corrupt).
+- Native 152/152 PASS; ESP32 build unchanged; Xtensa compile smoke PASS; `life_timeline` output identical to HEAD. Production firmware unchanged. Evidence: [S18 preparation record](docs/roadmap/S18-prep-product-learner-2026-10-15.md).
+## 2026-10-15 — S12a + S12b: LifeSnapshot v2 codec and v1 migration (host)
+
+- Owner chose to run S12a/S12b before S11/D2 (the codec does not depend on the medium). Added `xuna/persist/SnapshotCodec.h` (sectioned v2 layout, CRC-32, typed `LoadResult`, validate-before-mutate), `Migrations.h` (v1 → v2 with the E10-C cap) and `SnapshotStore.h` (`ISnapshotStore`, A/B recovery and commit-first write). Layout frozen in plan §7.5; product snapshot 544 B of 1,536 B.
+- 16 new tests incl. every-bit-flip and every-offset torn-write sweeps. Native 143/143 PASS; ESP32 build unchanged; Xtensa compile smoke PASS. Not wired (S13 after D2). Evidence: [S12 record](docs/roadmap/S12-snapshot-v2-2026-10-15.md).
+## 2026-10-15 — Board trial instrumentation
+
+- The LCD shows only the sprite (resting draws idle) and the board does not compute mood, so the life-feel trial was not measurable. `main.cpp` now logs `needs …` every 5 s and `activity_change …` on each change; added `tools/serial_capture.py` and `sim/board_needs_report.py`. Native 127/127 PASS; ESP32 RAM unchanged, Flash 1,347,657 B (+576). Firmware commit `5d872d3`. Not uploaded.
 ## 2026-10-15 — Learner v3 board-trial shortcut
 
 - Owner chose to skip LifeSnapshot v2 for a first board trial. `BoardLearner` lets v3 decide BLE opcode 2 choices, the quiet routine and the reported preference, while v1 stays the durable 96-byte record (commit-first, §9.5) and v3 is rebuilt from it at boot. `BleManager`/`main.cpp` wired; BLE bytes, snapshot format and NVS keys unchanged.

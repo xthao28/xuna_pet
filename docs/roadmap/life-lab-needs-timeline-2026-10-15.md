@@ -122,6 +122,15 @@ region):
   stimulation. Native 121/121 PASS; ESP32 build SUCCESS (RAM 46,224 B, Flash
   1,343,589 B). Not uploaded yet: the board was not connected.
 
+Board instrumentation (added 2026-10-15, firmware `5d872d3`): the LCD shows only the
+pet sprite, resting draws the idle sprite, and the board does not compute mood.
+`main.cpp` now prints `needs t_s=… activity=… energy=… stim=…` every 5 s and
+`activity_change from=… t_s=… activity=…` on each activity change (log only;
+no storage/BLE change; RAM unchanged, Flash +576 B). Capture with
+`firmware/tools/serial_capture.py` to a file outside Git and summarise with
+`firmware/sim/board_needs_report.py` (first rest, awake/rest periods, energy
+range, time shares). Mood targets cannot be checked on the board until S18.
+
 Owner board check (1–2 hours after upload): the first rest comes after about
 48 minutes; then XUNA is awake about 25 minutes and rests about 4 minutes
 (energy between 25% and 64% instead of 25–38%). It should stay responsive
