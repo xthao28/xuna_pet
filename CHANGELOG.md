@@ -3,6 +3,19 @@
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — Learner v3 board-trial shortcut
+
+- Owner chose to skip LifeSnapshot v2 for a first board trial. `BoardLearner` lets v3 decide BLE opcode 2 choices, the quiet routine and the reported preference, while v1 stays the durable 96-byte record (commit-first, §9.5) and v3 is rebuilt from it at boot. `BleManager`/`main.cpp` wired; BLE bytes, snapshot format and NVS keys unchanged.
+- 6 new tests; native 127/127 PASS; ESP32 build SUCCESS (RAM 48,328 B, Flash 1,347,081 B). Known limits: recency lost across reboots; 2 × 2 shape only. Not uploaded (board not connected). Evidence: [board trial record](docs/roadmap/learner-v3-board-trial-2026-10-15.md).
+## 2026-10-15 — Life-feel configuration enabled for a board trial
+
+- Owner approved the 11 life-feel targets and enabling the candidate configuration for a board trial. Added `xuna/life/LifeFeel.h` (`lifeFeelTuning`, `lifeFeelThresholds`, shared `applyAcceptedAction`); production `main.cpp` and `BleManager` and the `LifeCore` defaults use it. Values stay provisional until the owner board check.
+- New test (accepted happy spends 409 energy, adds 4096 stimulation). Native 121/121 PASS; ESP32 build SUCCESS (RAM 46,224 B, Flash 1,343,589 B). Not uploaded: board not connected. No commit or push.
+## 2026-10-15 — Life Lab Phase 0 slice 2: needs, rest and mood timeline
+
+- Added `sim/life_timeline.cpp` and `sim/life_sweep.py`; inactive Life Lab knobs (`ActivityThresholds` with `wakeEnergy`/`resumeInterruptedRest`, `LifeTuning.actionCostPercent`/`stimulationPerInteraction`, `Needs::spend/stimulate`, LifeCore tuning parameters) with defaults equal to shipped behaviour; 2 tests. Native 120/120 PASS; ESP32 RAM +16 B, Flash +116 B.
+- Findings (shipped values, also on the board): after ~49 min XUNA cycles 8 min awake / 4 min resting with energy 25–38%; actions never spend energy; stimulation never rises (excited/curious/overwhelmed unreachable); interrupted rest is lost; sleep needs explicit wake.
+- Proposed life-feel targets and a candidate configuration passing all 11 checks; owner decision needed before board use. Evidence: [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md). No board/mobile operation, commit or push.
 ## 2026-10-15 — E10 review packet
 
 - Added [E10 review packet](docs/roadmap/E10-review-packet-2026-10-15.md) with decision requests E10-A/B/C, selection evidence, §9.9 status per scenario, owner board checks, gates and risks.

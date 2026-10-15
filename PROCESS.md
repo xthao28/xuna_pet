@@ -803,3 +803,18 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Next: owner decision on E10-A/B/C; then Phase 0 slice 2 (LifeCore time series) or S12a/D2 preparation.
 - Owner approved E10-A (v3 + UCB for M05a), E10-B (γ 0.90, k 1, m 1, bonus 0.15; re-check on board) and E10-C (capped v1 migration amending §7.5) on 2026-10-15. Recorded in AGENTS.md §3, plan §7.5/§9.4/§16.2, the decision index and the packet. Board use stays gated by S12a/D2, S10, S18, E2/E6 and owner acceptance.
 - Commit checkpoint (2026-10-15): firmware child `2ad51df` (`feat(firmware): add D5 learner vocabulary and feedback spam test`); the parent commit records the gitlink, D5 and E10 approvals and the E10 packet. No push.
+
+## Life Lab Phase 0 slice 2 — needs/rest/mood timeline (2026-10-15)
+
+- Added `sim/life_timeline.cpp` (hours-long LifeCore runs, idle/casual/active owners), `sim/life_sweep.py`, and inactive Life Lab knobs: `ActivityThresholds` (incl. `wakeEnergy`, `resumeInterruptedRest`), `LifeTuning.actionCostPercent`/`stimulationPerInteraction`, `Needs::spend/stimulate`, `LifeCore` tuning parameters. Defaults keep the shipped behaviour; 2 new tests. Native 120/120 PASS; ESP32 RAM 46,224 B (+16), Flash 1,343,453 B (+116).
+- Fact (also true on the board): after ~49 min XUNA cycles 8 min awake / 4 min resting with energy 25–38% (91% of time below 37.5%); actions never spend energy; stimulation never rises, so excited/curious/overwhelmed moods are unreachable; interrupted rest is lost; sleep needs an explicit wake.
+- Proposal: life-feel targets (11 checks) and candidate values (restExit 64%, recovery 6144/min, action cost 10%, stimulation +4096, wake at 80%, resume interrupted rest) that pass all targets. Owner decision needed before enabling on the board. Evidence: [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md).
+- Git: uncommitted. No push.
+- Owner approved the life-feel targets and enabling the candidate configuration for a board trial (2026-10-15). Added `xuna/life/LifeFeel.h`; production `main.cpp`/`BleManager` and `LifeCore` defaults use it; 1 more test. Native 121/121 PASS; ESP32 build SUCCESS (RAM 46,224 B, Flash 1,343,589 B). **Not uploaded:** the board was not connected (only COM1). Next: owner connects the board; back up NVS and the partition table, upload (NVS excluded), then a 1–2 hour owner observation.
+
+## Learner v3 board-trial shortcut (2026-10-15)
+
+- Owner chose to skip LifeSnapshot v2 for a first board trial. Added `xuna/learning/BoardLearner.h` (v3 decides; v1 stays the durable 96-byte record; commit-first via `StorageCommit`; rebuild at boot), `approvedLearnerParameters()`/`v1CompatibleLearnerConfig()`, `LocalBehavior::choosePreferred`; wired into `BleManager` (opcodes 2/3/4, preference bytes) and `main.cpp`. 6 new tests; native 127/127 PASS; ESP32 build SUCCESS (RAM 48,328 B, Flash 1,347,081 B).
+- Known limits: recency lost across reboots; 2 × 2 shape only (no curious/greeting) until S12a. Evidence and board checklist: [board trial record](docs/roadmap/learner-v3-board-trial-2026-10-15.md).
+- Not uploaded: board not connected. Next: owner connects the board → NVS/partition backup → upload → Serial check → owner observation (life-feel + learning).
+- Commit checkpoint (2026-10-15): firmware child `efdd915` (`feat(firmware): enable life-feel tuning and learner v3 board trial`) with Life Lab slice 2 (needs timeline, knobs, LifeFeel) and the BoardLearner shortcut; the parent commit records the gitlink and docs. Not uploaded; no push.

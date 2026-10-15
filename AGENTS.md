@@ -119,6 +119,8 @@ Status vocabulary:
   - **E10-B:** starting parameters γ 0.90 (responsive), k 1, m 1, UCB bonus 0.15; to be re-checked by the owner on the board.
   - **E10-C:** v1 → v3 migration keeps the positive:negative ratio and caps mass at 1/(1 − γ) (amends plan §7.5).
   - Selection only: v3 does not drive the board until S12a/D2, S10, S18, E2/E6 and owner board acceptance.
+- **Life-feel targets and board trial (owner-approved 2026-10-15; [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md)):** the 11 life-feel targets are the yardstick for needs/mood tuning. The candidate configuration (rest until about 64%, recovery 6144/min, 10% action cost, +4096 stimulation per interaction, self-wake at about 80%, resume interrupted rest) is enabled in the firmware for a board trial; values stay provisional until the owner's board check.
+- **Learner v3 board-trial shortcut (owner decision 2026-10-15):** ahead of the planned S12a → S18 order, learner v3 (E10 config, 2 × 5 × 2 shape) decides BLE opcode 2 choices, the quiet routine and the reported preference on the board, through `xuna/learning/BoardLearner.h`. v1 `LifeEngine` stays the durable record in the unchanged 96-byte snapshot (commit-first, §9.5); v3 is rebuilt from it at boot with the capped migration. Known limits until LifeSnapshot v2: recency is lost across reboots; no curious action or GPIO0 greeting context yet. The planned S12a/S18 work still applies for the full product shape.
 
 ### Proposed — not yet fixed
 
