@@ -104,6 +104,15 @@ Status vocabulary:
     - **Layer A** (text-first, developed and accepted with M05a, opcode 6 `StatedPreference`).
     - **Layer B** (personal facts and recall, after M05b).
     - Voice remains deferred pending D16. Stated-preference weight and cap values stay Proposed until tuned in Life Lab.
+- **Learning upgrade decisions (owner-approved 2026-10-15; IDs from implementation plan §18 and the [competitive upgrade plan](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md)):**
+  - **L-D1:** adopt the competitive learning upgrade plan as an amendment to plan §9–§10. D1 sequencing (M04 first) and existing session gates still apply.
+  - **L-D2:** add learning-progress curiosity (plan §9.4 Alternative D) to experiment E10. Selection still follows the E10 rule.
+  - **L-D3:** teachable tricks (plan §9.10) become a planned capability, scheduled after M05a acceptance. Thresholds and budgets stay Proposed until Life Lab data.
+  - **L-D4:** drive-reduction learning is allowed as `device_observed` evidence, kept separate from owner ratings and never treated as implicit owner feedback (D6 unchanged).
+  - **L-D5:** open a sensor **research** track for touch, IMU and microphone (microphone together with D18/VOICE-01). Research only: no purchase, wiring or firmware change without a separate approval.
+- **Hybrid offline + online learning (owner-requested 2026-10-15):** keep the offline learning as a complete core and add an optional online layer (cloud services, later device MQTT). The pet must keep living and keep what it learned without network or service. Provider, broker, data upload, consent defaults and cost model stay Proposed ([ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md), plan §22, D23–D24).
+  - **D21 (owner-approved 2026-10-15):** the plan §22.1 contract H1–H8 is a design rule. Offline-complete core; cloud sends only bounded, expiring, revertible suggestions; owner evidence wins; opt-in data classes with U0 by default; exit plan; per-device security.
+  - **D22 (owner-approved 2026-10-15):** transport order is phone gateway (BLE → app → HTTPS) first, device MQTT over TLS only after experiment E14. Broker/provider choice remains open until E14 and a cost review.
 
 ### Proposed — not yet fixed
 

@@ -117,6 +117,10 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | VOICE-02 | Conditional — Proposed | VOICE-01 + D18 + authorized real audio hardware |
 | VOICE-03 | Conditional — Proposed | VOICE-02 + D19 research scope + D11a for cloud |
 | VOICE-04 | Conditional — Proposed | VOICE-03 + final service/scope decisions D19/D20 (D11 if applicable) + S28; facts additionally S42 |
+| LRN-01 | Done — 2026-10-15, documentation only | [Competitive learning upgrade plan](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md); plan §9.4 Alt D, §9.9 scenarios, §9.10 tricks, §18 L-D1–L-D5 (all Proposed) |
+| LRN-02 | Done — 2026-10-15 | Owner approved L-D1–L-D5 (L-D5: touch + IMU + mic research only). D5 and D15 remain open |
+| LRN-04 | D21/D22 approved 2026-10-15; D23/D24 pending | Hybrid online layer: [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md), plan §22; decide D21–D24; E14/E15 not started |
+| LRN-03 | In progress — slice 1 done 2026-10-15 | [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md): closed-loop learner bench, 95/95 native PASS; next slice: LifeCore time series + §9.5 parity |
 
 M04 S00–S21 remain unchanged in implementation scope. M05a/Foundation text or simulation stays independent of voice hardware; M05b keeps memory/privacy/recovery; M05c extends Foundation; M05d vs Evolution order remains D15/S42a. M06/M07 may consume validated voice-originated evidence without treating spoken reports as sensor observations. Next coding session remains S00 after S02 documentation; no feature session started here.
 

@@ -92,3 +92,9 @@ Không chỉ tăng counter. Cần chứng minh bằng replay/golden data rằng:
 - Fact: added `firmware/sim/lifelab.cpp` and `firmware/sim/README.md`. The host-only runner consumes the learner subset, feeds the existing trace/shadow/evaluator stack and emits one deterministic CSV metrics row.
 - Experiment: added parser tests for learner events, extended verbs, malformed lines and replay through `LearningTraceRunner`.
 - Boundary: this is a pre-S19a learning runner. Reserved non-learner verbs are counted as unsupported; it does not emulate LifeCore, NVS/LittleFS, persistence or board behavior.
+
+## Competitive upgrade plan (2026-10-15, Proposed)
+
+Competitor review and phased amendments (closed-loop Life Lab, v3 learner,
+curiosity variant, teachable tricks, formation arc, senses):
+[XUNA_LEARNING_COMPETITIVE_UPGRADE.md](../architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md).

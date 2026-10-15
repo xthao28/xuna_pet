@@ -1,8 +1,40 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-14** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — Hybrid offline + online learning plan (documentation only)
+
+- Owner asked to integrate an online layer (cloud, MQTT) combined with the existing offline learning. Recorded as owner-requested direction (AGENTS.md §3); technical choices stay Proposed.
+- Added [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md) and plan §22 (contract H1–H8, capabilities O1–O6, phone-gateway then device MQTT/TLS transport, sequencing), experiments E14/E15, decisions D21–D24, decision-index rows and an online-layer table per learning phase. Cites the Moxie (2025-01-30) and Vector server shutdowns as the reason for the offline-complete rule.
+- Owner then approved D21 and D22 (broker/provider, D23, D24 still open). No code, build or board/mobile operation.
+## 2026-10-15 — Life Lab Phase 0 slice 1: closed-loop learner bench
+
+- Owner approved L-D1–L-D5 (recorded in AGENTS.md §3, plan §18; L-D5 = research on touch, IMU and microphone only) and chose the closed-loop Life Lab next.
+- Added host-only `xuna/lab/OwnerModel.h` (oracle, reversal, drift, no-feedback, sparse rating) and `xuna/lab/LearnerBench.h` (random/static/v1/v2 adapters, regret, greedy-correct, trials to target, flips, Brier, no-feedback invariance), `test/test_life_lab` (8 tests) and `sim/learning_bench.cpp` (200 seeds, bootstrap CIs, `--curves`).
+- Validation: native 95/95 PASS; ESP32 build SUCCESS with unchanged RAM 46,208 B / Flash 1,343,337 B; purity PASS.
+- Findings: v1 and v2 learn a stable preference in a median of 7 trials and beat baselines (§9.9 B holds). Neither handles change: after a reversal v1 never recovers in 60 trials (0% of seeds, worse than random) and v2 recovers in 26%; under drift v1 is worse than both baselines. No feedback leaves every learner unchanged (§9.9 D). Measured case for the §9.3 discounted estimator in Phase 1.
+- Evidence: [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md). No production code change, board/mobile operation, commit or push.
+## 2026-10-15 — Learning competitive upgrade plan (documentation only)
+
+- Owner requested a review of large projects for strong learning algorithms suited to XUNA and an upgrade plan, and allowed revising the plan where needed.
+- Added [XUNA_LEARNING_COMPETITIVE_UPGRADE.md](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md) (Proposed): competitor review (public/marketing claims), algorithm fit table, six gaps, phases 0–6, decisions and sources.
+- Amended the implementation plan ([P]): §9.4 Alternative D learning-progress curiosity and a note on what v2 actually implements; §9.9 drift and noisy/sparse scenarios; §9.10 teachable tricks; §18 L-D1–L-D5. Linked from the learning roadmap; PLAN rows LRN-01/02.
+- Corrected the lab-run finding: plan §9.5 already defines the commit-failure model, so it is a parity task, not an open choice.
+- No code, build, board/mobile operation, commit or push.
+## 2026-10-15 — Host lab runs (LifeCore and learning)
+
+- Owner chose host experiments. Built `sim/lifelab` and `sim/lifecore_lab` with g++ 16 `-Werror` (clean). Added 12 annotated traces in `firmware/sim/traces/`; results are deterministic across reruns.
+- LifeCore: commit, power cut, reboot, pending-after-reboot, duplicate and window cases behave as designed. Finding: commit-failure semantics differ from production (BLE opcode 3 saves a copy and keeps the decision pending for retry; `LifeCore` applies first, clears pending, and in the lab cannot report or retry a failed commit). Plan §9.5 already defines the production model; bring `LifeCore` in line with a parity test before it replaces the BLE path (S18).
+- Learning: with consistent scripted feedback v2 Brier is 0.052 vs 0.25 uniform; with no signal it is 0.279 (slightly worse than uniform). Traces are open-loop, so this is not evidence of preference learning, and v1/v2 agreement is not meaningful.
+- Limits: runners are open-loop, print one summary row and cap traces at 64 events, so they cannot tune the Proposed needs/energy/FSM values. A closed-loop time-series lab is proposed, not started.
+- Evidence: [lab runs record](docs/roadmap/lifecore-lab-runs-2026-10-15.md). No production code change, board/mobile operation, commit or push.
+## 2026-10-15 — Windows toolchain and gcc warning fix
+
+- Owner installed the PlatformIO IDE extension (Core 6.2.0, not on PATH) and asked the agent to install the rest. Installed MSYS2 via winget and UCRT64 gcc/g++ 16.2.0 via pacman; added `C:\msys64\ucrt64\bin` to the user PATH. No admin rights used.
+- First Windows native run: 15/17 suites; `test_life` and `test_v1_characterization` failed to compile because gcc 16 reports `-Wmisleading-indentation` (as error) on `BleProtocol.h` `remember()`. Fixed by splitting the line; no behavior change.
+- Validation on Windows: native 87/87 PASS (17 suites); ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,337 B, 20 B below the Mac figure); `git diff --check` PASS. `native_asan` not run: MinGW lacks usable ASan/UBSan (needs WSL or the Mac). No board/mobile/backend operation, commit or push.
+- Editor diagnostics: the Problems panel (clangd in Antigravity) showed false errors (`cstdint` not found, unknown `uint8_t`) because clangd had no compile flags and defaulted to missing MSVC headers. Added `firmware/.clangd` (strip xtensa-only flags; host tests and `sim/` use native C++11 flags with Unity instead of the ESP32 database) and ignored `compile_commands.json`/`.cache/`. Machine-local only: generated `compile_commands.json` via `pio run -e xuna_t_display_s3 -t compiledb`, added `clangd.arguments --query-driver` for the xtensa toolchain to Antigravity settings, and `%LOCALAPPDATA%\clangd\config.yaml` pointing host files at MSYS2. `clangd --check` reports no diagnostics on 65 tracked firmware sources.
 ## 2026-10-14 — Mobile UI: XUNA design system and four-tab home
 
 - Owner-requested UI from Claude Design "XUNA App": XUNA tokens, bundled OFL fonts (Anton, Be Vietnam Pro, JetBrains Mono), 11 base widgets, 24 SVG icons, and a four-tab home (Nhà, Trò chuyện, Nhật ký, Thiết bị) on the existing controller and device repository.

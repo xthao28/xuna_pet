@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-14** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 Current milestone: **M04 pure-core work partially implemented; animated LCD UI uploaded and provisionally accepted.** The local MVP through M05 is implemented, but its physical acceptance is pending.
 Current status:
 
@@ -701,3 +701,49 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Follow-up Serial capture observed GPIO0 Happy twice and GPIO14 Idle once; subsequent diagnostics returned to idle after the first Happy. Input routing smoke PASS; LCD appearance remains owner-observed/pending confirmation. Capture: button-observation-serial.log in the same external backup directory.
 
 - S17 owner visual confirmation (2026-10-14): owner confirmed normal XUNA/Idle LCD, GPIO0 Happy and return to Idle, followed by GPIO14 Idle on firmware aa2dbca. Combined with captured button Serial logs, LCD/button smoke PASS. Full S17 remains In progress: BLE sleep/wake/result 5, rest/recovery and render timing acceptance still pending.
+
+## Windows toolchain and gcc fix — 2026-10-15
+
+- The Windows machine now has PlatformIO Core 6.2.0 (`~/.platformio/penv/Scripts/pio.exe`, not on PATH), `espressif32@6.5.0`, and MSYS2 UCRT64 gcc/g++ 16.2.0 (`C:\msys64\ucrt64\bin` on the user PATH; restart VS Code to pick it up). No WSL distribution; `native_asan` still requires the Mac or WSL.
+- Fix: `BleProtocol.h` `remember()` split onto two lines to satisfy gcc 16 `-Werror=misleading-indentation`; no behavior change.
+- Validation: native 87/87 PASS; ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,337 B); `git diff --check` PASS. No upload, commit or push; firmware change uncommitted.
+- Editor (clangd in Antigravity): new `firmware/.clangd`; `compile_commands.json` and `.cache/` gitignored. After a clean checkout, or when the build config changes, regenerate with `pio run -d firmware -e xuna_t_display_s3 -t compiledb`. Machine-local pieces live outside Git: `clangd.arguments` `--query-driver` in Antigravity user settings and `%LOCALAPPDATA%\clangd\config.yaml` (MSYS2 target for `test/` and `sim/`). `clangd --check` reports no diagnostics on 65 sources.
+- Next: unchanged (S17 BLE checks with a phone, or host trace/snapshot experiments).
+
+## Host lab runs — 2026-10-15
+
+- Ran `lifelab` and `lifecore_lab` (g++ 16, `-Werror` clean) on 12 annotated traces now in `firmware/sim/traces/`. Results are deterministic across reruns. Evidence: [lab runs record](docs/roadmap/lifecore-lab-runs-2026-10-15.md).
+- Fact: LifeCore reboot/power-cut/pending/duplicate bookkeeping behaves as designed.
+- Finding (S18 blocker): commit-failure semantics differ from production. BLE opcode 3 commits a copy, then applies it, and keeps the decision pending for retry (result 7). `LifeCore` applies first, clears pending and cannot report or retry a failed commit in the lab. Plan §9.5 already specifies the production model (commit first, RAM unchanged and `not_ready` on failure), so no new decision is needed: bring `LifeCore` in line and add a parity test before it replaces the BLE path.
+
+## Learning competitive upgrade plan — 2026-10-15
+
+- Owner requested a review of large projects and a learning upgrade plan, and allowed revising the plan where needed. Documentation only.
+- Added [competitive upgrade plan](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md) (Proposed). It reviews Moflin, LOVOT, aibo, Loona, Emo and Vector (public claims), and Creatures, Black & White, Oudeyer IAC, contextual/discounted bandits, FSRS, Generative Agents memory, TinyOL/MCUNetV3 and ESP-SR against XUNA constraints.
+- Amended the implementation plan as [P] items: §9.4 Alternative D (learning-progress curiosity) plus a note that the v2 code is undiscounted UCB, not the §9.3 estimator; §9.9 gradual-drift and noisy/sparse-owner scenarios; new §9.10 teachable tricks; decisions L-D1–L-D5 in §18.
+- Phases: 0 closed-loop Life Lab (S19a) → 1 v3 learner per §9.3 with E10 A/C/D (M05a) → 2 habits (M05d) → 3 teachable tricks → 4 formation arc/memory/drive-reduction → 5 conversation → 6 senses R&D (touch first).
+- Owner decisions pending: L-D1–L-D5, plus existing D5 (more actions) and D15.
+- No code, build, board/mobile operation, commit or push.
+- Fact: the runners are open-loop, print one summary row and cap traces at 64 events. They cannot tune Proposed needs/energy/FSM values or show preference learning. v2 Brier: 0.052 with a consistent signal and 0.279 with no signal, against a 0.25 uniform baseline.
+- Proposal (not started, needs owner approval; overlaps S19a): closed-loop user model, time-series output (activity/needs/mood/visual) and long generated runs.
+- Git: new traces, `sim/README.md` link and the record are uncommitted; no production code change, board/mobile operation, commit or push.
+
+## Learning decisions and Life Lab Phase 0 slice 1 — 2026-10-15
+
+- Owner approved L-D1–L-D5 (AGENTS.md §3; plan §18). L-D5 is research only for touch, IMU and microphone. D5 and D15 remain open.
+- Added the host-only closed-loop learner bench: `xuna/lab/OwnerModel.h`, `xuna/lab/LearnerBench.h`, `test/test_life_lab`, `sim/learning_bench.cpp`. Native 95/95 PASS; ESP32 build unchanged (RAM 46,208 B, Flash 1,343,337 B).
+- Fact (200 seeds): v1 and v2 pass the §9.9 B hypothesis and keep state unchanged without feedback (D). Both fail reversal (C): v1 recovers in 0% of seeds within 60 trials, v2 in 26%. v1 is worse than random under reversal and drift. Evidence: [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md).
+- Git: firmware lab files, traces, `.clangd`, `.gitignore`, `BleProtocol.h`; root docs, AGENTS.md and plan edits are uncommitted. No push.
+- Next: Phase 1 learner v3 per plan §9.3 (discounted Beta + hierarchical prior) into the bench, with E10 variants A/C/D; or Phase 0 slice 2 (`LifeCore` time series + §9.5 parity fix).
+
+## Hybrid offline + online learning plan — 2026-10-15
+
+- Owner asked to integrate an online layer (cloud, MQTT) while keeping the offline learning. Recorded as owner-requested product direction in AGENTS.md §3. Documentation only.
+- Added [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md) (Proposed) and plan §22: contract H1–H8 (offline-complete, device authority, bounded expiring suggestions, owner evidence wins, new provenance `cloud_inferred`/`population`, opt-in data classes U0–U3, exit plan, per-device security), capabilities O1–O6, two-stage transport (phone gateway → device MQTT/TLS), sequencing.
+- Added experiments E14 (Wi-Fi + MQTT/TLS + BLE coexistence) and E15 (cloud consolidation benefit in Life Lab), decisions D21–D24 (Proposed), the decision index rows and an online-layer table in the competitive upgrade plan.
+- Sequencing: no network code now; make persistence v2/experience log export-ready; Stage 1 O1 only after M05a acceptance; Stage 2 after D19/D22/E14.
+- No code, build, board/mobile operation, commit or push.
+- Owner approved D21 (contract H1–H8) and D22 (phone gateway first, device MQTT/TLS only after E14) on 2026-10-15; broker/provider, D23 and D24 remain open. Recorded in AGENTS.md §3, plan §18 and the decision index.
+- Owner asked to commit the current work and defer Phase 1 (learner v3 per §9.3) to a later session.
+- Commit checkpoint (2026-10-15): firmware child `97b0efb` (`feat(firmware): add closed-loop learner bench, lab traces and clangd setup`); the parent commit records the gitlink, AGENTS.md decisions, plan §9/§18/§22 amendments, ADR-0007 and today's records. No push.
+- Next session: Phase 1 learner v3 per plan §9.3 into the Life Lab bench (E10 variants A/C/D), or Phase 0 slice 2 (LifeCore time series + §9.5 parity).

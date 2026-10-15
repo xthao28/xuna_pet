@@ -1124,6 +1124,8 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 
 - **Alternative B [E, optional]:** Thompson sampling from Beta. It needs float gamma sampling, which breaks the bit-exact parity principle. Run it in Life Lab only if ε-greedy and UCB both show a regret problem. **It is not required for E10.**
 - **Alternative C [E]:** UCB1-style bonus. Deterministic and integer-friendly; compare in the same benchmark.
+- **Alternative D [E; added to E10 by L-D2, approved 2026-10-15]:** learning-progress curiosity (Oudeyer IAC). Per context, the exploration budget follows the recent drop in prequential Brier loss: high while predictions are improving, low once learned or when nothing is learnable. Integer-only, reuses `PrequentialEvaluator`. It wins E10 only if it is within the 5% regret rule **and** improves drift recovery or visible behaviour. See [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md).
+- **Current code note (2026-10-15):** `PreferenceLearnerV2` implements undiscounted cells with a UCB-like bonus (Alternative C without §9.3 discounting or the hierarchical prior). It is a shadow candidate, not the §9.3 estimator.
 - **Stage-scaled `ε_stage`** (young XUNA explores more) is **gameplay design** and is labeled as such. It is not evidence of learning (D4).
 
 ### 9.5 Credit assignment and safety
@@ -1184,8 +1186,24 @@ Rules:
 | E reboot parity | Same trace with 10 reboots, host vs target | Snapshot hashes and decisions | Bit-identical |
 | Spam | 1,000 feedback attempts in 60 s | Applied count, commits/hour | ≤ 1 per reaction; commit guard holds |
 | Stated vs rated (M05c-A) | Owner states "like wave in the evening" 20 times, then rates wave negatively 10 times | Stated mass, greedy action over time | Stated mass stays within its cap; explicit ratings can override it; the explanation separates the two kinds |
+| Gradual drift [P, added 2026-10-15] | Oracle preference moves linearly from action a to b over 100 trials | Trials until greedy follows; regret during drift | Reported per γ; no pass value claimed before data |
+| Noisy / sparse owner [P, added 2026-10-15] | P(approve\|preferred) = 0.6, or ratings on only 10% of reactions | Brier vs uniform; greedy stability | Learner not worse than uniform beyond a margin set from data (open-loop lab showed 0.279 vs 0.25 on pure noise) |
 
 The report lists the parameter set, seeds, CIs and CPU time per `step`. **No target accuracy is claimed before the experiment runs** (spec §8.3).
+
+### 9.10 Teachable tricks [A L-D3 2026-10-15: capability; all parameters P]
+
+Owner teaching, offline. Details and rationale: [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md) §5 Phase 3.
+
+| Aspect | Design [P] |
+|---|---|
+| Cue | Button pattern, app command; later a spoken command if VOICE is approved |
+| Model | Bounded `w[cue][action]` Q16.16, delta-rule update toward explicit reward only; step size decays with evidence; masked by `ActionGate` |
+| Retention | Per-trick stability (FSRS-inspired integer table): practice raises it, disuse lowers readiness; evidence is never deleted by time |
+| Skill | `learnedTrick` when cue→action accuracy ≥ threshold over the last N trials (thresholds from Life Lab) |
+| Budget | ≤ 8 cues × ≤ 8 actions × 4 B ≈ 256 B plus stability bytes, inside the learner section budget review |
+| Explanation | "Mình học được: khi bạn bấm X, mình làm Y — đúng 9/10 lần gần đây", built only from counters |
+| Not | Not a neural network, not implicit feedback, not stage-granted |
 
 ---
 
@@ -1734,6 +1752,8 @@ Short-horizon planning in Life Lab only and a VM for user content (T9) remain [F
 | E11 | Palette sprite render | 4 bpp layered vs current per-cell fill | ≤ current render time | M06 |
 | E12 | Cloud STT/LLM research spike (after D11a; test data only) | Latency, cost, privacy review | Decision input for D11 only | M05c-B (V2) |
 | E13 | On-device speech recognition for vi-VN and en | Check iOS (and Android if used) on-device recognition support for Vietnamese, accuracy on the Layer A phrases, latency, offline behavior | Feasible on the owner's phone without network; otherwise voice stays deferred | M05c-A (optional, before D16) |
+| E14 | Wi-Fi + MQTT/TLS + BLE coexistence on the board (added 2026-10-15, §22) | Isolated firmware experiment: connect, publish/subscribe, reconnect storms, BLE active; heap/min heap, loop gap, render time, power | Free heap and loop-gap budgets (§17.1) still hold; otherwise Stage 2 stays phone-gateway only | §22 Stage 2 |
+| E15 | Cloud consolidation benefit (added 2026-10-15, §22) | Life Lab: per-owner parameters tuned offline from history vs fixed on-device defaults, same owner zoo and seeds | Lower regret or faster drift recovery with non-overlapping CIs; otherwise O1 is not built | §22 O1 |
 
 ---
 
@@ -1811,6 +1831,25 @@ Additional open device-voice decisions (all **Proposed**, independent of D16 pho
 | D19 | Device authentication/provisioning/revocation, TLS, service/provider/transport, retention and spending limit | Research authorization before VOICE-03 (D11a for cloud); final architecture after measurements; D11 where cloud product adoption is involved |
 | D20 | Device voice product/MVP scope, confirmation/owner identity UX, offline limits and rollout | VOICE-03 evidence before VOICE-04; no expansion of A5/D17 by implication |
 
+Learning upgrade decisions (2026-10-15; [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md) §6). **L-D1–L-D5 owner-approved 2026-10-15** (AGENTS.md §3); L-D5 approved as research for touch, IMU and microphone:
+
+| ID | Decision | Recommendation | Needed before |
+|---|---|---|---|
+| L-D1 | Adopt the competitive upgrade plan as an amendment to §9–§10 | Yes | S19a planning |
+| L-D2 | Add learning-progress curiosity (§9.4 Alternative D) to E10 | Yes | E10 |
+| L-D3 | Add teachable tricks (§9.10) as a new capability | Yes; scheduled after M05a acceptance | M05a exit |
+| L-D4 | Drive-reduction learning as `device_observed` evidence, separate from owner ratings | Yes | M05b |
+| L-D5 | Hardware R&D track for touch first, then IMU/mic (with D18) | Research only; no purchase or wiring implied | Any sensor work |
+
+Hybrid online decisions (all **Proposed**, 2026-10-15; §22, [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md)). The hybrid direction itself is owner-requested (AGENTS.md §3):
+
+| ID | Decision | Recommendation | Needed before |
+|---|---|---|---|
+| D21 | **[A] 2026-10-15: adopted.** The §22.1 contract H1–H8 is a design rule | Approved | Any online code |
+| D22 | **[A] 2026-10-15: order approved.** Phone gateway first; device MQTT/TLS only after E14; broker/provider still chosen after E14 and a cost review | Approved (order); broker/provider open | §22 Stage 1 / Stage 2 |
+| D23 | Upload classes, consent defaults, retention, region, deletion propagation; legal review | U0 by default, per-class opt-in; legal review before any commercial launch | O1–O4 |
+| D24 | Business model for recurring online cost (subscription vs one-time) | Decide before any public online service | Public launch |
+
 ## 19. Upstream audit record (read-only, 2026-10-12)
 
 | Repo | Commit | Date | License | Build | Notes |
@@ -1838,3 +1877,47 @@ Method:
 ## 21. Device voice workstream [P/E]
 
 VOICE-01 hardware feasibility → D18 → VOICE-02 real audio I/O → research authorization/D19 → VOICE-03 end-to-end device conversation → D19 final/D11 where applicable + D20 → VOICE-04 shared learning integration. VOICE-04 additionally requires S28; fact integration requires S42. See [session plan §9](../roadmap/XUNA_SESSION_PLAN.md) and [architecture feasibility matrix](XUNA_DEVICE_VOICE_ARCHITECTURE.md). All sessions are not started. None blocks M04, text M05a or text M05c acceptance. Existing E12/E13 keep their IDs and scope; E13 is phone STT, not device STT.
+
+## 22. Hybrid offline + online learning [P; direction owner-requested 2026-10-15]
+
+Combines the offline learning in §9–§10 with an optional online layer. Rationale and options: [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md). Nothing here changes D1 sequencing or approves a provider, broker, data upload or cost model.
+
+### 22.1 Contract
+
+| ID | Rule |
+|---|---|
+| H1 | **Offline-complete.** Every capability of learning Phases 1–4 works with no network. Online only adds. |
+| H2 | **Device authority.** Cloud never writes device state. It sends `CloudSuggestion` messages; the device validates, applies, journals and can revert them. |
+| H3 | **Bounded suggestions.** `CloudSuggestion{id, kind, target, delta, bounds, provenance, expiresAt, evidenceRef}`. Kinds: learner parameter (γ, ε, curiosity gain), prior (cell, habit slot), content (trick/action pack metadata). Per-kind range and daily rate limits; expired or out-of-range suggestions are rejected with a reason. |
+| H4 | **Owner evidence wins.** Suggestions may change priors and parameters only. They never override `user_feedback`/`user_stated` mass, never create facts and never change traits directly (§5.6). |
+| H5 | **Provenance.** New provenance values `cloud_inferred` (per-owner batch) and `population` (aggregated fleet). Explanations show them separately, like stated vs rated (§9.6). |
+| H6 | **Opt-in data classes.** U0 nothing (default); U1 aggregates (cell counts, habit histogram, metrics); U2 typed experience events; U3 conversation text sent only for an LLM call and not stored by default. Each class is opt-in, exportable and deletable; deletion propagates with tombstones. |
+| H7 | **Graceful degradation and exit.** Network loss or service end leaves all learned state on the device. Upload queues are bounded and dropped first. A local export works without the service. |
+| H8 | **Security.** No shared secrets in firmware or app; per-device credentials and TLS (D19); suggestions authenticated and replay-protected (reuse `CommandId` dedup). |
+
+### 22.2 Online capabilities
+
+| ID | Capability | Data | Attaches to | Gate |
+|---|---|---|---|---|
+| O1 | Cloud consolidation ("sleep learning"): batch over the owner's history; tunes γ/ε/curiosity, habit priors, detects drift; returns H3 suggestions | U1, optionally U2 | Phases 1–2 | E15 must show benefit over on-device defaults |
+| O2 | Population priors and content packs: aggregated across opt-in pets; better starting priors, new tricks/actions | U1 only, minimum-group threshold | Phases 1, 3 | D23; aggregation threshold set before launch |
+| O3 | Conversation LLM: wording and candidate extraction into the existing confirm flow (§11) | U3 per call | Phase 5 | D11/D11a, E12 |
+| O4 | Encrypted backup, restore to a new board, multi-phone sync | Snapshot | Phase 4 | D23, D19 |
+| O5 | Remote presence: interact while away through the same `ActionGate` | Commands | Any | D19 |
+| O6 | Perception offload (STT, later vision) | Audio/images per call | Phase 6, VOICE | D11, D18–D20 |
+
+### 22.3 Transport
+
+- **Stage 1 — phone gateway.** BLE ↔ app ↔ HTTPS backend. No network stack in firmware. First choice for O1–O4.
+- **Stage 2 — device direct.** Wi-Fi + MQTT over TLS, for device-first use without a phone.
+  - Topics `xuna/v1/{deviceId}/up/events`, `up/state`, `down/cmd`, `down/suggest`; LWT on `status`.
+  - QoS 1 with idempotent IDs for events, commands and suggestions; retained messages only for status.
+  - Audio is not carried over MQTT (WebSocket/HTTP per VOICE work).
+  - Broker (self-hosted EMQX/Mosquitto or a managed service) chosen after E14 and cost review (D22).
+
+### 22.4 Sequencing
+
+- **Now (no network code):** persistence v2 and the experience log carry typed codes and provenance so they can be exported later. E15 can run in Life Lab at any time (host only).
+- **After M05a acceptance:** Stage 1 O1 prototype behind U0-by-default consent.
+- **After D19/D22 and E14:** Stage 2 MQTT.
+- The online layer never blocks offline acceptance of any phase.
