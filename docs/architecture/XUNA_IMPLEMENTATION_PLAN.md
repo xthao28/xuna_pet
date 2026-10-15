@@ -963,6 +963,8 @@ The schema version lives in each log segment header (Section 7.6), not in each r
 
 The 8 episodes in the current v1 snapshot migrate to v2 memory-store episodes with provenance `user_feedback` and `utcMinute = 0` (unknown). v1 counts migrate into the coarse learner cells as `alpha = 1 + positive`, `beta = 1 + negative` in Q16.16.
 
+**Proposed amendment (2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md) slice 3.
+
 ### 7.6 Commit policy
 
 | Class | Examples | When committed | Expected frequency (hypothesis) |
@@ -1126,6 +1128,8 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 - **Alternative C [E]:** UCB1-style bonus. Deterministic and integer-friendly; compare in the same benchmark.
 - **Alternative D [E; added to E10 by L-D2, approved 2026-10-15]:** learning-progress curiosity (Oudeyer IAC). Per context, the exploration budget follows the recent drop in prequential Brier loss: high while predictions are improving, low once learned or when nothing is learnable. Integer-only, reuses `PrequentialEvaluator`. It wins E10 only if it is within the 5% regret rule **and** improves drift recovery or visible behaviour. See [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md).
 - **Current code note (2026-10-15):** `PreferenceLearnerV2` implements undiscounted cells with a UCB-like bonus (Alternative C without §9.3 discounting or the hierarchical prior). It is a shadow candidate, not the §9.3 estimator.
+- **Preliminary E10 evidence (2026-10-15, lab only):** `PreferenceLearnerV3` implements §9.3 with policies A/C/D. In the closed-loop bench (200 seeds), C (UCB) is best or within CIs in oracle, reversal, drift, noisy, sparse and 4-action scenarios; A and D pay for exploring on unrated trials; the hierarchical prior (k = 2, m = 3) learns slower than flat contexts when day parts disagree. Not E10 acceptance. See [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md).
+- **Sweep result (2026-10-15, lab only):** across 137 configurations and 8 scenarios, C with γ 0.90, k 1, m 1 and bonus 0.15 ranks best (averaged regret ratio 1.11 against 1.27 for the §9.3/§9.4 defaults; best A 2.42, best D 3.18). These values are **Proposed** replacements for the defaults above (γ 0.95, k 2, m 3), pending owner review of visible flips and board checks. Feedback-aware ε scaling fixes A/D in sparse rating but not their overall exploration cost.
 - **Stage-scaled `ε_stage`** (young XUNA explores more) is **gameplay design** and is labeled as such. It is not evidence of learning (D4).
 
 ### 9.5 Credit assignment and safety

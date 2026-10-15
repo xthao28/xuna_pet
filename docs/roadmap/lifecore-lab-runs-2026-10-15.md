@@ -103,3 +103,14 @@ To tune the Proposed values and to measure learning, the lab needs:
 3. Long runs: a generated event stream instead of the 64-event trace cap.
 
 This needs owner approval. It also overlaps the S19a simulator scope.
+
+## Update — §9.5 parity implemented in LifeCore (2026-10-15)
+
+`LifeCore` now follows plan §9.5 through an `ILifeCommit` port: feedback is
+staged, committed, and only then applied to v1 and the v3 shadow. A failed
+commit leaves RAM unchanged, keeps the decision pending for a retry and sets
+`feedbackNotReady` (BLE result 7). The snapshot lab is the committer. Replayed
+traces: `c2` now applies 3 feedbacks (the cut one is not applied) and `c3`
+ends with event_count 4 instead of 5, because the failed feedback never reaches
+RAM. All other traces are unchanged. The finding above is resolved for
+`LifeCore`; production `BleManager` already behaved this way.

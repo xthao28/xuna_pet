@@ -119,6 +119,7 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | VOICE-04 | Conditional — Proposed | VOICE-03 + final service/scope decisions D19/D20 (D11 if applicable) + S28; facts additionally S42 |
 | LRN-01 | Done — 2026-10-15, documentation only | [Competitive learning upgrade plan](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md); plan §9.4 Alt D, §9.9 scenarios, §9.10 tricks, §18 L-D1–L-D5 (all Proposed) |
 | LRN-02 | Done — 2026-10-15 | Owner approved L-D1–L-D5 (L-D5: touch + IMU + mic research only). D5 and D15 remain open |
+| LRN-05 | In progress — slices 1–5 done 2026-10-15 | Phase 1 learner v3 (lab/shadow): [record](docs/roadmap/learner-v3-phase1-2026-10-15.md); E10 preliminary choice C, tuned γ 0.90 k 1 m 1 bonus 0.15 (Proposed); learner codec + capped v1 migration + §9.6 explanation + LifeCore shadow v3 + §9.5 commit-first parity done (lab); next E10 review packet |
 | LRN-04 | D21/D22 approved 2026-10-15; D23/D24 pending | Hybrid online layer: [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md), plan §22; decide D21–D24; E14/E15 not started |
 | LRN-03 | In progress — slice 1 done 2026-10-15 | [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md): closed-loop learner bench, 95/95 native PASS; next slice: LifeCore time series + §9.5 parity |
 

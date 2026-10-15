@@ -747,3 +747,43 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Owner asked to commit the current work and defer Phase 1 (learner v3 per §9.3) to a later session.
 - Commit checkpoint (2026-10-15): firmware child `97b0efb` (`feat(firmware): add closed-loop learner bench, lab traces and clangd setup`); the parent commit records the gitlink, AGENTS.md decisions, plan §9/§18/§22 amendments, ADR-0007 and today's records. No push.
 - Next session: Phase 1 learner v3 per plan §9.3 into the Life Lab bench (E10 variants A/C/D), or Phase 0 slice 2 (LifeCore time series + §9.5 parity).
+
+## Phase 1 slice 1 — learner v3 candidate (2026-10-15)
+
+- Owner asked to start Phase 1. Added lab/shadow `PreferenceLearnerV3` (plan §9.3 discounted Beta + hierarchical day-part prior; §9.4 policies Greedy/A/C/D), 10 unit tests, bench adapters, a `dayparts` scenario and `--gamma`. No production wiring (D1, S18 gates).
+- Validation: native 105/105 PASS; ESP32 build unchanged (RAM 46,208 B, Flash 1,343,337 B); purity PASS.
+- Fact (200 seeds): v3 C (UCB) recovers after reversal in 84% of seeds at γ 0.95 and 98% at γ 0.90 (v1 0%, v2 26%); it is the preliminary E10 winner. A and D over-explore when ratings are sparse. The hierarchical prior learns slower than flat contexts when day parts disagree. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md).
+- Git: firmware v3 files and bench changes, root docs uncommitted. No push.
+- Next: sweep k/m and D parameters, add a generalization scenario; then propose v3 C (γ in [0.90, 0.95]) for E10 acceptance, L2 persistence and shadow wiring.
+
+## Phase 1 slice 2 — learner v3 parameter sweep (2026-10-15)
+
+- Added `feedbackAware` ε scaling to v3, a late-context schedule and generalization metric to the bench, the `new_daypart` scenario, `sim/learner_sweep.cpp` (137 configurations × 8 scenarios × 200 seeds) and `v3_C_tuned`. Native 106/106 PASS; ESP32 build unchanged.
+- Fact: C (UCB) with γ 0.90, k 1, m 1, bonus 0.15 ranks best (score 1.11 vs 1.27 for plan defaults; best A 2.42, best D 3.18). Tuned v3 recovers after reversal in 94% of seeds and under drift in 96%; it beats or matches v2 everywhere except disagreeing day parts (4.15 vs 2.88); on a new day part it is right 98% of the time immediately (v2 83.5%).
+- Proposal: these values replace the §9.3/§9.4 defaults as **Proposed** values, pending owner review of visible flips and board checks. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md) slice 2; plan §9.4 note.
+- Git: uncommitted (firmware v3, bench, sweep, tests; root docs). No push.
+- Next: L2 persistence v2 (used shape only) + migration from the 96-byte v1 snapshot, §9.6 explanation mapping, then shadow wiring behind LifeCore (S18 gates still apply to production).
+
+## Phase 1 slice 3 — learner codec, migration, explanation (2026-10-15)
+
+- Added `LearnerV3Codec` (learner payload for LifeSnapshot v2, 408 B for 2 × 5 × 4, typed errors, validate-before-mutate, shape migration), `migrateFromV1` with a mass cap of 1/(1 − γ), `LearnerV3Explanation` (§9.6 fields and reasons), raw `rated` counts in v3, and 7 tests. Fixed `tools/check_core_purity.py` to read UTF-8 (it crashed on Windows cp1252).
+- Validation: native 113/113 PASS; ESP32 build unchanged (RAM 46,208 B, Flash 1,343,337 B); purity PASS. Lab only, not linked.
+- Proposal: capped v1 migration amends plan §7.5 (Proposed). Container/CRC/medium stay S12a/D2.
+- Git: uncommitted. No push.
+- Next: v3 as the shadow candidate behind LifeCore/LearningBridge, then E10 acceptance review and the §9.5 parity fix.
+
+## Phase 1 slice 4 — v3 shadow candidate in LifeCore (2026-10-15)
+
+- Added `LearningBridgeV3`; `LifeCore` now shadows learner v3 (`shadowConfig()` tuned Proposed values) instead of v2, exposes `shadowMetrics()`, resets the candidate on boot. Host core only; production BLE path unchanged.
+- Finding: the old v2 bridge credited ratings to v2's own (unshown) action; v3 bridge credits the shown action. Earlier v2 shadow agreement numbers are not valid evidence.
+- Validation: native 115/115 PASS; ESP32 build unchanged; LifeCore traces replay with identical bookkeeping. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md) slice 4.
+- Git: uncommitted. No push.
+- Next: §9.5 commit-failure parity in LifeCore (commit first, RAM unchanged, `not_ready`, retry), then E10 acceptance review; production stays gated by S18.
+
+## Phase 1 slice 5 — §9.5 commit-first parity in LifeCore (2026-10-15)
+
+- Added `ILifeCommit`; `LifeCore` (via `LearningBridgeV3`) now validates, stages v1, commits, then applies v1 and v3. A failed commit leaves RAM unchanged, keeps the decision pending and sets `feedbackNotReady`. The snapshot lab is the committer; trace runner and c2/c3 expectations updated.
+- Resolves the 2026-10-15 lab finding for LifeCore (production BleManager already did this). Native 116/116 PASS; ESP32 build unchanged.
+- Git: uncommitted (Phase 1 slices 1–5). No push.
+- Next: E10 acceptance review packet for v3 C tuned; remaining production gates: S12a container/D2, S10 trusted time, D5 actions, S18 integration, owner board checks.
+- Commit checkpoint (2026-10-15): firmware child `c4e7e19` (`feat(firmware): add learner v3 shadow with codec, sweep and commit-first feedback`), Phase 1 slices 1–5; the parent commit records the gitlink and docs. No push.

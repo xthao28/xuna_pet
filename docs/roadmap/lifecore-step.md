@@ -27,3 +27,8 @@ explicit feedback. Transport adapters are intentionally outside this header.
 S10 trusted time, S13 persistence v2, full event envelope and S18 integration
 into the firmware loop are still required before this slice can replace the
 current adapters or promote v2 from shadow to production policy.
+
+**Update 2026-10-15:** inside `LifeCore` the shadow candidate is now learner v3
+(`PreferenceLearnerV3` via `LearningBridgeV3`, tuned Proposed values) instead
+of v2. v1 stays authoritative; the v3 candidate still resets on boot. See the
+[learner v3 record](learner-v3-phase1-2026-10-15.md) slice 4.

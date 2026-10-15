@@ -3,6 +3,32 @@
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — Phase 1 slice 5: §9.5 commit-first parity in LifeCore
+
+- Added `ILifeCommit` and `PreferenceLearnerV3::accepts()`; `LearningBridgeV3` now validates, stages v1, commits, then applies v1 and v3 (Applied/Rejected/CommitFailed). `LifeCore::setCommitter()` with `feedbackCommitted`/`feedbackNotReady` outputs; `LifeCoreSnapshotLab` is the committer; trace runner counts urgent commits.
+- A failed commit leaves v1, generation and the v3 shadow unchanged and keeps the decision pending for retry (BLE result 7 semantics). Traces c2/c3 now reflect this. Resolves the earlier lab finding for LifeCore.
+- Native 116/116 PASS; ESP32 build unchanged. No board/mobile operation, commit or push.
+## 2026-10-15 — Phase 1 slice 4: v3 shadow candidate in LifeCore
+
+- Added `LearningBridgeV3` (v1 baseline + v3 candidate, metrics). `LifeCore` now shadows learner v3 with `shadowConfig()` (tuned Proposed values) instead of v2 and exposes `shadowMetrics()`; candidate resets on boot. Host core only; production BLE path unchanged.
+- Finding: the v2 bridge credited ratings to v2's own unshown action; the v3 bridge credits the shown action. Earlier v2 shadow agreement numbers are not valid evidence.
+- Tests updated plus 2 bridge tests; native 115/115 PASS; ESP32 build unchanged; LifeCore traces replay with identical bookkeeping. No board/mobile operation, commit or push.
+## 2026-10-15 — Phase 1 slice 3: learner codec, v1 migration, explanation
+
+- Added `LearnerV3Codec` (LifeSnapshot v2 learner payload: 8-byte header + 10-byte cells, 408 B for 2 × 5 × 4; typed errors; validate before mutating; shape growth/shrink), `migrateFromV1` (ratio kept, mass capped at 1/(1 − γ)), `LearnerV3Explanation` (§9.6 evidence fields and reasons), raw `rated` counts in v3 and `test/test_learner_v3_codec` (7 tests).
+- Fixed `tools/check_core_purity.py` to read sources as UTF-8; on Windows it crashed (cp1252) on non-Latin comment text.
+- Validation: native 113/113 PASS; ESP32 build unchanged; purity PASS. Proposed amendment to plan §7.5 for the capped migration. Lab only; no production wiring, board/mobile operation, commit or push.
+## 2026-10-15 — Phase 1 slice 2: learner v3 parameter sweep
+
+- Added feedback-aware ε scaling (A/D), a late-context schedule with a generalization metric, the `new_daypart` scenario, `sim/learner_sweep.cpp` and `v3_C_tuned`; 1 more unit test. Native 106/106 PASS; ESP32 build unchanged.
+- Sweep (137 configurations, 8 scenarios, 200 seeds): C with γ 0.90, k 1, m 1, bonus 0.15 ranks best (1.11 vs 1.27 for plan defaults; best A 2.42, best D 3.18). Tuned v3 reaches the target after reversal in 94% of seeds and under drift in 96%; it loses only to flat v2 when day parts disagree, and generalizes to a new day part 98% of the time.
+- Tuned values recorded as Proposed replacements in plan §9.4 and the [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md). No production wiring, board/mobile operation, commit or push.
+## 2026-10-15 — Phase 1 slice 1: learner v3 candidate
+
+- Owner asked to start Phase 1. Added lab/shadow `PreferenceLearnerV3` (plan §9.3 Q16.16 discounted Beta, rated-cell-only discount, hierarchical day-part prior; §9.4 policies Greedy, A ε-greedy, C UCB, D learning progress), `test/test_learning_v3` (10 tests), `V3BenchLearner`, a `dayparts` scenario and `--gamma` in `learning_bench`.
+- Validation: native 105/105 PASS; ESP32 build SUCCESS with unchanged RAM 46,208 B / Flash 1,343,337 B (not linked); purity PASS.
+- Findings (200 seeds): v3 C recovers after a reversal in 84% of seeds (γ 0.95) or 98% (γ 0.90), against v1 0% and v2 26%; C is the preliminary E10 winner. A and D over-explore when ratings are sparse. The hierarchical prior (k 2, m 3) learns slower than flat contexts when day parts disagree. γ 0.90 adapts faster but flips more under noise.
+- Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md); plan §9.4 note. No production wiring, board/mobile operation, commit or push.
 ## 2026-10-15 — Hybrid offline + online learning plan (documentation only)
 
 - Owner asked to integrate an online layer (cloud, MQTT) combined with the existing offline learning. Recorded as owner-requested direction (AGENTS.md §3); technical choices stay Proposed.
