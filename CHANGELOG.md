@@ -3,6 +3,14 @@
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — S24a: stated preference (opcode 6) in the device core
+
+- Opcode 6 parse behind a flag (production unchanged); `PreferenceLearnerV3::state` adds capped, decaying `user_stated` evidence (w_s 0.5, cap 2 ratings, both [P]; latest statement wins); `ProductLearner`/`LifeCore` commit-first handling with validation, in-session dedup and ERROR_SAFE refusal; explanation reports stated mass and reason `Told`; LifeSnapshot v2 section 12.
+- 15 new tests; native 179/179 PASS; traces/timeline unchanged; Xtensa smoke PASS. ESP32 RAM 48,976 B (+648, shared learner cells), Flash 1,347,853 B. Evidence: [S24a record](docs/roadmap/S24a-stated-preference-2026-10-15.md).
+## 2026-10-15 — S39: Conversation Layer A extractor (mobile)
+
+- Added the pure Dart Layer A domain in `mobile/lib/features/conversation/domain`: `CandidateEvent`, `ExtractionResult`, `PreferenceContext`, `DayPart` and `ExtractCandidateUseCase` (LocalRuleExtractor from the S22 phrase table: ratings, context requests, stated preferences with follow-up for a missing context, AskWhy; hypotheticals, questions, quotes, injection and Layer B produce nothing). V1 parser unchanged; not wired into the UI (S27a).
+- Flutter 3.32.8: lock unchanged, analyze clean, 39/39 tests PASS (10 new). Evidence: [S39 record](docs/roadmap/S39-layer-a-extractor-2026-10-15.md).
 ## 2026-10-15 — S22 learning and conversation decisions
 
 - Owner approved, all as recommended: D4 (E10 UCB exploration, labelled in "Why?"), D6 (implicit feedback off), Layer A replies as "mình – bạn", Vietnamese first, one follow-up question when a statement has no context, the Layer A phrase table as the S39 starting set; D16 deferred (text first). Recorded in AGENTS.md §3, plan §11/§18, the decision index and the [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md). Documentation only.

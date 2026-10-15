@@ -1385,6 +1385,7 @@ This is the smallest safe addition that lets conversation change learned behavio
 | Retry safety | No automatic resend after a timeout (existing v1 rule). After a timeout the app reads the explanation to see whether `statedMass` changed before offering to resend. The durable `CommandId` ring (§7.5) is used once snapshot v2 exists. |
 | Trust level | Same as opcode 3 under the approved unbonded prototype (A8). A behavioral preference is **not** a personal fact. Personal facts stay in Layer B behind bonding (G18). |
 | Data minimization | Only typed codes cross BLE. No text, transcript or audio leaves the phone. |
+| Implementation (S24a, 2026-10-15) | Core done on host: parse behind a flag, `PreferenceLearnerV3::state`, snapshot section 12, explanation `Told`. Proposed detail: an opposite statement withdraws the cell's earlier stated mass first ("latest statement wins"). [S24a record](../roadmap/S24a-stated-preference-2026-10-15.md) |
 - Scenario F: no `sensor_observed` from text, no actuation.
 
 ---

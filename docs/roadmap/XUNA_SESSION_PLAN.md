@@ -746,6 +746,8 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S24a — Stated-preference evidence + opcode 6 (pure; M05c-A)
 
+- **Done on host (2026-10-15):** applied to learner v3 / `ProductLearner` / `LifeCore` (the v2 learner named in this plan was superseded by E10). Opcode 6 parse behind a flag, stated mass with weight/cap/decay, explanation `Told`, snapshot section 12. Evidence: [S24a record](S24a-stated-preference-2026-10-15.md).
+
 - **Shared contract:** separate input channel from `user_stated`/`user_feedback` evidence; add simulated candidate fixtures without changing deployed source codes. No device audio work.
 
 - Implement plan §11.6 in the core:
@@ -778,6 +780,8 @@ The track is developed together and accepted together in S28. This implements A6
 - The board demo script is prepared for S28.
 
 #### S39 — Conversation domain + LocalRuleExtractor (Dart; M05c-A)
+
+- **Done (2026-10-15):** `CandidateEvent`, `ExtractionResult`, `ExtractCandidateUseCase` from the S22 table; 10 table tests, mobile 39/39 PASS, analyze clean, lock unchanged. Speech/provider interfaces deferred with D16/D11. Evidence: [S39 record](S39-layer-a-extractor-2026-10-15.md).
 
 - **Foundation role:** define candidate/confirmation contracts shared conceptually with device and simulation adapters; Dart extraction is the first implementation. Layer B S40–S42 extends this Foundation. No mandatory interface hierarchy or voice dependency.
 
