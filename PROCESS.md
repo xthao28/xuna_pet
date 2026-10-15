@@ -1,14 +1,15 @@
 # XUNA — Process and Session Handoff
 
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
-Current milestone: **M04 pure-core work partially implemented; animated LCD UI uploaded and provisionally accepted.** The local MVP through M05 is implemented, but its physical acceptance is pending.
-Current status:
+Current milestone: **M04 pure core + Phase 1 learner v3 done on host; board trial firmware built, not uploaded.** The local MVP through M05 is implemented, but its physical acceptance is pending.
+Current status (2026-10-15 end of session):
 
-- Technical plan 0.1.2 and session plan rev. 3 updated for device-first Conversation; implementation remains Proposed. Product direction is owner-requested/Approved; ADR-0006 and VOICE-01–04 remain Proposed/not started.
-- Owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
-- Firmware S03/S04/S05/S07 and S05-fix-01 complete; S06 pure core only. Current firmware commit c84d4e3 includes animated UI; M04 physical/full acceptance remains pending.
+- Firmware `efdd915` (root `9ee3137`): learner v3 (E10-approved UCB, γ 0.90) decides on the board through `BoardLearner` (v1 stays the durable 96-byte record); approved life-feel tuning (`LifeFeel.h`) enabled. Native 127/127 PASS, ESP32 build SUCCESS. **Not uploaded** (board was not connected). Board still runs `aa2dbca`.
+- Owner decisions on 2026-10-15: L-D1–L-D5, hybrid offline/online direction, D21, D22, D5 (idle/happy/curious + GPIO0 greeting), E10-A/B/C, life-feel targets and board trial, board-trial shortcut ahead of S12a/S18. See AGENTS.md §3.
+- Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin` (prepend to PATH in shells); `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
+- Earlier: owner approved D1, D7, D12, D14, D17 (2026-10-12); S01 partly done (owner deferred the rest); S11 paused.
 
-Next action: **Owner deferred remaining S01 checks to a later session.** Android/BLE/learning/reboot/forget smoke and required raw inspector transcript complete; ten-cut matrix, diagnostics and pre-confirmation text evidence remain open. S01 In progress; full S06 pending; S11 paused.
+Next action: **owner connects the board** → back up NVS and partition table → upload `efdd915` (NVS excluded) → Serial check (`learner=v3-ucb (board trial)`) → owner observation per the [board trial record](docs/roadmap/learner-v3-board-trial-2026-10-15.md) and [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md). Then: S11 (E4/E5) → D2 → S12a LifeSnapshot v2 → S18 full integration with the 3 × 3 product shape. Latest session details are at the end of this file.
 
 ## 0. Start here — next work (updated 2026-10-12)
 
