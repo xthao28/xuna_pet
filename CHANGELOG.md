@@ -3,6 +3,16 @@
 Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+## 2026-10-15 — E10 review packet
+
+- Added [E10 review packet](docs/roadmap/E10-review-packet-2026-10-15.md) with decision requests E10-A/B/C, selection evidence, §9.9 status per scenario, owner board checks, gates and risks.
+- Added the §9.9 spam test (1,000 feedback attempts → 1 apply, 1 urgent commit). Native 118/118 PASS.
+- Owner approved E10-A (v3 + UCB for M05a), E10-B (γ 0.90, k 1, m 1, bonus 0.15) and E10-C (capped v1 migration). Recorded in AGENTS.md §3, plan §7.5/§9.4/§16.2 and the decision index. No board/mobile operation, commit or push.
+## 2026-10-15 — D5 decision and product learner vocabulary
+
+- Owner approved D5: learnable actions idle, happy, curious (existing art) and the GPIO0 press as a learnable `button_greeting` context; day parts remain planned with S10. Recorded in AGENTS.md §3, plan §18 and the decision index.
+- Added `learning/LearnerVocabulary.h` (interactions, index → ActionId keeping v1 positions, `productLearnerConfig()` 3 × 5 × 3, 458 B payload), a test, and `product_3x3` / `product_3x3_reversal` bench scenarios. Tuned v3: median 14 trials to learn; 96.5% recovery after reversal (v2 20.5%).
+- Native 117/117 PASS; ESP32 build unchanged. LifeCore shadow stays 2 × 2 until v3 is authoritative. No board/mobile operation, commit or push.
 ## 2026-10-15 — Phase 1 slice 5: §9.5 commit-first parity in LifeCore
 
 - Added `ILifeCommit` and `PreferenceLearnerV3::accepts()`; `LearningBridgeV3` now validates, stages v1, commits, then applies v1 and v3 (Applied/Rejected/CommitFailed). `LifeCore::setCommitter()` with `feedbackCommitted`/`feedbackNotReady` outputs; `LifeCoreSnapshotLab` is the committer; trace runner counts urgent commits.

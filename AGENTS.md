@@ -113,6 +113,12 @@ Status vocabulary:
 - **Hybrid offline + online learning (owner-requested 2026-10-15):** keep the offline learning as a complete core and add an optional online layer (cloud services, later device MQTT). The pet must keep living and keep what it learned without network or service. Provider, broker, data upload, consent defaults and cost model stay Proposed ([ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md), plan §22, D23–D24).
   - **D21 (owner-approved 2026-10-15):** the plan §22.1 contract H1–H8 is a design rule. Offline-complete core; cloud sends only bounded, expiring, revertible suggestions; owner evidence wins; opt-in data classes with U0 by default; exit plan; per-device security.
   - **D22 (owner-approved 2026-10-15):** transport order is phone gateway (BLE → app → HTTPS) first, device MQTT over TLS only after experiment E14. Broker/provider choice remains open until E14 and a cost review.
+- **D5 (owner-approved 2026-10-15; plan §18):** XUNA learns to choose among **idle, happy and curious** (existing art). The **GPIO0 press becomes a learnable `button_greeting` context**: XUNA chooses how to answer and the owner rates it in the app within the feedback window. Day parts remain planned with trusted time (S10). A fourth action such as greet needs new art and a new decision.
+- **E10 learner selection (owner-approved 2026-10-15; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md)):**
+  - **E10-A:** learner v3 with policy C (UCB) is the M05a learner, replacing the plan default ε-greedy.
+  - **E10-B:** starting parameters γ 0.90 (responsive), k 1, m 1, UCB bonus 0.15; to be re-checked by the owner on the board.
+  - **E10-C:** v1 → v3 migration keeps the positive:negative ratio and caps mass at 1/(1 − γ) (amends plan §7.5).
+  - Selection only: v3 does not drive the board until S12a/D2, S10, S18, E2/E6 and owner board acceptance.
 
 ### Proposed — not yet fixed
 

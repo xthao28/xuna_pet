@@ -228,3 +228,27 @@ action vocabulary (D5), E10 acceptance review and owner board checks.
   unchanged, keeps the decision pending, and a retry commits exactly once.
   Native 116/116 PASS; ESP32 build unchanged; traces c2/c3 change as
   described in the [lab runs update](lifecore-lab-runs-2026-10-15.md).
+
+## D5 product vocabulary (2026-10-15)
+
+Owner decision D5: learnable actions **idle, happy, curious** (existing art)
+and the **GPIO0 press as a learnable `button_greeting` context**. Day parts
+stay planned with trusted time (S10).
+
+- `learning/LearnerVocabulary.h`: `LearnInteraction` (quiet 0, play 1,
+  button greeting 2), learner index → `ActionId` (0 idle, 1 happy, 2 →
+  `ActionId::Curious` 3) with v1's 0/1 positions unchanged so migration keeps
+  their meaning, and `productLearnerConfig()` (3 × 5 × 3, tuned Proposed
+  values; 458-byte learner payload).
+- New test: mapping, payload size and v1 migration into the product shape
+  (greeting cells start empty). Native 117/117 PASS; ESP32 build unchanged.
+- `LifeCore::shadowConfig()` stays 2 × 2 because v1 still picks what is shown
+  and cannot represent the greeting context or curious. The product shape is
+  used when v3 becomes authoritative (after E10, S12a/D2, S18).
+
+Bench, product shape (200 seeds):
+
+| Scenario | v2 | v3 C defaults | **v3 C tuned** |
+|---|---|---|---|
+| 3 × 3 stable (regret; median trials to target) | 3.96; 15 | 4.18; 14 | **4.09; 14** |
+| 3 × 3 reversal at trial 120 (regret; reach) | 63.9; 20.5% | 38.6; 92% | **29.4; 96.5%** |

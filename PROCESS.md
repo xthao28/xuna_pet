@@ -787,3 +787,19 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Git: uncommitted (Phase 1 slices 1–5). No push.
 - Next: E10 acceptance review packet for v3 C tuned; remaining production gates: S12a container/D2, S10 trusted time, D5 actions, S18 integration, owner board checks.
 - Commit checkpoint (2026-10-15): firmware child `c4e7e19` (`feat(firmware): add learner v3 shadow with codec, sweep and commit-first feedback`), Phase 1 slices 1–5; the parent commit records the gitlink and docs. No push.
+
+## D5 decision and product learner vocabulary (2026-10-15)
+
+- Owner approved D5: learnable actions idle/happy/curious (existing art) and the GPIO0 press as a learnable `button_greeting` context; day parts stay planned with S10. Recorded in AGENTS.md §3, plan §18 and the decision index.
+- Added `learning/LearnerVocabulary.h` (interaction enum, index → ActionId, `productLearnerConfig()` 3 × 5 × 3, 458 B payload), a vocabulary/migration test and two product-shape bench scenarios. Native 117/117 PASS; ESP32 build unchanged.
+- Fact: in the 3 × 3 product shape tuned v3 learns stable preferences as fast as v2 (median 14 trials) and recovers after reversal in 96.5% of seeds (v2 20.5%). LifeCore shadow stays 2 × 2 until v3 is authoritative.
+- Git: uncommitted. No push.
+
+## E10 review packet (2026-10-15)
+
+- Added [E10 review packet](docs/roadmap/E10-review-packet-2026-10-15.md): decision requests E10-A (select v3 C UCB for M05a), E10-B (tuned starting parameters, provisional until board check), E10-C (capped v1 migration amendment); §9.9 status (B, C, D, isolation, spam met on host; E reboot parity partly; stated-vs-rated not started); owner board checks; remaining gates.
+- Added §9.9 spam test (1,000 attempts → 1 apply, 1 commit). Native 118/118 PASS.
+- Git: D5 vocabulary, spam test and packet uncommitted. No push.
+- Next: owner decision on E10-A/B/C; then Phase 0 slice 2 (LifeCore time series) or S12a/D2 preparation.
+- Owner approved E10-A (v3 + UCB for M05a), E10-B (γ 0.90, k 1, m 1, bonus 0.15; re-check on board) and E10-C (capped v1 migration amending §7.5) on 2026-10-15. Recorded in AGENTS.md §3, plan §7.5/§9.4/§16.2, the decision index and the packet. Board use stays gated by S12a/D2, S10, S18, E2/E6 and owner acceptance.
+- Commit checkpoint (2026-10-15): firmware child `2ad51df` (`feat(firmware): add D5 learner vocabulary and feedback spam test`); the parent commit records the gitlink, D5 and E10 approvals and the E10 packet. No push.

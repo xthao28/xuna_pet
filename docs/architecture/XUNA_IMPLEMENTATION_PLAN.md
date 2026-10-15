@@ -963,7 +963,7 @@ The schema version lives in each log segment header (Section 7.6), not in each r
 
 The 8 episodes in the current v1 snapshot migrate to v2 memory-store episodes with provenance `user_feedback` and `utcMinute = 0` (unknown). v1 counts migrate into the coarse learner cells as `alpha = 1 + positive`, `beta = 1 + negative` in Q16.16.
 
-**Proposed amendment (2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md) slice 3.
+**Approved amendment (E10-C, owner 2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md) slice 3.
 
 ### 7.6 Commit policy
 
@@ -1129,7 +1129,7 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 - **Alternative D [E; added to E10 by L-D2, approved 2026-10-15]:** learning-progress curiosity (Oudeyer IAC). Per context, the exploration budget follows the recent drop in prequential Brier loss: high while predictions are improving, low once learned or when nothing is learnable. Integer-only, reuses `PrequentialEvaluator`. It wins E10 only if it is within the 5% regret rule **and** improves drift recovery or visible behaviour. See [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md).
 - **Current code note (2026-10-15):** `PreferenceLearnerV2` implements undiscounted cells with a UCB-like bonus (Alternative C without §9.3 discounting or the hierarchical prior). It is a shadow candidate, not the §9.3 estimator.
 - **Preliminary E10 evidence (2026-10-15, lab only):** `PreferenceLearnerV3` implements §9.3 with policies A/C/D. In the closed-loop bench (200 seeds), C (UCB) is best or within CIs in oracle, reversal, drift, noisy, sparse and 4-action scenarios; A and D pay for exploring on unrated trials; the hierarchical prior (k = 2, m = 3) learns slower than flat contexts when day parts disagree. Not E10 acceptance. See [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md).
-- **Sweep result (2026-10-15, lab only):** across 137 configurations and 8 scenarios, C with γ 0.90, k 1, m 1 and bonus 0.15 ranks best (averaged regret ratio 1.11 against 1.27 for the §9.3/§9.4 defaults; best A 2.42, best D 3.18). These values are **Proposed** replacements for the defaults above (γ 0.95, k 2, m 3), pending owner review of visible flips and board checks. Feedback-aware ε scaling fixes A/D in sparse rating but not their overall exploration cost.
+- **Sweep result (2026-10-15, lab only):** across 137 configurations and 8 scenarios, C with γ 0.90, k 1, m 1 and bonus 0.15 ranks best (averaged regret ratio 1.11 against 1.27 for the §9.3/§9.4 defaults; best A 2.42, best D 3.18). **Owner-approved 2026-10-15 (E10-A/B):** policy C with these values replaces the defaults above (γ 0.95, k 2, m 3) as the M05a learner; re-check on the board. Feedback-aware ε scaling fixes A/D in sparse rating but not their overall exploration cost.
 - **Stage-scaled `ε_stage`** (young XUNA explores more) is **gameplay design** and is labeled as such. It is not evidence of learning (D4).
 
 ### 9.5 Credit assignment and safety
@@ -1752,7 +1752,7 @@ Short-horizon planning in Life Lab only and a VM for user content (T9) remain [F
 | E7 | Commit-induced hitches | Render/loop gap during commits | No visible animation stall; else consider a storage task | M04.4 |
 | E8 | BLE MTU on the owner's iPhone | Negotiated MTU + heap | ≥ 185 B with tolerable heap | M05b |
 | E9 | Bonding with LCD passkey (Bluedroid) | Pair, reconnect, forget-bond, unbonded rejection | Works on iOS; recoverable UX | M05b |
-| E10 | Learner alternatives | Beta-greedy-ε vs UCB in Life Lab (Thompson only if both show a regret problem) | Pick the simplest within 5% regret | M05a |
+| E10 | Learner alternatives | Beta-greedy-ε vs UCB in Life Lab (Thompson only if both show a regret problem) | Pick the simplest within 5% regret. **Selection done 2026-10-15 (host): C UCB, owner-approved E10-A/B/C**; target parity (E2) and board check pending | M05a |
 | E11 | Palette sprite render | 4 bpp layered vs current per-cell fill | ≤ current render time | M06 |
 | E12 | Cloud STT/LLM research spike (after D11a; test data only) | Latency, cost, privacy review | Decision input for D11 only | M05c-B (V2) |
 | E13 | On-device speech recognition for vi-VN and en | Check iOS (and Android if used) on-device recognition support for Vietnamese, accuracy on the Layer A phrases, latency, offline behavior | Feasible on the owner's phone without network; otherwise voice stays deferred | M05c-A (optional, before D16) |
@@ -1810,7 +1810,7 @@ The following need the owner:
 | D2 | Storage layout — decided **after** E4/E5 evidence and the ADR-0002 draft (session S11), not before | Hypothesis: NVS (identity + life A/B) + LittleFS on the existing `spiffs` partition | M04.4 (S12a) |
 | D3 | Feedback window and invalidation | 120 s window; keep "direct input invalidates pending reaction" | M05a |
 | D4 | Visible exploration: should XUNA sometimes choose a non-preferred action, more when young? | Yes, bounded (ε 0.03–0.30), labeled as exploration in the explanation | M05a |
-| D5 | First trainable contexts and actions: day parts? GPIO0 greeting as a learning context? Which animations beyond idle/happy? | Add day parts; make the GPIO0 greeting learnable; 3–4 actions aligned with the art | M05a |
+| D5 | **[A] 2026-10-15 (actions and GPIO0):** learnable actions are idle, happy and curious (existing art; learner index 0/1/2 → ActionId 0/1/3); the GPIO0 press becomes the learnable `button_greeting` context. Day parts stay as recommended and need trusted time (S10); a fourth action (e.g. greet) needs new art | Approved (actions, GPIO0); day parts per S10 | M05a |
 | D6 | Implicit feedback | Off by default | M05a |
 | D7 | **[A] 2026-10-12: hatch on the device or via the app.** Exact `bornAt` only with trusted time in the hatch boot session; otherwise unknown. The existing MVP pet migrates as Newborn with `bornAt` unknown (§12) | Approved (owner chose the local-first variant over app-only hatch) | M04.2 |
 | D8 | Facts on the device: predicate allowlist, nickname ≤ 16 bytes on the device, capacity 32 | Approve the allowlist in §10.4 | M05b |
