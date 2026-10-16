@@ -99,36 +99,38 @@ Session size estimates (one focused AI-assisted sitting = 2–4 h):
 
 Session IDs are kept stable. Suffixes (`a`, `b`) mark splits or additions from the audit. Rows are in recommended execution order.
 
+**2026-10-16 owner gate simplification (AGENTS §3):** S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B) replaces the S11 prerequisite of S13; S13 + S18 run as one integration that absorbs S08b/S09, with S08a as the byte-compatibility regression; S10 splits into S10-sync (after the integration) and S10-hatch (deferred); S23/S24 are superseded. The table keeps the original rows for history; the bold notes override their Needs column.
+
 | ID | Slice | Title | Repo(s) | Needs | Size |
 |---|---|---|---|---|---|
 | S02 | M04.0 | ADR-0001 + decisions index (D1, D7, D12, D14, D17 already approved 2026-10-12) | root | — | S |
 | S00 | prep | Development environment and baseline | all (no code) | D14 for the Flutter pin | M + Owner |
-| S01 | M04.0 | MVP physical acceptance + observed v1 byte capture (behavioral baseline) | firmware, mobile | S00, phone path | Owner |
+| S01 | M04.0 | MVP physical acceptance + observed v1 byte capture (behavioral baseline). **Closed 2026-10-16 — Accepted with owner-skipped items** (AGENTS §3) | firmware, mobile | S00, phone path | Owner |
 | S03 | M04.1 | Characterization tests and golden v1 fixtures | firmware | S00, D1 | M |
 | S04 | M04.1 | `xuna_core` library and native test environment | firmware | S03 | M |
 | S05 | M04.2 | Fixed-point, PCG32, ClockModel (pure) | firmware | S04 | M |
 | S06 | M04.2 | Identity record, `bootc`, hatch/migration | firmware | S05, D7; **board step: S01 + §5 backup** | M + Owner check |
 | S07 | M04.3 | In-RAM events, registry, ring buffer, queue (pure) | firmware | S04 | S |
 | S08a | M04.3 | v1 transcript fixture (from S01 observed bytes + code) | firmware | S03, S01 | S |
-| S08b | M04.3 | Core `CommandHandler` reproducing v1 byte-exactly | firmware | S07, S08a | M |
-| S09 | M04.3 | `BleManager` becomes transport-only | firmware | S08b, S01 | M + Owner check |
-| S10 | M04.2 | TimeSync + app hatch (opcodes 5, 7) | firmware, mobile | S05, S06, S09, D14 | M + Owner check |
-| S11 | M04.4 | Storage experiment E4/E5 → ADR-0002 → **D2** | firmware (bench) | S04, §5 backup | M + Owner |
+| S08b | M04.3 | Core `CommandHandler` reproducing v1 byte-exactly. **Folded into the merged S13+S18 integration (2026-10-16)** | firmware | S07, S08a | M |
+| S09 | M04.3 | `BleManager` becomes transport-only. **Folded into the merged S13+S18 integration (2026-10-16)** | firmware | S08b, S01 | M + Owner check |
+| S10 | M04.2 | TimeSync + app hatch (opcodes 5, 7). **2026-10-16: split into S10-sync (after S13+S18) and S10-hatch (deferred)** | firmware, mobile | S05, S06, S13+S18, D14 | M + Owner check |
+| S11 | M04.4 | Storage experiment E4/E5 → ADR-0002 → **D2**. **Deferred to S32 (D2a approved 2026-10-16)** | firmware (bench) | S04, §5 backup | M + Owner |
 | S12a | M04.4 | Snapshot v2 layout freeze + sectioned codec | firmware | S06, D2 | M |
 | S12b | M04.4 | v1→v2 migration + torn-write simulation | firmware | S12a, S03 | M |
-| S13 | M04.4 | Persistence v2 wiring, safe mode, commit budget | firmware | S12b, S09, S06, §5 backup | M + Owner check |
+| S13 | M04.4 | Persistence v2 wiring, safe mode, commit budget. **Merged with S18 (2026-10-16)** | firmware | S12b, S08a, D2a, §5 backup | M + Owner check |
 | S14 | M04.5 | ActivityFsm (pure) | firmware | S07 | M |
 | S15 | M04.5 | Needs, mood, bounded catch-up (pure) | firmware | S05 | S |
 | S16 | M04.5 | Action registry, request validator, VisualIntent, idle selector (pure) | firmware | S14, S15 | M |
-| S17 | M04.5 | Wire FSM and visuals into firmware; renderer fallback | firmware | S16, S09 | M + Owner check |
-| S18 | M04.6 | `LifeCore::step` composition; thin `main.cpp` | firmware | S17, S13, S10 | M |
+| S17 | M04.5 | Wire FSM and visuals into firmware; renderer fallback. **Closed 2026-10-16 on owner smoke; render ±20% not measured** | firmware | S16, S09 | M + Owner check |
+| S18 | M04.6 | `LifeCore::step` composition; thin `main.cpp`. **Merged with S13 (2026-10-16)** | firmware | S17, S13 | M |
 | S19a | M04.6 | Life Lab CLI + trace DSL + runner | firmware | S18 | M |
 | S19b | M04.6 | Scenarios D/E + 100-day invariants | firmware | S19a | M |
 | S20 | M04.6 | Golden vectors and Dart conformance | firmware, mobile | S19b, D14 | M |
 | S21 | M04.6 | Target parity build and M04 acceptance review | firmware, root | S20 | M + Owner |
 | S22 | M05a/c-A | Learning + conversation decisions: D3–D6, D17, vocabulary, phrase scope (D16 optional) | root | can run any time after S02; must precede S23/S39 | Owner |
-| S23 | M05a | PreferenceLearner v2 + section migration (pure) | firmware | S22, S21 | M |
-| S24 | M05a | Policy + ReactionTable (pure) | firmware | S23 | M |
+| S23 | M05a | PreferenceLearner v2 + section migration (pure). **Superseded by E10 learner v3 / S18-prep** | firmware | S22, S21 | M |
+| S24 | M05a | Policy + ReactionTable (pure). **Superseded by E10 UCB + D3 in `ProductLearner`** | firmware | S23 | M |
 | S24a | M05c-A | Stated-preference evidence + opcode 6 handling (pure) | firmware | S24, D17 | S |
 | S25 | M05a | Proof-of-learning experiments + report (E10, incl. stated vs rated) | firmware, docs | S24a | M |
 | S26 | M05a/c-A | Firmware wiring: contexts, day part, explanation, opcode 6 + capability bit 5 | firmware | S25 | M |
@@ -969,22 +971,16 @@ The track is developed together and accepted together in S28. This implements A6
 
 The milestone chosen second in D15 (M05d or the Evolution MVP), the rest of M06 (growth/evolution: art scope, layered assets, `GrowthConfig`), and M07 (sensors) are split into sessions **when they become next**, using the measurements available then. Pre-splitting them now would conflict with AGENTS.md §4, which says not to build later milestones speculatively.
 
-## 9. Recommended next three sessions
+## 9. Recommended next sessions
 
-Actual status (2026-10-12):
+Updated 2026-10-16 after the owner smoke PASS and the gate simplification (AGENTS §3). Earlier recommendations (S02 → S00 → S01, 2026-10-12) are historical.
 
-- No M04 work has started.
-- MVP physical acceptance is still pending.
-- This machine has no firmware toolchain.
-- The planning documents are committed (`e3d3485`).
-
-Recommended order:
-
-1. **S02** — ADR-0001 and the decisions index (S). D1, D7, D12, D14 and D17 were approved on 2026-10-12. This needs no tooling.
-2. **S00** — toolchain and baseline on this machine, with the approved Flutter 3.32.8 pin (`mobile/.fvmrc`).
-3. **S01** — MVP physical acceptance plus the observed-byte capture. It must finish before S06's board step, S08a and S09.
-
-S03–S05 and S07 are pure host work and can proceed while S01 waits for the phone, once S00 is done (D1 is approved).
+| # | Session | Repo | Depends on | Minimum done when |
+|---|---|---|---|---|
+| 1 | **Done 2026-10-16 ([record](S13-S18-integration-prep-2026-10-16.md)).** **S08a + integration prep (host):** S01 observed transcript as a replay test; `BleManager` → `LifeCoreEvent` adapter design; `NvsSnapshotStore` (`life0/life1`, static recover scratch); v1 → v2 migration of the owner's real NVS backup decoded on host; `IdentityRecord` (`MigratedFromV1`) creation | firmware | — | Transcript replays byte-identically through the new path; migrated quiet/play preferences match `BoardLearner` (check the untried-curious prior edge case); native + ESP32 build PASS |
+| 2 | **Uploaded 2026-10-16; initial smoke PASS, remaining board checks owner-skipped ([record](S13-S18-switch-2026-10-16.md)).** **S13 + S18 merged (board):** production switch to `LifeCore` + LifeSnapshot v2 | firmware | 1, §5 backup | Real pet's learned preferences preserved; reboot ×3; forget + reboot; `slot0/slot1` untouched; owner smoke (four emotions, buttons, BLE) |
+| 3 | **Source/host/build done 2026-10-16; not uploaded; physical acceptance deferred ([record](S26-S27-lite-2026-10-16.md)).** **S26 + S27-lite:** opcode 6 + capability bit 5, explanation characteristic, D3 `expired` result; minimal "Why?" in the app | firmware, mobile | 2 | Chat statement → confirm → explanation shows `Told` → choice shifts → survives reboot with the phone off (S28-lite) |
+| 4 | **S10-sync:** opcode 5 after connect, 16-byte command packets, day-part cells on the board | firmware, mobile | 2 (parallel with 3) | Serial shows `Synced` + day part; S10-hatch stays deferred |
 
 ## 9. Proposed device voice feasibility sessions — separate workstream
 

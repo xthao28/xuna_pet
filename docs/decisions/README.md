@@ -27,6 +27,7 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md) |
 | D16 phone voice (push-to-talk, on-device STT) | Deferred by owner (text first, E13 later) | 2026-10-15 |
 | E10-A/B/C: learner v3 + UCB for M05a, γ 0.90 / k 1 / m 1 / bonus 0.15, capped v1 migration | Approved (selection; board use gated) | 2026-10-15, AGENTS §3, [E10 packet](../roadmap/E10-review-packet-2026-10-15.md) |
+| Prototype gate simplification: S01 closed with owner-skipped items; D2a NVS A/B snapshot v2; S13 + S18 merged; concrete Cloud gate | Approved; not Implemented | 2026-10-16, AGENTS §3, ADR-0002, ADR-0009 |
 
 [ADR-0001 reference reuse policy](ADR-0001-reference-reuse-policy.md) is drafted (Proposed); owner acceptance remains pending. ADR-0002–0005 identifiers remain reserved by existing sessions. This index does not accept their decisions or promote other open D-decisions.
 
@@ -34,4 +35,4 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 
 Title/ID · Date · Status (Proposed / Approved / Implemented / Validated) · Context · Options · Decision (or Proposed decision) · Consequences · Evidence links · Owner acceptance/date. Approval applies only to its stated scope; implementation and validation are separate entries.
 
-[ADR-0002 storage layout](ADR-0002-storage-layout.md): Proposed draft, no option selected; awaits measured E4/E5 and D2.
+[ADR-0002 storage layout](ADR-0002-storage-layout.md): D2a Approved 2026-10-16 (snapshot v2 in NVS A/B `life0/life1`); LittleFS/log medium pending S32.

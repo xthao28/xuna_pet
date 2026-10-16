@@ -2,7 +2,7 @@
 
 **Document ID:** XUNA-TIP-001
 **Version:** 0.1.2. Device-first direction update; preserves audit history. D17 was Approved on 2026-10-12; D15 and device voice implementation choices remain Proposed.
-**Status:** **Proposed / planning only.** No application code has been written for this plan. Nothing here is Approved unless it cites an existing Approved decision.
+**Status:** **Proposed.** Nothing here is Approved unless it cites an existing Approved decision. *(2026-10-16 note: much of M04 and the M05a core is now Implemented on host; production still runs the v1 + `BoardLearner` path. Current status lives in [PROCESS.md](../../PROCESS.md); gate simplifications approved 2026-10-16 are in AGENTS.md §3.)*
 **Date:** 2026-10-12
 **Inputs:** root [AGENTS.md](../../AGENTS.md) (canonical), [XUNA_DIGITAL_LIFE_SPEC.md](../product/XUNA_DIGITAL_LIFE_SPEC.md) v0.3.0 (Proposed spec), [PROCESS.md](../../PROCESS.md), [PLAN.md](../../PLAN.md), [MVP-local.md](../roadmap/MVP-local.md), [M02-ble.md](../roadmap/M02-ble.md), and the source at firmware `be58099`, mobile `3846880`, backend `0032828`.
 **Audience:** product owner, coding agents and firmware/mobile engineers who will implement XUNA milestones M04–M07.
@@ -1812,7 +1812,7 @@ The following need the owner:
 | ID | Decision | Recommendation | Needed before |
 |---|---|---|---|
 | D1 | **[A] 2026-10-12: complete M04 first.** Approve the M04 foundation sequence (M04.0–M04.6) before new M05 features | Approved | M04.1 |
-| D2 | Storage layout — decided **after** E4/E5 evidence and the ADR-0002 draft (session S11), not before | Hypothesis: NVS (identity + life A/B) + LittleFS on the existing `spiffs` partition | M04.4 (S12a) |
+| D2 | Storage layout. **D2a [A] 2026-10-16:** LifeSnapshot v2 in NVS A/B `life0/life1`, v1 `slot0/slot1` kept as rollback; no partition change (ADR-0002). The log/memory medium is decided at S32 with E4/E5 | Hypothesis for the rest: LittleFS on the existing `spiffs` partition | D2a: S13; rest: S32 |
 | D3 | **[A] 2026-10-15:** feedback window **120 s** after the reaction is shown; a later rating is rejected as expired. Keep "direct input invalidates pending reaction" | Approved | M05a |
 | D4 | **[A] 2026-10-15:** exploration is the E10 UCB policy (bonus 0.15, replaces the ε range); exploratory choices are labelled in the "Why?" explanation; no age dependence until M06 | Approved | M05a |
 | D5 | **[A] 2026-10-15 (actions and GPIO0):** learnable actions are idle, happy and curious (existing art; learner index 0/1/2 → ActionId 0/1/3); the GPIO0 press becomes the learnable `button_greeting` context. Day parts stay as recommended and need trusted time (S10); a fourth action (e.g. greet) needs new art | Approved (actions, GPIO0); day parts per S10 | M05a |
@@ -1927,6 +1927,6 @@ Combines the offline learning in §9–§10 with an optional online layer. Ratio
 ### 22.4 Sequencing
 
 - **Now (no network code):** persistence v2 and the experience log carry typed codes and provenance so they can be exported later. E15 can run in Life Lab at any time (host only).
-- **After M05b/S38 acceptance:** Stage 1 text projection may begin. O1 remains separately gated by E15.
+- **After the Cloud gate (owner revision 2026-10-16: snapshot v2 on the board, durable `PetId` readable over BLE, local export):** Stage 1 text projection may begin. O1 remains separately gated by E15.
 - **After D19/D22 and E14:** Stage 2 MQTT.
 - The online layer never blocks offline acceptance of any phase.

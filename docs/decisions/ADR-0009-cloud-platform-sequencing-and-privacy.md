@@ -9,7 +9,12 @@ accepted local MVP or prematurely binding XUNA to a vendor.
 
 ## Decision
 
-- Do not implement backend code before local M05b / S38 acceptance.
+- Do not implement backend code before the concrete Cloud gate is met
+  (owner revision 2026-10-16, replacing "local M05b / S38 acceptance"):
+  (a) LifeSnapshot v2 runs on the board, (b) a durable `PetId` exists on the
+  device and is readable over BLE, (c) a local export works without a service.
+  Phase 0 documentation (threat model, `BrainId` semantics, projection
+  ordering key) may proceed before the gate.
 - Start with a Python/FastAPI modular monolith, PostgreSQL, SQLAlchemy 2.x,
   Alembic and Pydantic.
 - Use relational fields plus JSONB and PostgreSQL full-text search. `pgvector`

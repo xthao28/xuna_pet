@@ -1,18 +1,129 @@
 # XUNA — Process and Session Handoff
 
 Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
-Current milestone: **M04 pure core + Phase 1 learner v3 done on host; board trial firmware built, not uploaded.** The local MVP through M05 is implemented, but its physical acceptance is pending.
-Current status (2026-10-15 end of session):
+Current milestone: **S13 + S18 on board (migration/one reboot/feedback smoke passed; remaining checks owner-skipped). S26/S27-lite implemented in source, host/build PASS, NOT uploaded.** Extended life-feel/power-cut checks remain unvalidated.
+Current status (2026-10-16):
 
-- Firmware `5d872d3` (= `efdd915` + needs/activity Serial log; this is the board-trial build): learner v3 (E10-approved UCB, γ 0.90) decides on the board through `BoardLearner` (v1 stays the durable 96-byte record); approved life-feel tuning (`LifeFeel.h`) enabled. **Not uploaded** (board not connected). Board still runs `aa2dbca`.
-- S12a + S12b done on host ahead of D2 (owner choice): LifeSnapshot v2 codec, v1 migration, A/B recovery with torn-write sweep. S18 preparation done on host: `LifeCore` runs learner v3 3 × 5 × 3 (incl. GPIO0 greeting and curious) with LifeSnapshot v2. S10 host core, design freeze and pure C++/Dart codec slice are done; runtime/transport wiring remains gated. Current validation: firmware native 182/182, ESP32 build/purity PASS; mobile analyze clean and 45/45 PASS. D3 remains implemented in core. Uncommitted. See the S10 record and latest entries.
-- Owner decisions through 2026-10-16: the earlier learning/hybrid decisions remain; S25 defaults (`w_s=0.5`, cap 2) and the S10 TimeSync/Hatch/Lifecycle protocol freeze are now approved. See AGENTS.md §3 and the S10 record.
-- Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin` (prepend to PATH in shells); `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
-- Earlier: owner approved D1, D7, D12, D14, D17 (2026-10-12); S01 partly done (owner deferred the rest); S11 paused.
+- Board firmware: owner-authorized 2026-10-16 S13+S18 production switch (intermediate S13/S18 build with current artwork, before the S26 changes), LifeCore/ProductLearner + LifeSnapshot v2; first boot Migrated, subsequent boot Ok. PetId `d945c77026fd4f4a8a899bbff4aeed86`; Happy/Idle preserved. GPIO0 is direct Happy, not learnable greeting. Stack setup 8,228 B first boot / 8,036 B first reboot (16 KiB stack).
+- Source ahead of board: **S26/S27-lite** enables opcode 6 + bit 5, explanation READ `000b`, expired=8; Chat AskWhy and grounded confirmation replies. Board still has bits 4/5/6 off and expired=4. Source keeps bits 4/6 off and 12-byte packets; S10-sync/hatch and learnable GPIO0 remain deferred. Install upgraded app before any future result-8 firmware rollout.
+- Latest recorded validation: S26 firmware full native/ASan 192/192 each, then final adapter 11/11 each; ESP32/purity PASS (52,088 B RAM / 2,851,677 B Flash). Flutter 3.32.8 analyze clean, 59/59 tests and debug APK PASS; lock unchanged. All artwork/UI and upgrade source is now committed: firmware `b0f4ded`, mobile `4976147`; parent records both pointers.
+- Owner decisions 2026-10-16 (AGENTS.md §3): S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B `life0/life1`, LittleFS → S32); S13 + S18 merged, absorbing S08b/S09; concrete Cloud gate replaces M05b/S38. Earlier: S25 defaults, S10 protocol freeze, learning/hybrid/Cloud baseline.
+- Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Next action: the board trial remains preferred when the board is available: verified partition/NVS backup → upload `5d872d3` without NVS → Serial smoke → 1–2 h capture and owner observation. The 2026-10-16 Windows check detected only COM1, so the owner deferred it. Cloud Phase 0 documentation is complete; Cloud implementation remains blocked until M05b/S38 acceptance. Continue the local dependency chain and current S10/S27a work; then S11 (E4/E5) → D2 → S13 → S18 remains the production sequence.
+Next action: **S26/S27-lite code/host/build done** ([record](docs/roadmap/S26-S27-lite-2026-10-16.md)); next recommended code session is S10-sync (opcode 5, trusted day parts), when requested. No further board tests/upload unless requested; owner skipped the remaining S13/S18 physical checks (checkpoint/reboots/forget/final NVS dump), not marked PASS. The physical board and current build now differ. No backend; Cloud gate still unmet (PetId BLE visibility/local export absent).
 
-## 0. Start here — next work (updated 2026-10-12)
+Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-16 — Owner-requested commit of all pending work
+
+- Owner requested committing everything currently pending. Committed firmware first (`b0f4ded`: LifeCore/v2 integration, stated preference/explanation, artwork and tools), then mobile (`4976147`: shared pet visuals/UI, explanation pipeline and tests), then parent documentation and both gitlinks.
+- Staged diff whitespace checks passed. No source changes or tests rerun in this commit-only step; preceding validation and owner-skipped hardware checks retain their exact status. The board still runs the earlier S13/S18 image, not the committed enhanced S26 source.
+- No push, upload, phone install or board operations. Next recommended session remains S10-sync when requested.
+
+## 2026-10-16 — S26/S27-lite source upgrade after owner-skipped board tests
+
+- Owner asked to stop lengthy board testing and proceed with upgrades. Stopped S13/S18 Serial at uptime ~281 s, before checkpoint; one reboot and feedback result=0 recorded, stack 8,036 B. Remaining physical tests are owner-skipped, not validated. No subsequent board/phone operations.
+- Enabled source opcode 6/bit 5, 20-byte explanation READ `000b`, dedicated expired=8; kept GPIO0 direct Happy, 12-byte packets, no TimeSync/hatch flags. Commit-grounded explanation is published before command notification; cached to avoid per-loop GATT updates. Baseline adapter/S01 remains compatible.
+- Mobile explanation domain/model/mapper/repository/read use case, BLE discovery, Chat AskWhy and grounded post-confirmation reply; unsupported/fake evidence unavailable; timeout reads evidence without resend. Locale/expired handling updated. Existing artwork/UI retained.
+- Firmware full native/ASan 192/192 each; final adapter 11/11 each; purity/ESP32 PASS (52,088 B RAM / 2,851,677 B Flash). Mobile fvm 3.32.8 pub get/lock unchanged, analyze clean, tests 59/59, debug APK PASS. [Record](docs/roadmap/S26-S27-lite-2026-10-16.md).
+- Source/build only; board remains preceding S13/S18 image, app was not installed. No commit/push. Future enhanced firmware rollout requires compatible app first (result 8).
+
+## 2026-10-16 — S13/S18 USB recheck and rollback verification passed
+
+- Owner requested another check. Read 64 KiB successfully; entire preserved prior application (2,840,752 B) passed esptool `verify_flash` using the chip's digest. Saved verified rollback image outside Git; no application upload or Flash write.
+- Re-read partition table/NVS; both byte-identical to existing verified backup. Host decoder/migration PASS, actual pet still Happy/Idle with 4 feedback. [Record](docs/roadmap/S13-S18-switch-2026-10-16.md) has hashes and commands.
+- Long-read USB root cause remains unknown; those failures are not erased from history. Upload approval is the next gate; new-firmware physical/stack checks not run. No code changes, test rerun, erase, NVS restore, commit or push.
+
+## 2026-10-16 — S13/S18 lower-baud read retry failed
+
+- Owner authorized the optional prior-firmware read retry, not upload. esptool read at 115200 failed again with short USB data after 77,824-byte progress (`expected 0x1000`, received `0xfe0`), exit 2.
+- Stopped board operations. Existing verified NVS backup untouched; no new freshness check, upload, erase, NVS restore/write, source change, test rerun, commit or push. [Switch record](docs/roadmap/S13-S18-switch-2026-10-16.md) records the failed attempt. USB cable/port check and transport resolution precede the next board attempt and upload authorization.
+
+## 2026-10-16 — S13 + S18 production wiring; stopped before upload
+
+- Switched production source to LifeCore + V1LifeCoreAdapter + NvsSnapshotStore; identity migration commit-first, initial durable v2 migration, read-only snapshot ERROR_SAFE guard, BLE transport-only, GPIO0 direct Happy, unchanged 12-byte packets/capabilities. Loop stack 16 KiB plus high-water logs; no board measurements yet.
+- Passed: native 190/190, ASan/UBSan 190/190, S01 replay, purity, ESP32 build (52,048 B RAM / 2,850,341 B Flash), whitespace. Earlier dirty artwork/UI/Session 2 work retained; no mobile edit, commit or push.
+- Verified device partition table equals build; NVS 0x9000 / 0x5000 backed up at `/Users/xthao28/xuna_backups/2026-10-16-s13-switch/`. Actual pet generation 33, activeSeconds 6,989, feedback 4, preferences Happy/Idle preserved by host migration check. Full hashes/evidence: [record](docs/roadmap/S13-S18-switch-2026-10-16.md).
+- Optional application read for rollback verification failed: esptool code 2, short USB data (`expected 0x1000`, received `0xf6e`). Board work stopped immediately per owner's rule. No upload, erase or NVS restore. Prior local firmware artifact preserved in scratch but not verified against board. Upload authorization and all new-firmware physical checks remain pending.
+
+## 2026-10-16 — S08a + S13/S18 integration preparation (host)
+
+- Added `V1LifeCoreAdapter` (BLE v1 over `LifeCore` + LifeSnapshot v2), `test_v1_adapter` (S08a replay of the S01 transcript + 6 cases), Arduino `NvsSnapshotStore` (D2a `life0/life1`, v1 keys read-only, `ident`, `bootc`; not linked), `tools/nvs_life_dump.py` and `sim/migration_check.cpp`. Evidence: [integration prep record](docs/roadmap/S13-S18-integration-prep-2026-10-16.md).
+- Fact: the S01 script replays with identical result codes, counters, decision/feedback flags and memory pages; with the board's real timing the 168 s approval is expired under D3 (4). Real pet backups migrate with identical preferences (pet has no learned evidence). Synthetic edge: idle and happy both disliked → LifeCore prefers Curious.
+- Embedded provisional choices needing owner confirmation: expired → 4; GPIO0 stays Happy (greeting learning off because v1 bytes and the app cannot carry context 2); reserved IDs ≥ 0x80000000 → 4; coarse preference bytes; needs not persisted.
+- Validation: native 189/189, ASan/UBSan 189/189, purity PASS, ESP32 build SUCCESS (production unchanged 49,024 B RAM / 2,840,385 B Flash; adapter smoke +3,552 B RAM). Board stack for the ~2.8 KB staged snapshot must be measured in the switch session.
+- No board/phone operation, upload, NVS write, commit or push. Backups only read.
+
+
+## 2026-10-16 — Gate simplification decisions and handoff cleanup (Session 1)
+
+- Independent plan review found the session gates self-blocking after the owner skips (S09 required "S01 completed"; S13 required S11/D2 power-cut benches) and several stale handoffs. Owner chose, all as recommended: close S01 with owner-skipped items; D2a (LifeSnapshot v2 in NVS A/B `life0/life1`, v1 keys kept as rollback, LittleFS decision → S32); merge S13 + S18 and fold S08b/S09 into it with S08a as regression; replace the Cloud M05b/S38 gate with (a) snapshot v2 on the board, (b) durable `PetId` readable over BLE, (c) local export. No backend code authorized; D11a still open.
+- Status adjustments (not new decisions): S10 split into S10-sync (after the integration) and S10-hatch (deferred); S23/S24 superseded by E10 v3 / `ProductLearner`; S17 closed on owner smoke with render ±20% unmeasured; TRIAL-01 superseded by the artwork upload.
+- Updated AGENTS.md §3, ADR-0002, ADR-0009, decision index, Cloud plan, implementation plan (status note, D2 row, §22.4), session plan (map notes, §9 next sessions), this header, PLAN.md and CHANGELOG.md.
+- Known risks recorded: v2 power-loss behaviour on this board unmeasured; `BleManager` command packet is 12 bytes and must grow to 16 for TimeSync; `BoardLearner` loses recency on reboot until the switch.
+- Documentation only: no code, build, test, board/app operation, commit or push. Firmware/mobile uncommitted work preserved.
+
+
+## 2026-10-16 — Owner smoke acceptance and deferred extended checks
+
+- Owner confirmed pet display, all four expressions, both physical buttons and mobile BLE connection are OK on the current build: owner-observed smoke PASS.
+- Owner explicitly chose to skip the 1–2-hour life-feel trial and power-cut matrix for this iteration, favoring incremental improvements. Mark these checks owner-skipped, not passed; do not require them again as prerequisites to routine UI/local feature work. This does not approve a storage architecture choice or clear unrelated S11/D2/S13/S18 gates.
+- Cloud architecture plan / Phase 0 documentation is complete and approved. Backend implementation still waits for M05b/S38 under the existing plan; no backend work authorized in this status session. Next local work is S10 runtime/transport integration, then the remaining foundation/learning wiring gates.
+- Documentation update only; no tests, board/app operations, commit or push.
+
+
+## 2026-10-16 — Warm beige chat avatar
+
+- Added the existing `AppColors.xunaCardPressed` warm beige (#EFE8D6) behind the circular XUNA chat avatar in HomeChatBubble. Preserved shared pet widget, geometry and pixel filtering.
+- Flutter 3.32.8 analyze clean; formatting/whitespace PASS; debug APK build/install/launch PASS on Redmi. No tests rerun for this color-only change. Previous changes preserved; no commit/push.
+
+
+## 2026-10-16 — Simple pixel backgrounds on mobile
+
+- Owner requested backgrounds for Home, Chat and Journal, then rejected detailed image drafts in favor of simple pixels. Final implementation uses code-native flat rectangles on an 80×60 grid in `AppXunaPet`: window/plant room, bookshelf/lamp reading nook, fence/cloud garden. Generated detailed drafts were discarded from the workspace and are not bundled.
+- Room state adapter supports the background option; Home uses room, Chat header reading, Journal thumbnails garden. Transparent pet GIFs stay separate from backdrops, generated reproducibly by the existing export tool. Existing firmware/board preview remains unchanged. These backdrops are decorative, not physical-location or growth claims.
+- Flutter 3.32.8 analyze clean, full test run 49/49 PASS (including small-card background coverage), focused shared widget tests 2/2 PASS; debug APK build/install/launch PASS on Redmi. GIF alpha checked, lock unchanged, whitespace clean. Physical visual review pending owner. No board operation, commit/push; earlier work preserved.
+
+
+## 2026-10-16 — Shared mobile XUNA artwork base
+
+- Owner requested consistent XUNA art throughout mobile using the base widgets. Added `shared/widgets/AppXunaPet` and UI-only `AppPetExpression`, exported from `widget_src.dart`; shared code has no feature dependencies. `HomePetScene` remains the device-state adapter to this base.
+- Replaced old character illustrations in chat header, chat avatar, journal cards and growth placeholder with transparent XUNA portraits. Room and connected board preview reuse the same base in scene/animation mode. Decorative portraits are static, not claims about device emotion or implemented growth. No remaining feature references to legacy HERO/RAIN/LEARN images; old asset files retained.
+- Extended deterministic export script for four transparent PNG portraits; README documents usage. Flutter 3.32.8 analyze clean, full tests 48/48 PASS, APK build/install/launch PASS on Redmi. Lock unchanged. Physical visual acceptance pending owner review; no firmware operation, commit/push. Earlier dirty changes retained.
+
+
+## 2026-10-16 — Mobile pet artwork and animation
+
+- Owner clarified the mobile complaint concerns pet artwork/animation. Added `HomePetScene` for the Home room and connected board-screen preview, driven by the device-reported `AnimationState`. Exported four GIF loops and still PNGs from firmware canonical anchored frames with `mobile/tools/export_pet_animation.py`; mobile builds consume checked-in assets without requiring firmware/Python.
+- Offline/reduced-motion/TickerMode-disabled views use still images; no phone-owned pet progression. Loop phase is local presentation, not frame-synchronized with firmware. Existing UI layout retained. README documents regeneration.
+- Flutter 3.32.8 analyze clean, 47/47 tests PASS including state/asset and reduced-motion coverage, debug APK build PASS, lock unchanged. `adb install -r` and launch PASS on Redmi 2510DRA23E. Physical BLE/visual acceptance pending owner observation. No firmware operation, commit or push; previous dirty work preserved.
+
+
+## 2026-10-16 — Mobile build/install for emotion checks
+
+- Owner requested the mobile build to exercise other firmware expressions. Built Android debug APK with pinned Flutter 3.32.8 (`flutter build apk --debug` via the pinned SDK binary); build PASS. Existing Device-tab expression controls cover Idle/Happy/Curious/Sleep; no code changes required.
+- `adb install -r` PASS on Redmi 2510DRA23E, then `am start com.example.xuna_mobile/.MainActivity` PASS. Mobile Git and pubspec.lock unchanged. No analyze/test rerun for this build-only session. Physical BLE emotion observations remain owner acceptance work; app launch does not establish BLE/animation acceptance. No commit/push.
+
+
+## 2026-10-16 — Anchored pet motion revision
+
+- Owner reported sliding/tilting and sparse animation in the first replacement. Reworked `firmware/tools/generate_pet_scene.py` to use one upright reference, redraw expressions on the same body, keep feet byte-identical, and limit upper-body breathing to two pixels. Removed whole-body translation/rotation. Idle blinks, Happy smiles/pulses, Curious moves pupils, Sleep breathes with closed eyes.
+- Four 32-sample timelines at 100 ms/sample (128 exported frames; intentional held/repeated poses, not 128 unique drawings). Exported PNG sheet, LCD preview and timed GIF. `PetVisualAnimation.h` selects the corresponding row, resets on state changes and handles unsigned time rollover.
+- Validation: native `test_visual` 2/2 PASS (state switches, loop, late calls, rollover); generator fixed-foot/transparent-key assertions PASS; ESP32 build/purity PASS. Static RAM 49,024 B; image 2,840,385 B / 6,553,600 B; fixed render buffer 13,824 B. Other core logic unchanged; full suite was not rerun this revision.
+- Upload PASS (hash verified); ~15-second Serial smoke recorded Idle, GPIO0 Happy and return to Idle, no spontaneous error/reset; max draw 5,427 us. Post-upload NVS byte-identical to backup. This is runtime smoke, not visual acceptance.
+- Partition table read and matches build byte-for-byte. Pre-upload NVS backup stored outside Git at `/Users/xthao28/xuna_backups/2026-10-16-pet-motion/`; NVS SHA-256 `d7d12a9bebe95738bad48bdee08ce90f7de284bbd928ca24611286c5988ec52d`. Physical motion acceptance remains pending owner observation. No commit/push.
+
+
+## 2026-10-16 — Owner-requested XUNA pet artwork replacement
+
+- Replaced firmware pet art with the generated reference sheet retained at `firmware/assets/source/xuna-emotion-sheet-v2.png`. Deterministic Pillow conversion preserves alpha, uses nearest-neighbor scaling and exports 16 fixed 96×72 frames (Idle/Happy/Curious/Sleep), RGB565 arrays, PNG/GIF and LCD preview. Existing room background and anchor remain unchanged.
+- Updated presentation-only frame selection for four loops; pet-life, learning and storage logic were not edited. Built current firmware production path, which already includes the previously prepared BoardLearner/life-feel trial.
+- Validation: native 182/182 PASS; ESP32 build/purity PASS, static RAM 49,024 B, Flash 1,292,101 B. Pixel assets 329,984 B; render buffer stays 13,824 B. Upload to ESP32-S3 at `/dev/cu.usbmodem14101` PASS, hashes verified. Physical visual/button acceptance pending owner observation.
+- Post-upload NVS is byte-for-byte identical to the backup (SHA-256 `d7d12a9bebe95738bad48bdee08ce90f7de284bbd928ca24611286c5988ec52d`). Serial smoke ~20 seconds: no spontaneous reset/error, stable heap 251,536 B, max draw 4,815 us; not long-run acceptance.
+- Device partition table matches build; NVS offset 0x9000, size 0x5000 backed up before upload outside Git at `/Users/xthao28/xuna_backups/2026-10-16-pet-v2/`. No commit/push or mobile changes.
+
+
+## 0. Start here — next work (historical, 2026-10-12; superseded by the header above)
 
 **Read first.** AGENTS.md (canonical) → this section → [XUNA_SESSION_PLAN.md](docs/roadmap/XUNA_SESSION_PLAN.md):
 
@@ -228,26 +339,21 @@ Do not store credentials, tokens or other secrets here. Use links to detailed re
 
 ## 9. Copyable prompt for the next AI/session
 
-> Read AGENTS.md, then PROCESS.md §0 "Start here", then docs/roadmap/XUNA_SESSION_PLAN.md (§2 rules, §3 map, and the entry of the next session), and only the cited sections of docs/architecture/XUNA_IMPLEMENTATION_PLAN.md. Check the latest CHANGELOG.md entries. Inspect root and submodule Git.
+> Read AGENTS.md (§3 decisions, including the 2026-10-16 gate simplification), then the header and newest dated entries of PROCESS.md, then docs/roadmap/XUNA_SESSION_PLAN.md §2 rules and §9 next sessions, and only the cited sections of docs/architecture/XUNA_IMPLEMENTATION_PLAN.md. Inspect root and submodule Git; firmware and mobile may hold uncommitted owner work — preserve it.
 >
-> Current state:
+> Current state (2026-10-16):
 >
-> - Planning is complete. The owner approved D1, D7, D12, D14 and D17 on 2026-10-12.
-> - No M04 code has started.
-> - Local MVP physical acceptance (MVP-07) is pending.
->
-> The next sessions are S02 → S00 → S01 unless PROCESS §0 says otherwise.
+> - M04 core and the M05a learning core are Implemented on host; the board runs the v1 + `BoardLearner` path with new artwork. Owner smoke PASS; 1–2 h trial and power-cut matrix owner-skipped (not validated).
+> - Next: S08a + integration prep (host), then the merged S13 + S18 board switch.
 >
 > Working rules:
 >
-> - Ask the owner before starting a session.
-> - Follow that session's preconditions, steps and done criteria.
-> - Never put refactored or storage-changing firmware on the owner's board before S01 and a verified NVS backup.
-> - Report in Vietnamese.
+> - Ask the owner before starting a session; explain its purpose in Vietnamese.
+> - Verified NVS backup (session plan §5) before any upload; never upload `5d872d3`.
+> - Report in Vietnamese; separate ran/passed, failed and not run.
 > - Commit only on request, as single-line conventional messages with no AI attribution.
-> - Keep Clean/GetX and the pinned firmware baseline.
-> - The simulator requires `XUNA_SIMULATOR=true`.
-> - Do not infer validation from commits or builds.
+> - Keep Clean/GetX and the pinned toolchains (Flutter 3.32.8, espressif32@6.5.0).
+> - No backend code before the Cloud gate in AGENTS §3.
 
 ## Mobile base update — 2026-10-11
 

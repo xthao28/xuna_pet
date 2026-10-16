@@ -122,13 +122,14 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | LRN-05 | In progress — slices 1–5 done; board-trial shortcut built 2026-10-15 | Phase 1 learner v3 (lab/shadow): [record](docs/roadmap/learner-v3-phase1-2026-10-15.md); E10 preliminary choice C, tuned γ 0.90 k 1 m 1 bonus 0.15 (Proposed); learner codec + capped v1 migration + §9.6 explanation + LifeCore shadow v3 + §9.5 commit-first parity done (lab); D5 vocabulary added; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md) approved (E10-A/B/C); next production gates S12a/D2, S10, S18 |
 | LRN-04 | Architecture/D21/D22 and D23 baseline approved; implementation gated | Hybrid online layer: [Cloud plan](docs/architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md), [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md); provider/broker/D24 open; E14/E15 not started |
 | CLD-00 | Done (documentation only, 2026-10-16) | Cloud authority, identity, stack, privacy and Phase 0–6 baseline; no backend code |
-| CLD-01–14 | Blocked by S38 acceptance | Phase 1 threat model, contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
+| CLD-01 | Pending — may start (documentation) | Threat model, `BrainId` semantics, projection ordering key |
+| CLD-02–14 | Gated by the Cloud gate (AGENTS §3, 2026-10-16) | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
 | CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
 | CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |
 | CLD-40–41 | Gated by E14 + D19/D22 | Direct-device MQTT/TLS |
 | CLD-50/60 | Gated by VOICE decisions / D24 | Voice services and commercial readiness |
 | LRN-03 | In progress — slices 1–2 done 2026-10-15 | [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md): closed-loop learner bench, 95/95 native PASS; slice 2: [needs timeline](docs/roadmap/life-lab-needs-timeline-2026-10-15.md), candidate values await owner decision |
-| TRIAL-01 | Built, not uploaded — 2026-10-15 | Board trial firmware `5d872d3` (learner v3 + life-feel + needs/activity Serial log). Next: owner connects board → backup → upload → 1–2 h capture with `tools/serial_capture.py`, summary with `sim/board_needs_report.py` |
+| TRIAL-01 | Superseded — 2026-10-16 | Its production path (learner v3 + life-feel + needs/activity Serial log) shipped with the 2026-10-16 artwork upload; owner smoke PASS. The 1–2 h capture was owner-skipped (not validated). Do not upload `5d872d3` |
 | S12a | Done on host — 2026-10-15 (ahead of D2, owner choice) | [S12 record](docs/roadmap/S12-snapshot-v2-2026-10-15.md); layout frozen in plan §7.5; `xuna/persist/SnapshotCodec.h` |
 | S12b | Done on host — 2026-10-15 | v1→v2 migration (E10-C cap), `ISnapshotStore` A/B recovery/commit, every-offset torn-write sweep; native 143/143 PASS |
 | S18-prep | Done on host — 2026-10-15 | [S18 preparation record](docs/roadmap/S18-prep-product-learner-2026-10-15.md): `LifeCore` = v3 3 × 5 × 3 via `ProductLearner` + LifeSnapshot v2; GPIO0 `button_greeting`, curious; snapshot lab/trace on v2; native 152/152 PASS. Production unchanged |
@@ -137,9 +138,9 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | S22 | Done — 2026-10-15 (owner decisions) | [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md): D4 UCB labelled in "Why?", D6 off, "mình – bạn", vi-first, follow-up for missing context, phrase table approved, D16 deferred. Next: S39 (pure Dart extractor) |
 | S39 | Done — 2026-10-15 (mobile, pure Dart) | [S39 record](docs/roadmap/S39-layer-a-extractor-2026-10-15.md): Layer A LocalRuleExtractor + `CandidateEvent`; mobile 39/39 PASS, analyze clean. Not wired (S27a); device opcode 6 is S24a |
 | S24a | Done on host — 2026-10-15 | [S24a record](docs/roadmap/S24a-stated-preference-2026-10-15.md): opcode 6 parse (flagged off in production), stated evidence w_s 0.5 / cap 2 [P], explanation `Told`, section 12; native 179/179. ESP32 RAM +648 B (shared learner cells). Wiring S18, app S27a, tuning S25 |
-| S13 | Pending — needs D2 (after S11) and a verified backup | Adapter + `life0/life1`, ERROR_SAFE, commit budget; use static scratch (recover ≈ 6 KB stack on Xtensa) |
+| S13 + S18 | Implemented + initial board smoke PASS — 2026-10-16; remaining board checks owner-skipped, not validated | Production switch to `LifeCore` + LifeSnapshot v2 in NVS `life0/life1` (v1 keys kept as rollback), ERROR_SAFE, commit budget, `IdentityRecord` MigratedFromV1; static scratch (recover ≈ 6 KB stack on Xtensa). Absorbs S08b/S09 |
 
-M04 S00–S21 remain unchanged in implementation scope. M05a/Foundation text or simulation stays independent of voice hardware; M05b keeps memory/privacy/recovery; M05c extends Foundation; M05d vs Evolution order remains D15/S42a. M06/M07 may consume validated voice-originated evidence without treating spoken reports as sensor observations. Next coding session remains S00 after S02 documentation; no feature session started here.
+M04 S00–S21 remain unchanged in implementation scope. M05a/Foundation text or simulation stays independent of voice hardware; M05b keeps memory/privacy/recovery; M05c extends Foundation; M05d vs Evolution order remains D15/S42a. M06/M07 may consume validated voice-originated evidence without treating spoken reports as sensor observations. (Historical 2026-10-12 note; for current next sessions see session plan §9.)
 
 ## S02 documentation delivery — 2026-10-12
 
@@ -421,3 +422,57 @@ Owner requested committing. Firmware `aa2dbca` (review fixes) and mobile `df7d2e
 - Full S17 remains In progress: owner visual/button observations, BLE sleep/wake/rejection, rest/recovery and render timing acceptance pending. Device state preservation not yet checked through BLE.
 
 - S17 owner visual confirmation (2026-10-14): owner confirmed normal XUNA/Idle LCD, GPIO0 Happy and return to Idle, followed by GPIO14 Idle on firmware aa2dbca. Combined with captured button Serial logs, LCD/button smoke PASS. Full S17 remains In progress: BLE sleep/wake/result 5, rest/recovery and render timing acceptance still pending.
+
+## Pet artwork replacement — 2026-10-16
+
+Implemented and uploaded: 16-frame XUNA sprite sheet, four visual states. Native 182/182 and ESP32 build PASS; physical visual acceptance pending. See latest PROCESS.md record.
+
+## Anchored motion revision — 2026-10-16
+
+Implemented 32 timed samples per emotion, fixed feet, no rotation/slide, bounded breath and face motion. Visual tests and ESP32 build PASS. Physical animation acceptance remains pending; see latest PROCESS.md entry.
+
+- 2026-10-16: mobile debug APK built/installed/launched on Redmi for four-expression board checks; owner visual/BLE acceptance pending. No mobile code changes.
+
+## Mobile pet animation — 2026-10-16
+
+Implemented, tested (47/47), Android build/install/launch PASS: shared firmware pet artwork with four state-driven loops in Home and board preview. Physical visual/BLE acceptance pending; no commit/push.
+
+## Shared mobile pet base — 2026-10-16
+
+Implemented AppXunaPet in shared; chat/avatar/journal/growth placeholders updated, room/board use the same base. Analyze clean, tests 48/48, APK build/install/launch PASS. Owner visual review pending.
+
+## Simple mobile backgrounds — 2026-10-16
+
+Implemented three flat pixel backgrounds for Home/Chat/Journal via shared base. Analyze/build and 49 tests PASS; installed/launched on Redmi. Owner visual acceptance pending.
+
+## Owner checkpoint — 2026-10-16
+
+Current display/four emotions/two buttons/mobile BLE smoke: owner-confirmed PASS. Extended 1–2 h trial and power-cut matrix: owner-skipped for this iteration, not validated. Continue local S10 integration and existing foundation gates; cloud Phase 0 plan complete, implementation gated by M05b/S38.
+
+## Gate simplification — 2026-10-16
+
+| Item | Status | Evidence / next action |
+|---|---|---|
+| S01 | Closed — Accepted with owner-skipped items | Ten-cut matrix, diagnostics windows, text pre-confirmation and off/deny/timeout not validated |
+| D2a | Approved | Snapshot v2 in NVS A/B; [ADR-0002](docs/decisions/ADR-0002-storage-layout.md); LittleFS → S32; S11 runtime deferred |
+| S08b / S09 | Folded into S13 + S18 | S08a is the byte-compatibility regression |
+| S10 | Split | S10-sync after S13 + S18; S10-hatch deferred |
+| S17 | Closed on owner smoke | Render ±20% not measured |
+| S23 / S24 | Superseded | E10 learner v3, UCB and D3 in `ProductLearner` |
+| Cloud gate | Approved revision of ADR-0009 | No backend code until snapshot v2 on board + `PetId` over BLE + local export |
+
+| S08a + integration prep | Done on host — 2026-10-16 | [Record](docs/roadmap/S13-S18-integration-prep-2026-10-16.md): `V1LifeCoreAdapter`, S01 replay, `NvsSnapshotStore`, real-backup migration check; native/ASan 189/189 |
+
+Current: item 2 uploaded with initial smoke PASS, remaining board checks owner-skipped; item 3 S26/S27-lite source/build complete, not uploaded (see newest section below). [Switch record](docs/roadmap/S13-S18-switch-2026-10-16.md): native/ASan 190/190, ESP32/purity PASS; verified backup; actual pet Happy/Idle (4 feedback) preserved on host. Board still uses the previous firmware.
+
+
+## S26/S27-lite source upgrade — 2026-10-16
+
+- **Implemented on host, not uploaded:** opcode 6 + bit 5, explanation READ `000b`, expired result 8; minimal Chat Why and evidence-grounded confirmation reply. [Record](docs/roadmap/S26-S27-lite-2026-10-16.md).
+- Firmware full native/ASan 192/192 each plus final adapter 11/11 each; ESP32/purity PASS. Mobile analyze clean, 59/59 tests, APK PASS, pinned SDK/lock unchanged.
+- Board still runs S13/S18. Remaining S13/S18 board checks owner-skipped, not prerequisites for this requested code slice, and not validated. S28-lite physical acceptance deferred. Next recommended code work: S10-sync, when requested. No new board/phone operations or commit/push.
+
+
+## Git delivery checkpoint — 2026-10-16
+
+Owner requested all pending work committed: firmware `b0f4ded`, mobile `4976147`, then root docs and updated gitlinks. No push requested/performed. Implementation/board validation status remains unchanged; S26 is source/build only, while the board runs the preceding S13/S18 image.

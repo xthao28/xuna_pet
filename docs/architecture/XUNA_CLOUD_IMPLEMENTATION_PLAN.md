@@ -3,8 +3,14 @@
 Date: 2026-10-16. **Status: Approved architecture baseline; planning only.**
 
 This plan is the execution baseline for XUNA's optional Cloud Brain. It does
-not authorize backend implementation before local M05b / session S38 is
-accepted. The physical device remains the authoritative home of the pet.
+not authorize backend implementation before the **Cloud gate** (owner revision
+2026-10-16, replacing "local M05b / session S38 accepted"):
+
+- (a) LifeSnapshot v2 runs on the board;
+- (b) a durable `PetId` exists on the device and is readable over BLE;
+- (c) a local export works without a service.
+
+The physical device remains the authoritative home of the pet.
 
 ## 1. Product outcome
 
@@ -91,12 +97,17 @@ propagates by tombstone; stale replicas cannot resurrect deleted memory.
 
 ### Phase 0 — Architecture baseline (now)
 
-Deliver this plan, ADRs and protocol/data contracts only. Exit when local M05b
-is accepted at S38 and the implementation session is separately started.
+Deliver this plan, ADRs and protocol/data contracts only. Still open in this
+phase: the CLD-01 threat model, `BrainId` semantics (does ForgetAll or a
+restore start a new Brain?) and the projection ordering key (proposed
+`(PetId, snapshot generation)`). Exit when the Cloud gate (a)–(c) is met and
+the implementation session is separately started.
 
 ### Phase 1 — Persistent text conversation projection
 
-Prerequisites: S38 acceptance, consent UI design and threat model. Build owner
+Prerequisites: Cloud gate (a)–(c), consent UI design and threat model.
+Projection of confirmed facts needs device facts (S40); before that, only
+confirmed Layer A evidence (ratings, stated preferences) can be projected. Build owner
 auth, Pet/Brain/Device records, HTTPS phone gateway, provider adapter,
 candidate-confirmation flow and a minimal confirmed-memory projection.
 
@@ -164,8 +175,8 @@ frozen public API; freeze occurs in the Phase 1 contract session.
 | ID | Work item | Gate / result |
 |---|---|---|
 | CLD-00 | Architecture, ADR and privacy baseline | This documentation session |
-| CLD-01 | Threat model and data-flow inventory | Before backend scaffold |
-| CLD-02 | Versioned HTTP/event contracts | After S38 |
+| CLD-01 | Threat model and data-flow inventory | Before backend scaffold; may start now |
+| CLD-02 | Versioned HTTP/event contracts | After Cloud gate (a)–(c) |
 | CLD-10 | Modular-monolith scaffold and CI | Phase 1 authorized |
 | CLD-11 | Owner auth + Pet/Brain/Device identity | CLD-01/02 |
 | CLD-12 | Consent enforcement and audit | U0 verified |
