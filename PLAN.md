@@ -173,6 +173,10 @@ S04 complete: portable core, Unity suites, native environments and purity guard.
 
 This follows existing dependency order; M04 still precedes M05. No app/hardware work, commit/push or gitlink update.
 
+## S27a checkpoint - 2026-10-16
+
+Mobile simulator wiring is in progress: candidate confirmation, context follow-up, opcode 3/6 encoding and capability gating are implemented. Flutter analyze PASS and 40/40 tests PASS. Device-grounded explanation replies remain pending S26/S27.
+
 ## S07 checkpoint — 2026-10-12
 
 | Session | Status | Evidence / next action |

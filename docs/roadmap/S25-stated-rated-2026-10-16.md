@@ -1,0 +1,11 @@
+# S25 stated-vs-rated slice - 2026-10-16
+
+Status: host slice done; full S25 report remains partial.
+
+The new C++11 runner applies 20 repeated positive statements, then negative explicit ratings, for 200 deterministic seeds across weights 0.25/0.5/0.75/1.0 and caps 1/2/3.
+
+All configurations were overridden. Caps 1/2/3 required 1/2/3 negative ratings. Repeated statements saturate every cap, so this scenario cannot distinguish weights. Cap 2 remains the recommended starting point; weight 0.5 remains Proposed.
+
+Evidence: `docs/research/M05a-learning-report.md` and `docs/research/M05a-stated-rated-sweep.csv`.
+
+Validation: runner C++11 `-Werror` PASS; native 179/179 PASS; whitespace PASS. No ESP32 build, board, app, commit or push.
