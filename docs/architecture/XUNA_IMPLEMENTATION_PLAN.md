@@ -1850,13 +1850,13 @@ Learning upgrade decisions (2026-10-15; [competitive upgrade plan](XUNA_LEARNING
 | L-D4 | Drive-reduction learning as `device_observed` evidence, separate from owner ratings | Yes | M05b |
 | L-D5 | Hardware R&D track for touch first, then IMU/mic (with D18) | Research only; no purchase or wiring implied | Any sensor work |
 
-Hybrid online decisions (all **Proposed**, 2026-10-15; §22, [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md)). The hybrid direction itself is owner-requested (AGENTS.md §3):
+Hybrid online decisions (status per row; §22, [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md)). The architecture direction is owner-approved (AGENTS.md §3):
 
 | ID | Decision | Recommendation | Needed before |
 |---|---|---|---|
 | D21 | **[A] 2026-10-15: adopted.** The §22.1 contract H1–H8 is a design rule | Approved | Any online code |
 | D22 | **[A] 2026-10-15: order approved.** Phone gateway first; device MQTT/TLS only after E14; broker/provider still chosen after E14 and a cost review | Approved (order); broker/provider open | §22 Stage 1 / Stage 2 |
-| D23 | Upload classes, consent defaults, retention, region, deletion propagation; legal review | U0 by default, per-class opt-in; legal review before any commercial launch | O1–O4 |
+| D23 | Upload classes, consent defaults, retention, region, deletion propagation; legal review | **Partially Approved 2026-10-16:** U0 default; U1–U3 separate opt-ins; no raw-audio storage; conversation text not retained by default; confirmed facts retained until corrected/deleted; export/deletion+tombstones required. Region/age/guardian/legal details remain open before commercial launch. | O1–O4 |
 | D24 | Business model for recurring online cost (subscription vs one-time) | Decide before any public online service | Public launch |
 
 ## 19. Upstream audit record (read-only, 2026-10-12)
@@ -1887,9 +1887,9 @@ Method:
 
 VOICE-01 hardware feasibility → D18 → VOICE-02 real audio I/O → research authorization/D19 → VOICE-03 end-to-end device conversation → D19 final/D11 where applicable + D20 → VOICE-04 shared learning integration. VOICE-04 additionally requires S28; fact integration requires S42. See [session plan §9](../roadmap/XUNA_SESSION_PLAN.md) and [architecture feasibility matrix](XUNA_DEVICE_VOICE_ARCHITECTURE.md). All sessions are not started. None blocks M04, text M05a or text M05c acceptance. Existing E12/E13 keep their IDs and scope; E13 is phone STT, not device STT.
 
-## 22. Hybrid offline + online learning [P; direction owner-requested 2026-10-15]
+## 22. Hybrid offline + online learning [A architecture; implementation gated]
 
-Combines the offline learning in §9–§10 with an optional online layer. Rationale and options: [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md). Nothing here changes D1 sequencing or approves a provider, broker, data upload or cost model.
+Combines the offline learning in §9–§10 with an optional online layer. Rationale and options: [ADR-0007](../decisions/ADR-0007-hybrid-offline-online-learning.md). The detailed approved baseline and phases are in [XUNA_CLOUD_IMPLEMENTATION_PLAN.md](XUNA_CLOUD_IMPLEMENTATION_PLAN.md), [ADR-0008](../decisions/ADR-0008-cloud-brain-authority-and-identity.md) and [ADR-0009](../decisions/ADR-0009-cloud-platform-sequencing-and-privacy.md). Nothing here changes D1 sequencing or approves a provider, broker, hosting vendor or cost model.
 
 ### 22.1 Contract
 
@@ -1927,6 +1927,6 @@ Combines the offline learning in §9–§10 with an optional online layer. Ratio
 ### 22.4 Sequencing
 
 - **Now (no network code):** persistence v2 and the experience log carry typed codes and provenance so they can be exported later. E15 can run in Life Lab at any time (host only).
-- **After M05a acceptance:** Stage 1 O1 prototype behind U0-by-default consent.
+- **After M05b/S38 acceptance:** Stage 1 text projection may begin. O1 remains separately gated by E15.
 - **After D19/D22 and E14:** Stage 2 MQTT.
 - The online layer never blocks offline acceptance of any phase.

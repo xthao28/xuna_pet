@@ -1,16 +1,16 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
 Current milestone: **M04 pure core + Phase 1 learner v3 done on host; board trial firmware built, not uploaded.** The local MVP through M05 is implemented, but its physical acceptance is pending.
 Current status (2026-10-15 end of session):
 
 - Firmware `5d872d3` (= `efdd915` + needs/activity Serial log; this is the board-trial build): learner v3 (E10-approved UCB, γ 0.90) decides on the board through `BoardLearner` (v1 stays the durable 96-byte record); approved life-feel tuning (`LifeFeel.h`) enabled. **Not uploaded** (board not connected). Board still runs `aa2dbca`.
-- S12a + S12b done on host ahead of D2 (owner choice): LifeSnapshot v2 codec, v1 migration, A/B recovery with torn-write sweep. S18 preparation done on host: `LifeCore` runs learner v3 3 × 5 × 3 (incl. GPIO0 greeting and curious) with LifeSnapshot v2. S10 host part done: trusted time inside `LifeCore`, day-part learning cells, persisted clock watermark. D3 (120 s feedback window) approved and implemented in the core. Uncommitted. Native 164/164 PASS. See the session entry at the end.
-- Owner decisions on 2026-10-15: L-D1–L-D5, hybrid offline/online direction, D21, D22, D5 (idle/happy/curious + GPIO0 greeting), E10-A/B/C, life-feel targets and board trial, board-trial shortcut ahead of S12a/S18, D3 (120 s feedback window), S22 (D4, D6, Layer A scope and phrase table; D16 deferred). See AGENTS.md §3.
+- S12a + S12b done on host ahead of D2 (owner choice): LifeSnapshot v2 codec, v1 migration, A/B recovery with torn-write sweep. S18 preparation done on host: `LifeCore` runs learner v3 3 × 5 × 3 (incl. GPIO0 greeting and curious) with LifeSnapshot v2. S10 host core, design freeze and pure C++/Dart codec slice are done; runtime/transport wiring remains gated. Current validation: firmware native 182/182, ESP32 build/purity PASS; mobile analyze clean and 45/45 PASS. D3 remains implemented in core. Uncommitted. See the S10 record and latest entries.
+- Owner decisions through 2026-10-16: the earlier learning/hybrid decisions remain; S25 defaults (`w_s=0.5`, cap 2) and the S10 TimeSync/Hatch/Lifecycle protocol freeze are now approved. See AGENTS.md §3 and the S10 record.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin` (prepend to PATH in shells); `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 - Earlier: owner approved D1, D7, D12, D14, D17 (2026-10-12); S01 partly done (owner deferred the rest); S11 paused.
 
-Next action: **owner connects the board** → back up NVS and partition table → upload `5d872d3` (NVS excluded) → Serial check (`learner=v3-ucb (board trial)`) → 1–2 h Serial capture (`tools/serial_capture.py`) and owner observation per the [board trial record](docs/roadmap/learner-v3-board-trial-2026-10-15.md) and [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md), summarised by `sim/board_needs_report.py`. Then: S11 (E4/E5) → D2 → S13 v2 wiring → S18 production wiring of the prepared `LifeCore` (BLE/main, protocol notes in the S18 preparation record). Without the board: the S10 protocol design freeze (opcode 5/7, needs owner review), or S06 identity/hatch host work. S22, S39 and S24a are done; the next host-only conversation step is S27a (mobile wiring, simulator only until S18). Latest session details are at the end of this file.
+Next action: the board trial remains preferred when the board is available: verified partition/NVS backup → upload `5d872d3` without NVS → Serial smoke → 1–2 h capture and owner observation. The 2026-10-16 Windows check detected only COM1, so the owner deferred it. Cloud Phase 0 documentation is complete; Cloud implementation remains blocked until M05b/S38 acceptance. Continue the local dependency chain and current S10/S27a work; then S11 (E4/E5) → D2 → S13 → S18 remains the production sequence.
 
 ## 0. Start here — next work (updated 2026-10-12)
 
@@ -737,6 +737,14 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Fact (200 seeds): v1 and v2 pass the §9.9 B hypothesis and keep state unchanged without feedback (D). Both fail reversal (C): v1 recovers in 0% of seeds within 60 trials, v2 in 26%. v1 is worse than random under reversal and drift. Evidence: [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md).
 - Git: firmware lab files, traces, `.clangd`, `.gitignore`, `BleProtocol.h`; root docs, AGENTS.md and plan edits are uncommitted. No push.
 - Next: Phase 1 learner v3 per plan §9.3 (discounted Beta + hierarchical prior) into the bench, with E10 variants A/C/D; or Phase 0 slice 2 (`LifeCore` time series + §9.5 parity fix).
+
+## Cloud & Brain architecture baseline — 2026-10-16
+
+- Owner delegated the Cloud architecture choices and approved saving the plan and decisions. Added [XUNA_CLOUD_IMPLEMENTATION_PLAN.md](docs/architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md) with Phase 0–6 gates and CLD-00–60 work items.
+- Approved device authority, separate User/Pet/Brain/Device identities, one active Brain and authoritative Device per Pet in Phase 1, and the provider-output confirmation boundary (ADR-0008).
+- Approved the future FastAPI/PostgreSQL modular-monolith baseline, phone gateway first, U0 default, no raw-audio retention and no conversation-text retention by default (ADR-0009). D23 is partially approved; launch-specific legal/region/retention details remain open.
+- No Cloud implementation may start before M05b/S38 acceptance. E15 gates learning suggestions; E14 plus D19/D22 gate direct MQTT/TLS; VOICE-01–04 gate voice services. Provider, broker, hosting and D24 remain open.
+- Documentation only: no backend code, dependency, provider call, database, board/app operation, build, commit or push. `git diff --check` passed.
 
 ## Hybrid offline + online learning plan — 2026-10-15
 

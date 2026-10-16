@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-11** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -120,13 +120,19 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | LRN-01 | Done — 2026-10-15, documentation only | [Competitive learning upgrade plan](docs/architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md); plan §9.4 Alt D, §9.9 scenarios, §9.10 tricks, §18 L-D1–L-D5 (all Proposed) |
 | LRN-02 | Done — 2026-10-15 | Owner approved L-D1–L-D5 (L-D5: touch + IMU + mic research only). D5 and D15 remain open |
 | LRN-05 | In progress — slices 1–5 done; board-trial shortcut built 2026-10-15 | Phase 1 learner v3 (lab/shadow): [record](docs/roadmap/learner-v3-phase1-2026-10-15.md); E10 preliminary choice C, tuned γ 0.90 k 1 m 1 bonus 0.15 (Proposed); learner codec + capped v1 migration + §9.6 explanation + LifeCore shadow v3 + §9.5 commit-first parity done (lab); D5 vocabulary added; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md) approved (E10-A/B/C); next production gates S12a/D2, S10, S18 |
-| LRN-04 | D21/D22 approved 2026-10-15; D23/D24 pending | Hybrid online layer: [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md), plan §22; decide D21–D24; E14/E15 not started |
+| LRN-04 | Architecture/D21/D22 and D23 baseline approved; implementation gated | Hybrid online layer: [Cloud plan](docs/architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md), [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md); provider/broker/D24 open; E14/E15 not started |
+| CLD-00 | Done (documentation only, 2026-10-16) | Cloud authority, identity, stack, privacy and Phase 0–6 baseline; no backend code |
+| CLD-01–14 | Blocked by S38 acceptance | Phase 1 threat model, contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
+| CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
+| CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |
+| CLD-40–41 | Gated by E14 + D19/D22 | Direct-device MQTT/TLS |
+| CLD-50/60 | Gated by VOICE decisions / D24 | Voice services and commercial readiness |
 | LRN-03 | In progress — slices 1–2 done 2026-10-15 | [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md): closed-loop learner bench, 95/95 native PASS; slice 2: [needs timeline](docs/roadmap/life-lab-needs-timeline-2026-10-15.md), candidate values await owner decision |
 | TRIAL-01 | Built, not uploaded — 2026-10-15 | Board trial firmware `5d872d3` (learner v3 + life-feel + needs/activity Serial log). Next: owner connects board → backup → upload → 1–2 h capture with `tools/serial_capture.py`, summary with `sim/board_needs_report.py` |
 | S12a | Done on host — 2026-10-15 (ahead of D2, owner choice) | [S12 record](docs/roadmap/S12-snapshot-v2-2026-10-15.md); layout frozen in plan §7.5; `xuna/persist/SnapshotCodec.h` |
 | S12b | Done on host — 2026-10-15 | v1→v2 migration (E10-C cap), `ISnapshotStore` A/B recovery/commit, every-offset torn-write sweep; native 143/143 PASS |
 | S18-prep | Done on host — 2026-10-15 | [S18 preparation record](docs/roadmap/S18-prep-product-learner-2026-10-15.md): `LifeCore` = v3 3 × 5 × 3 via `ProductLearner` + LifeSnapshot v2; GPIO0 `button_greeting`, curious; snapshot lab/trace on v2; native 152/152 PASS. Production unchanged |
-| S10-host | Done on host — 2026-10-15 | [S10 host record](docs/roadmap/S10-host-trusted-time-2026-10-15.md): `ClockModel` in `LifeCore`, day-part learning cells, snapshot Clock section, 64-bit mono; native 159/159. Remaining S10: opcode 5/7 protocol, CommandHandler, Hatch, firmware, mobile, owner check |
+| S10-host/codec | Host + design + pure codecs done — 2026-10-16 | [S10 record](docs/roadmap/S10-host-trusted-time-2026-10-15.md): `ClockModel`, day-part cells, approved opcode 5/7 and Lifecycle V1; feature-gated C++ parser/cache/codec plus Dart encode/decode models and golden tests. Firmware native 182/182, ESP32 build/purity PASS; mobile analyze clean, 45/45 PASS. CommandHandler, transport/UI and board/phone validation remain pending S09/S13/S18 gates |
 | D3 | Approved and implemented in core — 2026-10-15 | 120 s feedback window, direct input invalidates; `ProductLearner`/`LifeCore` expiry, native 164/164. BLE result code for `expired` and board-trial firmware pending (S18) |
 | S22 | Done — 2026-10-15 (owner decisions) | [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md): D4 UCB labelled in "Why?", D6 off, "mình – bạn", vi-first, follow-up for missing context, phrase table approved, D16 deferred. Next: S39 (pure Dart extractor) |
 | S39 | Done — 2026-10-15 (mobile, pure Dart) | [S39 record](docs/roadmap/S39-layer-a-extractor-2026-10-15.md): Layer A LocalRuleExtractor + `CandidateEvent`; mobile 39/39 PASS, analyze clean. Not wired (S27a); device opcode 6 is S24a |
@@ -176,6 +182,10 @@ This follows existing dependency order; M04 still precedes M05. No app/hardware 
 ## S27a checkpoint - 2026-10-16
 
 Mobile simulator wiring is in progress: candidate confirmation, context follow-up, opcode 3/6 encoding and capability gating are implemented. Flutter analyze PASS and 40/40 tests PASS. Device-grounded explanation replies remain pending S26/S27.
+
+## S25/S26 checkpoint - 2026-10-16
+
+Owner approved `w_s=0.5`, cap 2 as S26 starting defaults. Stated-vs-rated and pre-cap sensitivity evidence is recorded under `docs/research/`. The pure 20-byte explanation codec and golden test pass on host; ESP32 build passes unchanged. Production wiring remains gated by S13/S18 because BoardLearner plus snapshot v1 cannot persist stated evidence.
 
 ## S07 checkpoint — 2026-10-12
 

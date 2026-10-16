@@ -15,10 +15,13 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | D19 device voice security/provider/transport and experiment scope | Proposed | Research authorization before VOICE-03; final choice after evidence |
 | D20 voice product/MVP scope and persistent teaching confirmation UX | Proposed | After VOICE-03, before VOICE-04 |
 | L-D1–L-D5 learning upgrade (curiosity in E10, teachable tricks, drive-reduction learning, sensor research) | Approved (L-D5 research only) | 2026-10-15, AGENTS §3 |
-| Hybrid offline + online learning | Approved product direction only | Owner request 2026-10-15, AGENTS §3 |
-| [ADR-0007 hybrid offline + online learning](ADR-0007-hybrid-offline-online-learning.md) | Proposed | Pending E14/E15 and explicit acceptance |
+| Hybrid offline + online learning | Approved architecture direction; implementation gated | Owner 2026-10-15/16, AGENTS §3 |
+| [ADR-0007 hybrid offline + online learning](ADR-0007-hybrid-offline-online-learning.md) | Approved direction/contract; implementation gated | D21/D22 approved 2026-10-15; E14/E15 gate later phases |
 | D21 hybrid contract H1–H8 · D22 transport order (phone gateway → MQTT after E14) | Approved (broker/provider still open) | 2026-10-15, AGENTS §3 |
-| D23 data/consent/legal · D24 online business model | Proposed | Plan §18, §22 |
+| D23 consent/retention baseline | Partially Approved; launch legal/region review remains open | 2026-10-16, ADR-0009 |
+| D24 online business model | Proposed | Plan §18, §22 |
+| [ADR-0008 Cloud Brain authority and identity](ADR-0008-cloud-brain-authority-and-identity.md) | Approved | 2026-10-16, owner-delegated architecture choice |
+| [ADR-0009 Cloud platform, sequencing and privacy](ADR-0009-cloud-platform-sequencing-and-privacy.md) | Approved architecture baseline; not Implemented | 2026-10-16 |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
 | D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
 | D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md) |

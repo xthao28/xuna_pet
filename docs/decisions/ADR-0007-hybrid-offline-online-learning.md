@@ -1,10 +1,10 @@
 # ADR-0007 — Hybrid offline + online learning
 
-Date: 2026-10-15. **Status: Proposed.** The owner asked on 2026-10-15 to
-combine the existing offline learning with an online layer (cloud, MQTT). That
-product direction is recorded as owner-requested in AGENTS.md §3. Transport,
-provider, data scope, consent defaults and business model remain open
-(D21–D24 in [implementation plan §18](../architecture/XUNA_IMPLEMENTATION_PLAN.md)).
+Date: 2026-10-15. **Status: Approved direction and contract; implementation is
+gated.** The owner approved H1–H8 and the phone-gateway-first transport order
+on 2026-10-15 (D21/D22), then approved the Cloud architecture baseline and
+privacy defaults on 2026-10-16. Provider, broker and business model remain
+open; E14/E15 still gate their respective implementation phases.
 
 ## Context
 
@@ -30,7 +30,7 @@ provider, data scope, consent defaults and business model remain open
 3. **Hybrid: offline-complete core, optional online layer** that can only
    *suggest* bounded changes. Device stays the authority.
 
-## Proposed decision
+## Decision
 
 Option 3, with the contract in plan §22:
 
@@ -50,14 +50,19 @@ Option 3, with the contract in plan §22:
 
 ## Consequences
 
-- New backend work becomes a concrete use case (the Python/FastAPI stack stays
-  Proposed). Recurring cost (LLM, broker) needs D24.
+- New backend work becomes a concrete use case. ADR-0009 fixes the future
+  FastAPI/PostgreSQL baseline; implementation remains gated. Recurring cost
+  (LLM, broker) needs D24.
 - Persistence v2 and the experience log should be export-ready (typed codes,
   provenance) now, at no network cost.
 - Privacy/legal review is needed before any commercial launch (D23).
 - ESP32-S3 RAM budget must absorb Wi-Fi + TLS + BLE in stage 2 (E14).
 
-## Evidence required before acceptance
+## Evidence required before implementation phases
 
-E14 (MQTT/TLS/Wi-Fi + BLE coexistence on the board) and E15 (cloud
-consolidation benefit in Life Lab). Owner acceptance: **pending**.
+E14 (MQTT/TLS/Wi-Fi + BLE coexistence on the board) gates direct device
+transport. E15 (cloud consolidation benefit in Life Lab) gates online learning
+suggestions. Neither blocks the already approved architecture contract. See
+[ADR-0008](ADR-0008-cloud-brain-authority-and-identity.md),
+[ADR-0009](ADR-0009-cloud-platform-sequencing-and-privacy.md) and the
+[Cloud plan](../architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md).

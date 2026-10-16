@@ -1,8 +1,27 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-15** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
+
+## 2026-10-16 — Cloud & Brain architecture baseline (documentation only)
+
+- Added the approved [Cloud implementation plan](docs/architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md): device authority, four-ID model, FastAPI/PostgreSQL modular-monolith baseline, confirmation lifecycle, privacy defaults, Phase 0–6 gates and CLD-00–60 work breakdown.
+- Added [ADR-0008](docs/decisions/ADR-0008-cloud-brain-authority-and-identity.md) and [ADR-0009](docs/decisions/ADR-0009-cloud-platform-sequencing-and-privacy.md); updated ADR-0007 and the decision registry. D23 is partially approved; provider, broker, hosting, launch legal details and D24 remain open.
+- No backend code, dependency, provider call, database, board/app operation, build, commit or push.
 
 This file records work actually performed, including uncommitted changes, validation and handoff updates. Entries are not evidence that a Git commit or release exists. Read [PROCESS.md](PROCESS.md) for the current snapshot and [PLAN.md](PLAN.md) for remaining work. AGENTS.md remains canonical for decisions.
+
+## 2026-10-16 — S10 protocol design freeze
+
+- Owner approved the TimeSync opcode 5 and Hatch opcode 7 wire contracts, rollback/trust/sync cadence, GPIO14 hatch gesture, additive 8-byte Lifecycle V1 projection, independent capability bits, explicit unknown-birth confirmation, four day-part ranges, existing result-code mapping and commit-first identity durability.
+- Updated the S10 evidence record and root handoffs. This is design approval only: no firmware/mobile implementation or validation was claimed.
+- A read-only Windows device scan found only COM1; no ESP32 was detected. No partition/NVS read, backup, build, upload, app operation, commit or push occurred.
+
+## 2026-10-16 — S10 pure protocol codecs
+
+- Added feature-gated firmware parsing for TimeSync/Hatch, 16-byte command-cache support restricted to the approved frame, and a pure C++11 Lifecycle V1 encoder. The legacy parser remains unchanged unless the new feature flags are supplied.
+- Added Dart TimeSync/Hatch encoding and decoding, capability queries, strict Lifecycle V1 decoding and wire models. No BLE data-source, repository, UI or production capability was enabled.
+- Validation: firmware native 182/182 PASS; ESP32 build/core purity PASS at 49,040 B RAM and 1,347,757 B Flash; Flutter 3.32.8 analyze clean and 45/45 tests PASS; whitespace checks PASS. No board/phone operation, upload, commit or push.
+
 ## 2026-10-15 — S24a: stated preference (opcode 6) in the device core
 
 - Opcode 6 parse behind a flag (production unchanged); `PreferenceLearnerV3::state` adds capped, decaying `user_stated` evidence (w_s 0.5, cap 2 ratings, both [P]; latest statement wins); `ProductLearner`/`LifeCore` commit-first handling with validation, in-session dedup and ERROR_SAFE refusal; explanation reports stated mass and reason `Told`; LifeSnapshot v2 section 12.

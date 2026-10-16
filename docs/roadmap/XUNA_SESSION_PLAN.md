@@ -479,10 +479,10 @@ Notes:
 
 ### S10 — TimeSync and app hatch end-to-end (M04.2c)
 
-- **Host part done (2026-10-15):** `ClockModel` inside `LifeCore` with `LifeCore::sync`, day-part learning cells, LifeSnapshot v2 Clock section (watermark replaces "keep it in RAM and log it"), 64-bit monotonic extension. Protocol, CommandHandler, Hatch, firmware, mobile and owner checks remain. Evidence: [S10 host record](S10-host-trusted-time-2026-10-15.md).
+- **Host part done (2026-10-15); protocol design and pure codecs done (2026-10-16):** `ClockModel` inside `LifeCore` with `LifeCore::sync`, day-part learning cells, LifeSnapshot v2 Clock section and 64-bit monotonic extension. Opcode 5/7, Lifecycle V1, capabilities, app fallback, day-part defaults and durability/error contracts are approved; feature-gated C++/Dart codecs and golden tests now pass. See the [S10 record](S10-host-trusted-time-2026-10-15.md). CommandHandler, firmware/mobile transport/UI wiring and owner checks remain.
 - **Preconditions:** S05, S06, S09; D14 for the mobile part.
 - **Steps:**
-  1. **Design freeze:** append to the MVP-local protocol section:
+  1. **Design freeze — done 2026-10-16:** use the approved byte layouts and policies in the S10 record; append them to the MVP-local protocol section during implementation documentation.
      - **TimeSync:** opcode 5, length 16: header `[ver=1, op=5, requestId u32, arg=source (1 = phone), reserved=0]` + `utcSeconds u32 @8` + `tzOffsetMin i16 @12` + `reserved u16 @14`.
      - A rollback or implausible value returns result 4 (stay within result codes 0–7 so existing parsers keep working).
      - Capability command mask bit 4 (0x10). Mobile keeps requiring bits 0–3 and treats bit 4 as optional.
