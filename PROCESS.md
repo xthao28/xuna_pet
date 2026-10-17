@@ -10,9 +10,16 @@ Current status (2026-10-16):
 - Owner decisions 2026-10-16 (AGENTS.md §3): S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B `life0/life1`, LittleFS → S32); S13 + S18 merged, absorbing S08b/S09; concrete Cloud gate replaces M05b/S38. Earlier: S25 defaults, S10 protocol freeze, learning/hybrid/Cloud baseline.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Backend C started 2026-10-17: CLD-10 scaffold + rules, CLD-01 threat model and CLD-02 contract draft (Proposed/Draft). Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. (C) backend CLD-01/02/10 can start now on the Mac (Python 3.12.8, PostgreSQL 14, Docker present). A and B are done in source but uncommitted ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
+Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Recommended next: firmware **Identity V2** (P-256 key in NVS + BLE sign command) so the app can bind the real pet. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. (C) backend CLD-01/02/10 can start now on the Mac (Python 3.12.8, PostgreSQL 14, Docker present). A and B are done in source but uncommitted ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-17 — Backend CLD-11: owner auth and device-proof pet binding
+
+- Owner delegated all choices ("cứ quyết định theo ý bạn"). Recorded CLD-01 §4 decisions as approved (AGENTS §3); switched device proof to **ECDSA P-256** because ESP-IDF 4.4 mbedTLS lacks Ed25519. Committed earlier work locally: firmware `aad7093`, mobile `86e0251`, backend `37f845e`, parent `5dfda6e` (no push).
+- Backend: `accounts` (vendor-neutral OIDC JWT via JWKS, owner upsert by issuer/subject, `GET /v1/me`), `identity` (proof message golden vector, single-use 5-minute challenges, TOFU binding → Pet + active Brain + Device, owner-scoped reads returning 404 for others), `core.idempotency` (24 h replay, reuse → 409), UTC sessions, migration `0002`. New pinned deps PyJWT 2.10.1, cryptography 44.0.0 (delegated approval).
+- Tests found and fixed a real bug: PostgreSQL returned `+07:00` times; sessions now forced to UTC. Architecture test tightened (api may not import SQLAlchemy).
+- `scripts/check.sh` PASS: ruff, mypy strict (55 files), pytest 59/59 with PostgreSQL (52 + 7 skipped without), migration round trip. No real OIDC provider, firmware signing or phone involved.
 
 ## 2026-10-17 — Backend workstream C: CLD-10 scaffold, CLD-01, CLD-02 drafts
 

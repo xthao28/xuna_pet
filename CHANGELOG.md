@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Backend CLD-11 identity
+
+- OIDC owner auth, device challenges, ECDSA P-256 trust-on-first-use pet binding (Pet/Brain/Device), idempotency keys, migration 0002; UTC session fix. 59/59 tests with PostgreSQL. CLD-01 decisions recorded as owner-delegated approvals.
+
 ## 2026-10-17 — Backend scaffold and Cloud Phase 0 drafts
 
 - `backend/`: FastAPI/async SQLAlchemy/Alembic modular monolith (health, identity, exports, cognition ports + provider registry), coding rules `backend/AGENTS.md`, architecture test, `scripts/check.sh`, CI. ruff/mypy strict clean; pytest 38/38 with PostgreSQL; uvicorn smoke OK.

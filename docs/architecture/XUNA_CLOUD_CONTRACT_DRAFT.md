@@ -1,12 +1,12 @@
 # XUNA Cloud HTTP contract — draft (CLD-02)
 
-Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 contract session after Cloud gate (c) and owner review. Names follow the Cloud plan §8 baseline. Implemented today: only `/healthz`, `/readyz` (backend CLD-10 scaffold).
+Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 contract session after Cloud gate (c) and owner review. Names follow the Cloud plan §8 baseline. Implemented today (backend, 2026-10-17): `/healthz`, `/readyz`, `GET /v1/me`, `POST /v1/devices/challenges`, `POST /v1/pets`, `GET /v1/pets`, `GET /v1/pets/{petId}` (CLD-11). Their shapes below are what the code does; still not frozen.
 
 ## 1. Conventions
 
 - Base path `/v1`. JSON bodies use camelCase to match the app/device export contract. Times are RFC 3339 UTC strings.
 - **IDs:** `petId` = 32 lowercase hex (device-issued UUIDv4, Identity V1). `userId`, `brainId`, `deviceId`, request and resource IDs = UUID strings. Never interchangeable.
-- **Errors:** RFC 9457 `application/problem+json` with `type`, `title`, `status`, stable `code`, optional `detail` (no user content). Example codes: `validation_failed`, `unauthorized`, `forbidden`, `not_found`, `conflict_stale_generation`, `consent_required`, `provider_unavailable`, `rate_limited`, `database_unavailable`, `internal_error`.
+- **Errors:** RFC 9457 `application/problem+json` with `type`, `title`, `status`, stable `code`, optional `detail` (no user content). Codes in use: `validation_failed`, `unauthorized`, `auth_unavailable`, `idempotency_key_required`, `idempotency_key_reused`, `conflict_retry`, `not_found`, `invalid_public_key` (422), `invalid_signature` (403), `challenge_invalid` (409), `pet_already_bound` (409), `device_key_mismatch` (409), `database_unavailable`, `internal_error`. Reserved: `conflict_stale_generation`, `consent_required`, `provider_unavailable`, `rate_limited`.
 - **Idempotency:** every `POST`/`PUT`/`PATCH`/`DELETE` requires `Idempotency-Key: <uuid>`. Same key + same body → same response; same key + different body → `409 idempotency_key_reused`. Keys kept 24 h.
 - **Versioning:** mutating bodies carry `"schemaVersion": 1`. Additive fields only within v1; breaking changes → `/v2`.
 - **Request ID:** `X-Request-ID` accepted (8–64 alphanumerics/dashes) or generated, always echoed.
@@ -19,10 +19,12 @@ Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 c
 ```http
 POST /v1/pets            # bind a device-issued PetId to the owner
 { "schemaVersion": 1, "petId": "d945…ed86", "origin": "migrated_from_v1",
-  "deviceProof": { … } }                       # §4; required
-→ 201 { "petId": "…", "brainId": "<uuid>", "boundAt": "…" }
+  "snapshotGeneration": 38,
+  "deviceProof": { "challengeId": "<uuid>", "publicKey": "<b64 65B>", "signature": "<b64 64B>" } }
+→ 201 created | 200 already bound by this owner with this device key
+  { "petId", "brainId", "deviceId", "origin", "lastGeneration", "boundAt" }
 
-GET  /v1/pets            → 200 { "items": [ { "petId", "brainId", "origin", "lastGeneration", "lastProjectedAt" } ] }
+GET  /v1/pets            → 200 { "items": [ <pet as above> ] }
 GET  /v1/pets/{petId}    → 200 | 404
 ```
 
