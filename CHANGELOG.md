@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Mobile Firebase Auth account
+
+- Optional Google sign-in via Firebase (project `xuna-pet`), cloud connection check against `/v1/me`, sign-out; minSdk 23. 77/77 tests, debug APK PASS. Config file gitignored.
+
 ## 2026-10-17 — Firebase Auth preset, OpenAI-compatible provider, conversation SSE
 
 - Backend verifies Firebase ID tokens; generic OpenAI-compatible streaming adapter for the owner's internal AI over OpenVPN; U3-guarded conversation turn endpoint that stores nothing; Vietnamese benchmark script and VPN ops guide. 91/91 tests with PostgreSQL.
