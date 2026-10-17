@@ -2,6 +2,21 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Backend scaffold and Cloud Phase 0 drafts
+
+- `backend/`: FastAPI/async SQLAlchemy/Alembic modular monolith (health, identity, exports, cognition ports + provider registry), coding rules `backend/AGENTS.md`, architecture test, `scripts/check.sh`, CI. ruff/mypy strict clean; pytest 38/38 with PostgreSQL; uvicorn smoke OK.
+- Drafts: CLD-01 threat model, CLD-02 HTTP contract. Xiaozhi server used as an architecture reference only (MIT, no code copied).
+
+## 2026-10-17 — Board upload: Identity V1 live, GATT handle fix
+
+- Backed up partition/NVS, uploaded S10-sync + S26/S27-lite + Identity V1. Fixed `createService` 15-handle default that hid `000b`/`000c`; re-uploaded. Mac BLE: capabilities `0xbf`, PetId/generation match NVS, TimeSync Synced/evening, explanation grounded. Gate (b) met; app export pending a phone.
+
+## 2026-10-17 — Cloud gate A + B: Identity V1 and local JSON export
+
+- Firmware: `IdentityCodec` + READ characteristic `7a6e000c` (24 B: petId, origin, snapshot generation), capability bit 7 (`0xbf`), cached GATT update on change. Native/ASan 195/195, ESP32 build/purity PASS.
+- Mobile: identity read path and `xuna.export.v1` export (identity, capabilities, life, memories, explanation, SHA-256) written locally from the Device tab; `crypto` 3.0.7 promoted to a direct dependency. Analyze clean, 72/72 tests PASS.
+- Source/host only: no upload, BLE, phone run, commit or push. Gates (b)/(c) close after the combined board session.
+
 ## 2026-10-17 — Cloud gate sprint decisions
 
 - Committed S10-sync (firmware `f339fff`, mobile `d34c63b`, parent `b7d71cc`; not pushed).

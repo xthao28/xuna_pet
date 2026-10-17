@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -122,8 +122,10 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | LRN-05 | In progress — slices 1–5 done; board-trial shortcut built 2026-10-15 | Phase 1 learner v3 (lab/shadow): [record](docs/roadmap/learner-v3-phase1-2026-10-15.md); E10 preliminary choice C, tuned γ 0.90 k 1 m 1 bonus 0.15 (Proposed); learner codec + capped v1 migration + §9.6 explanation + LifeCore shadow v3 + §9.5 commit-first parity done (lab); D5 vocabulary added; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md) approved (E10-A/B/C); next production gates S12a/D2, S10, S18 |
 | LRN-04 | Architecture/D21/D22 and D23 baseline approved; implementation gated | Hybrid online layer: [Cloud plan](docs/architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md), [ADR-0007](docs/decisions/ADR-0007-hybrid-offline-online-learning.md); provider/broker/D24 open; E14/E15 not started |
 | CLD-00 | Done (documentation only, 2026-10-16) | Cloud authority, identity, stack, privacy and Phase 0–6 baseline; no backend code |
-| CLD-01 | Pending — may start (documentation) | Threat model, `BrainId` semantics, projection ordering key |
-| CLD-02–14 | Gated by the Cloud gate (AGENTS §3, 2026-10-16) | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
+| CLD-01 | Draft — 2026-10-17 | [Threat model](docs/architecture/XUNA_CLOUD_THREAT_MODEL.md): assets, flows F1–F9, STRIDE T1–T14; Proposed ordering key, `BrainId` semantics, unsigned exports = claims. Needs owner confirmation |
+| CLD-02 | Draft — 2026-10-17 (not frozen) | [Contract draft](docs/architecture/XUNA_CLOUD_CONTRACT_DRAFT.md): conventions, problem codes, idempotency, draft resources, device proof proposal |
+| CLD-10 | Scaffold done — 2026-10-17 | `backend/`: modular monolith, rules in `backend/AGENTS.md`, `scripts/check.sh` PASS (ruff, mypy strict, 38/38 pytest with PostgreSQL), CI workflow written (not yet run on GitHub) |
+| CLD-11–14 | Gated by the Cloud gate (AGENTS §3, 2026-10-16) | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
 | CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
 | CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |
 | CLD-40–41 | Gated by E14 + D19/D22 | Direct-device MQTT/TLS |
@@ -135,7 +137,7 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | S18-prep | Done on host — 2026-10-15 | [S18 preparation record](docs/roadmap/S18-prep-product-learner-2026-10-15.md): `LifeCore` = v3 3 × 5 × 3 via `ProductLearner` + LifeSnapshot v2; GPIO0 `button_greeting`, curious; snapshot lab/trace on v2; native 152/152 PASS. Production unchanged |
 | S10-host/codec | Host + design + pure codecs done — 2026-10-16 | [S10 record](docs/roadmap/S10-host-trusted-time-2026-10-15.md): `ClockModel`, day-part cells, approved opcode 5/7 and Lifecycle V1; feature-gated C++ parser/cache/codec plus Dart encode/decode models and golden tests. Firmware native 182/182, ESP32 build/purity PASS; mobile analyze clean, 45/45 PASS. CommandHandler, transport/UI and board/phone validation remain pending S09/S13/S18 gates |
 | S10-sync | Source/host/build + Android install smoke done — 2026-10-17; not uploaded | [Record](docs/roadmap/S10-sync-2026-10-17.md): production opcode 5, 16-byte BLE queue, capability bit 4, Serial diagnostics, mobile connect + six-hour sync. Firmware native/ESP32 PASS; Flutter analyze and 60/60 tests PASS. AGP 8.2.2 resolves JDK 21 build; APK install/launch PASS. ESP32 physical acceptance pending. S10-hatch deferred. |
-| CLOUD-SPRINT | Planned — 2026-10-17 (owner-approved) | [Sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md): A firmware Identity V1 (`7a6e000c`, bit 7), B mobile identity + JSON export, C backend CLD-01/02/10 in parallel, D one combined board session. Not started |
+| CLOUD-SPRINT | In progress — A + B done; D firmware uploaded and gate (b) met on board 2026-10-17 (GATT handle fix); app install/export (gate c) and C pending | [Sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md): A firmware Identity V1 (`7a6e000c`, bit 7) — native/ASan 195/195, ESP32 PASS; B mobile identity + `xuna.export.v1` JSON export — analyze clean, 72/72 PASS. C backend CLD-01/02/10 not started; D combined board upload/acceptance needs the ESP32 and closes gates (b)/(c). Uncommitted |
 | D3 | Approved and implemented in core — 2026-10-15 | 120 s feedback window, direct input invalidates; `ProductLearner`/`LifeCore` expiry, native 164/164. BLE result code for `expired` and board-trial firmware pending (S18) |
 | S22 | Done — 2026-10-15 (owner decisions) | [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md): D4 UCB labelled in "Why?", D6 off, "mình – bạn", vi-first, follow-up for missing context, phrase table approved, D16 deferred. Next: S39 (pure Dart extractor) |
 | S39 | Done — 2026-10-15 (mobile, pure Dart) | [S39 record](docs/roadmap/S39-layer-a-extractor-2026-10-15.md): Layer A LocalRuleExtractor + `CandidateEvent`; mobile 39/39 PASS, analyze clean. Not wired (S27a); device opcode 6 is S24a |
