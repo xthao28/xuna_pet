@@ -128,7 +128,9 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | CLD-11 | Backend done — 2026-10-17 | OIDC owner auth (vendor open), challenges, ECDSA P-256 TOFU pet binding, Pet/Brain/Device tables, idempotency; 59/59 tests with PostgreSQL. Needs firmware Identity V2 + app flow to bind the real pet |
 | ID-V2 | Done on board — 2026-10-17 | [Record](docs/roadmap/identity-v2-2026-10-17.md): P-256 device key, BLE `7a6e000d` proof, E2E bind with local backend PASS. Mobile bind flow pending |
 | CLD-12 | Backend done — 2026-10-17 | U0-default consent with append-only history, `RequireConsent` guard, append-only audit trail (DB triggers), owner audit endpoint; 78/78 tests with PostgreSQL |
-| CLD-13–14 | CLD-13 needs D11a/provider choice; CLD-14+ gated by Cloud gate (c) | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
+| CLD-13 | Adapter done — 2026-10-17; benchmark pending owner VPN run | `openai_compatible` streaming adapter, conversation SSE endpoint (U3), Vietnamese benchmark script; internal AI over OpenVPN is the temporary provider. Needs the owner's endpoint URL/model and a VPN run |
+| AUTH-FB | Backend preset done — 2026-10-17 | Firebase Auth chosen; backend verifies Firebase ID tokens via `XUNA_FIREBASE_PROJECT_ID`. Mobile Firebase integration needs the Firebase project + `google-services.json` |
+| CLD-14 | Gated by Cloud gate (c) | Candidate/confirm/device-commit pipeline | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
 | CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
 | CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |
 | CLD-40–41 | Gated by E14 + D19/D22 | Direct-device MQTT/TLS |

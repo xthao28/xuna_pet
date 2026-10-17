@@ -66,7 +66,7 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
              | error {code}
 ```
 
-Requires `conversationText` consent for this call; text is not stored unless retention is separately enabled. Output is display text; facts only via memory candidates.
+Requires `conversationText` consent for this call; text is not stored unless retention is separately enabled. Output is display text; facts only via memory candidates. **Implemented 2026-10-17**: 403 `consent_required` without U3, 404 for another owner's pet, 422 for >500 chars; on provider outage the stream ends with `event: error {"code": "provider_unavailable"}`. Tool calls are not forwarded yet.
 
 ### Memory candidates (CLD-14)
 

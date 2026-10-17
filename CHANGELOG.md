@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Firebase Auth preset, OpenAI-compatible provider, conversation SSE
+
+- Backend verifies Firebase ID tokens; generic OpenAI-compatible streaming adapter for the owner's internal AI over OpenVPN; U3-guarded conversation turn endpoint that stores nothing; Vietnamese benchmark script and VPN ops guide. 91/91 tests with PostgreSQL.
+
 ## 2026-10-17 — Backend CLD-12 consent and audit
 
 - U0-default consent with append-only history and route guard; append-only audit trail with content-free metadata; DB triggers block UPDATE/DELETE. 78/78 tests with PostgreSQL.
