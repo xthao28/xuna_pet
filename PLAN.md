@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-18** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -126,10 +126,11 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | CLD-02 | Draft — 2026-10-17 (not frozen) | [Contract draft](docs/architecture/XUNA_CLOUD_CONTRACT_DRAFT.md): conventions, problem codes, idempotency, draft resources, device proof proposal |
 | CLD-10 | Scaffold done — 2026-10-17 | `backend/`: modular monolith, rules in `backend/AGENTS.md`, `scripts/check.sh` PASS (ruff, mypy strict, 38/38 pytest with PostgreSQL), CI workflow written (not yet run on GitHub) |
 | CLD-11 | Backend done — 2026-10-17 | OIDC owner auth (vendor open), challenges, ECDSA P-256 TOFU pet binding, Pet/Brain/Device tables, idempotency; 59/59 tests with PostgreSQL. Needs firmware Identity V2 + app flow to bind the real pet |
-| ID-V2 | Done on board — 2026-10-17 | [Record](docs/roadmap/identity-v2-2026-10-17.md): P-256 device key, BLE `7a6e000d` proof, E2E bind with local backend PASS. Mobile bind flow pending |
+| ID-V2 | Done on board — 2026-10-17 | [Record](docs/roadmap/identity-v2-2026-10-17.md): P-256 device key, BLE `7a6e000d` proof, E2E bind with local backend PASS. Mobile bind flow built 2026-10-18 (APP-BIND), not yet run on a phone |
 | CLD-12 | Backend done — 2026-10-17 | U0-default consent with append-only history, `RequireConsent` guard, append-only audit trail (DB triggers), owner audit endpoint; 78/78 tests with PostgreSQL |
-| CLD-13 | Adapter + first benchmark done — 2026-10-17 (Gemini temporary: `gemini-3.5-flash-lite`); Bifrost run pending its key | `openai_compatible` streaming adapter, conversation SSE endpoint (U3), Vietnamese benchmark script; internal AI over OpenVPN is the temporary provider. Needs the owner's endpoint URL/model and a VPN run |
+| CLD-13 | Adapter + first benchmark done — 2026-10-17 (Gemini temporary: `gemini-3.5-flash-lite`); persona "no hearing/seeing" rule re-benchmarked 2026-10-18 (14/14); Bifrost run pending its key | `openai_compatible` streaming adapter, conversation SSE endpoint (U3), Vietnamese benchmark script; internal AI over OpenVPN is the temporary provider. Needs the owner's endpoint URL/model and a VPN run |
 | AUTH-FB | Validated end to end — 2026-10-17 (Play Store emulator + local backend) | Project `xuna-pet`; backend verifies Firebase ID tokens; app has Google sign-in, cloud check, sign-out (77/77 tests, APK PASS). Pending: enable Google provider + re-download config, real sign-in on phone/emulator, then the app bind flow (Identity V2 proof → `POST /v1/pets`) |
+| APP-BIND | Built — 2026-10-18 (code + tests + debug APK; no phone/BLE run) | Mobile: BLE `7a6e000d` proof codec/transport + capability byte 3 bit 0; cloud client for challenges/pets/consents (Idempotency-Key, `schemaVersion`, problem codes → Vietnamese); `BindPetToCloud`; Device-tab account card bind + U1–U3 consent sheet; chat streams AI replies (SSE) when signed in + bound + U3, local templates otherwise. 119/119 tests. Next: phone validation (PROCESS "Next session plan") |
 | CLD-14 | Gated by Cloud gate (c) | Candidate/confirm/device-commit pipeline | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
 | CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
 | CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |

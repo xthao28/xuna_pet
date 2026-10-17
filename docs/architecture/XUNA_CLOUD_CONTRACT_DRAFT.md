@@ -1,6 +1,6 @@
 # XUNA Cloud HTTP contract — draft (CLD-02)
 
-Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 contract session after Cloud gate (c) and owner review. Names follow the Cloud plan §8 baseline. Implemented today (backend, 2026-10-17): `/healthz`, `/readyz`, `GET /v1/me`, `POST /v1/devices/challenges`, `POST /v1/pets`, `GET /v1/pets`, `GET /v1/pets/{petId}` (CLD-11). Their shapes below are what the code does; still not frozen.
+Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 contract session after Cloud gate (c) and owner review. Names follow the Cloud plan §8 baseline. Implemented today (backend, 2026-10-17): `/healthz`, `/readyz`, `GET /v1/me`, `POST /v1/devices/challenges`, `POST /v1/pets`, `GET /v1/pets`, `GET /v1/pets/{petId}` (CLD-11). Their shapes below are what the code does; still not frozen. The mobile app (2026-10-18) calls challenges, pets, consents and conversation turns with these shapes (host tests only, no phone run yet).
 
 ## 1. Conventions
 

@@ -1,6 +1,11 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-18** (Asia/Ho_Chi_Minh).
+
+## 2026-10-18 — Mobile pet bind, consent sheet and AI chat; persona rule
+
+- Mobile: Identity V2 proof over BLE (`7a6e000d`, capability byte 3 bit 0, long write + poll, no resend), XUNA Cloud client (challenge, bind, pets, consents, SSE turn) with backend problem codes in Vietnamese, `BindPetToCloud` use case, bind button + U1–U3 consent sheet in the Device tab, AI replies in chat only when signed in + bound + U3 (labelled "AI · không ghi nhớ", never learned), local templates on any failure. Found and fixed a consent-conflict reload that was skipped while busy. 119/119 tests, analyze clean, debug APK PASS; not run on a phone or board.
+- Backend: persona forbids claims of hearing/seeing (no mic/camera); benchmark gained two sensing prompts and a `noSensingClaim` check. Gemini `3.5-flash-lite` 14/14, TTFT median 0.85 s, all checks 1.00. 98/98 tests with PostgreSQL.
 
 ## 2026-10-17 — Gemini benchmark and provider options
 
