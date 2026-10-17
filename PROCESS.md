@@ -14,6 +14,17 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## Next session plan — mobile bind flow + consent (prepared 2026-10-17)
+
+Owner asked to code and test first (no phone attached yet; the board stays on the Mac USB port).
+
+1. **Device feature (mobile `features/device`)**: decode capability byte 3 bit 0 (`DeviceProtocol.capabilityDeviceProof`); codec for Identity V2 `7a6e000d` — request 40 B `ver=1,size=40,purpose,0,requestId u32 LE,nonce[32]`, response 141 B `ver,size,purpose,status,requestId,generation u32,publicKey[65],signature[64]` (status 0 idle,1 pending,2 ok,3 invalid,4 unsupported,5 not ready,6 failed). Write request, poll READ until status ≠ pending and requestId matches (explicit timeout, never resend after timeout). Golden bytes from the board E2E in `docs/roadmap/identity-v2-2026-10-17.md`. Simulator: no capability (never fabricate a proof).
+2. **Cloud feature (mobile `features/account` or new `pet_cloud`)**: `POST /v1/devices/challenges` and `POST /v1/pets` (base64 fields, `Idempotency-Key` UUID per action, `schemaVersion: 1`), `GET /v1/pets`, `GET/PUT /v1/consents` (`expectedVersion`). Map backend problem `code`s (`challenge_invalid`, `invalid_signature`, `pet_already_bound`, `device_key_mismatch`, `consent_version_conflict`, `unauthorized`) to localized messages. Contract: `docs/architecture/XUNA_CLOUD_CONTRACT_DRAFT.md`.
+3. **Use case `BindPetToCloud`**: requires signed-in account + connected device with identity + proof capability; challenge → device proof → bind; returns Pet/Brain ids; audit is server-side.
+4. **UI**: in the Device tab account card, "Gắn XUNA với tài khoản" (enabled only when signed in and connected) and a consent sheet (U1/U2/U3 toggles, default off, clear Vietnamese copy; U3 needed for AI chat). Follow `mobile/AGENTS.md` (base widgets, locales, `buildState`, `nav`).
+5. **Tests**: codec byte fixtures (valid/malformed), repository fakes incl. timeouts and problem codes, use case ordering (no bind without proof, no proof without challenge), controller states, widget test for the card. `fvm flutter analyze`, `fvm flutter test`, debug APK; lock change only if a package is truly needed.
+6. **When a phone is available**: rebuild with `--dart-define=XUNA_API_BASE_URL=http://<Mac LAN IP>:8000`, run the backend with `XUNA_FIREBASE_PROJECT_ID=xuna-pet` on `0.0.0.0:8000`, sign in, connect BLE, bind the real pet `d945c77026fd4f4a8a899bbff4aeed86`, check `GET /v1/pets` and `GET /v1/audit-events`. Note: the local dev DB `xuna_local` already holds a test binding of this PetId to a *test* owner from the Identity V2 E2E (different owner → expect `409 pet_already_bound`); reset that dev row first (dev DB only; audit tables are append-only by trigger).
+
 ## 2026-10-17 — Firebase Google sign-in validated end to end
 
 - Owner enabled Google sign-in and re-downloaded `google-services.json` (now has Android OAuth client with the debug SHA-1 `cb679da2…` and a web client). Replaced the gitignored file, rebuilt the APK.
