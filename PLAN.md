@@ -126,6 +126,7 @@ Owner authorized publishing local MVP. Firmware be58099 and mobile3846880 are co
 | CLD-02 | Draft — 2026-10-17 (not frozen) | [Contract draft](docs/architecture/XUNA_CLOUD_CONTRACT_DRAFT.md): conventions, problem codes, idempotency, draft resources, device proof proposal |
 | CLD-10 | Scaffold done — 2026-10-17 | `backend/`: modular monolith, rules in `backend/AGENTS.md`, `scripts/check.sh` PASS (ruff, mypy strict, 38/38 pytest with PostgreSQL), CI workflow written (not yet run on GitHub) |
 | CLD-11 | Backend done — 2026-10-17 | OIDC owner auth (vendor open), challenges, ECDSA P-256 TOFU pet binding, Pet/Brain/Device tables, idempotency; 59/59 tests with PostgreSQL. Needs firmware Identity V2 + app flow to bind the real pet |
+| ID-V2 | Done on board — 2026-10-17 | [Record](docs/roadmap/identity-v2-2026-10-17.md): P-256 device key, BLE `7a6e000d` proof, E2E bind with local backend PASS. Mobile bind flow pending |
 | CLD-12–14 | CLD-12/13 may start; CLD-14+ gated by Cloud gate (c) | Snapshot v2 on the board + durable `PetId` over BLE + local export; then contracts, scaffold, auth/identity, consent, provider benchmark and confirmation pipeline |
 | CLD-20 | Planned after Phase 1 | Encrypted backup, export, restore and deletion |
 | CLD-30–31 | Gated by E15 | Cloud consolidation experiment and bounded suggestions |

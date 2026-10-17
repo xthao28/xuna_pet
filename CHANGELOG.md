@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Firmware Identity V2 device proof
+
+- P-256 device key in NVS, BLE `7a6e000d` proof (Bind only), capability byte 3 bit 0; golden message shared with backend. Native/ASan 200/200; uploaded; real pet bound end to end against the local backend (201 then idempotent 200).
+
 ## 2026-10-17 — Backend CLD-11 identity
 
 - OIDC owner auth, device challenges, ECDSA P-256 trust-on-first-use pet binding (Pet/Brain/Device), idempotency keys, migration 0002; UTC session fix. 59/59 tests with PostgreSQL. CLD-01 decisions recorded as owner-delegated approvals.

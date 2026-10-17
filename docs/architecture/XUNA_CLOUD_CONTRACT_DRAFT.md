@@ -83,7 +83,7 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 Defined in [cloud-gate sprint record](../roadmap/cloud-gate-sprint-2026-10-17.md) and mirrored by backend `exports.application.schemas.ExportPayloadV1` (strict, unknown fields rejected). Golden fixture shared from mobile Dart output.
 
-## 4. Device proof (approved design 2026-10-17; firmware Identity V2 pending)
+## 4. Device proof (approved design; firmware Identity V2 implemented 2026-10-17 — BLE `7a6e000d`, see [record](../roadmap/identity-v2-2026-10-17.md))
 
 Device holds an **ECDSA P-256** key generated on first boot (private key never leaves NVS). Message bytes:
 
@@ -92,7 +92,7 @@ Device holds an **ECDSA P-256** key generated on first boot (private key never l
 purpose: 1 bind, 2 projection
 ```
 
-`deviceProof = { "challengeId", "publicKey": base64(65-byte uncompressed SEC1), "signature": base64(64-byte r||s over SHA-256(message)) }`. Challenges are single-use and expire after 5 minutes. The first successful bind pins the device key to the pet (TOFU); later proofs must use that key. Until firmware supports it, the app cannot produce a proof (threat model T1/T3).
+`deviceProof = { "challengeId", "publicKey": base64(65-byte uncompressed SEC1), "signature": base64(64-byte r||s over SHA-256(message)) }`. Challenges are single-use and expire after 5 minutes. The first successful bind pins the device key to the pet (TOFU); later proofs must use that key. The board refuses projection proofs until it can hash its own export.
 
 ## 5. Open questions for the freeze session
 

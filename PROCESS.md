@@ -1,7 +1,7 @@
 # XUNA — Process and Session Handoff
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
-Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
+Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
 - Board firmware: owner-authorized 2026-10-16 S13+S18 production switch (intermediate S13/S18 build with current artwork, before the S26 changes), LifeCore/ProductLearner + LifeSnapshot v2; first boot Migrated, subsequent boot Ok. PetId `d945c77026fd4f4a8a899bbff4aeed86`; Happy/Idle preserved. GPIO0 is direct Happy, not learnable greeting. Stack setup 8,228 B first boot / 8,036 B first reboot (16 KiB stack).
@@ -10,9 +10,15 @@ Current status (2026-10-16):
 - Owner decisions 2026-10-16 (AGENTS.md §3): S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B `life0/life1`, LittleFS → S32); S13 + S18 merged, absorbing S08b/S09; concrete Cloud gate replaces M05b/S38. Earlier: S25 defaults, S10 protocol freeze, learning/hybrid/Cloud baseline.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Recommended next: firmware **Identity V2** (P-256 key in NVS + BLE sign command) so the app can bind the real pet. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. (C) backend CLD-01/02/10 can start now on the Mac (Python 3.12.8, PostgreSQL 14, Docker present). A and B are done in source but uncommitted ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
+Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. Next options: mobile bind flow (needs an OIDC provider choice), CLD-12 consent, or CLD-13 provider benchmark (needs D11a). Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. (C) backend CLD-01/02/10 can start now on the Mac (Python 3.12.8, PostgreSQL 14, Docker present). A and B are done in source but uncommitted ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-17 — Firmware Identity V2: device key and BLE proof (board E2E PASS)
+
+- Owner chose Identity V2. Pure `Sha256` + `DeviceProof`/`ProofService` in `xuna_core`, mbedTLS `DeviceKey` (P-256, NVS `devkey`, never overwritten if corrupt, RFC 6979), BLE `7a6e000d` WRITE/READ with capability byte 3 bit 0. Projection proofs refused.
+- Firmware native/ASan 200/200, ESP32 PASS (52,504 B RAM / 2,880,513 B Flash). NVS backed up (`2026-10-17-identity-v2/`), upload PASS; key created (161 ms) then loaded on reboot with the same public key.
+- E2E from the Mac: backend challenge → board signs (~74 ms) → `POST /v1/pets` 201 then 200 with same Brain against local PostgreSQL. No phone, no hosted service, no push. [Record](docs/roadmap/identity-v2-2026-10-17.md).
 
 ## 2026-10-17 — Backend CLD-11: owner auth and device-proof pet binding
 
