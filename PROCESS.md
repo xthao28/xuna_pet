@@ -1,18 +1,25 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
-Current milestone: **S13 + S18 on board (migration/one reboot/feedback smoke passed; remaining checks owner-skipped). S26/S27-lite implemented in source, host/build PASS, NOT uploaded.** Extended life-feel/power-cut checks remain unvalidated.
+Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
+Current milestone: **S10-sync and S26/S27-lite implemented in source, host/build PASS, NOT uploaded. Board remains on the earlier S13 + S18 image.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
 - Board firmware: owner-authorized 2026-10-16 S13+S18 production switch (intermediate S13/S18 build with current artwork, before the S26 changes), LifeCore/ProductLearner + LifeSnapshot v2; first boot Migrated, subsequent boot Ok. PetId `d945c77026fd4f4a8a899bbff4aeed86`; Happy/Idle preserved. GPIO0 is direct Happy, not learnable greeting. Stack setup 8,228 B first boot / 8,036 B first reboot (16 KiB stack).
-- Source ahead of board: **S26/S27-lite** enables opcode 6 + bit 5, explanation READ `000b`, expired=8; Chat AskWhy and grounded confirmation replies. Board still has bits 4/5/6 off and expired=4. Source keeps bits 4/6 off and 12-byte packets; S10-sync/hatch and learnable GPIO0 remain deferred. Install upgraded app before any future result-8 firmware rollout.
+- Source ahead of board: **S10-sync + S26/S27-lite** enable opcode 5/6 and capability bits 4/5 (`0x003f`), 16-byte TimeSync, day-part learning, explanation READ `000b` and expired=8. Mobile syncs after connect and every six hours. Board still has bits 4/5/6 off and expired=4. Hatch bit 6 and learnable GPIO0 remain deferred. Install upgraded app before firmware rollout.
 - Latest recorded validation: S26 firmware full native/ASan 192/192 each, then final adapter 11/11 each; ESP32/purity PASS (52,088 B RAM / 2,851,677 B Flash). Flutter 3.32.8 analyze clean, 59/59 tests and debug APK PASS; lock unchanged. All artwork/UI and upgrade source is now committed: firmware `b0f4ded`, mobile `4976147`; parent records both pointers.
 - Owner decisions 2026-10-16 (AGENTS.md §3): S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B `life0/life1`, LittleFS → S32); S13 + S18 merged, absorbing S08b/S09; concrete Cloud gate replaces M05b/S38. Earlier: S25 defaults, S10 protocol freeze, learning/hybrid/Cloud baseline.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Next action: **S26/S27-lite code/host/build done** ([record](docs/roadmap/S26-S27-lite-2026-10-16.md)); next recommended code session is S10-sync (opcode 5, trusted day parts), when requested. No further board tests/upload unless requested; owner skipped the remaining S13/S18 physical checks (checkpoint/reboots/forget/final NVS dump), not marked PASS. The physical board and current build now differ. No backend; Cloud gate still unmet (PetId BLE visibility/local export absent).
+Next action: **S10-sync source integration and Android build/install smoke done** ([record](docs/roadmap/S10-sync-2026-10-17.md)). Connect the ESP32, take the mandatory NVS backup, then upload firmware and run BLE/Serial acceptance. The physical board and current source differ. No backend; Cloud gate still unmet (PetId BLE visibility/local export absent).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-17 — S10-sync production source integration
+
+- Wired opcode 5 through the 16-byte firmware queue and production adapter into `LifeCore::sync`; enabled capability bit 4 with bit 5 (`0x003f`) and added Serial clock/day-part diagnostics.
+- Mobile syncs phone UTC/timezone after connect and every six hours, cancelling on disconnect/close. Simulator keeps the capability off.
+- Firmware focused 12/12 and full native PASS; ESP32 build/purity PASS (52,088 B RAM / 2,852,429 B Flash). Flutter analyze clean and 60/60 tests PASS.
+- Initial APK build exposed JDK 21 + AGP 8.1.0 incompatibility. Updated AGP minimally to 8.2.2 (Gradle/Flutter unchanged); debug APK build, ADB install and cold launch PASS on `emulator-5554`, with the process alive and `MainActivity` top-resumed. ESP32 absent, so no BLE/Serial observation or upload. No commit/push. [Record](docs/roadmap/S10-sync-2026-10-17.md).
 
 ## 2026-10-16 — Owner-requested commit of all pending work
 

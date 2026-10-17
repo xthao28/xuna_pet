@@ -1,6 +1,12 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-16** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
+
+## 2026-10-17 — S10-sync production source integration
+
+- Wired opcode 5 TimeSync through the production firmware adapter and 16-byte BLE queue; advertised capability bit 4 and added Serial clock/day-part diagnostics.
+- Mobile syncs UTC/timezone after connect and every six hours while connected; simulator does not advertise a clock capability it cannot model.
+- Firmware full native and ESP32 build/purity PASS; Flutter analyze clean and 60/60 tests PASS. Updated AGP 8.1.0 → 8.2.2 to resolve the JDK 21 build incompatibility; debug APK build/install/cold launch PASS on `emulator-5554`. ESP32 absent, so no BLE/Serial validation or upload. No commit/push.
 
 ## 2026-10-16 — Commit all pending work
 
