@@ -14,6 +14,12 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## 2026-10-17 — CLD-13 Gemini benchmark (temporary provider)
+
+- Owner provided the internal AI URL (Bifrost gateway `SDS-AI`, reachable over VPN, needs a virtual key in `x-bf-vk` — not yet provided) and chose **Gemini** as the temporary provider. Key stored by the owner in gitignored `backend/.env.gemini` (mode 600); commands only `source` it, the key was never printed.
+- Results ([record](docs/roadmap/CLD-13-benchmark-2026-10-17.md)): `gemini-3.5-flash-lite` 12/12, TTFT median 0.92 s, all persona checks pass → temporary model. `gemini-3.8-flash` truncated by hidden reasoning; with `reasoning_effort=none` complete but free-tier 429s.
+- Backend: `XUNA_TEXT_API_KEY_HEADER`, `XUNA_TEXT_REASONING_EFFORT`, benchmark `--delay`; 93/93 tests with PostgreSQL. Free tier = synthetic prompts only; paid tier required before real users. Persona needs a "no hearing/seeing claims" rule.
+
 ## Next session plan — mobile bind flow + consent (prepared 2026-10-17)
 
 Owner asked to code and test first (no phone attached yet; the board stays on the Mac USB port).

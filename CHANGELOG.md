@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Gemini benchmark and provider options
+
+- Vietnamese benchmark on Gemini: `3.5-flash-lite` 12/12, 0.92 s TTFT, chosen temporarily; `3.8-flash` needs `reasoning_effort` and hit free-tier limits. Added key-header and reasoning-effort options (Bifrost `x-bf-vk`). 93/93 backend tests.
+
 ## 2026-10-17 — Firebase Google sign-in validated
 
 - Real Google sign-in on the Play Store emulator; backend accepted the Firebase ID token (`/v1/me` 200, owner created). Fixed the Google picker being cancelled by a 30 s timeout.
