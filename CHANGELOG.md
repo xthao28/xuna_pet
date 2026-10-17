@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Firebase Google sign-in validated
+
+- Real Google sign-in on the Play Store emulator; backend accepted the Firebase ID token (`/v1/me` 200, owner created). Fixed the Google picker being cancelled by a 30 s timeout.
+
 ## 2026-10-17 — Mobile Firebase Auth account
 
 - Optional Google sign-in via Firebase (project `xuna-pet`), cloud connection check against `/v1/me`, sign-out; minSdk 23. 77/77 tests, debug APK PASS. Config file gitignored.
