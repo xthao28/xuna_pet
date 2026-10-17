@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Backend CLD-12 consent and audit
+
+- U0-default consent with append-only history and route guard; append-only audit trail with content-free metadata; DB triggers block UPDATE/DELETE. 78/78 tests with PostgreSQL.
+
 ## 2026-10-17 — Firmware Identity V2 device proof
 
 - P-256 device key in NVS, BLE `7a6e000d` proof (Bind only), capability byte 3 bit 0; golden message shared with backend. Native/ASan 200/200; uploaded; real pet bound end to end against the local backend (201 then idempotent 200).

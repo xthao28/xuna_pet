@@ -6,7 +6,7 @@ Date: 2026-10-17. **Status: Draft, not frozen.** Freeze happens in the Phase 1 c
 
 - Base path `/v1`. JSON bodies use camelCase to match the app/device export contract. Times are RFC 3339 UTC strings.
 - **IDs:** `petId` = 32 lowercase hex (device-issued UUIDv4, Identity V1). `userId`, `brainId`, `deviceId`, request and resource IDs = UUID strings. Never interchangeable.
-- **Errors:** RFC 9457 `application/problem+json` with `type`, `title`, `status`, stable `code`, optional `detail` (no user content). Codes in use: `validation_failed`, `unauthorized`, `auth_unavailable`, `idempotency_key_required`, `idempotency_key_reused`, `conflict_retry`, `not_found`, `invalid_public_key` (422), `invalid_signature` (403), `challenge_invalid` (409), `pet_already_bound` (409), `device_key_mismatch` (409), `database_unavailable`, `internal_error`. Reserved: `conflict_stale_generation`, `consent_required`, `provider_unavailable`, `rate_limited`.
+- **Errors:** RFC 9457 `application/problem+json` with `type`, `title`, `status`, stable `code`, optional `detail` (no user content). Codes in use: `validation_failed`, `unauthorized`, `auth_unavailable`, `idempotency_key_required`, `idempotency_key_reused`, `conflict_retry`, `not_found`, `invalid_public_key` (422), `invalid_signature` (403), `challenge_invalid` (409), `pet_already_bound` (409), `device_key_mismatch` (409), `consent_required` (403), `consent_version_conflict` (409), `database_unavailable`, `internal_error`. Reserved: `conflict_stale_generation`, `provider_unavailable`, `rate_limited`.
 - **Idempotency:** every `POST`/`PUT`/`PATCH`/`DELETE` requires `Idempotency-Key: <uuid>`. Same key + same body → same response; same key + different body → `409 idempotency_key_reused`. Keys kept 24 h.
 - **Versioning:** mutating bodies carry `"schemaVersion": 1`. Additive fields only within v1; breaking changes → `/v2`.
 - **Request ID:** `X-Request-ID` accepted (8–64 alphanumerics/dashes) or generated, always echoed.
@@ -48,11 +48,14 @@ Server rules: verify envelope hash and strict payload (implemented in `exports` 
 ### Consents (CLD-12)
 
 ```http
-GET /v1/consents
-PUT /v1/consents   { "schemaVersion": 1, "aggregateMetrics": false, "experienceEvents": false, "conversationText": false }
+GET /v1/consents → { "aggregateMetrics", "experienceEvents", "conversationText", "version", "updatedAt" | null }
+PUT /v1/consents   { "schemaVersion": 1, "aggregateMetrics": false, "experienceEvents": false,
+                     "conversationText": false, "expectedVersion": 0 }
+→ 200 new state | 409 consent_version_conflict
+GET /v1/audit-events?limit=50 → { "items": [ { "eventId", "action", "subject", "metadata", "occurredAt" } ] }
 ```
 
-Default all `false` (U0).
+Default all `false`, version 0 (U0). Each change appends a history row and an audit event; protected routes return `403 consent_required` (implemented 2026-10-17, CLD-12).
 
 ### Conversations (Phase 1, CLD-13)
 
