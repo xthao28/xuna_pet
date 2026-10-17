@@ -10,9 +10,14 @@ Current status (2026-10-16):
 - Owner decisions 2026-10-16 (AGENTS.md §3): S01 closed with owner-skipped items; D2a (snapshot v2 in NVS A/B `life0/life1`, LittleFS → S32); S13 + S18 merged, absorbing S08b/S09; concrete Cloud gate replaces M05b/S38. Earlier: S25 defaults, S10 protocol freeze, learning/hybrid/Cloud baseline.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Next action: **S10-sync source integration and Android build/install smoke done** ([record](docs/roadmap/S10-sync-2026-10-17.md)). Connect the ESP32, take the mandatory NVS backup, then upload firmware and run BLE/Serial acceptance. The physical board and current source differ. No backend; Cloud gate still unmet (PetId BLE visibility/local export absent).
+Next action: **Cloud gate sprint** ([plan](docs/roadmap/cloud-gate-sprint-2026-10-17.md)). The owner wants maximum speed toward Cloud. Run in parallel: (A) firmware Identity V1 characteristic `7a6e000c` + capability bit 7, (B) mobile identity read + JSON export, (C) backend CLD-01/02/10 (install Python/PostgreSQL first; not available on this Windows machine). Then (D) one combined NVS backup + upload + short acceptance. S10-sync committed (parent `b7d71cc`), not pushed or uploaded.
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-17 — Cloud gate sprint decisions (handoff)
+
+- Owner asked to accelerate toward Cloud. Chose all recommended options: app-side JSON export for gate (c); backend CLD-01/02/10 may start now in parallel; one combined board upload/acceptance; commit S10-sync now (firmware `f339fff`, mobile `d34c63b`, parent `b7d71cc`; no push).
+- Proposed Identity V1 (24 B READ `7a6e000c`, capability bit 7) and workstreams A–D in the [sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md). Session stopped at the owner's request (token limit) before any implementation. No code, build, board or push.
 
 ## 2026-10-17 — S10-sync production source integration
 

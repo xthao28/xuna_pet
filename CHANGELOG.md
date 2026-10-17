@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-17** (Asia/Ho_Chi_Minh).
 
+## 2026-10-17 — Cloud gate sprint decisions
+
+- Committed S10-sync (firmware `f339fff`, mobile `d34c63b`, parent `b7d71cc`; not pushed).
+- Owner approved accelerating toward Cloud: app JSON export for gate (c), backend CLD-01/02/10 in parallel now, one combined board session. Plan and proposed Identity V1 format in [sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md). Documentation only.
+
 ## 2026-10-17 — S10-sync production source integration
 
 - Wired opcode 5 TimeSync through the production firmware adapter and 16-byte BLE queue; advertised capability bit 4 and added Serial clock/day-part diagnostics.
