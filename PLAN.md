@@ -260,6 +260,8 @@ No automatic next feature session or S11 resume. Wait for owner's next UI/sessio
 | MOB-TOOLCHAIN | Done on this Windows machine | Flutter 3.32.8 installed via fvm; VS Code workspace points to it; `pubspec.lock` restored and unchanged after `fvm flutter pub get` |
 | MOB-REFACTOR-01 | Implemented; host tests PASS | `features/device`, `conversation`, `home` migrated to the rules without protocol change; analyze clean, 16/16 tests on 3.32.8. Native build, real phone and board not run |
 | S20 golden vectors | Done — 2026-10-19 | `firmware/sim/golden.cpp` → `mobile/test/fixtures/firmware/learning_v1.json`; Dart learner removed from the simulator (G17 resolved); app now accepts curious in life/memory values |
+| REACT-LEARN | Done (host) — 2026-10-19 | D6 revised: device pet/shoo reactions teach (w 0.3, 10 s window), app ratings removed, greeting learning + spontaneous idle choices on. Board trial pending |
+| ROUTINE-LEARN | Approved in principle — 2026-10-19 | Part C: learn when the owner is around and anticipate it; needs a design and a snapshot section |
 
 Mobile changes are uncommitted; gitlink unchanged. Physical BLE/learning acceptance (S01, MVP-08) remains open and is not affected by host tests.
 

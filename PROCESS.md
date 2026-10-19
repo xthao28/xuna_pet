@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board).
+Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board). Reaction learning replaced app ratings (D6 revised); routine learning (part C) is next.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -13,6 +13,13 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-19 — Reaction learning replaces app ratings (owner decision)
+
+- Owner: app "chọn → thích/không thích" is meaningless and tedious; approved (a) reactions on the device teach, (b) routine learning, (c) remove app ratings. Recorded as **D6 revised** in AGENTS.md §3; design freeze and evidence: [reaction-learning record](docs/roadmap/reaction-learning-2026-10-19.md).
+- Firmware: `PreferenceLearnerV3::feedback` takes a weight (`reactionWeightQ16` 0.3 [P]); `ProductLearner` reaction window 10 s [P], source 3; `LifeCore` `Reaction` and `Spontaneous` events, `reactionApplied`; `V1LifeCoreAdapter` GPIO0 inside the window = pet, GPIO14 = shoo then idle, `localSpontaneous`; `main.cpp` greeting learning on and the idle routine calls `localSpontaneous`. Snapshot episodes section v2 only when a source-3 episode exists (found: old decoder treated source 3 as corrupt → boot read-only). Tests: 4 adapter, 1 codec, `learnsFromReactions` scenario; S01 transcript and greeting tests moved their presses outside the window. Native and ASan **216/216**, ESP32 build + purity PASS (RAM 52,520 B, Flash 2,881,425 B). Golden vectors gained pet / greeting / shoo steps.
+- Mobile: removed rating chips, rating confirmation, journal rating buttons and pending card, `SendFeedbackUseCase` and `DeviceRepository.sendFeedback`; rating words in chat get `home_replyReactOnDevice`; statements still need confirmation. `InteractionContext.greeting` (memories only, never sent), `EpisodeSource {button, text, reaction}`, codec accepts context 2 / source 3, journal and export labels. Locales synced (11 keys removed, 3 added). **124/124**, analyze clean, lock unchanged. Backend export schema accepts `greeting`/`reaction`; `check.sh` **99/99**.
+- Not run: board, phone, APK. Next: part C routine learning design; board trial of window/weight; app poke as a reaction needs a protocol addition.
 
 ## 2026-10-19 — S20 golden vectors and Dart conformance (firmware + mobile, host only)
 

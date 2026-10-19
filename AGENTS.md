@@ -121,6 +121,7 @@ Status vocabulary:
 - **S22 learning and conversation decisions (owner-approved 2026-10-15; [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md)):**
   - **D4:** keep the E10 UCB exploration; the "Why?" view labels exploratory choices; no age dependence until M06.
   - **D6:** implicit feedback is off. Only explicit ratings and confirmed statements teach preferences (L-D4 drive reduction stays separate `device_observed` evidence).
+  - **D6 revised (owner-approved 2026-10-19; [reaction learning record](docs/roadmap/reaction-learning-2026-10-19.md)):** the owner's reaction on the device teaches XUNA: a GPIO0 press within 10 s after XUNA acts is a pet (positive), a GPIO14 press a shoo (negative), weight 0.3 of a rating; silence teaches nothing. App ratings are removed from the UI (BLE opcode 3 stays for older apps); confirmed chat statements still teach. D5 greeting learning is on, and the offline idle routine is a learner decision. Routine learning (anticipating when the owner is around) is approved in principle; its design and snapshot section are pending. Window and weight are Proposed until the board trial.
   - **Layer A voice and scope:** XUNA replies as "mình – bạn"; Vietnamese first (English keeps the V1 words only); a statement without a context gets one follow-up question and nothing is sent until answered; the packet's phrase table is the S39 starting set.
   - **D16:** deferred; Layer A is text-first, E13 later.
 - **E10 learner selection (owner-approved 2026-10-15; [E10 packet](docs/roadmap/E10-review-packet-2026-10-15.md)):**

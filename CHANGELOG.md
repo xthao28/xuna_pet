@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 
+## 2026-10-19 — XUNA learns from the owner's reactions; app ratings removed
+
+- Owner decision (D6 revised): a pet (top button) within 10 s after XUNA acts teaches "thích", a shoo (bottom button) "không thích", weight 0.3 of a rating; silence teaches nothing. Greeting learning is on and XUNA chooses on its own when idle. [Record](docs/roadmap/reaction-learning-2026-10-19.md).
+- Firmware: weighted learner feedback, reaction window, `Reaction`/`Spontaneous` core events, adapter button handling, episode source 3 with a versioned episodes section (found: the old decoder rejected it as corrupt). Life Lab proves the learned choice follows the owner from reactions alone (40/40 runs with ~13 reactions in a day). Native and ASan 216/216, ESP32 build + purity PASS.
+- Mobile: rating chips, confirmation and journal rating buttons removed; rating words in chat explain how to react on XUNA; greeting (context 2) and reaction (source 3) episodes decode, show and export. 124/124. Backend export schema accepts them (99/99).
+
 ## 2026-10-19 — S20 golden vectors; app accepts curious
 
 - Firmware `sim/golden.cpp` writes 27 BLE v1 steps (frame, real adapter result, life and memory values) from `BoardLab`; copied to `mobile/test/fixtures/firmware/` with an update procedure.
