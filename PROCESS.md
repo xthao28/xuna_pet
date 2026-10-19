@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a Life Lab done (host only); next S19b.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -13,6 +13,13 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-19 — S19a Life Lab (firmware, host only)
+
+- Owner chose S19a (S20 is gated by S19a/S19b). Most of S19a already existed (`@+` parser, `LifeCoreTraceRunner`, A/B memory store with power cuts). Added in `LifeCoreTrace.h`: `day <n>` (1–3650 days, one `LifeCore` step per minute, 64-bit offset so traces pass the `millis()` wrap), `expect <path> <op> <u32>` (19 snake_case paths; unknown path = invalid trace; failures counted, first failure recorded), core clock restart at 0 on `reboot`, SHA-256 of the encoded snapshot, explanation of the last shown decision (same projection as `V1LifeCoreAdapter`). `lifecore_lab` prints them and exits 1 on a failed expectation; the first 17 CSV columns are unchanged.
+- Grammar/outputs frozen in `firmware/sim/README.md` (S19a step 1). Kept file names: `lifecore_lab.cpp` is the S19a Life Lab; `lifelab.cpp` stays the learner-only runner. New trace `c9_lifelab_days.trace` (60 days + reboot, 6 expectations). `c7` header/expect updated because `day`/`expect` are no longer unsupported.
+- Checks: native **204/204**, native_asan **204/204**, ESP32 build + purity PASS (RAM 52,504 B, Flash 2,880,513 B). All 9 `c*.trace` give identical output on two runs; traces c1–c8 match the previous runner on the first 17 columns except the intended `c7` unsupported 2→0. 60-day trace: 0.05 s.
+- Found: active time and the five-minute lazy checkpoint live in `V1LifeCoreAdapter`, not `LifeCore`, so the Life Lab does not age the pet or write during quiet days. S19b scenario E ("no negative age") needs either the adapter in the runner or a decision — raise at S19b start. No board, phone or commit.
 
 ## 2026-10-19 — Mobile locale sync, teaching confirmation details, per-context journal count
 

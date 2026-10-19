@@ -344,7 +344,7 @@ The shadow harness is intentionally not linked from `main.cpp`, `BleManager` or 
 | Layer | Status | Evidence / gate |
 |---|---|---|
 | Bounded Choose/Feedback trace runner | Implemented in isolation; validation pending | `LearningTrace.h` + replay tests |
-| Full S19a Life Lab CLI/DSL | Pending | Requires S18/S19a sequencing and native toolchain |
+| Full S19a Life Lab CLI/DSL | Done — 2026-10-19 (`lifecore_lab`: day/expect, snapshot SHA-256, explanation dump; native/ASan 204/204) | Was: requires S18/S19a sequencing and native toolchain |
 | Production event integration | Deferred | Keep `main.cpp`/BLE/persistence unchanged until LifeCore and storage gates |
 
 The current runner is intentionally smaller than the roadmap DSL: it proves learner replay mechanics without pretending M04 LifeCore is complete.
@@ -367,7 +367,7 @@ Next actions remain validation-first: native + ASan/UBSan + ESP32 builds, then L
 |---|---|---|
 | Trace DSL parser | Implemented in isolation; validation pending | `LearningTraceDsl.h` + parser/error tests |
 | Learning-focused host runner | Implemented in isolation; validation pending | `firmware/sim/lifelab.cpp`, CSV contract in `firmware/sim/README.md` |
-| Full S19a Life Lab | Still pending | Requires S18 `LifeCore::step`, store/clock adapters and native toolchain |
+| Full S19a Life Lab | Done — 2026-10-19 | Was: requires S18 `LifeCore::step`, store/clock adapters and native toolchain |
 
 This slice intentionally completes only the learner portion that can be developed without mobile or board access. It does not bypass S10/S13/S18 gates.
 

@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 
+## 2026-10-19 — S19a Life Lab completed
+
+- Firmware: the LifeCore trace runner now runs `day <n>` (one step per simulated minute, past the `millis()` wrap) and `expect <path> <op> <value>`; `reboot` restarts the core clock at 0 as on the board. `lifecore_lab` prints the snapshot SHA-256 and the last decision's explanation and exits 1 on a failed expectation. Grammar frozen in `firmware/sim/README.md`. A 60-day trace runs in 0.05 s with identical output twice. Native and ASan 204/204, ESP32 build + purity PASS. Next: S19b scenarios.
+
 ## 2026-10-19 — Locale sync, teaching confirmation text, journal counts
 
 - Mobile: four `home_*` keys existed only in `locales.g.dart`, so `get generate locales` would have dropped them. Added the three used keys to `vi_VN.json` with proper Vietnamese, removed the unused `home_replyTeachingApplied`. `home_replyConfirmTeaching` lacked its `@details` placeholder, so the chat bubble omitted the candidate (the review row under the chat already showed it); fixed and seen on the Android emulator. New test keeps JSON and generated keys/texts identical. Journal "Học được" cards no longer cite the device-wide feedback total for each context; they count only that context's retained episodes. 121/121 tests, analyze clean, lock unchanged; checked on the Android emulator in simulator mode.

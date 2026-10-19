@@ -124,7 +124,7 @@ Session IDs are kept stable. Suffixes (`a`, `b`) mark splits or additions from t
 | S16 | M04.5 | Action registry, request validator, VisualIntent, idle selector (pure) | firmware | S14, S15 | M |
 | S17 | M04.5 | Wire FSM and visuals into firmware; renderer fallback. **Closed 2026-10-16 on owner smoke; render ±20% not measured** | firmware | S16, S09 | M + Owner check |
 | S18 | M04.6 | `LifeCore::step` composition; thin `main.cpp`. **Merged with S13 (2026-10-16)** | firmware | S17, S13 | M |
-| S19a | M04.6 | Life Lab CLI + trace DSL + runner | firmware | S18 | M |
+| S19a | M04.6 | Life Lab CLI + trace DSL + runner. **Done 2026-10-19** (`sim/lifecore_lab.cpp`; grammar frozen in `firmware/sim/README.md`) | firmware | S18 | M |
 | S19b | M04.6 | Scenarios D/E + 100-day invariants | firmware | S19a | M |
 | S20 | M04.6 | Golden vectors and Dart conformance | firmware, mobile | S19b, D14 | M |
 | S21 | M04.6 | Target parity build and M04 acceptance review | firmware, root | S20 | M + Owner |
