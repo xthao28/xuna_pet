@@ -5,7 +5,7 @@ Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 ## 2026-10-19 — S19b Life Lab scenarios; boot policy shared with the board
 
 - Firmware: `main.cpp` setup() boot policy moved unchanged into `xuna_core` `BootSequence` (port `IBootStore`, implemented by `NvsSnapshotStore`), so Life Lab replays the board's exact boot. New `BoardLab` (setup/loop replica with the production adapter flags) and scenarios D (100 days without rating → learner identical to fresh), E (10 reboots + 5 power cuts: no lost or duplicated feedback, stable PetId, age loss ≤ 295 s) and 100-day stability. All pass, repeatable, about 1 s each. Native 210/210, ASan scenario suite 6/6, ESP32 build + purity PASS (RAM unchanged, Flash +220 B). Not uploaded to the board.
-- Found: a never-migrated, unhatched (Egg) device saves v2 snapshots, then boots read-only because "snapshot Ok + identity Missing" is treated as damage. The current board is not affected (migrated pet); every new board would be. Owner decision needed.
+- Found and fixed: a never-migrated, unhatched (Egg) device saved v2 snapshots, then booted read-only ("snapshot Ok + identity Missing" = damage). Snapshot writes are now refused until the pet has an identity (`IdentityGatedCommit`); an Egg device lives but learns only after hatching. The current board (migrated pet) was never affected.
 
 ## 2026-10-19 — S19a Life Lab completed
 
