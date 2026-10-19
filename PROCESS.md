@@ -14,6 +14,12 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## 2026-10-19 — Phone-free device E2E (option A)
+
+- Owner chose option A: keep the simulator without a device key (mobile AGENTS §6.6) and simulate the board on the backend side instead. Added `backend/scripts/device_e2e.py` (real uvicorn subprocess, local OIDC issuer with JWKS on localhost, firmware-layout proof frames signed with a software P-256 key, request bodies copied from `cloud_repository_impl.dart`, random PetId per run).
+- Results against `xuna_test`: 15/15 PASS with `echo` and with Gemini `gemini-3.5-flash-lite` (synthetic prompt, 240-char Vietnamese reply, 1,536 ms). `scripts/check.sh` 98/98 with PostgreSQL. Not covered: BLE long write/MTU, Flutter UI, Firebase tokens.
+- Dev binding reset (next-session step 1) **not done**: the `DELETE` on `xuna_local` (`brains`/`devices`/`pets` rows of PetId `d945c770…`, test owner `b091…`) was blocked by the permission classifier; the owner must allow it or run it. Nothing was changed in `xuna_local`.
+
 ## 2026-10-17 — CLD-13 Gemini benchmark (temporary provider)
 
 - Owner provided the internal AI URL (Bifrost gateway `SDS-AI`, reachable over VPN, needs a virtual key in `x-bf-vk` — not yet provided) and chose **Gemini** as the temporary provider. Key stored by the owner in gitignored `backend/.env.gemini` (mode 600); commands only `source` it, the key was never printed.
@@ -32,7 +38,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 ## Next session plan — phone validation of bind + AI chat (updated 2026-10-18)
 
 1. Reset the dev binding first: `xuna_local` still binds PetId `d945c77026fd4f4a8a899bbff4aeed86` to the *test* owner from the Identity V2 E2E, so a real bind would return `409 pet_already_bound`. Dev DB only; audit/consent tables are append-only by trigger (leave them).
-2. Backend: `XUNA_FIREBASE_PROJECT_ID=xuna-pet`, Gemini via `set -a; source .env.gemini; set +a` (never print the key), uvicorn `--no-access-log` on `0.0.0.0:8000`.
+2. Optional pre-check without the phone: `backend/scripts/device_e2e.py --database-url …/xuna_local` (simulated board, app-shaped requests). Backend: `XUNA_FIREBASE_PROJECT_ID=xuna-pet`, Gemini via `set -a; source .env.gemini; set +a` (never print the key), uvicorn `--no-access-log` on `0.0.0.0:8000`.
 3. Build: `fvm flutter build apk --debug --dart-define=XUNA_API_BASE_URL=http://<Mac LAN IP>:8000`, `adb install -r`.
 4. On the phone: sign in → connect the board → "Gắn XUNA với tài khoản". Watch the board log `device_proof status=2`; if the 40-byte long write fails, fall back to `requestMtu` before the proof (decision for that session). Check `GET /v1/pets` and `GET /v1/audit-events`.
 5. "Quyền dữ liệu" → U3 on → chat free text ("kể chuyện đi") → streamed AI reply tagged AI; turn the backend provider off (or VPN) → local template, no crash. Teaching phrases must still ask for confirmation.

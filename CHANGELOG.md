@@ -1,6 +1,10 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-18** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
+
+## 2026-10-19 — Phone-free device E2E script
+
+- Backend `scripts/device_e2e.py`: starts a real uvicorn server with a throwaway local OIDC issuer, simulates the board's Identity V2 frames (40 B request / 141 B READ, software P-256 key) and sends the same JSON bodies as the mobile app. Bind, re-bind, `pet_already_bound`, owner isolation, `consent_required`, U3 on, SSE turn, unknown pet 404 and audit trail: 15/15 PASS with `echo` and with Gemini `3.5-flash-lite` (1.5 s). `check.sh` 98/98. BLE, Flutter UI and Firebase are not covered.
 
 ## 2026-10-18 — Mobile pet bind, consent sheet and AI chat; persona rule
 
