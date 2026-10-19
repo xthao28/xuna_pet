@@ -19,6 +19,26 @@ Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 - Firmware: `main.cpp` setup() boot policy moved unchanged into `xuna_core` `BootSequence` (port `IBootStore`, implemented by `NvsSnapshotStore`), so Life Lab replays the board's exact boot. New `BoardLab` (setup/loop replica with the production adapter flags) and scenarios D (100 days without rating → learner identical to fresh), E (10 reboots + 5 power cuts: no lost or duplicated feedback, stable PetId, age loss ≤ 295 s) and 100-day stability. All pass, repeatable, about 1 s each. Native 210/210, ASan scenario suite 6/6, ESP32 build + purity PASS (RAM unchanged, Flash +220 B). Not uploaded to the board.
 - Found and fixed: a never-migrated, unhatched (Egg) device saved v2 snapshots, then booted read-only ("snapshot Ok + identity Missing" = damage). Snapshot writes are now refused until the pet has an identity (`IdentityGatedCommit`); an Egg device lives but learns only after hatching. The current board (migrated pet) was never affected.
 
+## 2026-10-19 — Correct XUNA icon orientation and add Android icons
+
+- Corrected the iOS AppIcon render so the curious XUNA sprite is upright, and added Android density-specific launcher icons plus the Android 8+ adaptive icon/background resources.
+- Rebuilt the Development IPA, verified the app's deep code signature, installed it on the connected iPhone 15 (iOS 26.4.2), and launched XUNA successfully.
+- Validated Android icon PNG dimensions and adaptive-icon XML. Android APK build/install was not run because this Mac has no JDK or Android SDK.
+
+## 2026-10-19 — XUNA pixel-art iOS app icon
+
+- Replaced every iPhone/iPad/marketing AppIcon image with the curious XUNA sprite from `mobile/assets/images/xuna_pet_curious.png`, centered over an opaque dark background and rendered at each catalog size. This uses nearest-neighbor scaling to preserve the pixel-art style and avoids transparency in the 1024 px marketing icon.
+- Rebuilt the Development IPA with Flutter 3.32.8 / CocoaPods 1.16.2 / Xcode 27.1. Asset catalog compilation verified the icon renditions as opaque; Flutter no longer reports a placeholder app-icon warning (launch-image and placeholder bundle-ID warnings remain). All embedded framework signatures verified.
+- Installed the IPA and launched XUNA on the connected iPhone 15 (iOS 26.4.2). `pubspec.lock` is unchanged.
+
+## 2026-10-19 — Build signed iOS Development IPA
+
+- Owner requested an iOS device build. Installed the repository-pinned Flutter 3.32.8/FVM and CocoaPods 1.16.2 toolchain; `pubspec.lock` stayed unchanged.
+- Firebase Auth required iOS 13, and the installed Xcode 27.1 SDK requires iOS 15. Owner approved the iOS 15 minimum. Updated the iOS project/Pod deployment settings and mobile README; recorded the approved minimum in AGENTS.md.
+- `fvm flutter build ipa --release --export-method development` succeeded. First device install exposed an unsigned embedded `FirebaseAuthInterop.framework` despite the archive's valid app signature. Signed that embedded framework with the configured development identity, resealed the app, rebuilt the IPA at [mobile/build/ios/ipa/xuna_mobile.ipa](mobile/build/ios/ipa/xuna_mobile.ipa), and verified the deep signature/profile. The owner trusted the developer on iPhone 15 (iOS 26.4.2); install succeeded and the app launched with its process observed running. Investigate why the CocoaPods embed phase omitted this framework signature in a fresh archive.
+- Bundle ID remains `com.example.xunaMobile`. App Store ID/icon warnings remain.
+- Existing owner edits in `Runner.xcodeproj/project.pbxproj` and `Runner/Info.plist` were preserved.
+
 ## 2026-10-19 — S19a Life Lab completed
 
 - Firmware: the LifeCore trace runner now runs `day <n>` (one step per simulated minute, past the `millis()` wrap) and `expect <path> <op> <value>`; `reboot` restarts the core clock at 0 as on the board. `lifecore_lab` prints the snapshot SHA-256 and the last decision's explanation and exits 1 on a failed expectation. Grammar frozen in `firmware/sim/README.md`. A 60-day trace runs in 0.05 s with identical output twice. Native and ASan 204/204, ESP32 build + purity PASS. Next: S19b scenarios.

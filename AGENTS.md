@@ -87,6 +87,7 @@ Status vocabulary:
 - **Existing prototype board:** LILYGO T-Display-S3, standard LCD variant presumed; verify exact board revision and peripherals before pin mapping.
 - **Development environment:** **VS Code + PlatformIO IDE**.
 - **Mobile framework:** Flutter/Dart as the companion-app direction.
+- **iOS minimum deployment target:** 15.0 for the mobile app, owner-confirmed 2026-10-19 after checking the installed Xcode SDK and Firebase Auth plugin requirements.
 - **Local MVP through M05 (owner-approved 2026-10-11):** device owns MVP state/memory/preference; idle/happy preference learning from explicit feedback in quiet/play contexts; local template-based conversation text V1 without an LLM. Voice, evolution and sensors remain deferred.
 - **Delivery strategy:** proceed incrementally with existing hardware, then Flutter/BLE, then Digital Life systems.
 - **Conversation belongs alongside Learning:** speech/conversation is a source of learning events; it must not be postponed until all evolution work finishes.
