@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a + S19b Life Lab done (host only; boot policy now shared `BootSequence`, board upload pending); next S20.
+Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board).
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -13,6 +13,14 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-19 — S20 golden vectors and Dart conformance (firmware + mobile, host only)
+
+- Firmware `sim/golden.cpp`: `BoardLab` booted from a blank v1 snapshot (migrated pet, no history; an Egg device would answer not_ready), 27 v1 frames with request IDs 1…27 and realistic gaps (30 s between suggestions, ratings after 5 s): suggestions in both contexts, approve/reject from button and text, a consumed rating, an unknown target, a direct action that invalidates the decision, a stated preference, forget. Each step records frame hex, result and the 20-byte life + two memory pages. Output deterministic. `simulatorSkips`: learner fields (chosen action, both preferences, episode action) and `activeSeconds` (no clock).
+- Mobile: `test/fixtures/firmware/learning_v1.json` (+ README update procedure, no symlinks) and `firmware_golden_test.dart`: frames byte-identical from `ProtocolCodec.encode`; every life/memory value decodes; simulator results, decision IDs, `canFeedback`, feedback counts, memory counts and episode context/rating/source match at every step.
+- **Bug found and fixed:** firmware chose curious at step 3, and `ProtocolCodec.decodeLife`/`decodeMemoryPage` rejected codes above happy → `FormatException`, which the Home controller treats as a disconnect. On a phone this would have happened at the first curious choice. Now accepts up to curious (mapper already did). Verified the golden test fails without the fix.
+- Simulator: Dart learner removed (mobile AGENTS §6.2, G17 resolved in the gap table); suggestions show idle; stated preference no longer increments the feedback count; `memoryCount` = episodes. Rewritten tests: controller text-feedback (idle after a new suggestion), stated preference (asserts opcode 6 was sent; count stays 0 as on firmware), use-case "records feedback once and never learns"; `home_page_test` journal check scrolls the lazy list (`_scrollTo`).
+- Checks: mobile pub get (lock unchanged), analyze clean, **125/125**; firmware golden built with -Werror. Simulator UX change: the journal shows idle choices in simulator mode (honest: it never learned). No board, phone, APK rebuild.
 
 ## 2026-10-19 — S19b Life Lab scenarios (firmware, host only)
 
