@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board). Reaction learning replaced app ratings (D6 revised); routine learning (part C) is next.
+Last updated: **2026-10-20** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board). Reaction learning replaced app ratings (D6 revised); routine learning (part C) is in firmware (app display pending).
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -14,6 +14,13 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-20 — Routine learning (part C, firmware host only)
+
+- `xuna/learning/HabitPredictor.h`: 48 slots (hour × weekday/weekend) Q8.8 + mean arrival minute (u8 EMA ¼); session = owner input after ≥ 30 min [P] with trusted time (TimeSync alone is not presence); decay 0.95/day [P]; P(slot) with κ 0.5 for prequential Brier scoring (EMA ⅛, gate > 0.02 [P] and ≥ 10 sessions [P]); P(hour | day type) ≥ 4× uniform [P] marks likely hours; a likely run gives a count-weighted arrival estimate; ~20 min [P] before it `LifeCore::routine` asks `ActionGate` for curious once per run/day (not when sleeping/tired, not right after owner input). Snapshot section 7 Habit v1 (152 B, optional), lazy checkpoint, cleared by forget. Output flags `sessionObserved`, `anticipated`.
+- Life Lab `learnsRoutine` (BoardLab, daily app sync, presses every 10 min for 30 min): routine owner (19:00 / 09:00 ± 20 min, 28 days, seeds 21–25) gate open, 4–6/7 last-week days on time (≤ 80 min before; the last simulated day ends before arrival), **0 false alarms**; random owner never ready, **0 anticipations**. Iterations: hour-only bins fired ~1 h early and missed weekends → added the mean minute and within-day-type probability (deviation from plan §9.7, recorded).
+- Tests: `test_habit` (7) + routine scenario test. Native **224/224**, ASan 224/224 (before a rename), ESP32 build + purity PASS (RAM 52,848 B, Flash 2,883,645 B). Build found ESP-IDF's `likely()` macro clashing with a member named `likely` → renamed `isLikely`. Golden unchanged.
+- Not done: app display (needs a BLE read), board trial, drift test. No board, phone or app change.
 
 ## 2026-10-19 — Reaction learning replaces app ratings (owner decision)
 

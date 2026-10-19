@@ -1,6 +1,11 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-20** (Asia/Ho_Chi_Minh).
+
+## 2026-10-20 — Routine learning: XUNA waits for the owner
+
+- Firmware `HabitPredictor` (plan §9.7): sessions with trusted time fill 48 decayed hour slots (weekday/weekend) plus the mean arrival minute; a prequential Brier gate keeps a random owner from "teaching" a routine. About 20 min before the usual arrival an idle XUNA shows curious once (never woken from sleep, no reminders). Snapshot section 7 (optional), cleared by forget. Found during build: ESP-IDF's `likely()` macro broke a function named `likely`. [Record](docs/roadmap/routine-learning-2026-10-20.md).
+- Life Lab: routine owner anticipated on 4–6 of 7 last-week days with 0 false alarms; random owner never. Native and ASan 224/224, ESP32 build + purity PASS (RAM 52,848 B). App display not built yet.
 
 ## 2026-10-19 — XUNA learns from the owner's reactions; app ratings removed
 
