@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 
+## 2026-10-19 — S19b Life Lab scenarios; boot policy shared with the board
+
+- Firmware: `main.cpp` setup() boot policy moved unchanged into `xuna_core` `BootSequence` (port `IBootStore`, implemented by `NvsSnapshotStore`), so Life Lab replays the board's exact boot. New `BoardLab` (setup/loop replica with the production adapter flags) and scenarios D (100 days without rating → learner identical to fresh), E (10 reboots + 5 power cuts: no lost or duplicated feedback, stable PetId, age loss ≤ 295 s) and 100-day stability. All pass, repeatable, about 1 s each. Native 210/210, ASan scenario suite 6/6, ESP32 build + purity PASS (RAM unchanged, Flash +220 B). Not uploaded to the board.
+- Found: a never-migrated, unhatched (Egg) device saves v2 snapshots, then boots read-only because "snapshot Ok + identity Missing" is treated as damage. The current board is not affected (migrated pet); every new board would be. Owner decision needed.
+
 ## 2026-10-19 — S19a Life Lab completed
 
 - Firmware: the LifeCore trace runner now runs `day <n>` (one step per simulated minute, past the `millis()` wrap) and `expect <path> <op> <value>`; `reboot` restarts the core clock at 0 as on the board. `lifecore_lab` prints the snapshot SHA-256 and the last decision's explanation and exits 1 on a failed expectation. Grammar frozen in `firmware/sim/README.md`. A 60-day trace runs in 0.05 s with identical output twice. Native and ASan 204/204, ESP32 build + purity PASS. Next: S19b scenarios.

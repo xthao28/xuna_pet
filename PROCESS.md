@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a Life Lab done (host only); next S19b.
+Last updated: **2026-10-19** (Asia/Ho_Chi_Minh). Latest: S19a + S19b Life Lab done (host only; boot policy now shared `BootSequence`, board upload pending); next S20. Open owner decision: Egg devices boot read-only after first save.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -13,6 +13,15 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-19 — S19b Life Lab scenarios (firmware, host only)
+
+- Owner delegated the S19b approach. Chosen: move `main.cpp` setup()'s boot policy **unchanged** into `xuna_core/life/BootSequence.h` (`IBootStore` = snapshot slots + identity + `bootc`; `NvsSnapshotStore` now implements it; entropy via `IRandom`, `esp_random()` on the board) so the Life Lab replays the same code as the board. `main.cpp` calls it; prints and `adapter.begin` stay in `main.cpp`. Rejected: a copied boot path in `sim/` (would drift, G17-style).
+- `xuna/lab/BoardLab.h`: setup()/loop() replica (production adapter flags `false,true`, LocalBehavior quiet routine, five-minute checkpoint, RAM rebuilt on reboot, torn-write power cut). `xuna/lab/LifeScenarios.h`: D, E, stability; `test/test_life_lab_scenarios` (6 tests) and `sim/scenarios.cpp` (runtimes).
+- Results (1 s steps): **D** PASS — 8.64 M steps, 800 suggestions, 100 syncs, 28,800 checkpoints, learner bit-identical to fresh, 0.96 s. **E** PASS — 16 boots, 5 power cuts, 80 acks = durable count (+4 from the v1 fixture), 15/15 resent ratings rejected, PetId stable, max age loss 295 s, 0.02 s. **Stability** PASS — 100 days, 10 boots, 546 suggestions, 276 acks, feedback count = acks at every step (reset by forget on day 50), 0.98 s. Two runs identical apart from runtime.
+- Checks: native **210/210**, native_asan scenario suite **6/6** (full ASan 208/208 before the two boot tests), ESP32 build + purity PASS (RAM 52,504 B unchanged, Flash 2,880,733 B, +220 B). **Not uploaded**: the board still runs the 2026-10-17 image; the next upload must re-check the boot log (`recover=Ok … ready=1`, same PetId).
+- **Finding (owner decision needed):** a device that was never migrated and has not hatched (Egg) writes v2 snapshots on feedback; on the next boot `BootSequence` sees "snapshot Ok + identity Missing" and stays read-only (ERROR_SAFE). The current board is migrated and unaffected; every new board would hit it once hatch (S10-hatch, deferred) is missing. Options: allow Egg + Ok to start normally, or hatch before the first save. Pinned by `boot_unhatched_device_is_read_only_after_saving`.
+- Next: S20 (golden vectors) is now unblocked.
 
 ## 2026-10-19 — S19a Life Lab (firmware, host only)
 
