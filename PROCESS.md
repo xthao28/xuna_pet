@@ -14,6 +14,13 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## 2026-10-19 — Mobile locale sync, teaching confirmation details, per-context journal count
+
+- `test/generated/locales_sync_test.dart` compares `vi_VN.json` with `Locales.vi_VN` (keys and texts). It found `home_replyNeedContext`, `home_replyStatedUnsupported`, `home_replyConfirmTeaching` (used, unaccented, JSON-less) and `home_replyTeachingApplied` (unused, removed). `home_replyConfirmTeaching` had no `@details`, so the chat bubble omitted the candidate (the review row below already showed it); now "Xác nhận đây là điều bạn vừa nói với XUNA: @details", asserted in the stated-preference controller test. `get generate locales` is now safe to run.
+- Checks: pub get (lock unchanged), format, analyze clean, **120/120** tests.
+- Emulator run (`Pixel_XL_API_30`, debug APK with `XUNA_SIMULATOR=true`, driven by adb): simulator label shown, connect, "Chơi nhé" → "Thích" → bubble "Xác nhận đây là điều bạn vừa nói với XUNA: like | reaction 1 | user_feedback" → confirm → honest "chưa có dữ liệu giải thích" reply; no Flutter errors in logcat. iPhone 13 Simulator not possible: Xcode 14.2 (macOS 12 max) is below Firebase iOS SDK 11.10's Xcode 15.2.
+- Found on the emulator: Journal "Học được" cards used the device-wide `life.events` per context (`home_journal_entry.dart`), so after one Play feedback the Quiet card also said "rút ra từ 1 phản hồi". Owner chose option A: each card cites only its own context's retained episodes ("XUNA học từ phản hồi của bạn khi chơi (1 phản hồi gần đây còn lưu)" / "Chưa có phản hồi gần đây khi yên tĩnh."). New test; 121/121, analyze clean, lock unchanged; re-checked on the emulator.
+
 ## 2026-10-19 — Phone-free device E2E (option A)
 
 - Owner chose option A: keep the simulator without a device key (mobile AGENTS §6.6) and simulate the board on the backend side instead. Added `backend/scripts/device_e2e.py` (real uvicorn subprocess, local OIDC issuer with JWKS on localhost, firmware-layout proof frames signed with a software P-256 key, request bodies copied from `cloud_repository_impl.dart`, random PetId per run).

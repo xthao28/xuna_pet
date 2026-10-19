@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-19** (Asia/Ho_Chi_Minh).
 
+## 2026-10-19 — Locale sync, teaching confirmation text, journal counts
+
+- Mobile: four `home_*` keys existed only in `locales.g.dart`, so `get generate locales` would have dropped them. Added the three used keys to `vi_VN.json` with proper Vietnamese, removed the unused `home_replyTeachingApplied`. `home_replyConfirmTeaching` lacked its `@details` placeholder, so the chat bubble omitted the candidate (the review row under the chat already showed it); fixed and seen on the Android emulator. New test keeps JSON and generated keys/texts identical. Journal "Học được" cards no longer cite the device-wide feedback total for each context; they count only that context's retained episodes. 121/121 tests, analyze clean, lock unchanged; checked on the Android emulator in simulator mode.
+
 ## 2026-10-19 — Phone-free device E2E script
 
 - Backend `scripts/device_e2e.py`: starts a real uvicorn server with a throwaway local OIDC issuer, simulates the board's Identity V2 frames (40 B request / 141 B READ, software P-256 key) and sends the same JSON bodies as the mobile app. Bind, re-bind, `pet_already_bound`, owner isolation, `consent_required`, U3 on, SSE turn, unknown pet 404 and audit trail: 15/15 PASS with `echo` and with Gemini `3.5-flash-lite` (1.5 s). `check.sh` 98/98. BLE, Flutter UI and Firebase are not covered.
