@@ -1,6 +1,6 @@
 # V1 — Phone voice (started 2026-10-22)
 
-Status: **slices 1 (backend) and 2 (app) implemented and host-tested; slice 3 prepared (backend on the LAN with Groq, Android debug APK built), phone measurement open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
+Status: **slices 1 (backend) and 2 (app) implemented; slice 3 release build installed on the iPhone 15, with voice measurements, QR scan, audio route and BLE microphone checks open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
 
 ## Design freeze
 
@@ -51,8 +51,28 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 
   All four: Vietnamese 100 %, ≤ 3 sentences, no false-memory or sensing flags by the heuristics. Gemini free tier alone breaks the 3 s turn target; any Groq model leaves room for ASR (~0.35–0.7 s warm) and first TTS audio. Owner chooses the provider (D11a still open).
 
+
+## Slice 3 — iPhone 15 installation (2026-10-22; measurements pending)
+
+- Toolchain on the stronger Mac: Flutter 3.32.8 / Dart 3.8.1, Xcode 27.1, CocoaPods 1.16.2. CocoaPods was installed for the current user; Ruby 2.6 needs RUBYOPT=-rlogger and its user gem bin in PATH. Rosetta 2 was installed because the pinned Flutter SDK's idevicesyslog helper is Intel-only. No Flutter or Dart package upgrade. flutter pub get left pubspec.lock unchanged.
+- pod install completed (27 pods); Podfile.lock adds audio_session, just_audio, mobile_scanner, and record_ios. Release.xcconfig already includes the generated CocoaPods configuration.
+- Firebase plist validated: PROJECT_ID=xuna-pet, BUNDLE_ID=com.example.xunaMobile; no key was printed. The existing Info.plist already contains the matching REVERSED_CLIENT_ID scheme, so it had no diff. Backend http://192.168.2.11:8000/readyz returned {"status":"ready"}.
+- Release build and direct install/launch succeeded on the owner's iPhone 15 (owner reports iOS 26), using --dart-define=XUNA_API_BASE_URL=http://192.168.2.11:8000. The first launch showed a GetX named-route generic cast error when opening QR scan. AppNavigatorImpl.toNamed now navigates with a dynamic route and casts only the result; the corrected build was installed and launched. The QR camera flow still needs a manual check.
+- Mobile commits pushed: b60e396 (Pod lock + QR navigation fix), 7c32c33 (stop tracking the Firebase plist and ignore it). The Firebase plist remains on this machine and is ignored in the current tree. It was already committed in older mobile commit 7ebd06d; that old history has not been rewritten and no key rotation has been done. The new commits do not contain the plist.
+- Not run: Flutter analyze/tests, board, voice turns, speaker/earpiece route check, microphone while BLE is connected. No latency samples have been recorded yet.
+
+| Turn | Send-to-first-audio (s) | Output route | BLE connected during recording? |
+| --- | ---: | --- | --- |
+| 1 | — | — | — |
+| 2 | — | — | — |
+| 3 | — | — | — |
+| 4 | — | — | — |
+| 5 | — | — | — |
+
+Owner test steps: allow Local Network and microphone; sign in with Google; enable “Giọng nói” (U3V) and AI chat; tap the microphone, speak, and tap again to send. Measure from send until the first audible audio over at least five turns. Also record whether replies use the speaker or earpiece and whether recording works while connected to the board over BLE. Target for this free-tier milestone: p50 ≤ 3 s.
+
 ## Open
 
-1. **Slice 3 — measure:** end-to-end turn timings on a real phone against the targets; TTS overlap (synthesize sentence n+1 while n plays) if needed. Phone checks: iOS audio route after recording (speaker, not earpiece), Android permission flow, mic while BLE is connected.
+1. **Slice 3 — owner phone checks:** record at least five send-to-first-audio timings; calculate p50 against the ≤ 3 s first milestone; confirm the corrected QR camera flow, iOS speaker/earpiece route, and microphone while BLE is connected. Android permission flow remains untested. Consider TTS overlap only if measurements show it is needed.
 2. ~~Persona wording~~ done 2026-10-22 (owner: "cho xuna nghe đi"): XUNA hears the owner through the app microphone when they press talk; no camera, no ambient sound. Benchmark `SENSING_CLAIM` now flags seeing and hearing *sounds around*; persona test updated. Benchmark run (Gemini free tier, 14 prompts): 0 sensing / false-memory claims, but **TTFT median ≈ 7.9 s with 2 failures** (0.85 s on 2026-10-17) → the free LLM tier is the biggest risk for the 3 s turn target; check again and consider a paid or other LLM before the phone measurement.
 3. Run the backend with Piper on the stronger machine and decide Edge vs Piper as default.

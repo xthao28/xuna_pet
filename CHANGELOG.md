@@ -2,10 +2,16 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — iOS V1 app installed on iPhone 15; phone measurements open
+
+- Flutter 3.32.8 / Dart 3.8.1, Xcode 27.1, CocoaPods 1.16.2. pubspec.lock stayed unchanged; Podfile.lock gained iOS records for audio_session, just_audio, mobile_scanner, and record_ios. Backend /readyz returned ready.
+- The release app built and launched directly on the owner's iPhone 15. A QR navigation type error seen on the first launch was fixed in AppNavigatorImpl; the corrected build was installed and launched. Manual camera scan confirmation remains open. Google URL scheme already matched REVERSED_CLIENT_ID; no Info.plist change was needed.
+- b60e396 and 7c32c33 pushed in mobile. Firebase plist is now ignored and untracked in the current tree, kept locally for builds. It was already present in older commit 7ebd06d; history cleanup/key rotation has not been performed. No key was included in these new commits.
+- Not run: five-turn latency measurement, speaker/earpiece route check, microphone while BLE is connected, board validation, Flutter tests/analyze. See [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+
 ## 2026-10-22 — Board runs the window scenes, status card and pairing QR
 
-- Firmware `0a392c5` uploaded after a verified NVS backup; XUNA booted with the same identity and learned preferences. Visual check still to do.
-
+- Firmware 0a392c5 uploaded after a verified NVS backup; XUNA booted with the same identity and learned preferences. Visual check still to do.
 ## 2026-10-22 — Ready for the phone voice test; LLM speed re-checked
 
 - Backend database upgraded for the voice consent, voice settings filled in and the server runs on the home network for the phone. Gemini's free tier was still slow (about 6.4 s to the first word, 3 failures in 14); models on Groq answered in 0.4–0.9 s with no failures, and the owner chose Groq gpt-oss-120b for the phone test. Emojis are no longer read aloud.
