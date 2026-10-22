@@ -18,7 +18,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 ## 2026-10-22 — V1 phone voice, slice 2 (app)
 
 - `record` 6.2.1 + `just_audio` 0.10.6 (pinned); new `voice` feature; `account` gets U3V consent, transcription and spoken reply events; the chat mic works (tap/tap, 15 s, cancel); consent sheet U3V row; Android/iOS mic permissions. Speech takes the typed-text path (teaching still needs confirmation). [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
-- Checks: analyze clean, 151/151. Not run: native build, phone. Open: persona wording for voice (owner), phone measurement.
+- Checks: analyze clean, 151/151. Not run: native build, phone. Persona updated the same day (owner): XUNA hears the owner via the app mic, never sees or hears the room; benchmark 0 sensing claims but Gemini free tier TTFT ≈ 7.9 s today (risk). Open: phone measurement.
 
 ## 2026-10-22 — V1 phone voice, slice 1 (backend)
 

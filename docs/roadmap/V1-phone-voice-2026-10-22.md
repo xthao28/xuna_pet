@@ -37,5 +37,5 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 ## Open
 
 1. **Slice 3 — measure:** end-to-end turn timings on a real phone against the targets; TTS overlap (synthesize sentence n+1 while n plays) if needed. Phone checks: iOS audio route after recording (speaker, not earpiece), Android permission flow, mic while BLE is connected.
-2. Persona text says XUNA only reads typed messages; with voice the app hears through the phone. Decide the wording before the phone test (the sensing-claim benchmark check depends on it).
+2. ~~Persona wording~~ done 2026-10-22 (owner: "cho xuna nghe đi"): XUNA hears the owner through the app microphone when they press talk; no camera, no ambient sound. Benchmark `SENSING_CLAIM` now flags seeing and hearing *sounds around*; persona test updated. Benchmark run (Gemini free tier, 14 prompts): 0 sensing / false-memory claims, but **TTFT median ≈ 7.9 s with 2 failures** (0.85 s on 2026-10-17) → the free LLM tier is the biggest risk for the 3 s turn target; check again and consider a paid or other LLM before the phone measurement.
 3. Run the backend with Piper on the stronger machine and decide Edge vs Piper as default.
