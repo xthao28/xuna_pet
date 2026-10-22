@@ -1,6 +1,6 @@
 # V1 — Phone voice (started 2026-10-22)
 
-Status: **slice 1 (backend) implemented and tested; slices 2–3 open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
+Status: **slices 1 (backend) and 2 (app) implemented and host-tested; slice 3 (phone measurement) open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
 
 ## Design freeze
 
@@ -24,9 +24,18 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 - Checks: `scripts/check.sh` with PostgreSQL: **125 passed** (new: `test_voice.py`, `test_speech_adapters.py`, `test_voice_api.py`, consent voice tests), ruff/mypy clean, migration upgrade/downgrade round trip.
 - Live adapter smoke (this Mac): Groq ASR through the adapter 1222 → 715 → **351 ms** as the connection warms, transcript exact; Edge TTS first audio 3.4 s this time (0.47–0.63 s in V0): Edge is unreliable, keep Piper ready.
 
+## Slice 2 — app (done 2026-10-22, host tests only)
+
+- Packages (exact pins): `record` 6.2.1 (BSD-3; 7.x needs Flutter ≥ 3.44), `just_audio` 0.10.6 (MIT/Apache-2.0). Lock: their transitive packages only, Dart floor 3.8.0 (toolchain 3.8.1).
+- New capability feature `voice`: `RecordedSpeech`, `SpokenSentence`, `VoiceRepository` (+ `VoiceException`), use cases start/finish/cancel listening and speak/stop speaking; data `VoiceAudioDataSource` (AAC-LC 16 kHz mono 32 kb/s `.m4a`) and `VoiceRepositoryImpl` (temporary files deleted right after reading or playing; ordered playback queue; stop drops queued sentences).
+- `account`: consent `conversationVoice` (optional from older backends), `CloudRepository.transcribe`, `streamReply(speak:)` yielding `CloudReplyDelta` / `CloudReplySpeech` / `CloudReplySpeechUnavailable`, `TranscribeSpeechUseCase`, `voiceUnavailable` and `validation_failed` mapping.
+- Home: the chat microphone is live (tap to talk, tap again to send, auto-stop 15 s, cancel), states idle / listening / transcribing; the consent sheet has the U3V row. The mic needs sign-in + U3V; speech then works for local commands even without AI chat; AI replies need U3 + a bound pet and are spoken. Starting to listen stops any reply being spoken. Voice lives in `HomeController` (the rules forbid a page looking up a second controller).
+- Permissions: Android `RECORD_AUDIO`, iOS `NSMicrophoneUsageDescription`.
+- Not done on purpose: number normalisation — no local intent phrase contains numbers yet; add it when one does. Local template replies are not spoken (backend TTS serves AI replies only).
+- Checks: analyze clean, **151/151** tests (new: voice repository/data, listening use cases, cloud transcription/audio parsing, controller voice flow). Not run: native build, phone, board.
+
 ## Open
 
-1. **Slice 2 — app:** record button (hold-to-talk) in chat, consent sheet toggle for U3V, transcription call, `speak: true`, audio playback queue, cancel; new packages need checking (recorder and player, exact pins); iOS `NSMicrophoneUsageDescription`, Android `RECORD_AUDIO`. Number normalisation (digits → words) before the local intent parser.
-2. **Slice 3 — measure:** end-to-end turn timings on a real phone against the targets; TTS overlap (synthesize sentence n+1 while n plays) if needed.
-3. Persona text says XUNA only reads typed messages; with voice the app hears through the phone. Decide the wording before the phone test (the sensing-claim benchmark check depends on it).
-4. Run the backend with Piper on the stronger machine and decide Edge vs Piper as default.
+1. **Slice 3 — measure:** end-to-end turn timings on a real phone against the targets; TTS overlap (synthesize sentence n+1 while n plays) if needed. Phone checks: iOS audio route after recording (speaker, not earpiece), Android permission flow, mic while BLE is connected.
+2. Persona text says XUNA only reads typed messages; with voice the app hears through the phone. Decide the wording before the phone test (the sensing-claim benchmark check depends on it).
+3. Run the backend with Piper on the stronger machine and decide Edge vs Piper as default.

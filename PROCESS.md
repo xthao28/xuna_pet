@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: **V1 phone voice started** (D16 approved): slice 1 backend done ([V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md)): `POST /v1/speech/transcriptions` (Groq Whisper, consent U3V), `speak: true` spoken replies (Edge / optional Piper), check.sh 125 passed. Next: slice 2 app (hold-to-talk, U3V toggle, playback). V0 done ([plan](docs/roadmap/voice-parity-plan-2026-10-22.md), [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md)). Owner skipped Phase S for now; continues on a stronger machine. Earlier today: board runs `d1b17b8`; firmware `0a392c5` and mobile `73a80f8` pushed, not yet on board/phone; M04 review pending.
+Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: **V1 phone voice started** (D16 approved): slice 1 backend done ([V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md)): `POST /v1/speech/transcriptions` (Groq Whisper, consent U3V), `speak: true` spoken replies (Edge / optional Piper), check.sh 125 passed. Slice 2 app done (chat mic, U3V toggle, spoken replies; mobile 151/151). Next: slice 3 on a real phone (needs `XUNA_ASR_*`/`XUNA_TTS_*` on the backend and `alembic upgrade head`). V0 done ([plan](docs/roadmap/voice-parity-plan-2026-10-22.md), [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md)). Owner skipped Phase S for now; continues on a stronger machine. Earlier today: board runs `d1b17b8`; firmware `0a392c5` and mobile `73a80f8` pushed, not yet on board/phone; M04 review pending.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -14,6 +14,11 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-22 — V1 phone voice, slice 2 (app)
+
+- `record` 6.2.1 + `just_audio` 0.10.6 (pinned); new `voice` feature; `account` gets U3V consent, transcription and spoken reply events; the chat mic works (tap/tap, 15 s, cancel); consent sheet U3V row; Android/iOS mic permissions. Speech takes the typed-text path (teaching still needs confirmation). [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+- Checks: analyze clean, 151/151. Not run: native build, phone. Open: persona wording for voice (owner), phone measurement.
 
 ## 2026-10-22 — V1 phone voice, slice 1 (backend)
 

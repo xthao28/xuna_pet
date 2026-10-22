@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — Talk to XUNA from the app (phone voice V1, slice 2)
+
+- The chat microphone works: tap to talk, tap again to send. After turning on the new "Giọng nói" consent, speech becomes text that XUNA handles like typed text, and AI replies are read aloud sentence by sentence. Recordings are never kept. Host tests only so far. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+
 ## 2026-10-22 — Backend can hear and speak (phone voice V1, slice 1)
 
 - New consent "voice" (separate from text), speech-to-text endpoint using Groq Whisper, and spoken replies sentence by sentence (Edge voices, optional local Piper). Audio is never stored. The app part comes next. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
