@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — Ready for the phone voice test; LLM speed re-checked
+
+- Backend database upgraded for the voice consent, voice settings filled in and the server runs on the home network for the phone. Gemini's free tier was still slow (about 6.4 s to the first word, 3 failures in 14); models on Groq answered in 0.4–0.9 s with no failures, and the owner chose Groq gpt-oss-120b for the phone test. Emojis are no longer read aloud.
+- The Android app had stopped building after the voice and QR packages were added; the Android build tools were upgraded (AGP 8.9.1, Kotlin 2.2.20, Gradle 8.11.1, minimum Android 7.0) and the test app now builds on this Mac. The iPhone build needs the newer Mac. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+
 ## 2026-10-22 — Talk to XUNA from the app (phone voice V1, slice 2)
 
 - The chat microphone works: tap to talk, tap again to send. After turning on the new "Giọng nói" consent, speech becomes text that XUNA handles like typed text, and AI replies are read aloud sentence by sentence. Recordings are never kept. Host tests only so far. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).

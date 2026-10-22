@@ -1,6 +1,6 @@
 # V1 — Phone voice (started 2026-10-22)
 
-Status: **slices 1 (backend) and 2 (app) implemented and host-tested; slice 3 (phone measurement) open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
+Status: **slices 1 (backend) and 2 (app) implemented and host-tested; slice 3 prepared (backend on the LAN with Groq, Android debug APK built), phone measurement open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
 
 ## Design freeze
 
@@ -33,6 +33,23 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 - Permissions: Android `RECORD_AUDIO`, iOS `NSMicrophoneUsageDescription`.
 - Not done on purpose: number normalisation — no local intent phrase contains numbers yet; add it when one does. Local template replies are not spoken (backend TTS serves AI replies only).
 - Checks: analyze clean, **151/151** tests (new: voice repository/data, listening use cases, cloud transcription/audio parsing, controller voice flow). Not run: native build, phone, board.
+
+## Slice 3 — preparation and LLM re-check (2026-10-22, this Mac)
+
+- Backend: `alembic upgrade head` on `xuna_local` 0003 → 0004; gitignored `.env.groq` got `XUNA_ASR_PROVIDER=openai_transcription` and `XUNA_TTS_PROVIDER=edge` (+ voice/timeouts) per `.env.example`; uvicorn runs on `0.0.0.0:8000` with `.env.gemini` + `.env.groq` (`/readyz` ready over the LAN IP, speech route answers 401 without a token). A stale uvicorn from 2026-10-17 was holding port 8000 and was stopped.
+- App: this Mac has Xcode 14.2 (macOS 12), which cannot install on iOS 26 and is below Firebase 11.10's Xcode floor, so the **iOS build must run on the stronger machine**. The app uses Dio (dart:io), so iOS ATS does not block plain HTTP; iOS will ask for "Local Network" access on the first LAN call.
+- **Android build was broken since slice 2 / the QR feature** (host tests never build native code): `audio_session` 0.2.4 (via `just_audio`) and `mobile_scanner` 7.4.2 need the Kotlin 2 `compilerOptions` DSL; CameraX 1.6.1 needs AGP ≥ 8.9.1 and compileSdk 36; `audio_session` needs minSdk 24. Owner approved the toolchain bump: **AGP 8.2.2 → 8.9.1, Kotlin Gradle Plugin 1.8.22 → 2.2.20, Gradle 8.3 → 8.11.1, compileSdk 36, minSdk 23 → 24** (drops Android 6; all Apache-2.0). `pubspec.lock` unchanged. Debug APK (`--dart-define=XUNA_API_BASE_URL=http://192.168.2.11:8000`) **built** on this Mac (mobile `539630c`); not installed (no phone attached).
+- LLM for the phone test (owner choice): **Groq `openai/gpt-oss-120b`, reasoning effort low**, in gitignored `backend/.env.groq-text` that reuses the Groq key by variable; uvicorn now runs with `.env.groq` + `.env.groq-text`. Backend `bb905d9` drops emojis before TTS (gpt-oss adds them); check.sh 125 passed. Groq free tier is about 30 requests/min and 1,000/day for this model (third-party summaries of Groq's limits; check the console); Groq's data-use terms still need reading before any real owner data.
+- `text_benchmark.py`, 14 synthetic prompts, 1 run each (results local, gitignored):
+
+| Provider / model | Reasoning | Failures | TTFT median | Total median | Total max | Reading the replies |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gemini `gemini-3.5-flash-lite` (free) | — | 3 (2 ReadTimeout, 1 × 503) | 6376 ms | 6575 ms | 15645 ms | most natural Vietnamese, fits persona |
+| Groq `openai/gpt-oss-120b` (free) | low | 0 | 922 ms | 1001 ms | 2001 ms | natural, correct; adds emojis (strip before TTS) |
+| Groq `openai/gpt-oss-20b` (free) | low | 0 | 880 ms | 1009 ms | 1952 ms | odd words ("thịt kho tây", "hạt dưa"), invented memories ("Mình nhớ một chú mèo…") |
+| Groq `qwen/qwen3.8-27b` (free) | none | 0 | 434 ms | 515 ms | 1598 ms | fastest; awkward phrasing ("Nghe tên 'mệt'", "webcam hay tai nghe thụ động") |
+
+  All four: Vietnamese 100 %, ≤ 3 sentences, no false-memory or sensing flags by the heuristics. Gemini free tier alone breaks the 3 s turn target; any Groq model leaves room for ASR (~0.35–0.7 s warm) and first TTS audio. Owner chooses the provider (D11a still open).
 
 ## Open
 
