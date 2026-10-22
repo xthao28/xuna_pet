@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — Voice parity plan and first V0 measurements
+
+- [Plan](docs/roadmap/voice-parity-plan-2026-10-22.md) to match Xiaozhi on spoken conversation while stabilising XUNA's core; [Xiaozhi stack research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md). Benchmark tools in `backend/scripts/voice_bench/`. First small runs: local Whisper too slow on this Mac, Gemini audio accurate but far too slow, Edge TTS fast but flaky.
+
 ## 2026-10-22 — The app connects by scanning XUNA's pairing QR
 
 - Device tab → "Quét mã QR trên XUNA" opens the camera; the app reads `xuna://pair?…`, finds the nearby XUNA with that PetId and connects. New dependency `mobile_scanner` 7.4.2 (BSD-3, owner-approved). Not yet tried on a phone.

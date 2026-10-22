@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: board runs firmware `d1b17b8` (S19b BootSequence, S20, reaction + routine learning; uploaded 2026-10-22, boot Ok, same PetId); S21 target parity bit-identical host vs ESP32; [M04 record](docs/roadmap/M04-foundation.md) awaits owner review (S21 step 4). Device scenes, reaction effects, status card and pairing QR implemented host-side (board unplugged, upload pending; [record](docs/roadmap/device-scenes-2026-10-22.md)). Next: upload scenes when the board is back, owner review of M04, then phone session (gate (c), bind, AI chat). Routine learning app display pending.
+Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: **voice V0 in progress** ([plan](docs/roadmap/voice-parity-plan-2026-10-22.md), [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md), tools `backend/scripts/voice_bench/`). Owner skipped Phase S for now, tries voice through the app first, will continue on a stronger machine. Next: Groq Whisper key → cloud ASR run; full ASR model run on the stronger machine; then V1. Earlier today: board runs `d1b17b8`; firmware `0a392c5` (scenes/cards/QR) and mobile `73a80f8` (QR scan) pushed, not yet on board/phone; M04 review pending.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -14,6 +14,17 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-22 — Voice V0: corpus, small ASR/TTS runs, Xiaozhi research
+
+- Owner: mic + speaker are INMP441 + MAX98357A; skip Phase S for now; voice through the app first; V0 free/local only, synthetic corpus first; **do not run Xiaozhi**, study it instead; keep runs small on this Mac (2014 i7); try free cloud ASR; continue on a stronger machine.
+- `backend/scripts/voice_bench/` (own venv, not backend deps; [README](backend/scripts/voice_bench/README.md)): 30 sentences × 2 Edge voices × clean/10 dB noise = 120 WAVs (gitignored, rebuilt per machine); `asr_bench.py` (faster-whisper), `asr_cloud_bench.py` (Gemini audio / OpenAI-compatible transcriptions), `tts_bench.py`. `scripts/check.sh` passes (83 passed, 16 DB tests skipped).
+- Results (small): Whisper `small` WER 13 % (7.9 % clean with prompt "XUNA"), 5 s per 3 s audio on this Mac; Gemini audio WER 0 % clean but 13–21 s + 503s; Edge TTS first audio 0.47–0.63 s but flaky. [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md): Opus 16 kHz/60 ms WebSocket or MQTT+UDP, ESP-SR wake word, FunASR/SenseVoice default ASR (no Vietnamese), streaming Chinese vendors recommended.
+- Needs from the owner: a Groq API key (free tier) for the next ASR run; D16 before V1.
+
+## 2026-10-22 — Voice parity plan (Proposed)
+
+- Owner asked for a plan to at least match Xiaozhi on its strongest area (spoken conversation) while making XUNA's core stable. [Plan](docs/roadmap/voice-parity-plan-2026-10-22.md): Phase S (stabilise board/phone) + V0 (measure Xiaozhi locally on the same Vietnamese corpus) → V1 voice through the phone → V2 device voice (audio hardware) → V3 breadth; memory/backup in parallel. Waiting on owner decisions D16, D19/D11a (spending), D18 (hardware), Xiaozhi code reuse.
 
 ## 2026-10-22 — App scans the pairing QR
 
