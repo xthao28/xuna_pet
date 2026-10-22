@@ -62,7 +62,11 @@ GET /v1/audit-events?limit=50 → { "items": [ { "eventId", "action", "subject",
 
 ```http
 POST /v1/conversations/{petId}/turns     Accept: text/event-stream
-{ "schemaVersion": 1, "text": "…", "locale": "vi", "speak"?: false }
+{ "schemaVersion": 1, "text": "…", "locale": "vi", "speak"?: false,
+  "clientTime"?: "2026-10-23T21:05:00+07:00",                       (turn context, 2026-10-23)
+  "history"?: [{ "role": "owner"|"xuna", "text": "…" }],            (≤ 12 lines, each ≤ 500 chars)
+  "pet"?: { "activeSeconds", "learnedEvents", "current"?, "quietChoice"?, "playChoice"? } }
+                                                                      (actions: idle|happy|curious)
 → SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?}
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
@@ -74,6 +78,8 @@ POST /v1/speech/transcriptions            (phone voice V1, 2026-10-22)
 | 403 consent_required (needs conversationVoice) | 422 validation_failed (audio: size ≤ 256 KiB,
   base64, container magic) | 503 voice_unavailable (ASR off) | 503 provider_unavailable
 ```
+
+Turn context (owner 2026-10-23, "smart like Xiaozhi"): all optional, used for this call only and never stored (same U3 consent as the text). `clientTime` must carry a UTC offset; the prompt then states the time and weekday, otherwise XUNA says it does not know. `history` lines become earlier user/assistant messages. `pet` is the device's own view read over BLE (closed action set, integer counters, no free text) so XUNA can describe its age, current action and learned likes. Unknown fields → 422.
 
 `speak: true` cuts the streamed reply into sentences and sends one `audio` event per sentence, in order, after that sentence's `delta`s; a TTS failure stops speech for the rest of the turn with one `speech_unavailable`, while text continues. Pronunciation fixes (e.g. "XUNA" → "Xu Na") apply to the audio only. The transcription endpoint stores and logs neither the audio nor the text; the app sends the transcript through its normal text path (teaching still needs confirmation).
 

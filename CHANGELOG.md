@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — XUNA knows the time, the conversation and itself
+
+- AI replies now know the current time and day, remember the last few lines of the chat, and know XUNA's own age, what it is doing and what it has learned to like. XUNA answers knowledge questions properly, in short spoken-friendly sentences. Nothing is stored. Needs the iPhone app rebuilt.
+
 ## 2026-10-23 — XUNA's AI replies reach the phone; iOS rebuilt
 
 - The owner found that voice transcription worked but AI replies fell back to the local template. The test pet was rebound from the old test issuer to the owner's Google account. The app's SSE decoder also failed on Dio's Uint8List stream; mobile 006cf5b fixed it. The recorded app validation is 152/152.
