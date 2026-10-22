@@ -61,6 +61,11 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 - Mobile commits pushed: b60e396 (Pod lock + QR navigation fix), 7c32c33 (stop tracking the Firebase plist and ignore it). The Firebase plist remains on this machine and is ignored in the current tree. It was already committed in older mobile commit 7ebd06d; that old history has not been rewritten and no key rotation has been done. The new commits do not contain the plist.
 - Not run: Flutter analyze/tests, board, voice turns, speaker/earpiece route check, microphone while BLE is connected. No latency samples have been recorded yet.
 
+- **First phone tests (2026-10-23, iPhone 15):** transcription worked (Groq 0.63–1.42 s), but every reply was the local template "Mình chỉ hiểu…". Two causes, both fixed:
+  1. The real pet `d945c770…` was bound in `xuna_local` to the 2026-10-17 **test issuer** owner (`https://auth.test.xuna`), not the owner's Google account, so `boundPet` was null. The owner removed that local binding (devices/brains/pets/challenges rows; audit kept) and re-bound from the app (`POST /v1/pets` 201).
+  2. **App bug:** `SseCodec` used `bytes.transform(utf8.decoder)`; Dio delivers `Stream<Uint8List>`, which throws a runtime type error, so the first event failed and the repository reported the cloud unavailable. Host tests used `Stream<List<int>>`. Reproduced with real Dio against a replay of the backend's bytes; fixed with `utf8.decoder.bind` (mobile `006cf5b`, +1 regression test, analyze clean, 152/152). **The iOS app must be rebuilt.**
+- Backend probe (real Groq + Edge, test issuer, `xuna_test`): text turn 0.88 s total; spoken turn 4.9–11 s total because Edge TTS synthesises each sentence inline and failed with `provider_unavailable` after the first sentence once — Edge remains the latency/reliability risk for the 3 s target.
+
 | Turn | Send-to-first-audio (s) | Output route | BLE connected during recording? |
 | --- | ---: | --- | --- |
 | 1 | — | — | — |

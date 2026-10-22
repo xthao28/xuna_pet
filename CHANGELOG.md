@@ -1,6 +1,10 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
+
+## 2026-10-23 — XUNA's AI replies reach the phone
+
+- On the iPhone every chat or spoken message got the "Mình chỉ hiểu…" fallback. The pet was linked to an old test account on the home server (relinked to the owner's Google account), and the app could not read the server's streamed reply on a real device. The app is fixed; the iPhone app needs rebuilding.
 
 ## 2026-10-22 — iOS V1 app installed on iPhone 15; phone measurements open
 
