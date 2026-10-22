@@ -31,6 +31,12 @@ Steps with events (choose/feedback/commit/encode) cost 0.1–0.3 ms; quiet steps
 - Production upload SUCCESS, app SHA-256 `02c2fcee…2640764c` (`firmware-uploaded.bin`). Boot `recover=Ok slot=0 corrupt_slots=0 boot=21 ready=1`, PetId `d945c770…ed86`, quiet=1 play=0 preserved, setup stack 7,300 B, no error in 40 s.
 - Parity image uploaded, read, then production re-uploaded (same SHA-256). Boot `recover=Ok slot=1 … boot=23 ready=1` (the five-minute checkpoint wrote slot 1 in between), same PetId and preferences.
 
+## Board upload 2026-10-22 (evening): firmware `0a392c5`
+
+- Backup `/Users/xthao28/xuna_backups/2026-10-22-v1-scenes/`: partition `bd0f7954…fff6ce` identical to the build and to the morning backup; NVS read twice, both `cd8dc421…124c9a` (identical); keys `ident`, `devkey`, `life0`, `life1`, `slot0`, `slot1`, `bootc` 25.
+- Upload SUCCESS (hash verified), app SHA-256 `b13ee96f…0d8135` (`firmware-uploaded.bin`). Boot: `recover=Ok slot=0 corrupt_slots=0 boot=28 ready=1`, same PetId `d945c770…ed86`, quiet=1 play=0, setup stack 7,300 B, `scene_mode=auto`, device key loaded. One `nvs_open failed: NOT_FOUND` line is expected: the new `xuna_ui` namespace does not exist until the scene is first cycled. 40 s log: idle, loop gap ≤ 5.7 ms, draw ≤ 4.8 ms, heap stable 233,868 B.
+- Not checked yet: visual check of window scenes, heart/puff, status card, pairing QR; rain `scene_max_us`.
+
 ## Acceptance by slice
 
 | Slice | Sessions | Status | Evidence / gap |

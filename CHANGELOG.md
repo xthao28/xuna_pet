@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — Board runs the window scenes, status card and pairing QR
+
+- Firmware `0a392c5` uploaded after a verified NVS backup; XUNA booted with the same identity and learned preferences. Visual check still to do.
+
 ## 2026-10-22 — Ready for the phone voice test; LLM speed re-checked
 
 - Backend database upgraded for the voice consent, voice settings filled in and the server runs on the home network for the phone. Gemini's free tier was still slow (about 6.4 s to the first word, 3 failures in 14); models on Groq answered in 0.4–0.9 s with no failures, and the owner chose Groq gpt-oss-120b for the phone test. Emojis are no longer read aloud.
