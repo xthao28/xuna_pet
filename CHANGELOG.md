@@ -1,6 +1,23 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-20** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
+
+## 2026-10-22 — The app connects by scanning XUNA's pairing QR
+
+- Device tab → "Quét mã QR trên XUNA" opens the camera; the app reads `xuna://pair?…`, finds the nearby XUNA with that PetId and connects. New dependency `mobile_scanner` 7.4.2 (BSD-3, owner-approved). Not yet tried on a phone.
+
+## 2026-10-22 — Status card and pairing QR on the device
+
+- Hold GPIO0 to see XUNA's status card (age, energy, mood, what it learned, when the owner usually comes); hold both buttons for 3 s to show a pairing QR. Vietnamese text renders with Be Vietnam Pro glyphs; QR by the vendored Nayuki library (MIT). Both buttons now act on release. Host tests 240/240, ESP32 build PASS; not yet on the board.
+
+## 2026-10-22 — XUNA's window changes with the time of day; reactions show a heart or a puff
+
+- Device: a heart rises above XUNA when a pet teaches it, a puff when a shoo does. The window shows day, sunset, a starry night or animated rain; Auto follows the phone-synced day part, and holding GPIO14 (≥ 0.8 s) cycles the scene (saved in `xuna_ui`). GPIO14's short press now acts on release. Host tests 232/232, ESP32 build PASS; not yet on the board. [Record](docs/roadmap/device-scenes-2026-10-22.md).
+
+## 2026-10-22 — Board runs the new firmware; S21 target parity bit-identical
+
+- Board upload (owner connected the board): NVS backup verified (pet keys byte-identical across two reads, partition unchanged), firmware `d1b17b8` uploaded; boot `recover=Ok … ready=1`, same PetId and preferences. The board now has S19b `BootSequence`, S20, reaction learning and routine learning.
+- S21: new `[env:xuna_parity]` replays three Life Lab traces on the ESP32 with an in-RAM store (no BLE/display/NVS). All 24 output lines (counters, snapshot SHA-256, explanation) are **bit-identical** to the host. `step()` p99 7 µs quiet, ≤ 313 µs with events. Production re-uploaded afterwards. Optional `LifeCoreStepProbe` timing hook (+1 test): native and ASan 225/225. [M04 record](docs/roadmap/M04-foundation.md) written; owner review pending.
 
 ## 2026-10-20 — Routine learning: XUNA waits for the owner
 

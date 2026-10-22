@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-20** (Asia/Ho_Chi_Minh). Latest: S19a, S19b and S20 done (host only; boot policy shared via `BootSequence`, board upload pending; app now accepts curious); next S21 (target parity, needs the board). Reaction learning replaced app ratings (D6 revised); routine learning (part C) is in firmware (app display pending).
+Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: board runs firmware `d1b17b8` (S19b BootSequence, S20, reaction + routine learning; uploaded 2026-10-22, boot Ok, same PetId); S21 target parity bit-identical host vs ESP32; [M04 record](docs/roadmap/M04-foundation.md) awaits owner review (S21 step 4). Device scenes, reaction effects, status card and pairing QR implemented host-side (board unplugged, upload pending; [record](docs/roadmap/device-scenes-2026-10-22.md)). Next: upload scenes when the board is back, owner review of M04, then phone session (gate (c), bind, AI chat). Routine learning app display pending.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -14,6 +14,28 @@ Current status (2026-10-16):
 Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-22 — App scans the pairing QR
+
+- Owner approved the scanner dependency: `mobile_scanner: 7.4.2` (BSD-3). New `pairingScan` route, `ParsePairingCodeUseCase`, `ConnectPairedDeviceUseCase` (matches PetId via the identity read), device-tab button, iOS camera usage text. [Record](docs/roadmap/device-scenes-2026-10-22.md). Phone and board runs not done.
+
+## 2026-10-22 — Status card and pairing QR (host only)
+
+- Owner asked for items 4–5. GPIO0 hold → 8 s status card (Vietnamese, Be Vietnam Pro glyphs); both buttons 3 s → 60 s pairing QR `xuna://pair?pet=…&key=…`; any press closes a card. Both buttons now act on release; combos swallow single-button events. Vendored `lib/qrcodegen` (MIT). [Record](docs/roadmap/device-scenes-2026-10-22.md).
+- Native/ASan 240/240, ESP32 build PASS (Flash 2,995,977 B). Not on the board yet. App-side scanning added in the next entry.
+
+## 2026-10-22 — Window scenes and reaction effects (host only)
+
+- Owner approved: heart/puff when a reaction teaches, window by day part, GPIO14 hold (≥ 800 ms) cycles Auto/Day/Evening/Night/Rain with a sparkle. GPIO14 short press now fires on release. Hold ignored before hatch (S10 reserves the 3 s Egg hold). Scene stored in NVS `xuna_ui/scene`. [Record](docs/roadmap/device-scenes-2026-10-22.md).
+- Native/ASan 232/232, ESP32 build PASS (Flash +52 KB, heap +13 KB). Owner unplugged the board (warm); **not uploaded**. Next with the board: NVS backup, upload, visual check, `scene_max_us`/loop gap with rain.
+- Correction: the 2026-10-16 status line "GPIO0 is direct Happy" is outdated; GPIO0 greeting learning is on since 2026-10-19.
+
+## 2026-10-22 — Board upload and S21 target parity
+
+- Owner connected the board. Backup `/Users/xthao28/xuna_backups/2026-10-22-s20-routine/`: partition byte-identical to 2026-10-17; NVS read twice, only `bootc` differs (esptool reset boots), `ident`/`devkey`/`life0`/`life1`/`slot0`/`slot1` identical. Upload of `d1b17b8` SUCCESS (app SHA-256 `02c2fcee…2640764c`); boot `recover=Ok slot=0 corrupt_slots=0 boot=21 ready=1`, PetId `d945c770…ed86`, quiet=1 play=0, setup stack 7,300 B. This closes the S19b "next upload must re-check the boot log" item.
+- S21 steps 1–2: `[env:xuna_parity]` (`src/parity/parity_main.cpp`; `tools/embed_parity_traces.py` embeds c3, c8, c9; production env now filters out `src/parity/`, image unchanged). Board output **bit-identical** to `sim/lifecore_lab` (24 lines incl. snapshot SHA-256), c9 expects 6/6, two passes identical. `step()` µs: quiet p50/p99 7/7, max 272; event steps ≤ 313. Core change: optional `LifeCoreStepProbe` in `LifeCoreTrace.h` + test (does not change replay). Native 225/225, ASan 225/225; parity and production builds + purity PASS.
+- Production re-uploaded after the parity run (same SHA-256); boot `recover=Ok slot=1 boot=23 ready=1`, same PetId.
+- S21 step 3: [M04 record](docs/roadmap/M04-foundation.md). Step 4 (owner review) pending. Not run: real power cut on the board, render ±20 %, phone/app. Nothing committed.
 
 ## 2026-10-20 — Routine learning (part C, firmware host only)
 

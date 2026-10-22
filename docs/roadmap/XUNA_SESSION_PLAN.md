@@ -127,7 +127,7 @@ Session IDs are kept stable. Suffixes (`a`, `b`) mark splits or additions from t
 | S19a | M04.6 | Life Lab CLI + trace DSL + runner. **Done 2026-10-19** (`sim/lifecore_lab.cpp`; grammar frozen in `firmware/sim/README.md`) | firmware | S18 | M |
 | S19b | M04.6 | Scenarios D/E + 100-day invariants. **Done 2026-10-19 (host)**; boot policy moved to `xuna_core` `BootSequence` (board re-check pending) | firmware | S19a | M |
 | S20 | M04.6 | Golden vectors and Dart conformance. **Done 2026-10-19** (`sim/golden.cpp` → `mobile/test/fixtures/firmware/`; simulator learner removed) | firmware, mobile | S19b, D14 | M |
-| S21 | M04.6 | Target parity build and M04 acceptance review | firmware, root | S20 | M + Owner |
+| S21 | M04.6 | Target parity build and M04 acceptance review. **Steps 1–3 done 2026-10-22** (board bit-identical; [M04 record](M04-foundation.md)); owner review pending | firmware, root | S20 | M + Owner |
 | S22 | M05a/c-A | Learning + conversation decisions: D3–D6, D17, vocabulary, phrase scope (D16 optional) | root | can run any time after S02; must precede S23/S39 | Owner |
 | S23 | M05a | PreferenceLearner v2 + section migration (pure). **Superseded by E10 learner v3 / S18-prep** | firmware | S22, S21 | M |
 | S24 | M05a | Policy + ReactionTable (pure). **Superseded by E10 UCB + D3 in `ProductLearner`** | firmware | S23 | M |
