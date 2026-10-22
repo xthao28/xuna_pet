@@ -2,9 +2,11 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
-## 2026-10-23 — XUNA's AI replies reach the phone
+## 2026-10-23 — XUNA's AI replies reach the phone; iOS rebuilt
 
-- On the iPhone every chat or spoken message got the "Mình chỉ hiểu…" fallback. The pet was linked to an old test account on the home server (relinked to the owner's Google account), and the app could not read the server's streamed reply on a real device. The app is fixed; the iPhone app needs rebuilding.
+- The owner found that voice transcription worked but AI replies fell back to the local template. The test pet was rebound from the old test issuer to the owner's Google account. The app's SSE decoder also failed on Dio's Uint8List stream; mobile 006cf5b fixed it. The recorded app validation is 152/152.
+- Rebuilt and directly installed the release app on iPhone 15 with Flutter 3.32.8 / Dart 3.8.1 and Xcode 27.1; backend /readyz was ready. No package or lockfile changes in this rebuild.
+- Backend probe showed spoken Edge turns at 4.9–11 s, so phone measurements remain open. Still needed: five send-to-first-audio timings, QR camera confirmation, speaker/earpiece route, and microphone while BLE is connected. See [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
 
 ## 2026-10-22 — iOS V1 app installed on iPhone 15; phone measurements open
 

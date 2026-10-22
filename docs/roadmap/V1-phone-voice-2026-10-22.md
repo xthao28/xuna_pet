@@ -76,6 +76,12 @@ App: hold-to-talk → record (Ogg/Opus or AAC) → POST /v1/speech/transcription
 
 Owner test steps: allow Local Network and microphone; sign in with Google; enable “Giọng nói” (U3V) and AI chat; tap the microphone, speak, and tap again to send. Measure from send until the first audible audio over at least five turns. Also record whether replies use the speaker or earpiece and whether recording works while connected to the board over BLE. Target for this free-tier milestone: p50 ≤ 3 s.
 
+
+### 2026-10-23 — rebuild after app update
+
+- Mobile commit 006cf5b decodes AI reply SSE chunks delivered as Uint8List. No dependency or lockfile changed.
+- Release build compiled and installed directly on the iPhone 15 with the existing Firebase configuration and backend define. Flutter tests/analyze were not run. The five-turn voice timing, QR camera flow, speaker route, and microphone while BLE is connected remain open.
+
 ## Open
 
 1. **Slice 3 — owner phone checks:** record at least five send-to-first-audio timings; calculate p50 against the ≤ 3 s first milestone; confirm the corrected QR camera flow, iOS speaker/earpiece route, and microphone while BLE is connected. Android permission flow remains untested. Consider TTS overlap only if measurements show it is needed.
