@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: **voice V0 in progress** ([plan](docs/roadmap/voice-parity-plan-2026-10-22.md), [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md), tools `backend/scripts/voice_bench/`). Owner skipped Phase S for now, tries voice through the app first, will continue on a stronger machine. Next: Groq Whisper key → cloud ASR run; full ASR model run on the stronger machine; then V1. Earlier today: board runs `d1b17b8`; firmware `0a392c5` (scenes/cards/QR) and mobile `73a80f8` (QR scan) pushed, not yet on board/phone; M04 review pending.
+Last updated: **2026-10-22** (Asia/Ho_Chi_Minh). Latest: **voice V0 in progress** ([plan](docs/roadmap/voice-parity-plan-2026-10-22.md), [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md), tools `backend/scripts/voice_bench/`). Owner skipped Phase S for now, tries voice through the app first, will continue on a stronger machine. Groq Whisper tested (WER 5.3 %, ≈ 1.8 s median with Opus upload; key in gitignored `backend/.env.groq`). Next: full Groq run + kept-alive session; full local model run on the stronger machine; then V1 (D16). Earlier today: board runs `d1b17b8`; firmware `0a392c5` (scenes/cards/QR) and mobile `73a80f8` (QR scan) pushed, not yet on board/phone; M04 review pending.
 Current milestone: **Board now runs S10-sync + S26/S27-lite + Identity V1/V2 (uploaded 2026-10-17). Cloud gate (a) and (b) met on the board; (c) waits for the upgraded app on a phone.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -20,7 +20,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Owner: mic + speaker are INMP441 + MAX98357A; skip Phase S for now; voice through the app first; V0 free/local only, synthetic corpus first; **do not run Xiaozhi**, study it instead; keep runs small on this Mac (2014 i7); try free cloud ASR; continue on a stronger machine.
 - `backend/scripts/voice_bench/` (own venv, not backend deps; [README](backend/scripts/voice_bench/README.md)): 30 sentences × 2 Edge voices × clean/10 dB noise = 120 WAVs (gitignored, rebuilt per machine); `asr_bench.py` (faster-whisper), `asr_cloud_bench.py` (Gemini audio / OpenAI-compatible transcriptions), `tts_bench.py`. `scripts/check.sh` passes (83 passed, 16 DB tests skipped).
 - Results (small): Whisper `small` WER 13 % (7.9 % clean with prompt "XUNA"), 5 s per 3 s audio on this Mac; Gemini audio WER 0 % clean but 13–21 s + 503s; Edge TTS first audio 0.47–0.63 s but flaky. [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md): Opus 16 kHz/60 ms WebSocket or MQTT+UDP, ESP-SR wake word, FunASR/SenseVoice default ASR (no Vietnamese), streaming Chinese vendors recommended.
-- Needs from the owner: a Groq API key (free tier) for the next ASR run; D16 before V1.
+- Groq key added by the owner (`backend/.env.groq`, gitignored, recreate per machine). Groq `whisper-large-v3-turbo`: WER 5.3 % (clean and 10 dB noise, 10 utterances), median ≈ 1.8 s with Ogg/Opus upload vs 2.3–4.8 s with WAV. D16 still needed before V1.
 
 ## 2026-10-22 — Voice parity plan (Proposed)
 

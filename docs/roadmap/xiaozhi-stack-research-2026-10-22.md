@@ -36,7 +36,7 @@ Python (core server), Java + Vue (management console API/web), mobile console; D
 ## What this means for XUNA
 
 1. **Vietnamese is not their strong side.** The free local ASR (SenseVoice) does not cover Vietnamese; their free Vietnamese path would be Whisper behind the `openai` provider, or Vosk's small Vietnamese model. Their streaming recommendations are Chinese vendors. XUNA can beat them here by choosing Vietnamese-first providers (V0 benchmark).
-2. **Their speed comes from streaming every stage** (streaming ASR, sentence-level TTS start, Opus both ways) and from vendor streaming APIs, not from special hardware. XUNA V1 must do the same.
+2. **Compressed audio matters as much as the model:** on Groq, sending Opus instead of WAV cut the median from 2.3–4.8 s to ≈ 1.8 s. **Their speed comes from streaming every stage** (streaming ASR, sentence-level TTS start, Opus both ways) and from vendor streaming APIs, not from special hardware. XUNA V1 must do the same.
 3. **Protocol compatibility is an option, not a dependency.** If XUNA's voice endpoint follows the same shape (hello with audio params, Opus 16 kHz/60 ms, listen/stt/tts/abort, MCP over JSON-RPC), XUNA firmware could later reuse Xiaozhi's MIT audio code (Opus, I2S, AEC handling) with the notice kept. Decision for V2.
 4. **Where XUNA stays different:** memory written only after owner confirmation and a device commit (theirs: provider-written mem0/PowerMem), device-authoritative life and learning, privacy defaults (U0, no raw audio), and device-validated suggestions instead of the cloud calling device tools directly.
 
@@ -47,4 +47,4 @@ Python (core server), Java + Vue (management console API/web), mobile console; D
 | faster-whisper `small` local (2014 Intel i7) | WER 13 % (7.9 % clean with prompt "XUNA"); decode ≈ 5 s per 3 s audio: too slow on this machine |
 | Gemini `gemini-3.5-flash-lite` audio input (free tier) | WER 0 % clean / ≈ 10 % noisy on 8–10 utterances, but **13–21 s per utterance** and HTTP 503 / timeouts; `reasoning_effort: none` → HTTP 400 on lite; `gemini-3.8-flash` → 503 / timeouts. Not usable for real time |
 | Edge TTS (free) | First audio 470–630 ms on 6 calls; repeated 403 / "No audio received" while building the corpus → needs a fallback |
-| Next candidate | Groq `whisper-large-v3-turbo` (free tier, OpenAI-compatible); needs an owner-created key |
+| Groq `whisper-large-v3-turbo` (free tier, prompt "XUNA", 10 utterances) | WAV upload (114 KB): WER 5.3 % clean / 7.9 % noisy, median 2.3–4.8 s. **Ogg/Opus 16 kb/s upload (~10x smaller): WER 5.3 % clean and noisy, median ≈ 1.8 s (0.8–4.4 s)**; single curl calls 0.42–0.9 s. "XUNA" heard correctly. Errors: "nhé"→"nha", "tĩnh"→"tỉnh", one noisy "Thôi"→"Huy". Each call opens a new TLS connection (0.25–0.7 s); a kept-alive connection would remove that |
