@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-22** (Asia/Ho_Chi_Minh).
 
+## 2026-10-22 — Backend can hear and speak (phone voice V1, slice 1)
+
+- New consent "voice" (separate from text), speech-to-text endpoint using Groq Whisper, and spoken replies sentence by sentence (Edge voices, optional local Piper). Audio is never stored. The app part comes next. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+
 ## 2026-10-22 — Voice parity plan and first V0 measurements
 
 - [Plan](docs/roadmap/voice-parity-plan-2026-10-22.md) to match Xiaozhi on spoken conversation while stabilising XUNA's core; [Xiaozhi stack research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md). Benchmark tools in `backend/scripts/voice_bench/`. First small runs: local Whisper too slow on this Mac, Gemini audio accurate but far too slow, Edge TTS fast but flaky.

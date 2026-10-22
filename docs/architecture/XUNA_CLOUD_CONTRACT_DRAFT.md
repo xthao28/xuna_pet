@@ -48,23 +48,34 @@ Server rules: verify envelope hash and strict payload (implemented in `exports` 
 ### Consents (CLD-12)
 
 ```http
-GET /v1/consents → { "aggregateMetrics", "experienceEvents", "conversationText", "version", "updatedAt" | null }
+GET /v1/consents → { "aggregateMetrics", "experienceEvents", "conversationText", "conversationVoice",
+                     "version", "updatedAt" | null }
 PUT /v1/consents   { "schemaVersion": 1, "aggregateMetrics": false, "experienceEvents": false,
-                     "conversationText": false, "expectedVersion": 0 }
+                     "conversationText": false, "conversationVoice"?: false, "expectedVersion": 0 }
 → 200 new state | 409 consent_version_conflict
 GET /v1/audit-events?limit=50 → { "items": [ { "eventId", "action", "subject", "metadata", "occurredAt" } ] }
 ```
 
-Default all `false`, version 0 (U0). Each change appends a history row and an audit event; protected routes return `403 consent_required` (implemented 2026-10-17, CLD-12).
+`conversationVoice` (U3V, added 2026-10-22, owner D16) is optional in `PUT`: omitted keeps the current value, so apps that predate voice never revoke it. Default all `false`, version 0 (U0). Each change appends a history row and an audit event; protected routes return `403 consent_required` (implemented 2026-10-17, CLD-12).
 
 ### Conversations (Phase 1, CLD-13)
 
 ```http
 POST /v1/conversations/{petId}/turns     Accept: text/event-stream
-{ "schemaVersion": 1, "text": "…", "locale": "vi" }
-→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs}
+{ "schemaVersion": 1, "text": "…", "locale": "vi", "speak"?: false }
+→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?}
              | error {code}
+             | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
+             | speech_unavailable {code: "voice_unavailable"|"provider_unavailable"} (speak only, once)
+
+POST /v1/speech/transcriptions            (phone voice V1, 2026-10-22)
+{ "schemaVersion": 1, "audio": base64, "format": "ogg_opus"|"m4a_aac"|"wav", "locale": "vi" }
+→ 200 { "text", "latencyMs" }  ("" = nothing heard)
+| 403 consent_required (needs conversationVoice) | 422 validation_failed (audio: size ≤ 256 KiB,
+  base64, container magic) | 503 voice_unavailable (ASR off) | 503 provider_unavailable
 ```
+
+`speak: true` cuts the streamed reply into sentences and sends one `audio` event per sentence, in order, after that sentence's `delta`s; a TTS failure stops speech for the rest of the turn with one `speech_unavailable`, while text continues. Pronunciation fixes (e.g. "XUNA" → "Xu Na") apply to the audio only. The transcription endpoint stores and logs neither the audio nor the text; the app sends the transcript through its normal text path (teaching still needs confirmation).
 
 Requires `conversationText` consent for this call; text is not stored unless retention is separately enabled. Output is display text; facts only via memory candidates. **Implemented 2026-10-17**: 403 `consent_required` without U3, 404 for another owner's pet, 422 for >500 chars; on provider outage the stream ends with `event: error {"code": "provider_unavailable"}`. Tool calls are not forwarded yet.
 
