@@ -93,6 +93,12 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
     - Một buổi cực đoan, "2 buổi xấu + 1 buổi tốt" và owner xen kẽ đều không làm dịch trait (có test).
   - **Tín hiệu sớm cho PE-1d:** owner ngẫu nhiên (mỗi lần khen/chê 50/50, 60 buổi) vẫn dịch trung bình 0.031, tối đa 0.15; owner pet 80 % dịch +0.35. Cần quét `kMinSessions` và ngưỡng nhất quán ở PE-1d.
   - Owner chỉ khen 2/3 số lần thì không dịch (độ nhất quán 1/3), có thể quá bảo thủ.
+- **PE-1b xong 2026-10-23:** `xuna/life/Drives.h` (explore, social, play, boredom; tốc độ theo genome; social bão hoà 2 h rồi lắng về 0; cập nhật theo phút, tách nhỏ = một lần). 8 test (`test_drives`).
+- **PE-1c xong 2026-10-23:** `xuna/life/Affect.h` (emotion ⇄ mood lò xo, cảm xúc từ kỳ vọng, competence, sàn mood −0,5). 9 test (`test_affect`). **O1 theo mặc định uỷ quyền 2026-10-23 (đổi được):** sensitivity chỉ làm cảm xúc mạnh và lâu hơn; mood luôn hồi về mức nền; vắng chủ không gây buồn; không có bằng chứng nào đẩy sensitivity/mood baseline.
+- **PE-1d xong 2026-10-23:** `xuna/lab/PersonalityShadow.h` + `sim/personality_lab.cpp` (shadow cạnh BoardLab, hành vi thật không đổi), 4 test shadow; `LedgerConfig` để quét tham số. Sociability đổi sang sai số dự đoán vì ±1 cố định tự phình. **Báo cáo G1:** [PE1-G1-report.md](../../research/PE1-G1-report.md).
+  - **Đạt:** mọi chốt an toàn (vắng chủ, ngày tệ, im lặng, owner ngẫu nhiên, đảo sở thích, không đè learning).
+  - **Chưa đạt:** tỉ lệ dòng 1 (0,49 ở ngày 30, 1,35 ở ngày 90), và khí chất bẩm sinh không nhìn thấy được qua lựa chọn action (JS 0).
+  - **Chờ owner:** G1-a…d.
 - **Gate G1 (owner):** đạt các ngưỡng §5 trong lab; báo cáo nêu rõ những khác biệt nào **nhìn thấy được với 3 action hiện có** và khác biệt nào cần animation mới.
 
 ### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2**
@@ -164,7 +170,7 @@ Nền PE-0 cho các dòng trên ([báo cáo](../../research/PE0-baseline.md) §3
 
 | ID | Câu hỏi | Khi nào cần |
 |---|---|---|
-| O1 | Tính "nhạy cảm" có được làm XUNA dè dặt lâu dài không (có sàn và hồi phục), hay chỉ ảnh hưởng mood tạm? | Trước PE-1c |
+| O1 | Tính "nhạy cảm" có được làm XUNA dè dặt lâu dài không (có sàn và hồi phục), hay chỉ ảnh hưởng mood tạm? | Trước PE-1c — **mặc định theo uỷ quyền 2026-10-23: chỉ mood tạm** (đổi được) |
 | O2 | Section 5 required (firmware cũ chỉ đọc) hay optional (mất trait khi rollback)? | Trước PE-3 |
 | O3 | Duyệt và vẽ animation mới nào (Track A)? | Trước PE-4a |
 | O4 | "Không xác nhận" có áp luôn cho **sở thích** học từ chat không? Plan hiện chỉ áp cho tính cách | Trước PE-4c |

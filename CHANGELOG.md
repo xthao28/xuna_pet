@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — Personality step 3: wants, feelings, and a first full test
+
+- XUNA's planned personality now also has wants (to explore, to play, to be with its owner, boredom) and feelings. Feelings come from what XUNA expected: a pet it did not expect is a happy surprise, a shoo after a pet it expected is a disappointment. Feelings fade, and its mood always returns to its usual level. Missing its owner settles down after a while and never turns into sadness.
+- In the computer simulation, everything runs next to XUNA without changing what it does. The safety checks pass: XUNA's personality does not change when the owner is away, after one bad day or with an owner who reacts at random, and it never overrides what the owner taught. An owner who loves XUNA's curiosity makes it noticeably more curious over a month or more. With only three animations, though, a pet's inborn temperament is hard to see. The owner now decides how to continue. [Report](docs/research/PE1-G1-report.md).
+
 ## 2026-10-23 — Personality step 2: an inborn temperament and how it may change
 
 - Each XUNA can now get its own temperament at birth (ten traits such as curiosity, sociability and tempo), drawn from a number every pet already stores, so the same pet always gets the same temperament. What the owner does is collected as evidence, and a trait moves only a little at a time, only after several separate sessions that point the same way. One extreme day, an owner who keeps changing their mind and XUNA's own actions do not change who it is. Each change is written down with its reason for a future Journal. Computer tests only; the board does not use it yet.
