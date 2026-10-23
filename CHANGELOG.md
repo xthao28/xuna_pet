@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — XUNA's voice no longer breaks off in long answers
+
+- In a long spoken answer, each sentence used to be cut off by the next one, so XUNA seemed to stop mid-sentence and jump ahead. The app now lets every sentence finish before the next one starts.
+- The free voice service sometimes fails or is slow for one sentence. XUNA now tries that sentence again instead of going silent for the rest of the answer, and never plays half a sentence.
+- Needs a new app build on the phone to take effect.
+
 ## 2026-10-23 — Personality step 3: wants, feelings, and a first full test
 
 - XUNA's planned personality now also has wants (to explore, to play, to be with its owner, boredom) and feelings. Feelings come from what XUNA expected: a pet it did not expect is a happy surprise, a shoo after a pet it expected is a disappointment. Feelings fade, and its mood always returns to its usual level. Missing its owner settles down after a while and never turns into sadness.
