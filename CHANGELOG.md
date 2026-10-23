@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — XUNA starts speaking sooner; plan for hands-free voice
+
+- XUNA's spoken replies no longer wait sentence by sentence: the text keeps coming while the next sentences are turned into speech, and the first piece can stop at a comma so the first sound comes sooner. Sentences are still spoken in order, and the server now reports how long the first sound took. Tested on the computer only; it still needs a phone measurement.
+- A design for a single always-open voice connection (talk without tapping twice, interrupt XUNA, the same connection for the board later) is written for the owner to review. Nothing of it is built yet.
+
 ## 2026-10-23 — The app reconnects to XUNA by itself
 
 - Opening the app now finds and connects the XUNA it was connected to last time, and checks that it is still the same pet. The "Tự động kết nối khi mở app" setting works (on by default) and can be turned off. If XUNA is not nearby, the status line says so without a pop-up. Tested on the computer only; it still needs a phone and the board.

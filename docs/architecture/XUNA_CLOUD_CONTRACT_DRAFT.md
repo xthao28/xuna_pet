@@ -67,7 +67,7 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
   "history"?: [{ "role": "owner"|"xuna", "text": "…" }],            (≤ 12 lines, each ≤ 500 chars)
   "pet"?: { "activeSeconds", "learnedEvents", "current"?, "quietChoice"?, "playChoice"? } }
                                                                       (actions: idle|happy|curious)
-→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?}
+→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?}
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
              | speech_unavailable {code: "voice_unavailable"|"provider_unavailable"} (speak only, once)
@@ -81,7 +81,7 @@ POST /v1/speech/transcriptions            (phone voice V1, 2026-10-22)
 
 Turn context (owner 2026-10-23, "smart like Xiaozhi"): all optional, used for this call only and never stored (same U3 consent as the text). `clientTime` must carry a UTC offset; the prompt then states the time and weekday, otherwise XUNA says it does not know. `history` lines become earlier user/assistant messages. `pet` is the device's own view read over BLE (closed action set, integer counters, no free text) so XUNA can describe its age, current action and learned likes. Unknown fields → 422.
 
-`speak: true` cuts the streamed reply into sentences and sends one `audio` event per sentence, in order, after that sentence's `delta`s; a TTS failure stops speech for the rest of the turn with one `speech_unavailable`, while text continues. Pronunciation fixes (e.g. "XUNA" → "Xu Na") apply to the audio only. The transcription endpoint stores and logs neither the audio nor the text; the app sends the transcript through its normal text path (teaching still needs confirmation).
+`speak: true` cuts the streamed reply into sentences and sends one `audio` event per sentence, in order, after that sentence's `delta`s. Since 2026-10-23 the text keeps streaming while sentences are synthesised (up to 2 at a time), so `delta`s of later sentences may arrive before earlier `audio`; the first piece may end at a comma once it is ≥ 16 characters; `firstAudioMs` (turn start → first audio ready on the server) is added to `finished` when something was spoken. A TTS failure stops speech for the rest of the turn with one `speech_unavailable`, while text continues. Pronunciation fixes (e.g. "XUNA" → "Xu Na") apply to the audio only. The transcription endpoint stores and logs neither the audio nor the text; the app sends the transcript through its normal text path (teaching still needs confirmation).
 
 Requires `conversationText` consent for this call; text is not stored unless retention is separately enabled. Output is display text; facts only via memory candidates. **Implemented 2026-10-17**: 403 `consent_required` without U3, 404 for another owner's pet, 422 for >500 chars; on provider outage the stream ends with `event: error {"code": "provider_unavailable"}`. Tool calls are not forwarded yet.
 
