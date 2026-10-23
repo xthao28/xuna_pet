@@ -7,7 +7,7 @@ Tiếp tục dự án XUNA (repo xuna_pet, nhánh dev, submodule backend/firmwar
 Trả lời mình bằng tiếng Việt. Máy này là máy mạnh, dùng để build iOS.
 
 Trước khi làm: git pull và git submodule update --init; đọc CLAUDE.md, AGENTS.md,
-mobile/AGENTS.md, dòng đầu PROCESS.md và docs/roadmap/V1-phone-voice-2026-10-22.md
+mobile/AGENTS.md, dòng đầu PROCESS.md và docs/roadmap/voice/V1-phone-voice-2026-10-22.md
 (mục "Slice 3").
 
 Mục tiêu: cài app XUNA bản mới (mobile 539630c trở lên: micro, giọng nói, quét QR) lên

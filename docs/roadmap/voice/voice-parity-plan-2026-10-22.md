@@ -1,6 +1,6 @@
 # Voice parity with Xiaozhi + a stable XUNA core (plan, 2026-10-22)
 
-Status: **Proposed** (owner asked for the plan; nothing here is approved until the decisions in §6 are made). Authority: [AGENTS.md](../../AGENTS.md); voice gates: [device voice architecture](../architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md) and session plan VOICE-01–04; cloud phases: [Cloud plan](../architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md) §7.
+Status: **Proposed** (owner asked for the plan; nothing here is approved until the decisions in §6 are made). Authority: [AGENTS.md](../../../AGENTS.md); voice gates: [device voice architecture](../../architecture/XUNA_DEVICE_VOICE_ARCHITECTURE.md) and session plan VOICE-01–04; cloud phases: [Cloud plan](../../architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md) §7.
 
 ## 1. Goal
 
@@ -11,7 +11,7 @@ Status: **Proposed** (owner asked for the plan; nothing here is approved until t
 
 ## 2. What "at least equal" means
 
-Xiaozhi baseline (from the 2026-10-17 inspection of `xiaozhi-esp32-server`, see [backend architecture](../../backend/docs/ARCHITECTURE.md)): VAD → ASR → LLM → TTS streaming per connection, device audio over WebSocket/MQTT, many providers per capability, plugin + MCP tools, memory and intent providers. Its actual latency and Vietnamese quality are **not yet measured by us**; §5 does that first.
+Xiaozhi baseline (from the 2026-10-17 inspection of `xiaozhi-esp32-server`, see [backend architecture](../../../backend/docs/ARCHITECTURE.md)): VAD → ASR → LLM → TTS streaming per connection, device audio over WebSocket/MQTT, many providers per capability, plugin + MCP tools, memory and intent providers. Its actual latency and Vietnamese quality are **not yet measured by us**; §5 does that first.
 
 | Area | Parity target (owner to confirm numbers after §5) |
 | --- | --- |
@@ -45,7 +45,7 @@ Estimates are working sessions of the current kind, not calendar promises; they 
 1. Board session: NVS backup, upload `0a392c5`, check scenes/effects/cards, `scene_max_us`, loop gap; thermal reading (and backlight/CPU-clock options if hot).
 2. Phone session: QR pairing, gate (c) export hash, bind + AI chat.
 3. Owner trial of reactions/routine; real power-cut matrix; 24 h then 7-day soak with logged heap/temperature.
-4. Owner review of the [M04 record](M04-foundation.md).
+4. Owner review of the [M04 record](../milestones/M04-foundation.md).
 
 ### Phase V0 — Baseline and provider choice (1–2 sessions, host only)
 
@@ -72,7 +72,7 @@ Rough turn estimate with a fast ASR (≈ 0.5 s) + LLM first sentence + TTS first
 
 Cloud ASR, free tiers (owner: "try free cloud before a stronger machine"): Gemini audio input is accurate (WER 0 % clean on 8 utterances) but takes 13–21 s per utterance with HTTP 503 / timeouts → not real-time. Groq `whisper-large-v3-turbo` (free, key in `backend/.env.groq`): **WER 5.3 % clean and noisy with Opus upload, median ≈ 1.8 s (single calls 0.42–0.9 s)**; best candidate so far. Still above the ≈ 0.5 s ASR budget: V1 needs a kept-alive connection, Opus from the phone, and a check of Groq free-tier limits/variance (or a streaming ASR).
 
-**Continue here (any machine):** set up `backend/scripts/voice_bench` per its [README](../../backend/scripts/voice_bench/README.md) (venv, `make_corpus.py`), then: (1) ~~Groq full run~~ done 2026-10-22: WER 2.2 % clean / 3.6 % noisy (digit formatting excluded), latency p50 1.40 s / p95 3.34 s with a kept-alive session, no rate-limit errors at 3.2 s pacing; V1 needs number normalisation (digits ↔ words) before intent parsing, and latency beyond the free tier (streaming ASR or a paid/dedicated endpoint) to reach the budget; (2) on a stronger machine, `asr_bench.py` with `small`, `medium`, `large-v3-turbo` ± `--prompt XUNA` on the full 120-utterance corpus; (3) ~~TTS fallback~~ done 2026-10-22: Piper local `vi_VN-vais1000-medium` (first audio ≈ 130 ms, ASR round-trip WER 4.3 %, offline; GPL-3.0 runtime) — owner to listen for naturalness; (4) ~~freeze §2 numbers~~ agreed 2026-10-22 (free-tier milestone p50 ≤ 3 s; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; WER ≤ 5 % clean / ≤ 8 % noisy); (5) ~~start V1~~ started 2026-10-22 with D16 approved: [V1 record](V1-phone-voice-2026-10-22.md) (slice 1 backend done; slice 2 app next).
+**Continue here (any machine):** set up `backend/scripts/voice_bench` per its [README](../../../backend/scripts/voice_bench/README.md) (venv, `make_corpus.py`), then: (1) ~~Groq full run~~ done 2026-10-22: WER 2.2 % clean / 3.6 % noisy (digit formatting excluded), latency p50 1.40 s / p95 3.34 s with a kept-alive session, no rate-limit errors at 3.2 s pacing; V1 needs number normalisation (digits ↔ words) before intent parsing, and latency beyond the free tier (streaming ASR or a paid/dedicated endpoint) to reach the budget; (2) on a stronger machine, `asr_bench.py` with `small`, `medium`, `large-v3-turbo` ± `--prompt XUNA` on the full 120-utterance corpus; (3) ~~TTS fallback~~ done 2026-10-22: Piper local `vi_VN-vais1000-medium` (first audio ≈ 130 ms, ASR round-trip WER 4.3 %, offline; GPL-3.0 runtime) — owner to listen for naturalness; (4) ~~freeze §2 numbers~~ agreed 2026-10-22 (free-tier milestone p50 ≤ 3 s; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; WER ≤ 5 % clean / ≤ 8 % noisy); (5) ~~start V1~~ started 2026-10-22 with D16 approved: [V1 record](V1-phone-voice-2026-10-22.md) (slice 1 backend done; slice 2 app next).
 
 ### Phase V1 — Voice through the phone (fastest real voice, ~4–6 sessions)
 

@@ -123,4 +123,4 @@ Board `/dev/cu.usbmodem14101`, ESP32-S3 rev v0.2, MAC `98:c3:77:a6:6f:d8`. No ph
 
 ## 2026-10-17 — C: backend CLD-10 scaffold, CLD-01/CLD-02 drafts
 
-See `backend/README.md`, `backend/AGENTS.md`, `backend/docs/ARCHITECTURE.md`, [threat model](../architecture/XUNA_CLOUD_THREAT_MODEL.md) and [contract draft](../architecture/XUNA_CLOUD_CONTRACT_DRAFT.md). Backend verifies the real mobile-generated `xuna.export.v1` golden fixture, so gate (c) files exported from the board will be checkable server-side. No device data stored; no provider; nothing pushed.
+See `backend/README.md`, `backend/AGENTS.md`, `backend/docs/ARCHITECTURE.md`, [threat model](../../architecture/XUNA_CLOUD_THREAT_MODEL.md) and [contract draft](../../architecture/XUNA_CLOUD_CONTRACT_DRAFT.md). Backend verifies the real mobile-generated `xuna.export.v1` golden fixture, so gate (c) files exported from the board will be checkable server-side. No device data stored; no provider; nothing pushed.

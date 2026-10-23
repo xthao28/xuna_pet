@@ -2,7 +2,7 @@
 
 Status: research note for the [voice parity plan](voice-parity-plan-2026-10-22.md). Owner decision 2026-10-22: **do not run or benchmark Xiaozhi now**; study what it uses. Test Xiaozhi itself only if XUNA later runs Xiaozhi code (server or firmware), not when it only follows the same design.
 
-Sources: `xinnan-tech/xiaozhi-esp32-server` `main` @ `fdf280f` (2026-10-22, MIT), read locally; `78/xiaozhi-esp32` README and `docs/websocket.md` (MIT). Earlier comparison: [backend architecture](../../backend/docs/ARCHITECTURE.md#cognition-design-and-the-xiaozhi-reference).
+Sources: `xinnan-tech/xiaozhi-esp32-server` `main` @ `fdf280f` (2026-10-22, MIT), read locally; `78/xiaozhi-esp32` README and `docs/websocket.md` (MIT). Earlier comparison: [backend architecture](../../../backend/docs/ARCHITECTURE.md#cognition-design-and-the-xiaozhi-reference).
 
 ## Device firmware (`78/xiaozhi-esp32`)
 

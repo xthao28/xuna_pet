@@ -71,7 +71,7 @@ Nét đứt = có trong code/spec nhưng **không chạy trong production**.
 | Behavior decision | **Implemented**: learner quyết định, FSM/Gate lọc | [LifeCore.h:320](../../firmware/lib/xuna_core/include/xuna/life/LifeCore.h#L320) [V] |
 | Utility scoring (`BehaviorSelector`) | **Experimental / không wire** | chỉ `test_action_policy` dùng [V] |
 | Preference learning | **Implemented + board + Life Lab** | [PreferenceLearnerV3.h:20](../../firmware/lib/xuna_core/include/xuna/learning/PreferenceLearnerV3.h#L20) [V] |
-| Habit / routine | **Implemented (firmware), app chưa hiển thị** | [HabitPredictor.h](../../firmware/lib/xuna_core/include/xuna/learning/HabitPredictor.h), [record](../roadmap/routine-learning-2026-10-20.md) [V] |
+| Habit / routine | **Implemented (firmware), app chưa hiển thị** | [HabitPredictor.h](../../firmware/lib/xuna_core/include/xuna/learning/HabitPredictor.h), [record](../roadmap/learning/routine-learning-2026-10-20.md) [V] |
 | Memory | **Partial**: ring 8 episode v1; memory store là M05b | `SnapshotEpisodes` [V] |
 | Explainability ("tại sao") | **Implemented** cho preference | `ExplanationCodec`, `LearnerV3Explanation` [V] |
 | Conversation (Layer A + LLM) | **Implemented, phone** | `chat_turn.py`, S39 extractor [V] |

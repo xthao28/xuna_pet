@@ -37,4 +37,4 @@ S18 is **partially prepared, not complete**. Existing host composition is useful
 3. With a board: finish S17 expression/sleep/wake/rejection and render timing checks. A supported real iPhone can serve the phone checks; Android is not intrinsically required.
 4. Once prerequisites pass: implement full S18 composition, typed persistence outputs and thin loop; run transcript, native/sanitizer/ESP32 checks and owner connect/feedback/reboot smoke.
 
-Evidence: [session plan](XUNA_SESSION_PLAN.md), [review fixes](M04-review-fixes-2026-10-14.md), [host LifeCore record](lifecore-step.md). No tests were rerun in this audit; prior results retain their original scope.
+Evidence: [session plan](../XUNA_SESSION_PLAN.md), [review fixes](../milestones/M04-review-fixes-2026-10-14.md), [host LifeCore record](../lifecore/lifecore-step.md). No tests were rerun in this audit; prior results retain their original scope.

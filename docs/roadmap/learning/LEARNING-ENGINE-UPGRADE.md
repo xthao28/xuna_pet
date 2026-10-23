@@ -97,4 +97,4 @@ Không chỉ tăng counter. Cần chứng minh bằng replay/golden data rằng:
 
 Competitor review and phased amendments (closed-loop Life Lab, v3 learner,
 curiosity variant, teachable tricks, formation arc, senses):
-[XUNA_LEARNING_COMPETITIVE_UPGRADE.md](../architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md).
+[XUNA_LEARNING_COMPETITIVE_UPGRADE.md](../../architecture/XUNA_LEARNING_COMPETITIVE_UPGRADE.md).

@@ -13,4 +13,4 @@ Mood is derived, transient state. Arousal and valence are clamped axes; labels u
 
 The current Windows environment has no PlatformIO or C++ compiler executable, so native/sanitizer/ESP32 validation remains pending.
 
-Update 2026-10-14 (Mac): native and ASan/UBSan suites PASS after correcting the partition test. Energy now recovers while the caller reports Resting/Sleeping (`energyRecoveryPerMinute`, Proposed); see [review fixes](M04-review-fixes-2026-10-14.md).
+Update 2026-10-14 (Mac): native and ASan/UBSan suites PASS after correcting the partition test. Energy now recovers while the caller reports Resting/Sleeping (`energyRecoveryPerMinute`, Proposed); see [review fixes](../milestones/M04-review-fixes-2026-10-14.md).

@@ -4,7 +4,7 @@
 **Version:** 0.1.2. Device-first direction update; preserves audit history. D17 was Approved on 2026-10-12; D15 and device voice implementation choices remain Proposed.
 **Status:** **Proposed.** Nothing here is Approved unless it cites an existing Approved decision. *(2026-10-16 note: much of M04 and the M05a core is now Implemented on host; production still runs the v1 + `BoardLearner` path. Current status lives in [PROCESS.md](../../PROCESS.md); gate simplifications approved 2026-10-16 are in AGENTS.md §3.)*
 **Date:** 2026-10-12
-**Inputs:** root [AGENTS.md](../../AGENTS.md) (canonical), [XUNA_DIGITAL_LIFE_SPEC.md](../product/XUNA_DIGITAL_LIFE_SPEC.md) v0.3.0 (Proposed spec), [PROCESS.md](../../PROCESS.md), [PLAN.md](../../PLAN.md), [MVP-local.md](../roadmap/MVP-local.md), [M02-ble.md](../roadmap/M02-ble.md), and the source at firmware `be58099`, mobile `3846880`, backend `0032828`.
+**Inputs:** root [AGENTS.md](../../AGENTS.md) (canonical), [XUNA_DIGITAL_LIFE_SPEC.md](../product/XUNA_DIGITAL_LIFE_SPEC.md) v0.3.0 (Proposed spec), [PROCESS.md](../../PROCESS.md), [PLAN.md](../../PLAN.md), [MVP-local.md](../roadmap/milestones/MVP-local.md), [M02-ble.md](../roadmap/milestones/M02-ble.md), and the source at firmware `be58099`, mobile `3846880`, backend `0032828`.
 **Audience:** product owner, coding agents and firmware/mobile engineers who will implement XUNA milestones M04–M07.
 
 > If this plan disagrees with AGENTS.md, AGENTS.md wins. Raise the conflict instead of silently following this plan. Every slice below needs an explicit owner go-ahead before implementation (AGENTS.md §4: "Only work on the requested milestone").
@@ -872,7 +872,7 @@ All multi-byte integers are little-endian. Codecs serialize field by field and n
 | `ClockQuality` | u8 | `0 Unknown, 1 Approximate, 2 Synced` (spec §12.2) |
 | `ClockSource` | u8 | `0 none, 1 phone_ble, 2 ntp [F], 3 rtc [F]` |
 
-S06 pure identity codec uses a 64-byte schema-1 layout recorded in [S06 core evidence](../roadmap/S06-identity-core.md). Storage and hardware entropy/boot-counter wiring remain pending; this record does not change storage-layout decision D2.
+S06 pure identity codec uses a 64-byte schema-1 layout recorded in [S06 core evidence](../roadmap/sessions/S06-identity-core.md). Storage and hardware entropy/boot-counter wiring remain pending; this record does not change storage-layout decision D2.
 
 ### 7.2 Experience event envelope (device binary, 40 bytes)
 
@@ -963,9 +963,9 @@ The schema version lives in each log segment header (Section 7.6), not in each r
 
 The 8 episodes in the current v1 snapshot migrate to v2 memory-store episodes with provenance `user_feedback` and `utcMinute = 0` (unknown). v1 counts migrate into the coarse learner cells as `alpha = 1 + positive`, `beta = 1 + negative` in Q16.16.
 
-**Approved amendment (E10-C, owner 2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md) slice 3.
+**Approved amendment (E10-C, owner 2026-10-15):** cap the migrated mass per cell at the learner's effective memory 1/(1 − γ) while keeping the positive:negative ratio, and keep the raw count in `nRated`. Uncapped v1 counts (up to 1,000 per cell) would make the discounted learner as slow to adapt as v1, which failed every reversal in Life Lab. Implemented in `LearnerV3Codec::migrateFromV1` (lab only); see the [learner v3 record](../roadmap/learning/learner-v3-phase1-2026-10-15.md) slice 3.
 
-**Frozen layout (S12a, 2026-10-15; host codec, not yet wired):** header 12 B = `'X' 'U'`, `schema u8 = 2`, `flags u8 = 0`, `size u16` (incl. CRC), reserved `u16 = 0`, `generation u32`; then sections `{u8 id, u8 version, u16 length, data}`; then the CRC-32 trailer. Id bit 7 = required. Ids: 1 Counters (required, 16 B: `bootCounter`, `activeSeconds`, `eventSeqCommitted`, `feedbackCount` = v1 `eventCount`), 2 Clock, 3 Lifecycle, 4 Needs (4 B), 5 Personality, 6 Learner (required, `LearnerV3Codec` payload, 458 B for 3 × 5 × 3), 7 Habit, 8 Skills, 9 Dedup, 10 Pointers, 11 Episodes (34 B, the v1 ring until M05b), 12 StatedPreference. Ids 3, 5, 7–10 and 12 are reserved until their code exists. Id 2 Clock (6 B: `lastTrustedUtcMinute` u32, `tzOffsetMin` i16) is written after the first accepted sync (S10 host part, [record](../roadmap/S10-host-trusted-time-2026-10-15.md)). Product snapshot: 536 B, 544 B with needs, 554 B with needs and clock. Recovery and A/B rules: [S12 record](../roadmap/S12-snapshot-v2-2026-10-15.md). Done before D2 by owner choice; D2 still decides the medium and keys (S13).
+**Frozen layout (S12a, 2026-10-15; host codec, not yet wired):** header 12 B = `'X' 'U'`, `schema u8 = 2`, `flags u8 = 0`, `size u16` (incl. CRC), reserved `u16 = 0`, `generation u32`; then sections `{u8 id, u8 version, u16 length, data}`; then the CRC-32 trailer. Id bit 7 = required. Ids: 1 Counters (required, 16 B: `bootCounter`, `activeSeconds`, `eventSeqCommitted`, `feedbackCount` = v1 `eventCount`), 2 Clock, 3 Lifecycle, 4 Needs (4 B), 5 Personality, 6 Learner (required, `LearnerV3Codec` payload, 458 B for 3 × 5 × 3), 7 Habit, 8 Skills, 9 Dedup, 10 Pointers, 11 Episodes (34 B, the v1 ring until M05b), 12 StatedPreference. Ids 3, 5, 7–10 and 12 are reserved until their code exists. Id 2 Clock (6 B: `lastTrustedUtcMinute` u32, `tzOffsetMin` i16) is written after the first accepted sync (S10 host part, [record](../roadmap/sessions/S10-host-trusted-time-2026-10-15.md)). Product snapshot: 536 B, 544 B with needs, 554 B with needs and clock. Recovery and A/B rules: [S12 record](../roadmap/sessions/S12-snapshot-v2-2026-10-15.md). Done before D2 by owner choice; D2 still decides the medium and keys (S13).
 
 ### 7.6 Commit policy
 
@@ -1051,7 +1051,7 @@ Recovery: on boot, if `stageEventId` exists but no journal entry references it, 
 | any | `TimeSync` with `utc < lastTrustedUtc − tolerance` (5 min [P]) | unchanged | `ClockRejected(rollback)`; no negative age; no repeated milestones |
 | any | forward jump | `Synced` | accepted, gap flagged "unknown activity"; **no** fabricated events or rewards |
 
-S05 pure ClockModel implementation contract is recorded in [S05 evidence](../roadmap/S05-foundation-primitives.md): tolerated small rollback clamps the UTC anchor; large forward jumps use the tolerance as gap threshold; unknown/overflow time yields no day part. Firmware wiring/time wire format remain deferred to S10; tuning values above remain [P].
+S05 pure ClockModel implementation contract is recorded in [S05 evidence](../roadmap/sessions/S05-foundation-primitives.md): tolerated small rollback clamps the UTC anchor; large forward jumps use the tolerance as gap threshold; unknown/overflow time yields no day part. Firmware wiring/time wire format remain deferred to S10; tuning values above remain [P].
 
 ### 8.4 Reaction and feedback lifecycle
 
@@ -1130,7 +1130,7 @@ emit BehaviorChosen{reactionId, ctx, action, policyVersion, explore}
 - **Alternative C [E]:** UCB1-style bonus. Deterministic and integer-friendly; compare in the same benchmark.
 - **Alternative D [E; added to E10 by L-D2, approved 2026-10-15]:** learning-progress curiosity (Oudeyer IAC). Per context, the exploration budget follows the recent drop in prequential Brier loss: high while predictions are improving, low once learned or when nothing is learnable. Integer-only, reuses `PrequentialEvaluator`. It wins E10 only if it is within the 5% regret rule **and** improves drift recovery or visible behaviour. See [competitive upgrade plan](XUNA_LEARNING_COMPETITIVE_UPGRADE.md).
 - **Current code note (2026-10-15):** `PreferenceLearnerV2` implements undiscounted cells with a UCB-like bonus (Alternative C without §9.3 discounting or the hierarchical prior). It is a shadow candidate, not the §9.3 estimator.
-- **Preliminary E10 evidence (2026-10-15, lab only):** `PreferenceLearnerV3` implements §9.3 with policies A/C/D. In the closed-loop bench (200 seeds), C (UCB) is best or within CIs in oracle, reversal, drift, noisy, sparse and 4-action scenarios; A and D pay for exploring on unrated trials; the hierarchical prior (k = 2, m = 3) learns slower than flat contexts when day parts disagree. Not E10 acceptance. See [learner v3 record](../roadmap/learner-v3-phase1-2026-10-15.md).
+- **Preliminary E10 evidence (2026-10-15, lab only):** `PreferenceLearnerV3` implements §9.3 with policies A/C/D. In the closed-loop bench (200 seeds), C (UCB) is best or within CIs in oracle, reversal, drift, noisy, sparse and 4-action scenarios; A and D pay for exploring on unrated trials; the hierarchical prior (k = 2, m = 3) learns slower than flat contexts when day parts disagree. Not E10 acceptance. See [learner v3 record](../roadmap/learning/learner-v3-phase1-2026-10-15.md).
 - **Sweep result (2026-10-15, lab only):** across 137 configurations and 8 scenarios, C with γ 0.90, k 1, m 1 and bonus 0.15 ranks best (averaged regret ratio 1.11 against 1.27 for the §9.3/§9.4 defaults; best A 2.42, best D 3.18). **Owner-approved 2026-10-15 (E10-A/B):** policy C with these values replaces the defaults above (γ 0.95, k 2, m 3) as the M05a learner; re-check on the board. Feedback-aware ε scaling fixes A/D in sparse rating but not their overall exploration cost.
 - **Stage-scaled `ε_stage`** (young XUNA explores more) is **gameplay design** and is labeled as such. It is not evidence of learning (D4).
 
@@ -1317,7 +1317,7 @@ Conversation is a **learning input channel** (A6, spec §23.9). It is split by d
 
 In Layer A, Layer-B phrases are recognized but answered with "mình chưa ghi nhớ được điều này". **Nothing is stored.**
 
-**S22 (owner-approved 2026-10-15):** Layer A is Vietnamese first (English keeps the V1 words only); XUNA replies as "mình – bạn"; a `StatePreference` without a context gets one follow-up question with quick replies and nothing is sent until it is answered; the starting phrase table, vocabulary, negative cases and reply templates are in the [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md). Action words map to D5 (idle/happy/curious); "wave" in the examples above is illustrative only.
+**S22 (owner-approved 2026-10-15):** Layer A is Vietnamese first (English keeps the V1 words only); XUNA replies as "mình – bạn"; a `StatePreference` without a context gets one follow-up question with quick replies and nothing is sent until it is answered; the starting phrase table, vocabulary, negative cases and reply templates are in the [S22 packet](../roadmap/sessions/S22-decision-packet-2026-10-15.md). Action words map to D5 (idle/happy/curious); "wave" in the examples above is illustrative only.
 
 Hypotheticals, quotes and jokes ("giả sử…", "nếu…", quoted text) are rejected by the rules. The tests include prompt-injection strings.
 
@@ -1385,7 +1385,7 @@ This is the smallest safe addition that lets conversation change learned behavio
 | Retry safety | No automatic resend after a timeout (existing v1 rule). After a timeout the app reads the explanation to see whether `statedMass` changed before offering to resend. The durable `CommandId` ring (§7.5) is used once snapshot v2 exists. |
 | Trust level | Same as opcode 3 under the approved unbonded prototype (A8). A behavioral preference is **not** a personal fact. Personal facts stay in Layer B behind bonding (G18). |
 | Data minimization | Only typed codes cross BLE. No text, transcript or audio leaves the phone. |
-| Implementation (S24a, 2026-10-15) | Core done on host: parse behind a flag, `PreferenceLearnerV3::state`, snapshot section 12, explanation `Told`. Proposed detail: an opposite statement withdraws the cell's earlier stated mass first ("latest statement wins"). [S24a record](../roadmap/S24a-stated-preference-2026-10-15.md) |
+| Implementation (S24a, 2026-10-15) | Core done on host: parse behind a flag, `PreferenceLearnerV3::state`, snapshot section 12, explanation `Told`. Proposed detail: an opposite statement withdraws the cell's earlier stated mass first ("latest statement wins"). [S24a record](../roadmap/sessions/S24a-stated-preference-2026-10-15.md) |
 - Scenario F: no `sensor_observed` from text, no actuation.
 
 ---

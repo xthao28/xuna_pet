@@ -2,7 +2,7 @@
 
 Status: owner request 2026-10-15. **Decisions L-D1–L-D5 approved 2026-10-15** (AGENTS.md §3; L-D5 = research on touch, IMU and microphone only). Algorithms, thresholds, budgets and phase contents remain Proposed until Life Lab evidence.
 It amends, and does not replace, [implementation plan §9–§10](XUNA_IMPLEMENTATION_PLAN.md)
-and the [learning roadmap L1–L5](../roadmap/LEARNING-ENGINE-UPGRADE.md).
+and the [learning roadmap L1–L5](../roadmap/learning/LEARNING-ENGINE-UPGRADE.md).
 Owner allowed revising the plan where needed; the amendments are already in the
 implementation plan as [P] items: §9.4 Alternative D, two new §9.9 scenarios,
 §9.10 teachable tricks and decisions L-D1–L-D5 in §18.
@@ -64,7 +64,7 @@ LLM-driven traits (all conflict with approved constraints or the evidence rule).
 4. **No visible formation arc early.** Personality traits wait for M06; the
    owner sees no "becoming" story in the first weeks.
 5. **No closed-loop evaluation yet.** Today's runners are open-loop with a
-   64-event cap ([lab runs](../roadmap/lifecore-lab-runs-2026-10-15.md)).
+   64-event cap ([lab runs](../roadmap/learning/lifecore-lab-runs-2026-10-15.md)).
    Every claim below depends on the planned Life Lab (M04.6/S19a) with the §9.9
    oracle owner.
 6. **Input poverty** (hardware), see §2.

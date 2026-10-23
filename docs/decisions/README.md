@@ -24,9 +24,9 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | [ADR-0009 Cloud platform, sequencing and privacy](ADR-0009-cloud-platform-sequencing-and-privacy.md) | Approved architecture baseline; not Implemented | 2026-10-16 |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
 | D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
-| D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/S22-decision-packet-2026-10-15.md) |
+| D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/sessions/S22-decision-packet-2026-10-15.md) |
 | D16 phone voice (push-to-talk, on-device STT) | Deferred by owner (text first, E13 later) | 2026-10-15 |
-| E10-A/B/C: learner v3 + UCB for M05a, γ 0.90 / k 1 / m 1 / bonus 0.15, capped v1 migration | Approved (selection; board use gated) | 2026-10-15, AGENTS §3, [E10 packet](../roadmap/E10-review-packet-2026-10-15.md) |
+| E10-A/B/C: learner v3 + UCB for M05a, γ 0.90 / k 1 / m 1 / bonus 0.15, capped v1 migration | Approved (selection; board use gated) | 2026-10-15, AGENTS §3, [E10 packet](../roadmap/learning/E10-review-packet-2026-10-15.md) |
 | Prototype gate simplification: S01 closed with owner-skipped items; D2a NVS A/B snapshot v2; S13 + S18 merged; concrete Cloud gate | Approved; not Implemented | 2026-10-16, AGENTS §3, ADR-0002, ADR-0009 |
 
 [ADR-0001 reference reuse policy](ADR-0001-reference-reuse-policy.md) is drafted (Proposed); owner acceptance remains pending. ADR-0002–0005 identifiers remain reserved by existing sessions. This index does not accept their decisions or promote other open D-decisions.

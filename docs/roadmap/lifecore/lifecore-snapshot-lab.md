@@ -15,4 +15,4 @@ owner's board or changing BLE v1 bytes.
 **Update 2026-10-15:** inside `LifeCore` the shadow candidate is now learner v3
 (`PreferenceLearnerV3` via `LearningBridgeV3`, tuned Proposed values) instead
 of v2. v1 stays authoritative; the v3 candidate still resets on boot. See the
-[learner v3 record](learner-v3-phase1-2026-10-15.md) slice 4.
+[learner v3 record](../learning/learner-v3-phase1-2026-10-15.md) slice 4.

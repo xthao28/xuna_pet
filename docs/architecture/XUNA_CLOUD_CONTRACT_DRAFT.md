@@ -101,9 +101,9 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 ## 3. Payload: `xuna.export.v1`
 
-Defined in [cloud-gate sprint record](../roadmap/cloud-gate-sprint-2026-10-17.md) and mirrored by backend `exports.application.schemas.ExportPayloadV1` (strict, unknown fields rejected). Golden fixture shared from mobile Dart output.
+Defined in [cloud-gate sprint record](../roadmap/cloud/cloud-gate-sprint-2026-10-17.md) and mirrored by backend `exports.application.schemas.ExportPayloadV1` (strict, unknown fields rejected). Golden fixture shared from mobile Dart output.
 
-## 4. Device proof (approved design; firmware Identity V2 implemented 2026-10-17 — BLE `7a6e000d`, see [record](../roadmap/identity-v2-2026-10-17.md))
+## 4. Device proof (approved design; firmware Identity V2 implemented 2026-10-17 — BLE `7a6e000d`, see [record](../roadmap/cloud/identity-v2-2026-10-17.md))
 
 Device holds an **ECDSA P-256** key generated on first boot (private key never leaves NVS). Message bytes:
 

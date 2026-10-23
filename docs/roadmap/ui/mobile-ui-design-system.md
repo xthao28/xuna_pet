@@ -20,7 +20,7 @@ Scope: owner-requested mobile UI session. Owner choices (2026-10-14): design sys
 
 - `AppDisplayHeading`: the title now takes all width left by the side note (it previously shared it with a `Spacer`, which wrapped "LỚN LÊN." and truncated "MỖI NGÀY.").
 - Display tokens loosened for stacked Vietnamese diacritics: `display62` line height 1.25 / tracking +0.3; new `display48` (line height 1.3 / tracking +1.5) for the journal title. Checked with a real-font render.
-- UI design roadmap and Claude Design prompts for later waves: [XUNA_UI_DESIGN_PLAN.md](../design/XUNA_UI_DESIGN_PLAN.md) (Proposed).
+- UI design roadmap and Claude Design prompts for later waves: [XUNA_UI_DESIGN_PLAN.md](../../design/XUNA_UI_DESIGN_PLAN.md) (Proposed).
 
 ## Fact / Assumption / Proposal
 

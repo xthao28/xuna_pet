@@ -51,7 +51,7 @@ Date: 2026-10-10. Status: **Implemented; physical validation pending**. This tas
 
 ## Git handoff
 
-2026-10-11 update: the owner requested committing current work. Firmware is committed as `be5829d`; its updated gitlink and root documentation are included in the parent handoff commit. No push performed. This Git delivery does not establish physical validation. See [change history](../../CHANGELOG.md) for the session record.
+2026-10-11 update: the owner requested committing current work. Firmware is committed as `be5829d`; its updated gitlink and root documentation are included in the parent handoff commit. No push performed. This Git delivery does not establish physical validation. See [change history](../../../CHANGELOG.md) for the session record.
 
 Suggested messages:
 

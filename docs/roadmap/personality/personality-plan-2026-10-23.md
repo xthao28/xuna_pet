@@ -1,6 +1,6 @@
 # XUNA Personality — kế hoạch triển khai (2026-10-23)
 
-> Nguồn nghiên cứu: [personality-evolution-assessment-2026-10-23.md](../research/personality-evolution-assessment-2026-10-23.md) (§7–§14, Addendum A–C).
+> Nguồn nghiên cứu: [personality-evolution-assessment-2026-10-23.md](../../research/personality-evolution-assessment-2026-10-23.md) (§7–§14, Addendum A–C).
 > Trạng thái: **hướng đi owner-approved 2026-10-23**; mọi tham số, ngưỡng và tên trong plan này là **[P] Proposed** cho tới khi Life Lab và board trial đo xong.
 
 ## 1. Mục tiêu

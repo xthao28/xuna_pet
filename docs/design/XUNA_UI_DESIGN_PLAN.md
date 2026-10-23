@@ -2,7 +2,7 @@
 
 Ngày: 2026-10-14. Trạng thái: **Proposed** — kế hoạch thiết kế, chưa phải phê duyệt tính năng. Mỗi đợt chỉ được code khi session tương ứng trong [XUNA_SESSION_PLAN.md](../roadmap/XUNA_SESSION_PLAN.md) được owner mở.
 
-Nền tảng hiện có: project Claude Design **"XUNA App"** (`XUNA App.dc.html`, project `021e070e-cd28-4c9e-924b-d571616aa42e`) và bản đã code trong `mobile/` (xem [mobile-ui-design-system.md](../roadmap/mobile-ui-design-system.md)): 4 tab Nhà / Trò chuyện / Nhật ký / Thiết bị, token màu, font Anton + Be Vietnam Pro + JetBrains Mono, các base widget `App*`.
+Nền tảng hiện có: project Claude Design **"XUNA App"** (`XUNA App.dc.html`, project `021e070e-cd28-4c9e-924b-d571616aa42e`) và bản đã code trong `mobile/` (xem [mobile-ui-design-system.md](../roadmap/ui/mobile-ui-design-system.md)): 4 tab Nhà / Trò chuyện / Nhật ký / Thiết bị, token màu, font Anton + Be Vietnam Pro + JetBrains Mono, các base widget `App*`.
 
 ---
 

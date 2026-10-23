@@ -27,7 +27,7 @@ S17 connects the M04 action policy to the firmware loop without adding a new ren
 
 ## Update 2026-10-14 — review fixes
 
-Native, ASan/UBSan and ESP32 builds now PASS on the Mac toolchain. The action path moved into pure `ActionGate` (shared with `LifeCore`); opcode 2 context, Reacting timer restart and energy recovery were fixed. See [review fixes](M04-review-fixes-2026-10-14.md). S17 stays In progress until the owner board check.
+Native, ASan/UBSan and ESP32 builds now PASS on the Mac toolchain. The action path moved into pure `ActionGate` (shared with `LifeCore`); opcode 2 context, Reacting timer restart and energy recovery were fixed. See [review fixes](../milestones/M04-review-fixes-2026-10-14.md). S17 stays In progress until the owner board check.
 
 ## Next
 

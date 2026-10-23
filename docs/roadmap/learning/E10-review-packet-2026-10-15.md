@@ -90,4 +90,4 @@ the target (E2).
 
 Sources: [learner v3 record](learner-v3-phase1-2026-10-15.md),
 [Life Lab Phase 0](life-lab-phase0-2026-10-15.md),
-[plan §9, §16.2](../architecture/XUNA_IMPLEMENTATION_PLAN.md).
+[plan §9, §16.2](../../architecture/XUNA_IMPLEMENTATION_PLAN.md).

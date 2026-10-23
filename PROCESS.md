@@ -1,6 +1,6 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-23** (Asia/Ho_Chi_Minh). Latest: **spoken replies overlap TTS with the text stream; WebSocket voice design Proposed** (backend host tests only; entry below). Before that: **app reconnects to the last XUNA on open** (mobile, host tests only). Before that: **owner reports all phone and board checks done; Cloud gate (c) met; M04 approved; free tiers only (D19/D11a); D18 deferred until V1 is finished** (entry below; no measurements recorded). The "Next"/"open" items further down this line are superseded by that entry. Previously: **XUNA's AI replies get context** (2026-10-23, owner: smart like Xiaozhi): each turn carries phone time, the last ≤ 12 chat lines and the device's view of XUNA (age, current action, learned likes), transient under U3; persona answers knowledge questions (backend `e150330`, mobile `8a42784`, 129/155 tests). Server restarted with it. Next: rebuild iOS, measure five spoken turns (Edge TTS is the latency risk). Previously: **mobile 006cf5b rebuilt and installed on the owner's iPhone 15** ([V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md)). This fixes SSE decoding for Dio's Uint8List chunks; the recorded mobile validation is 152/152, and the release build succeeded with Flutter 3.32.8 / Dart 3.8.1 and Xcode 27.1. The owner also rebound the test pet to the Google account. Backend probe: spoken Edge turns took 4.9–11 s, so phone timing remains open. Next: measure at least five real phone turns, confirm QR camera, output route, and microphone while BLE is connected. CocoaPods 1.16.2; no package or lockfile changes in this rebuild. Firebase plist is local and ignored now, but remains in old mobile history at 7ebd06d. Board firmware 0a392c5 is uploaded; visual check of scenes/status card/QR, Cloud gate (c), and M04 review remain open.
+Last updated: **2026-10-23** (Asia/Ho_Chi_Minh). Latest: **spoken replies overlap TTS with the text stream; WebSocket voice design Proposed** (backend host tests only; entry below). Before that: **app reconnects to the last XUNA on open** (mobile, host tests only). Before that: **owner reports all phone and board checks done; Cloud gate (c) met; M04 approved; free tiers only (D19/D11a); D18 deferred until V1 is finished** (entry below; no measurements recorded). The "Next"/"open" items further down this line are superseded by that entry. Previously: **XUNA's AI replies get context** (2026-10-23, owner: smart like Xiaozhi): each turn carries phone time, the last ≤ 12 chat lines and the device's view of XUNA (age, current action, learned likes), transient under U3; persona answers knowledge questions (backend `e150330`, mobile `8a42784`, 129/155 tests). Server restarted with it. Next: rebuild iOS, measure five spoken turns (Edge TTS is the latency risk). Previously: **mobile 006cf5b rebuilt and installed on the owner's iPhone 15** ([V1 record](docs/roadmap/voice/V1-phone-voice-2026-10-22.md)). This fixes SSE decoding for Dio's Uint8List chunks; the recorded mobile validation is 152/152, and the release build succeeded with Flutter 3.32.8 / Dart 3.8.1 and Xcode 27.1. The owner also rebound the test pet to the Google account. Backend probe: spoken Edge turns took 4.9–11 s, so phone timing remains open. Next: measure at least five real phone turns, confirm QR camera, output route, and microphone while BLE is connected. CocoaPods 1.16.2; no package or lockfile changes in this rebuild. Firebase plist is local and ignored now, but remains in old mobile history at 7ebd06d. Board firmware 0a392c5 is uploaded; visual check of scenes/status card/QR, Cloud gate (c), and M04 review remain open.
 Current milestone: **M04 approved; Cloud gate (a)–(c) met (c owner-reported 2026-10-23). Board runs firmware `0a392c5`; iPhone runs mobile `8a42784`.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
@@ -12,9 +12,14 @@ Current status (2026-10-16):
 - **Backend PostgreSQL differs per machine** (table in [backend/README.md](backend/README.md#owner-machines-mac-vs-windows-do-not-mix-them-up)): **Mac** = PostgreSQL 14.15, user `$(whoami)`, no password, has `xuna_test` + dev `xuna_local` (real pet binding); **Windows** = PostgreSQL 16.15 service `postgresql-x64-16`, user `xuna`/`xuna`, only `xuna_test`, venv tools in `.venv/Scripts`. Separate data: never assume a Mac database row exists on Windows or the reverse.
 - Windows toolchain: PlatformIO at `~/.platformio/penv/Scripts/pio.exe` (not on PATH); host compiler MSYS2 UCRT64 `C:\msys64\ucrt64\bin`; `native_asan` only on the Mac/WSL. clangd needs `firmware/compile_commands.json` (`pio run -e xuna_t_display_s3 -t compiledb`).
 
-Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md)).
+Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD-01 approved by delegation, CLD-02 draft. Identity V2 is on the board: the real pet was bound end to end against the local backend. CLD-12 consent/audit and CLD-13 adapter/conversation done; Firebase Auth chosen. Firebase Google sign-in **validated end to end** on the Play Store emulator against the local backend. **App bind flow + consent sheet + AI chat built 2026-10-18 (host tests + APK only).** Next: validate on a phone with the board (plan below). **Waiting on owner:** internal AI endpoint style/URL/model to run `scripts/text_benchmark.py` over OpenVPN. Next action: **connect the phone (USB debugging)** → `adb install -r` the upgraded debug APK → connect to the board → app "tại sao" + Device-tab export → verify the export hash with the Python line in the sprint record. That closes gate (c). The board already runs the new firmware; an older app on the phone may misbehave until upgraded. Workstreams A, B and backend CLD-10/11/12/13 are committed; parent and all submodules (`backend`, `firmware`, `mobile`) are on `dev` and pushed to `origin/dev` as of 2026-10-19 ([sprint record](docs/roadmap/cloud/cloud-gate-sprint-2026-10-17.md)).
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
+
+## 2026-10-23 — Roadmap records grouped into folders (docs only)
+
+- Owner asked for a tidier roadmap. `docs/roadmap/` now has `milestones/`, `sessions/`, `lifecore/`, `learning/`, `cloud/`, `voice/`, `ui/`, `personality/` and an index [README](docs/roadmap/README.md); `XUNA_SESSION_PLAN.md` stays at the top. 56 files moved with `git mv`; links rewritten by resolving each link against its old location (parent docs plus path comments in backend, firmware and mobile). Link check: the same 5 pre-existing broken links before and after (Mac-only paths, build output), none new. Submodule edits are comments/README only; no tests run for them.
+- New roadmap records go into the matching folder.
 
 ## 2026-10-23 — Personality evolution / JPAF assessment (research only)
 
@@ -24,7 +29,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Addendum A: Blaniel (`Lucas-Dono/blaniel`) reviewed: a server-side LLM companion platform (Next.js, Postgres, Gemini/Venice); its "evolving Big Five" is only an openness +0.1 drift. Not applicable directly; three rule-based ideas (trait-driven mood decay/inertia, per-pet mood baseline, state→expression cue mapper) and "relationship separate from personality" are added to Phase 2 / data model. Recommendation unchanged.
 - Addendum B (owner: personalities look limited): six more repos read (qs-vpets, openc2e/Creatures, WASABI, GAMYGDALA, MicroPsi 2, Generative Agents; Anki Vector `victor` excluded as leaked code). Proposed richer model: per-pet temperament genome (~10 parameters) driving ~6 drives, WASABI-style emotion/mood springs, emotions from expectation (learner p̂, HabitPredictor) and a competence signal; trait labels derived, not preset. Phase 1 PoC grows to M–L, still lab-only.
 - Addendum C (owner: device engine vs personality through cloud conversation): recommended combination. Device stays the only authority (H2/H4); conversation supplies evidence (confirmed statements now under D6; LLM-inferred tags only if D6 is revised) and expresses personality via `PetSelf` → persona. LLM-held personality (summaries in prompts) rejected as source of truth.
-- **Owner approved the direction and asked for a plan; then added "let it be natural, no confirmation".** [Personality plan](docs/roadmap/personality-plan-2026-10-23.md): decisions P-D1–P-D5 (recorded in AGENTS.md §3), phases PE-0 (baseline) → PE-1 (Life Lab PoC: Temperament + EvidenceLedger, Drives, Affect) → G1 → PE-2 board shadow + expression → PE-3 snapshot section 5 + BLE → PE-4 behaviour, persona, conversation tags without confirmation (§6 safeguards) and app card → PE-5 long trial; art Track A in parallel. Open: O1–O5. **Next: PE-0** (owner models + `sim/personality_lab.cpp`, no production change).
+- **Owner approved the direction and asked for a plan; then added "let it be natural, no confirmation".** [Personality plan](docs/roadmap/personality/personality-plan-2026-10-23.md): decisions P-D1–P-D5 (recorded in AGENTS.md §3), phases PE-0 (baseline) → PE-1 (Life Lab PoC: Temperament + EvidenceLedger, Drives, Affect) → G1 → PE-2 board shadow + expression → PE-3 snapshot section 5 + BLE → PE-4 behaviour, persona, conversation tags without confirmation (§6 safeguards) and app card → PE-5 long trial; art Track A in parallel. Open: O1–O5. **Next: PE-0** (owner models + `sim/personality_lab.cpp`, no production change).
 
 ## 2026-10-23 — Spoken replies overlap TTS with text; WebSocket voice design (backend, host only)
 
@@ -32,7 +37,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - **Machine: Windows** (`C:\Users\Thao`). Windows toolchain: Python **3.12.10** installed by winget (user scope, `~/AppData/Local/Programs/Python/Python312`); `backend/.venv` (gitignored) with `pip install -e ".[dev]"`; run `XUNA_TEST_DATABASE_URL=postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test PY=.venv/Scripts bash scripts/check.sh`. PostgreSQL **16.15** installed by winget (owner request; service `postgresql-x64-16`, port 5432; random superuser password in `~/.xuna_pg_superuser`, outside Git); role/database `xuna`/`xuna_test` as in CI. `tests/conftest.py` sets `WindowsSelectorEventLoopPolicy` on Windows (psycopg async cannot use the default Proactor loop; Linux/Mac unchanged); running uvicorn on Windows was not tried and may need the same. Fixed a Windows-only test error: the oversized-audio parametrize ID went into `PYTEST_CURRENT_TEST` (> 32,767 chars); short `ids` added.
 - Backend: new `conversation.application.spoken_turn`. The text stream keeps flowing while sentences are synthesised (≤ 2 in parallel); audio is still sent in `seq` order; after a TTS failure speech stops (one `speech_unavailable`); a text-provider failure drops pending audio; closing the stream cancels every synthesis. `SentenceSplitter(first_clause_chars=16)` lets the first piece end at ", " / "; " / ": " (decimal "3,5" is not cut). The route maps events only (`_Voice` removed). `finished` gains `firstAudioMs` (turn start → first audio ready); the app ignores `finished` data, so no mobile change. Contract draft and ARCHITECTURE updated.
 - Checks: `check.sh` with PostgreSQL PASS (ruff, mypy strict 87 files, alembic upgrade, pytest **140 passed, 0 skipped**, including the voice API SSE tests through the new pipeline). New: `test_spoken_turn.py` (9: overlap, order, parallel cap, TTS failure, no TTS, provider failure, timing, cancel on close, bad limit) and 2 splitter tests. **Not run:** live Edge/Groq, phone timing.
-- [WebSocket voice design](docs/roadmap/voice-websocket-design-2026-10-23.md) (Proposed): one `wss /v1/voice` protocol for phone (V1) and board (V2), auth in `hello` (Firebase token / Identity V2 proof), PCM16 phone uplink, Opus board uplink wrapped as Ogg for ASR, `stt.final` → app `turn.commit` keeps teaching behind the local confirmation, `abort` barge-in, slices WS-1…WS-4, decisions D-WS1…D-WS5 for the owner.
+- [WebSocket voice design](docs/roadmap/voice/voice-websocket-design-2026-10-23.md) (Proposed): one `wss /v1/voice` protocol for phone (V1) and board (V2), auth in `hello` (Firebase token / Identity V2 proof), PCM16 phone uplink, Opus board uplink wrapped as Ogg for ASR, `stt.final` → app `turn.commit` keeps teaching behind the local confirmation, `abort` barge-in, slices WS-1…WS-4, decisions D-WS1…D-WS5 for the owner.
 - Next: measure five phone turns with this backend (send → first audio) before WS-1 (D-WS5).
 
 ## 2026-10-23 — App reconnects to the last XUNA on open (mobile, host only)
@@ -55,11 +60,11 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 
 ## 2026-10-23 — Phone AI replies: binding and SSE decoder fixed
 
-- iPhone test: speech-to-text worked, every reply was the local template. Local DB had the real pet bound to the test-issuer owner; owner deleted that local binding and re-bound from the app. App `SseCodec` failed on `Stream<Uint8List>` (runtime type error) → fixed in mobile `006cf5b` with a regression test; real-Dio replay now reads 27 deltas + audio + finished. analyze clean, 152/152. Not run: iOS rebuild/install, Android APK rebuild. [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+- iPhone test: speech-to-text worked, every reply was the local template. Local DB had the real pet bound to the test-issuer owner; owner deleted that local binding and re-bound from the app. App `SseCodec` failed on `Stream<Uint8List>` (runtime type error) → fixed in mobile `006cf5b` with a regression test; real-Dio replay now reads 27 deltas + audio + finished. analyze clean, 152/152. Not run: iOS rebuild/install, Android APK rebuild. [V1 record](docs/roadmap/voice/V1-phone-voice-2026-10-22.md).
 
 ## 2026-10-22 — Board upload of firmware `0a392c5`
 
-- Backup `/Users/xthao28/xuna_backups/2026-10-22-v1-scenes/` (partition = build, two NVS reads identical), upload SUCCESS `b13ee96f…`, boot `recover=Ok … boot=28 ready=1`, same PetId and preferences, 40 s idle log clean. Details in the [M04 record](docs/roadmap/M04-foundation.md). Owner visual check pending.
+- Backup `/Users/xthao28/xuna_backups/2026-10-22-v1-scenes/` (partition = build, two NVS reads identical), upload SUCCESS `b13ee96f…`, boot `recover=Ok … boot=28 ready=1`, same PetId and preferences, 40 s idle log clean. Details in the [M04 record](docs/roadmap/milestones/M04-foundation.md). Owner visual check pending.
 
 ## 2026-10-22 — V1 phone voice, slice 3 preparation
 
@@ -69,7 +74,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 
 ## 2026-10-22 — V1 phone voice, slice 2 (app)
 
-- `record` 6.2.1 + `just_audio` 0.10.6 (pinned); new `voice` feature; `account` gets U3V consent, transcription and spoken reply events; the chat mic works (tap/tap, 15 s, cancel); consent sheet U3V row; Android/iOS mic permissions. Speech takes the typed-text path (teaching still needs confirmation). [V1 record](docs/roadmap/V1-phone-voice-2026-10-22.md).
+- `record` 6.2.1 + `just_audio` 0.10.6 (pinned); new `voice` feature; `account` gets U3V consent, transcription and spoken reply events; the chat mic works (tap/tap, 15 s, cancel); consent sheet U3V row; Android/iOS mic permissions. Speech takes the typed-text path (teaching still needs confirmation). [V1 record](docs/roadmap/voice/V1-phone-voice-2026-10-22.md).
 - Checks: analyze clean, 151/151. Not run: native build, phone. Persona updated the same day (owner): XUNA hears the owner via the app mic, never sees or hears the room; benchmark 0 sensing claims but Gemini free tier TTFT ≈ 7.9 s today (risk). Open: phone measurement.
 
 ## 2026-10-22 — V1 phone voice, slice 1 (backend)
@@ -82,25 +87,25 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 
 - Owner: mic + speaker are INMP441 + MAX98357A; skip Phase S for now; voice through the app first; V0 free/local only, synthetic corpus first; **do not run Xiaozhi**, study it instead; keep runs small on this Mac (2014 i7); try free cloud ASR; continue on a stronger machine.
 - `backend/scripts/voice_bench/` (own venv, not backend deps; [README](backend/scripts/voice_bench/README.md)): 30 sentences × 2 Edge voices × clean/10 dB noise = 120 WAVs (gitignored, rebuilt per machine); `asr_bench.py` (faster-whisper), `asr_cloud_bench.py` (Gemini audio / OpenAI-compatible transcriptions), `tts_bench.py`. `scripts/check.sh` passes (83 passed, 16 DB tests skipped).
-- Results (small): Whisper `small` WER 13 % (7.9 % clean with prompt "XUNA"), 5 s per 3 s audio on this Mac; Gemini audio WER 0 % clean but 13–21 s + 503s; Edge TTS first audio 0.47–0.63 s but flaky. [Xiaozhi research](docs/roadmap/xiaozhi-stack-research-2026-10-22.md): Opus 16 kHz/60 ms WebSocket or MQTT+UDP, ESP-SR wake word, FunASR/SenseVoice default ASR (no Vietnamese), streaming Chinese vendors recommended.
+- Results (small): Whisper `small` WER 13 % (7.9 % clean with prompt "XUNA"), 5 s per 3 s audio on this Mac; Gemini audio WER 0 % clean but 13–21 s + 503s; Edge TTS first audio 0.47–0.63 s but flaky. [Xiaozhi research](docs/roadmap/voice/xiaozhi-stack-research-2026-10-22.md): Opus 16 kHz/60 ms WebSocket or MQTT+UDP, ESP-SR wake word, FunASR/SenseVoice default ASR (no Vietnamese), streaming Chinese vendors recommended.
 - Groq key added by the owner (`backend/.env.groq`, gitignored, recreate per machine). Groq `whisper-large-v3-turbo`: WER 5.3 % (clean and 10 dB noise, 10 utterances), median ≈ 1.8 s with Ogg/Opus upload vs 2.3–4.8 s with WAV. D16 still needed before V1.
 
 ## 2026-10-22 — Voice parity plan (Proposed)
 
-- Owner asked for a plan to at least match Xiaozhi on its strongest area (spoken conversation) while making XUNA's core stable. [Plan](docs/roadmap/voice-parity-plan-2026-10-22.md): Phase S (stabilise board/phone) + V0 (measure Xiaozhi locally on the same Vietnamese corpus) → V1 voice through the phone → V2 device voice (audio hardware) → V3 breadth; memory/backup in parallel. Waiting on owner decisions D16, D19/D11a (spending), D18 (hardware), Xiaozhi code reuse.
+- Owner asked for a plan to at least match Xiaozhi on its strongest area (spoken conversation) while making XUNA's core stable. [Plan](docs/roadmap/voice/voice-parity-plan-2026-10-22.md): Phase S (stabilise board/phone) + V0 (measure Xiaozhi locally on the same Vietnamese corpus) → V1 voice through the phone → V2 device voice (audio hardware) → V3 breadth; memory/backup in parallel. Waiting on owner decisions D16, D19/D11a (spending), D18 (hardware), Xiaozhi code reuse.
 
 ## 2026-10-22 — App scans the pairing QR
 
-- Owner approved the scanner dependency: `mobile_scanner: 7.4.2` (BSD-3). New `pairingScan` route, `ParsePairingCodeUseCase`, `ConnectPairedDeviceUseCase` (matches PetId via the identity read), device-tab button, iOS camera usage text. [Record](docs/roadmap/device-scenes-2026-10-22.md). Phone and board runs not done.
+- Owner approved the scanner dependency: `mobile_scanner: 7.4.2` (BSD-3). New `pairingScan` route, `ParsePairingCodeUseCase`, `ConnectPairedDeviceUseCase` (matches PetId via the identity read), device-tab button, iOS camera usage text. [Record](docs/roadmap/ui/device-scenes-2026-10-22.md). Phone and board runs not done.
 
 ## 2026-10-22 — Status card and pairing QR (host only)
 
-- Owner asked for items 4–5. GPIO0 hold → 8 s status card (Vietnamese, Be Vietnam Pro glyphs); both buttons 3 s → 60 s pairing QR `xuna://pair?pet=…&key=…`; any press closes a card. Both buttons now act on release; combos swallow single-button events. Vendored `lib/qrcodegen` (MIT). [Record](docs/roadmap/device-scenes-2026-10-22.md).
+- Owner asked for items 4–5. GPIO0 hold → 8 s status card (Vietnamese, Be Vietnam Pro glyphs); both buttons 3 s → 60 s pairing QR `xuna://pair?pet=…&key=…`; any press closes a card. Both buttons now act on release; combos swallow single-button events. Vendored `lib/qrcodegen` (MIT). [Record](docs/roadmap/ui/device-scenes-2026-10-22.md).
 - Native/ASan 240/240, ESP32 build PASS (Flash 2,995,977 B). Not on the board yet. App-side scanning added in the next entry.
 
 ## 2026-10-22 — Window scenes and reaction effects (host only)
 
-- Owner approved: heart/puff when a reaction teaches, window by day part, GPIO14 hold (≥ 800 ms) cycles Auto/Day/Evening/Night/Rain with a sparkle. GPIO14 short press now fires on release. Hold ignored before hatch (S10 reserves the 3 s Egg hold). Scene stored in NVS `xuna_ui/scene`. [Record](docs/roadmap/device-scenes-2026-10-22.md).
+- Owner approved: heart/puff when a reaction teaches, window by day part, GPIO14 hold (≥ 800 ms) cycles Auto/Day/Evening/Night/Rain with a sparkle. GPIO14 short press now fires on release. Hold ignored before hatch (S10 reserves the 3 s Egg hold). Scene stored in NVS `xuna_ui/scene`. [Record](docs/roadmap/ui/device-scenes-2026-10-22.md).
 - Native/ASan 232/232, ESP32 build PASS (Flash +52 KB, heap +13 KB). Owner unplugged the board (warm); **not uploaded**. Next with the board: NVS backup, upload, visual check, `scene_max_us`/loop gap with rain.
 - Correction: the 2026-10-16 status line "GPIO0 is direct Happy" is outdated; GPIO0 greeting learning is on since 2026-10-19.
 
@@ -109,7 +114,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Owner connected the board. Backup `/Users/xthao28/xuna_backups/2026-10-22-s20-routine/`: partition byte-identical to 2026-10-17; NVS read twice, only `bootc` differs (esptool reset boots), `ident`/`devkey`/`life0`/`life1`/`slot0`/`slot1` identical. Upload of `d1b17b8` SUCCESS (app SHA-256 `02c2fcee…2640764c`); boot `recover=Ok slot=0 corrupt_slots=0 boot=21 ready=1`, PetId `d945c770…ed86`, quiet=1 play=0, setup stack 7,300 B. This closes the S19b "next upload must re-check the boot log" item.
 - S21 steps 1–2: `[env:xuna_parity]` (`src/parity/parity_main.cpp`; `tools/embed_parity_traces.py` embeds c3, c8, c9; production env now filters out `src/parity/`, image unchanged). Board output **bit-identical** to `sim/lifecore_lab` (24 lines incl. snapshot SHA-256), c9 expects 6/6, two passes identical. `step()` µs: quiet p50/p99 7/7, max 272; event steps ≤ 313. Core change: optional `LifeCoreStepProbe` in `LifeCoreTrace.h` + test (does not change replay). Native 225/225, ASan 225/225; parity and production builds + purity PASS.
 - Production re-uploaded after the parity run (same SHA-256); boot `recover=Ok slot=1 boot=23 ready=1`, same PetId.
-- S21 step 3: [M04 record](docs/roadmap/M04-foundation.md). Step 4 (owner review) pending. Not run: real power cut on the board, render ±20 %, phone/app. Nothing committed.
+- S21 step 3: [M04 record](docs/roadmap/milestones/M04-foundation.md). Step 4 (owner review) pending. Not run: real power cut on the board, render ±20 %, phone/app. Nothing committed.
 
 ## 2026-10-20 — Routine learning (part C, firmware host only)
 
@@ -120,7 +125,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 
 ## 2026-10-19 — Reaction learning replaces app ratings (owner decision)
 
-- Owner: app "chọn → thích/không thích" is meaningless and tedious; approved (a) reactions on the device teach, (b) routine learning, (c) remove app ratings. Recorded as **D6 revised** in AGENTS.md §3; design freeze and evidence: [reaction-learning record](docs/roadmap/reaction-learning-2026-10-19.md).
+- Owner: app "chọn → thích/không thích" is meaningless and tedious; approved (a) reactions on the device teach, (b) routine learning, (c) remove app ratings. Recorded as **D6 revised** in AGENTS.md §3; design freeze and evidence: [reaction-learning record](docs/roadmap/learning/reaction-learning-2026-10-19.md).
 - Firmware: `PreferenceLearnerV3::feedback` takes a weight (`reactionWeightQ16` 0.3 [P]); `ProductLearner` reaction window 10 s [P], source 3; `LifeCore` `Reaction` and `Spontaneous` events, `reactionApplied`; `V1LifeCoreAdapter` GPIO0 inside the window = pet, GPIO14 = shoo then idle, `localSpontaneous`; `main.cpp` greeting learning on and the idle routine calls `localSpontaneous`. Snapshot episodes section v2 only when a source-3 episode exists (found: old decoder treated source 3 as corrupt → boot read-only). Tests: 4 adapter, 1 codec, `learnsFromReactions` scenario; S01 transcript and greeting tests moved their presses outside the window. Native and ASan **216/216**, ESP32 build + purity PASS (RAM 52,520 B, Flash 2,881,425 B). Golden vectors gained pet / greeting / shoo steps.
 - Mobile: removed rating chips, rating confirmation, journal rating buttons and pending card, `SendFeedbackUseCase` and `DeviceRepository.sendFeedback`; rating words in chat get `home_replyReactOnDevice`; statements still need confirmation. `InteractionContext.greeting` (memories only, never sent), `EpisodeSource {button, text, reaction}`, codec accepts context 2 / source 3, journal and export labels. Locales synced (11 keys removed, 3 added). **124/124**, analyze clean, lock unchanged. Backend export schema accepts `greeting`/`reaction`; `check.sh` **99/99**.
 - Not run: board, phone, APK. Next: part C routine learning design; board trial of window/weight; app poke as a reaction needs a protocol addition.
@@ -165,7 +170,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 ## 2026-10-17 — CLD-13 Gemini benchmark (temporary provider)
 
 - Owner provided the internal AI URL (Bifrost gateway `SDS-AI`, reachable over VPN, needs a virtual key in `x-bf-vk` — not yet provided) and chose **Gemini** as the temporary provider. Key stored by the owner in gitignored `backend/.env.gemini` (mode 600); commands only `source` it, the key was never printed.
-- Results ([record](docs/roadmap/CLD-13-benchmark-2026-10-17.md)): `gemini-3.5-flash-lite` 12/12, TTFT median 0.92 s, all persona checks pass → temporary model. `gemini-3.8-flash` truncated by hidden reasoning; with `reasoning_effort=none` complete but free-tier 429s.
+- Results ([record](docs/roadmap/cloud/CLD-13-benchmark-2026-10-17.md)): `gemini-3.5-flash-lite` 12/12, TTFT median 0.92 s, all persona checks pass → temporary model. `gemini-3.8-flash` truncated by hidden reasoning; with `reasoning_effort=none` complete but free-tier 429s.
 - Backend: `XUNA_TEXT_API_KEY_HEADER`, `XUNA_TEXT_REASONING_EFFORT`, benchmark `--delay`; 93/93 tests with PostgreSQL. Free tier = synthetic prompts only; paid tier required before real users. Persona needs a "no hearing/seeing claims" rule.
 
 ## 2026-10-18 — Mobile bind flow, consent sheet, AI chat; persona rule
@@ -175,7 +180,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Mobile (`features/account`): `CloudRepository` gained challenge/bind/pets/consents/SSE turn with a fresh `Idempotency-Key` per mutation and `schemaVersion: 1`; problem `code`s (`challenge_invalid`, `invalid_signature`, `pet_already_bound`, `device_key_mismatch`, `consent_required`, `consent_version_conflict`, `not_found`, `unauthorized`, `provider_unavailable`) → Vietnamese messages; `BindPetToCloudUseCase` (capability → identity → challenge → proof → bind, signed generation sent); `StreamCloudReplyUseCase` turns every failure into a local fallback.
 - UI: Device-tab account card shows bound/unbound, "Gắn XUNA với tài khoản" (signed in + connected), "Quyền dữ liệu" sheet with U1/U2/U3 off by default and explicit save. Chat: only free text that the local parser does not understand goes to the AI, and only when signed in + pet bound + U3; reply streams into one bubble tagged "AI · không ghi nhớ"; teaching/device intents stay local; any failure → existing local template.
 - Tests found a real bug: a consent version conflict tried to reload while the controller was still busy, so the sheet stayed empty; fixed. `locales.g.dart` holds keys missing from `vi_VN.json` (e.g. `home_replyNeedContext`), so `get generate locales` would drop them; new keys were added by hand to both files.
-- Checks: Flutter analyze clean, **119/119** tests, debug APK PASS, lock unchanged. Backend persona rule + benchmark `noSensingClaim`; `scripts/check.sh` **98/98** with PostgreSQL; Gemini benchmark 14/14, TTFT median 0.85 s, all checks 1.00 ([record](docs/roadmap/CLD-13-benchmark-2026-10-17.md)). Committed locally at the time; pushed to `origin/dev` by 2026-10-19.
+- Checks: Flutter analyze clean, **119/119** tests, debug APK PASS, lock unchanged. Backend persona rule + benchmark `noSensingClaim`; `scripts/check.sh` **98/98** with PostgreSQL; Gemini benchmark 14/14, TTFT median 0.85 s, all checks 1.00 ([record](docs/roadmap/cloud/CLD-13-benchmark-2026-10-17.md)). Committed locally at the time; pushed to `origin/dev` by 2026-10-19.
 
 ## Next session plan — phone validation of bind + AI chat (updated 2026-10-18)
 
@@ -214,7 +219,7 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 
 - Owner chose Identity V2. Pure `Sha256` + `DeviceProof`/`ProofService` in `xuna_core`, mbedTLS `DeviceKey` (P-256, NVS `devkey`, never overwritten if corrupt, RFC 6979), BLE `7a6e000d` WRITE/READ with capability byte 3 bit 0. Projection proofs refused.
 - Firmware native/ASan 200/200, ESP32 PASS (52,504 B RAM / 2,880,513 B Flash). NVS backed up (`2026-10-17-identity-v2/`), upload PASS; key created (161 ms) then loaded on reboot with the same public key.
-- E2E from the Mac: backend challenge → board signs (~74 ms) → `POST /v1/pets` 201 then 200 with same Brain against local PostgreSQL. No phone, no hosted service, no push. [Record](docs/roadmap/identity-v2-2026-10-17.md).
+- E2E from the Mac: backend challenge → board signs (~74 ms) → `POST /v1/pets` 201 then 200 with same Brain against local PostgreSQL. No phone, no hosted service, no push. [Record](docs/roadmap/cloud/identity-v2-2026-10-17.md).
 
 ## 2026-10-17 — Backend CLD-11: owner auth and device-proof pet binding
 
@@ -236,26 +241,26 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Owner connected the ESP32. Backed up partition (identical to 2026-10-16) and NVS (`/Users/xthao28/xuna_backups/2026-10-17-cloud-gate/`); decoded pet: PetId `d945c770…`, generation 38, active 7,889 s, feedback 5; v1 rollback slots intact. App read-back failed again with the known USB short read (not retried).
 - Upload 1 boot OK, but a Mac BLE listing exposed a real defect: `createService` defaulted to 15 GATT handles, silently dropping `000b` and `000c` (explanation never worked on a board since S26). Fixed with a 32-handle service; ESP32 build PASS; upload 2 SUCCESS (app SHA-256 `381f7751…d587`).
 - Mac BLE acceptance: capabilities `0xbf`; identity PetId equal to Serial/NVS, origin 3, generation 38; TimeSync result 0 → Serial `quality=2 day_part=3` (Synced, evening); suggest quiet → Happy with explanation highest estimate, rated 3, p ≈ 0.79. Nothing rated or taught.
-- No phone attached: APK not installed, app "Why?" and export not run — gate (c) pending. No commit/push. Details: [sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md).
+- No phone attached: APK not installed, app "Why?" and export not run — gate (c) pending. No commit/push. Details: [sprint record](docs/roadmap/cloud/cloud-gate-sprint-2026-10-17.md).
 
 ## 2026-10-17 — Cloud gate workstreams A + B (Identity V1 and local export)
 
 - Owner asked to finish the remaining Cloud gate conditions with delegated decisions. Firmware: pure `IdentityCodec` (24 B), READ `7a6e000c`, capability byte `0xbf`, cached update on change after snapshot commits. Mobile: identity decode/model/use case, `ExportDeviceDataUseCase` + local file repository writing `xuna.export.v1` with SHA-256, Device-tab export button, PetId in the device info sheet. Simulator never exposes an identity, so it cannot export.
 - Delegated choice: `crypto` promoted to direct dependency at the already-locked 3.0.7 (lock changes only dependency type). `share_plus` not added; Android file stays in the app sandbox (adb `run-as` retrieval documented).
 - Firmware native 195/195, ASan 195/195, purity + ESP32 build PASS (52,112 B RAM / 2,852,645 B Flash). Flutter analyze clean, 72/72 tests PASS; Python cross-check of the export hash PASS. Debug APK build PASS (not installed).
-- Gates (b)/(c) are **implemented in source, not met** until the board session D. No board, phone, upload, commit or push. [Sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md) has the format and acceptance steps.
+- Gates (b)/(c) are **implemented in source, not met** until the board session D. No board, phone, upload, commit or push. [Sprint record](docs/roadmap/cloud/cloud-gate-sprint-2026-10-17.md) has the format and acceptance steps.
 
 ## 2026-10-17 — Cloud gate sprint decisions (handoff)
 
 - Owner asked to accelerate toward Cloud. Chose all recommended options: app-side JSON export for gate (c); backend CLD-01/02/10 may start now in parallel; one combined board upload/acceptance; commit S10-sync now (firmware `f339fff`, mobile `d34c63b`, parent `b7d71cc`; no push).
-- Proposed Identity V1 (24 B READ `7a6e000c`, capability bit 7) and workstreams A–D in the [sprint record](docs/roadmap/cloud-gate-sprint-2026-10-17.md). Session stopped at the owner's request (token limit) before any implementation. No code, build, board or push.
+- Proposed Identity V1 (24 B READ `7a6e000c`, capability bit 7) and workstreams A–D in the [sprint record](docs/roadmap/cloud/cloud-gate-sprint-2026-10-17.md). Session stopped at the owner's request (token limit) before any implementation. No code, build, board or push.
 
 ## 2026-10-17 — S10-sync production source integration
 
 - Wired opcode 5 through the 16-byte firmware queue and production adapter into `LifeCore::sync`; enabled capability bit 4 with bit 5 (`0x003f`) and added Serial clock/day-part diagnostics.
 - Mobile syncs phone UTC/timezone after connect and every six hours, cancelling on disconnect/close. Simulator keeps the capability off.
 - Firmware focused 12/12 and full native PASS; ESP32 build/purity PASS (52,088 B RAM / 2,852,429 B Flash). Flutter analyze clean and 60/60 tests PASS.
-- Initial APK build exposed JDK 21 + AGP 8.1.0 incompatibility. Updated AGP minimally to 8.2.2 (Gradle/Flutter unchanged); debug APK build, ADB install and cold launch PASS on `emulator-5554`, with the process alive and `MainActivity` top-resumed. ESP32 absent, so no BLE/Serial observation or upload. No commit/push. [Record](docs/roadmap/S10-sync-2026-10-17.md).
+- Initial APK build exposed JDK 21 + AGP 8.1.0 incompatibility. Updated AGP minimally to 8.2.2 (Gradle/Flutter unchanged); debug APK build, ADB install and cold launch PASS on `emulator-5554`, with the process alive and `MainActivity` top-resumed. ESP32 absent, so no BLE/Serial observation or upload. No commit/push. [Record](docs/roadmap/sessions/S10-sync-2026-10-17.md).
 
 ## 2026-10-16 — Owner-requested commit of all pending work
 
@@ -268,30 +273,30 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
 - Owner asked to stop lengthy board testing and proceed with upgrades. Stopped S13/S18 Serial at uptime ~281 s, before checkpoint; one reboot and feedback result=0 recorded, stack 8,036 B. Remaining physical tests are owner-skipped, not validated. No subsequent board/phone operations.
 - Enabled source opcode 6/bit 5, 20-byte explanation READ `000b`, dedicated expired=8; kept GPIO0 direct Happy, 12-byte packets, no TimeSync/hatch flags. Commit-grounded explanation is published before command notification; cached to avoid per-loop GATT updates. Baseline adapter/S01 remains compatible.
 - Mobile explanation domain/model/mapper/repository/read use case, BLE discovery, Chat AskWhy and grounded post-confirmation reply; unsupported/fake evidence unavailable; timeout reads evidence without resend. Locale/expired handling updated. Existing artwork/UI retained.
-- Firmware full native/ASan 192/192 each; final adapter 11/11 each; purity/ESP32 PASS (52,088 B RAM / 2,851,677 B Flash). Mobile fvm 3.32.8 pub get/lock unchanged, analyze clean, tests 59/59, debug APK PASS. [Record](docs/roadmap/S26-S27-lite-2026-10-16.md).
+- Firmware full native/ASan 192/192 each; final adapter 11/11 each; purity/ESP32 PASS (52,088 B RAM / 2,851,677 B Flash). Mobile fvm 3.32.8 pub get/lock unchanged, analyze clean, tests 59/59, debug APK PASS. [Record](docs/roadmap/sessions/S26-S27-lite-2026-10-16.md).
 - Source/build only; board remains preceding S13/S18 image, app was not installed. No commit/push. Future enhanced firmware rollout requires compatible app first (result 8).
 
 ## 2026-10-16 — S13/S18 USB recheck and rollback verification passed
 
 - Owner requested another check. Read 64 KiB successfully; entire preserved prior application (2,840,752 B) passed esptool `verify_flash` using the chip's digest. Saved verified rollback image outside Git; no application upload or Flash write.
-- Re-read partition table/NVS; both byte-identical to existing verified backup. Host decoder/migration PASS, actual pet still Happy/Idle with 4 feedback. [Record](docs/roadmap/S13-S18-switch-2026-10-16.md) has hashes and commands.
+- Re-read partition table/NVS; both byte-identical to existing verified backup. Host decoder/migration PASS, actual pet still Happy/Idle with 4 feedback. [Record](docs/roadmap/sessions/S13-S18-switch-2026-10-16.md) has hashes and commands.
 - Long-read USB root cause remains unknown; those failures are not erased from history. Upload approval is the next gate; new-firmware physical/stack checks not run. No code changes, test rerun, erase, NVS restore, commit or push.
 
 ## 2026-10-16 — S13/S18 lower-baud read retry failed
 
 - Owner authorized the optional prior-firmware read retry, not upload. esptool read at 115200 failed again with short USB data after 77,824-byte progress (`expected 0x1000`, received `0xfe0`), exit 2.
-- Stopped board operations. Existing verified NVS backup untouched; no new freshness check, upload, erase, NVS restore/write, source change, test rerun, commit or push. [Switch record](docs/roadmap/S13-S18-switch-2026-10-16.md) records the failed attempt. USB cable/port check and transport resolution precede the next board attempt and upload authorization.
+- Stopped board operations. Existing verified NVS backup untouched; no new freshness check, upload, erase, NVS restore/write, source change, test rerun, commit or push. [Switch record](docs/roadmap/sessions/S13-S18-switch-2026-10-16.md) records the failed attempt. USB cable/port check and transport resolution precede the next board attempt and upload authorization.
 
 ## 2026-10-16 — S13 + S18 production wiring; stopped before upload
 
 - Switched production source to LifeCore + V1LifeCoreAdapter + NvsSnapshotStore; identity migration commit-first, initial durable v2 migration, read-only snapshot ERROR_SAFE guard, BLE transport-only, GPIO0 direct Happy, unchanged 12-byte packets/capabilities. Loop stack 16 KiB plus high-water logs; no board measurements yet.
 - Passed: native 190/190, ASan/UBSan 190/190, S01 replay, purity, ESP32 build (52,048 B RAM / 2,850,341 B Flash), whitespace. Earlier dirty artwork/UI/Session 2 work retained; no mobile edit, commit or push.
-- Verified device partition table equals build; NVS 0x9000 / 0x5000 backed up at `/Users/xthao28/xuna_backups/2026-10-16-s13-switch/`. Actual pet generation 33, activeSeconds 6,989, feedback 4, preferences Happy/Idle preserved by host migration check. Full hashes/evidence: [record](docs/roadmap/S13-S18-switch-2026-10-16.md).
+- Verified device partition table equals build; NVS 0x9000 / 0x5000 backed up at `/Users/xthao28/xuna_backups/2026-10-16-s13-switch/`. Actual pet generation 33, activeSeconds 6,989, feedback 4, preferences Happy/Idle preserved by host migration check. Full hashes/evidence: [record](docs/roadmap/sessions/S13-S18-switch-2026-10-16.md).
 - Optional application read for rollback verification failed: esptool code 2, short USB data (`expected 0x1000`, received `0xf6e`). Board work stopped immediately per owner's rule. No upload, erase or NVS restore. Prior local firmware artifact preserved in scratch but not verified against board. Upload authorization and all new-firmware physical checks remain pending.
 
 ## 2026-10-16 — S08a + S13/S18 integration preparation (host)
 
-- Added `V1LifeCoreAdapter` (BLE v1 over `LifeCore` + LifeSnapshot v2), `test_v1_adapter` (S08a replay of the S01 transcript + 6 cases), Arduino `NvsSnapshotStore` (D2a `life0/life1`, v1 keys read-only, `ident`, `bootc`; not linked), `tools/nvs_life_dump.py` and `sim/migration_check.cpp`. Evidence: [integration prep record](docs/roadmap/S13-S18-integration-prep-2026-10-16.md).
+- Added `V1LifeCoreAdapter` (BLE v1 over `LifeCore` + LifeSnapshot v2), `test_v1_adapter` (S08a replay of the S01 transcript + 6 cases), Arduino `NvsSnapshotStore` (D2a `life0/life1`, v1 keys read-only, `ident`, `bootc`; not linked), `tools/nvs_life_dump.py` and `sim/migration_check.cpp`. Evidence: [integration prep record](docs/roadmap/sessions/S13-S18-integration-prep-2026-10-16.md).
 - Fact: the S01 script replays with identical result codes, counters, decision/feedback flags and memory pages; with the board's real timing the 168 s approval is expired under D3 (4). Real pet backups migrate with identical preferences (pet has no learned evidence). Synthetic edge: idle and happy both disliked → LifeCore prefers Curious.
 - Embedded provisional choices needing owner confirmation: expired → 4; GPIO0 stays Happy (greeting learning off because v1 bytes and the app cannot carry context 2); reserved IDs ≥ 0x80000000 → 4; coarse preference bytes; needs not persisted.
 - Validation: native 189/189, ASan/UBSan 189/189, purity PASS, ESP32 build SUCCESS (production unchanged 49,024 B RAM / 2,840,385 B Flash; adapter smoke +3,552 B RAM). Board stack for the ~2.8 KB staged snapshot must be measured in the switch session.
@@ -442,7 +447,7 @@ Check `git status` before starting.
 
 1. Read [AGENTS.md](AGENTS.md) completely: canonical product intent, approved decisions and agent rules.
 2. Read this file for working context, then [PLAN.md](PLAN.md) for tasks and the latest entries in [CHANGELOG.md](CHANGELOG.md) for recent changes.
-3. Read [M01 validation record](docs/roadmap/M01-bring-up.md), [firmware README](firmware/README.md) and relevant source before editing.
+3. Read [M01 validation record](docs/roadmap/milestones/M01-bring-up.md), [firmware README](firmware/README.md) and relevant source before editing.
 4. Inspect actual Git status in the parent and affected submodules. This snapshot is not live state.
 
 This file is an operational handoff, not a replacement for AGENTS.md. Plans in PLAN.md do not approve unresolved architectural decisions or authorize starting later milestones. When this file conflicts with implementation or newer evidence, inspect the discrepancy and update it without discarding history.
@@ -494,7 +499,7 @@ Firmware version: `0.1.0-m01`.
 | `firmware/src/main.cpp` | Setup, bounded loop, event mapping and serial diagnostics |
 | `firmware/test/test_core.cpp` | Host tests for debounce and animation |
 | `firmware/README.md` | Setup, commands, sources, limitations and licensing notes |
-| `docs/roadmap/M01-bring-up.md` | Build evidence and physical acceptance checklist |
+| `docs/roadmap/milestones/M01-bring-up.md` | Build evidence and physical acceptance checklist |
 | `.gitignore`, `firmware/.gitignore`, `CLAUDE.md` | Local artifact exclusions and agent entry point |
 
 Behavior:
@@ -559,9 +564,9 @@ Those temporary directories may disappear. VS Code's PlatformIO installation is 
 
 - [PLAN.md](PLAN.md): ordered M01 tasks P01–P08, their statuses/dependencies, execution commands and the Proposed M02 plan.
 - [CHANGELOG.md](CHANGELOG.md): dated implementation, fixes, validation outcomes and session changes. This includes uncommitted work, not only Git commits.
-- [M01 validation record](docs/roadmap/M01-bring-up.md): detailed physical checklist and measurement evidence.
+- [M01 validation record](docs/roadmap/milestones/M01-bring-up.md): detailed physical checklist and measurement evidence.
 
-Current run (2026-10-11): owner confirmed continuing after connection checkpoint. Normal IDE Core 6.2.0 build/upload PASS; host tests PASS. Board model read by owner: T-Display-S3, PCB revision unknown. Basic LCD/animation/buttons passed by owner observation. A false PSRAM warning was fixed in firmware diagnostics and the corrected build uploaded; Flash 16 MiB, PSRAM chip 8 MiB confirmed. More than 10 minutes of stable diagnostics passed; owner confirmed RST/USB startup and buttons with Monitor closed. PCB revision/final P07 review remain open; see [physical run](docs/roadmap/M01-bring-up.md#build-upload-and-physical-run--2026-10-11). Root HEAD remains `3dda411`, firmware HEAD `be5829d`; firmware now has uncommitted diagnostics/README changes, parent handoff docs uncommitted. Mobile/backend unchanged; no commit/push. Firmware gitlink still points to committed `be5829d`, not the uncommitted uploaded fix.
+Current run (2026-10-11): owner confirmed continuing after connection checkpoint. Normal IDE Core 6.2.0 build/upload PASS; host tests PASS. Board model read by owner: T-Display-S3, PCB revision unknown. Basic LCD/animation/buttons passed by owner observation. A false PSRAM warning was fixed in firmware diagnostics and the corrected build uploaded; Flash 16 MiB, PSRAM chip 8 MiB confirmed. More than 10 minutes of stable diagnostics passed; owner confirmed RST/USB startup and buttons with Monitor closed. PCB revision/final P07 review remain open; see [physical run](docs/roadmap/milestones/M01-bring-up.md#build-upload-and-physical-run--2026-10-11). Root HEAD remains `3dda411`, firmware HEAD `be5829d`; firmware now has uncommitted diagnostics/README changes, parent handoff docs uncommitted. Mobile/backend unchanged; no commit/push. Firmware gitlink still points to committed `be5829d`, not the uncommitted uploaded fix.
 
 ## 8. Session update procedure
 
@@ -730,13 +735,13 @@ S01 remains **In progress — phone-dependent acceptance deferred**. BLE transcr
 
 ## S03 complete — firmware first / Android later (2026-10-12)
 
-Owner selected Android for future app acceptance and requested the next ESP32/firmware step. S03 is Done; evidence in [S03 record](docs/roadmap/S03-v1-characterization.md). Three frozen host snapshot fixtures and characterization tests added; production code/config unchanged. New tests PASS with C++11/-Werror; all three host suites PASS with ASan/UBSan; ESP32 build PASS at unchanged 47,504 B RAM / 964,333 B image. No upload, runtime interaction, commit/push or gitlink update.
+Owner selected Android for future app acceptance and requested the next ESP32/firmware step. S03 is Done; evidence in [S03 record](docs/roadmap/sessions/S03-v1-characterization.md). Three frozen host snapshot fixtures and characterization tests added; production code/config unchanged. New tests PASS with C++11/-Werror; all three host suites PASS with ASan/UBSan; ESP32 build PASS at unchanged 47,504 B RAM / 964,333 B image. No upload, runtime interaction, commit/push or gitlink update.
 
 Current firmware working tree contains uncommitted test fixtures/test/README changes. Previous root documentation and mobile .fvmrc preserved. Next S04, then S05/S07 host work as appropriate; S01 remains a gate on later board refactor/storage uploads. Phone path is Android (owner-selected), not iPhone; no Android native/physical BLE success claimed.
 
 ## S04 — Portable core delivery (2026-10-12)
 
-[Evidence and changed paths](docs/roadmap/S04-portable-core.md). Five pure headers moved under firmware/lib/xuna_core/include/xuna without production logic changes; BoardConfig/CoreConfig split, Unity suites and native/native_asan environments added. Firmware tools/check_core_purity.py runs for every environment. Native and sanitizer runs PASS (8/8 each); ESP32 build PASS, unchanged RAM 47,504 B / image 964,333 B. Native 1.2.1 and Unity 2.6.1 installed by PlatformIO for this test setup; firmware pins/partitions unchanged.
+[Evidence and changed paths](docs/roadmap/sessions/S04-portable-core.md). Five pure headers moved under firmware/lib/xuna_core/include/xuna without production logic changes; BoardConfig/CoreConfig split, Unity suites and native/native_asan environments added. Firmware tools/check_core_purity.py runs for every environment. Native and sanitizer runs PASS (8/8 each); ESP32 build PASS, unchanged RAM 47,504 B / image 964,333 B. Native 1.2.1 and Unity 2.6.1 installed by PlatformIO for this test setup; firmware pins/partitions unchanged.
 
 Current commands: `~/.platformio/penv/bin/pio test -d firmware -e native` / `-e native_asan`; build with `pio run -d firmware -e xuna_t_display_s3`. Earlier manual test paths in historical sections no longer exist after this move. Core library has no Arduino dependencies. Mobile's earlier .fvmrc and all previous root/S03 edits retained; no new mobile/backend work. Firmware refactor is uncommitted; parent gitlink unchanged. No flash/upload or physical acceptance.
 
@@ -746,7 +751,7 @@ S04 negative guard check: PASS in native, native_asan and ESP32; temporary Ardui
 
 ## S05 — Foundation primitives complete (2026-10-12)
 
-Owner resumed work after reporting board warmth under Mac USB power. S05 ran entirely on host; no serial/flash/board operation or thermal measurement. [Detailed contracts/evidence](docs/roadmap/S05-foundation-primitives.md): fixed-point Q0.16/Q16.16 arithmetic with saturation/rounding; deterministic Pcg32/IRandom with official vectors; ClockModel with unknown-on-boot, rollback protection, quality/day-part logic and 64-bit monotonic inputs. Defaults 24 h/5 min remain Proposed tuning values. PCG adaptation is Apache-2.0, with notice/license and exact source SHA recorded in firmware README.
+Owner resumed work after reporting board warmth under Mac USB power. S05 ran entirely on host; no serial/flash/board operation or thermal measurement. [Detailed contracts/evidence](docs/roadmap/sessions/S05-foundation-primitives.md): fixed-point Q0.16/Q16.16 arithmetic with saturation/rounding; deterministic Pcg32/IRandom with official vectors; ClockModel with unknown-on-boot, rollback protection, quality/day-part logic and 64-bit monotonic inputs. Defaults 24 h/5 min remain Proposed tuning values. PCG adaptation is Apache-2.0, with notice/license and exact source SHA recorded in firmware README.
 
 Tests-first missing-header build failure observed; then all native and native_asan suites PASS (12/12 each). ESP32 cross-compile smoke for all new headers PASS; normal ESP32 build/purity guard PASS at unchanged 47,504 B RAM / 964,333 B image. Primitives are not wired into firmware yet; no host-target runtime parity or physical acceptance claimed. Root/firmware whitespace checks and updated document paths PASS.
 
@@ -754,7 +759,7 @@ Next prefer S07 since it requires S04 only and is fully host-side; this is allow
 
 ## S07 — Event foundation complete (2026-10-12)
 
-Owner requested a plain-language overview before each session; rule recorded in AGENTS §10 for future sessions. [S07 evidence](docs/roadmap/S07-events.md): 25-kind registry with compile-time uniqueness, in-RAM event envelope, fixed-capacity ring, no-wrap boot/sequence IDs and bounded queue with explicit critical rejection and drop counters. No persisted codec or firmware wiring.
+Owner requested a plain-language overview before each session; rule recorded in AGENTS §10 for future sessions. [S07 evidence](docs/roadmap/sessions/S07-events.md): 25-kind registry with compile-time uniqueness, in-RAM event envelope, fixed-capacity ring, no-wrap boot/sequence IDs and bounded queue with explicit critical rejection and drop counters. No persisted codec or firmware wiring.
 
 Tests-first failure for missing header, then new tests PASS. Full native and native_asan regression PASS, 18/18 each; Xtensa compile smoke PASS; ESP32 build/purity guard PASS at unchanged 47,504 B RAM / 964,333 B image. Existing upstream warnings unchanged. No board/serial/Flash operation, app change, commit/push or gitlink update; earlier edits retained.
 
@@ -762,7 +767,7 @@ Open finding: S05 ClockModel currently returns Unix-epoch minutes while event/pl
 
 ## S05-fix-01 — Compact time epoch corrected (2026-10-12)
 
-[Fix record](docs/roadmap/S05-fix-01-time-epoch.md). ClockModel compact minutes and persisted watermark now use the planned 2020 epoch; UTC milliseconds remain Unix. Reboot still yields unknown time; watermark conversion and u32 range checks are consistent. The S07 integration finding is resolved, with no deployed state or BLE protocol migration (new clock remains unwired).
+[Fix record](docs/roadmap/sessions/S05-fix-01-time-epoch.md). ClockModel compact minutes and persisted watermark now use the planned 2020 epoch; UTC milliseconds remain Unix. Reboot still yields unknown time; watermark conversion and u32 range checks are consistent. The S07 integration finding is resolved, with no deployed state or BLE protocol migration (new clock remains unwired).
 
 Tests-first regression failed against the old implementation, then native and native_asan PASS 19/19 each; no sanitizer diagnostics. Pinned Xtensa compile-only smoke PASS; ESP32 build/purity PASS at unchanged 47,504 B RAM / 964,333 B image. Whitespace/link checks PASS. No serial/Flash operation, upload, app change, thermal measurement, commit/push or gitlink update. Previous uncommitted edits retained.
 
@@ -770,7 +775,7 @@ Next S06 pure identity/hatch/migration work; board tests/NVS writes remain pendi
 
 ## S06 partial — Pure identity/hatch/migration (2026-10-12)
 
-[Scope and codec layout](docs/roadmap/S06-identity-core.md). CRC32, explicit 64-byte IdentityRecord and pure IdentityService implemented. Core stages candidates separately from successful storage acceptance; retains existing identity, never regenerates corrupt/too-new data, migrates valid MVP snapshot identity with birth unknown, and backfills birth only from Synced time in the hatch boot. Service does not change old learning/lifetime state. Hardware entropy/committed boot-counter come from future adapter, not this core.
+[Scope and codec layout](docs/roadmap/sessions/S06-identity-core.md). CRC32, explicit 64-byte IdentityRecord and pure IdentityService implemented. Core stages candidates separately from successful storage acceptance; retains existing identity, never regenerates corrupt/too-new data, migrates valid MVP snapshot identity with birth unknown, and backfills birth only from Synced time in the hatch boot. Service does not change old learning/lifetime state. Hardware entropy/committed boot-counter come from future adapter, not this core.
 
 Tests-first missing-header failure observed; native/ASan/UBSan full regression PASS 23/23 each. Xtensa compile smoke and ESP32 target build/purity PASS; unchanged 47,504 B RAM / 964,333 B image. Whitespace and local-link checks PASS. No board/Flash/serial operation, upload, app edit, commit/push or gitlink update; previous changes preserved.
 
@@ -786,7 +791,7 @@ Draft ADR-0002 created, Proposed, no layout option/D2 approved. Serial-controlle
 
 ## Static pet UI — owner-requested priority (2026-10-12)
 
-Owner paused S11 and requested direct reference-image UI in firmware, including upload when connected. [Static scene record](docs/roadmap/UI-static-scene.md) contains complete configuration, generation, validation and file paths. Source preserved, nearest-neighbor contain conversion to 320×170, no crop; RGB565 108,800 B in Flash. Display uploads image once, no loop repaint or sprite buffer; life/BLE/storage logic unchanged. Existing toolchain/pins/rotation retained, PCB revision unknown.
+Owner paused S11 and requested direct reference-image UI in firmware, including upload when connected. [Static scene record](docs/roadmap/ui/UI-static-scene.md) contains complete configuration, generation, validation and file paths. Source preserved, nearest-neighbor contain conversion to 320×170, no crop; RGB565 108,800 B in Flash. Display uploads image once, no loop repaint or sprite buffer; life/BLE/storage logic unchanged. Existing toolchain/pins/rotation retained, PCB revision unknown.
 
 Build PASS: RAM 46,072 B (−1,432), image 1,062,793 B (+98,460). Deterministic generation/Flash ELF placement and native 23/23 PASS. Board appeared again; fresh actual-table comparison/NVS backup PASS, then owner-authorized UI upload PASS. Startup draw 31,663 us; 25-second serial observation with no spontaneous reset/error. Owner confirmed “Ảnh đúng, màu đúng, ổn định”. NVS after upload equals backup byte-for-byte. Full-image benchmark/format/power-cut work was not run. Backup/log outside repo in xuna_backups/2026-10-12-static-ui.
 
@@ -794,7 +799,7 @@ Current board runs static UI from the uncommitted working tree (includes prior p
 
 ## Animated UI and Git delivery — 2026-10-12
 
-Owner requested room/pet palette redesign, independent idle/blink/wiggle and upload, then provisionally accepted final corrected version and requested committing today's work. [Animated UI record](docs/roadmap/UI-animated-scene.md) has current assets, implementation and physical evidence. Initial art/motion feedback incorporated; subsequent torso-foot seam and missing dark tips fixed with overlapped layers/immutable foot pieces/explicit tip color.
+Owner requested room/pet palette redesign, independent idle/blink/wiggle and upload, then provisionally accepted final corrected version and requested committing today's work. [Animated UI record](docs/roadmap/ui/UI-animated-scene.md) has current assets, implementation and physical evidence. Initial art/motion feedback incorporated; subsequent torso-foot seam and missing dark tips fixed with overlapped layers/immutable foot pieces/explicit tip color.
 
 Final assets: 320×170 background plus 20 fixed 96×72 frames, 385,280 B in Flash; one 13,824 B startup region buffer. Pet visible height 65 px (~38%). No frame allocations/delay; palette masks/seam checks PASS. Native and ASan/UBSan 25/25 PASS; final build/upload PASS at RAM 46,144 B / image 1,340,569 B. Final 25-second log: draw max 4,754 us / loop gap max 4,767 us, stable heap, no spontaneous reset/error. GPIO0 Happy observed in v2 log; GPIO14 full physical check not separately logged. Owner: “tạm thời đã ổn có gì cần sửa tôi sẽ nói sau”. Not long-run/thermal/BLE validation.
 
@@ -863,7 +868,7 @@ nRF Connect not installed; requested owner installation to continue observed raw
 
 ## S01 observed read baseline — 2026-10-13
 
-nRF Connect installed and connected. Five physical characteristic reads captured as raw hex: capabilities 8 B, status 16 B, life and both memory pages 20 B each. Life feedback 1/memory 1/pending 0; confirmed-text episode observed. Evidence: [S01 observed transcript](docs/roadmap/S01-v1-observed-transcript.md) (root-relative path); raw XMLs outside Git. No writes/upload in this read step. Scripted writes/error matrix and power-cut matrix remain pending; S01 In progress, S11 paused. Docs uncommitted; no commit/push.
+nRF Connect installed and connected. Five physical characteristic reads captured as raw hex: capabilities 8 B, status 16 B, life and both memory pages 20 B each. Life feedback 1/memory 1/pending 0; confirmed-text episode observed. Evidence: [S01 observed transcript](docs/roadmap/sessions/S01-v1-observed-transcript.md) (root-relative path); raw XMLs outside Git. No writes/upload in this read step. Scripted writes/error matrix and power-cut matrix remain pending; S01 In progress, S11 paused. Docs uncommitted; no commit/push.
 
 S01 raw command follow-up: Notify enabled; observed 7-byte Suggest Quiet attempt returned invalid_length (2), request 1; no pending suggestion or memory/feedback changes. Recorded actual transmitted bytes/status/life in S01-v1-observed-transcript.md. Valid 8-byte command with fresh request 2 pending. No firmware/code changes, commit/push.
 
@@ -938,7 +943,7 @@ Owner requested a gradual upgrade toward a real learning engine. This session is
 - Fact: added `firmware/lib/xuna_core/include/xuna/learning/PreferenceLearnerV2.h` as an independent C++11, no-heap learner core. It keeps bounded posterior cells for context/action pairs, uncertainty-aware optimistic exploration, decision IDs/propensity, feedback provenance, duplicate protection, evidence/history caps, metrics and deterministic fingerprinting.
 - Fact: added `firmware/test/test_learning_engine/test_main.cpp` covering initial exploration, contextual isolation, idempotent feedback, policy change after feedback, evidence bounds and deterministic replay.
 - Proposal: keep `LifeEngine`/BLE on learner v1 until persistence v2 and migration from the 96-byte snapshot exist. The next integration should run V2 in shadow mode and compare decisions before changing production behavior.
-- Experiment: L1 is intentionally a bounded contextual preference learner, not a neural network or full RL engine. The staged roadmap is recorded in [Learning Engine upgrade](docs/roadmap/LEARNING-ENGINE-UPGRADE.md): L2 persistence/migration, L3 feature contexts, L4 delayed credit/conversation provenance, L5 optional sequence learning only if measured data justifies it.
+- Experiment: L1 is intentionally a bounded contextual preference learner, not a neural network or full RL engine. The staged roadmap is recorded in [Learning Engine upgrade](docs/roadmap/learning/LEARNING-ENGINE-UPGRADE.md): L2 persistence/migration, L3 feature contexts, L4 delayed credit/conversation provenance, L5 optional sequence learning only if measured data justifies it.
 - Validation limit: no `pio`, C++ compiler, native test, sanitizer, ESP32 build or board test was available in this session. Only source/static review and whitespace checks are recorded; no runtime or learning-quality claim is made.
 - Git: firmware learner/test files and root handoff docs remain uncommitted; no upload, commit or push.
 - Next: add a versioned persistence codec/migration and golden vectors, then shadow-wire V2 behind a feature flag without changing BLE payloads.
@@ -1016,7 +1021,7 @@ Owner requested a careful review of today's firmware commits and approved fixing
 - Fact: production defects fixed: energy never recovered, so the pet stayed in Resting forever after ~48 min uptime; BLE opcode 2 retargeted pending feedback after a rejected choice; a new reaction did not restart the Reacting timer.
 - Decision (owner, 2026-10-14): fix #1 by recovering energy while Resting/Sleeping. Recovery rate 2048/min is a **Proposed** placeholder.
 - Fact: `ActionGate` now holds the single action path for `BleManager` and `LifeCore`; LifeCore visual expiry and accepted-only decisions fixed; ErrorSafe reboot guard reports `GuardReboot`.
-- Validation: native and ASan/UBSan 87/87 PASS; ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,357 B, purity PASS); `sim/` programs build; `git diff --check` PASS. Details: [review fixes record](docs/roadmap/M04-review-fixes-2026-10-14.md).
+- Validation: native and ASan/UBSan 87/87 PASS; ESP32 build SUCCESS (RAM 46,208 B, Flash 1,343,357 B, purity PASS); `sim/` programs build; `git diff --check` PASS. Details: [review fixes record](docs/roadmap/milestones/M04-review-fixes-2026-10-14.md).
 - Not run: board upload and physical acceptance. No storage-format change.
 - Git: firmware committed as `aa2dbca` (`fix(firmware): recover energy at rest and share the action gate`); parent commit records the gitlink. No push.
 - Next: owner S17 board check (sleep/wake, result 5 message, rest/recovery), then Life Lab tuning of Proposed values.
@@ -1028,7 +1033,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 - Fact: tokens, OFL fonts, 11 base widgets, 24 icons and a four-tab home shell replace the MVP single-screen home; all device logic still goes through the existing use cases and repository. No protocol, firmware, dependency or SDK change.
 - Fact: chat transcript is in memory only (max 40 lines); device errors also appear as snack bars.
 - Assumption: design images over 256 KiB could not be read through the connector; `rain.png`, `hero.png` and a redrawn pixel-book SVG stand in for `room`, `avatar`/growth sprites and `book`.
-- Validation: `pubspec.lock` unchanged; analyze clean; 29/29 tests. Details: [mobile UI record](docs/roadmap/mobile-ui-design-system.md).
+- Validation: `pubspec.lock` unchanged; analyze clean; 29/29 tests. Details: [mobile UI record](docs/roadmap/ui/mobile-ui-design-system.md).
 - iOS Simulator (iPhone 13, simulator transport): app launched, Nhà screenshot inspected; other tabs covered by widget tests.
 - Not run: real phone with the board, Android.
 - Git: mobile committed as `df7d2ee` (`feat: add XUNA design system and four-tab home`); parent commit records the gitlink and handoff docs. No push.
@@ -1038,7 +1043,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Source audit against S18/T1 confirms host LifeCore preparation only; production still owns business logic in main/BleManager. S10/S13 end-to-end and S17 owner checks remain unmet.
 - Missing composition: identity, canonical event queue, pure command dispatch, BehaviorSelector, typed persistence including needs, and thin main loop. Pending-feedback invalidation and commit-failure semantics need parity coverage before integration.
-- Evidence and next sequence: [S18 readiness review](docs/roadmap/S18-readiness-review.md). No code change, runtime test, board/app operation, commit or push in this audit. Prior 87/87 native/sanitizer and target build results are not full S18 acceptance.
+- Evidence and next sequence: [S18 readiness review](docs/roadmap/sessions/S18-readiness-review.md). No code change, runtime test, board/app operation, commit or push in this audit. Prior 87/87 native/sanitizer and target build results are not full S18 acceptance.
 - Next without a phone: execute existing host trace/snapshot experiments and record evidence; keep production/storage integration gated.
 
 ## S17 board upload smoke — 2026-10-14
@@ -1063,7 +1068,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 ## Host lab runs — 2026-10-15
 
-- Ran `lifelab` and `lifecore_lab` (g++ 16, `-Werror` clean) on 12 annotated traces now in `firmware/sim/traces/`. Results are deterministic across reruns. Evidence: [lab runs record](docs/roadmap/lifecore-lab-runs-2026-10-15.md).
+- Ran `lifelab` and `lifecore_lab` (g++ 16, `-Werror` clean) on 12 annotated traces now in `firmware/sim/traces/`. Results are deterministic across reruns. Evidence: [lab runs record](docs/roadmap/learning/lifecore-lab-runs-2026-10-15.md).
 - Fact: LifeCore reboot/power-cut/pending/duplicate bookkeeping behaves as designed.
 - Finding (S18 blocker): commit-failure semantics differ from production. BLE opcode 3 commits a copy, then applies it, and keeps the decision pending for retry (result 7). `LifeCore` applies first, clears pending and cannot report or retry a failed commit in the lab. Plan §9.5 already specifies the production model (commit first, RAM unchanged and `not_ready` on failure), so no new decision is needed: bring `LifeCore` in line and add a parity test before it replaces the BLE path.
 
@@ -1083,7 +1088,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Owner approved L-D1–L-D5 (AGENTS.md §3; plan §18). L-D5 is research only for touch, IMU and microphone. D5 and D15 remain open.
 - Added the host-only closed-loop learner bench: `xuna/lab/OwnerModel.h`, `xuna/lab/LearnerBench.h`, `test/test_life_lab`, `sim/learning_bench.cpp`. Native 95/95 PASS; ESP32 build unchanged (RAM 46,208 B, Flash 1,343,337 B).
-- Fact (200 seeds): v1 and v2 pass the §9.9 B hypothesis and keep state unchanged without feedback (D). Both fail reversal (C): v1 recovers in 0% of seeds within 60 trials, v2 in 26%. v1 is worse than random under reversal and drift. Evidence: [Phase 0 record](docs/roadmap/life-lab-phase0-2026-10-15.md).
+- Fact (200 seeds): v1 and v2 pass the §9.9 B hypothesis and keep state unchanged without feedback (D). Both fail reversal (C): v1 recovers in 0% of seeds within 60 trials, v2 in 26%. v1 is worse than random under reversal and drift. Evidence: [Phase 0 record](docs/roadmap/learning/life-lab-phase0-2026-10-15.md).
 - Git: firmware lab files, traces, `.clangd`, `.gitignore`, `BleProtocol.h`; root docs, AGENTS.md and plan edits are uncommitted. No push.
 - Next: Phase 1 learner v3 per plan §9.3 (discounted Beta + hierarchical prior) into the bench, with E10 variants A/C/D; or Phase 0 slice 2 (`LifeCore` time series + §9.5 parity fix).
 
@@ -1111,7 +1116,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Owner asked to start Phase 1. Added lab/shadow `PreferenceLearnerV3` (plan §9.3 discounted Beta + hierarchical day-part prior; §9.4 policies Greedy/A/C/D), 10 unit tests, bench adapters, a `dayparts` scenario and `--gamma`. No production wiring (D1, S18 gates).
 - Validation: native 105/105 PASS; ESP32 build unchanged (RAM 46,208 B, Flash 1,343,337 B); purity PASS.
-- Fact (200 seeds): v3 C (UCB) recovers after reversal in 84% of seeds at γ 0.95 and 98% at γ 0.90 (v1 0%, v2 26%); it is the preliminary E10 winner. A and D over-explore when ratings are sparse. The hierarchical prior learns slower than flat contexts when day parts disagree. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md).
+- Fact (200 seeds): v3 C (UCB) recovers after reversal in 84% of seeds at γ 0.95 and 98% at γ 0.90 (v1 0%, v2 26%); it is the preliminary E10 winner. A and D over-explore when ratings are sparse. The hierarchical prior learns slower than flat contexts when day parts disagree. Evidence: [learner v3 record](docs/roadmap/learning/learner-v3-phase1-2026-10-15.md).
 - Git: firmware v3 files and bench changes, root docs uncommitted. No push.
 - Next: sweep k/m and D parameters, add a generalization scenario; then propose v3 C (γ in [0.90, 0.95]) for E10 acceptance, L2 persistence and shadow wiring.
 
@@ -1119,7 +1124,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Added `feedbackAware` ε scaling to v3, a late-context schedule and generalization metric to the bench, the `new_daypart` scenario, `sim/learner_sweep.cpp` (137 configurations × 8 scenarios × 200 seeds) and `v3_C_tuned`. Native 106/106 PASS; ESP32 build unchanged.
 - Fact: C (UCB) with γ 0.90, k 1, m 1, bonus 0.15 ranks best (score 1.11 vs 1.27 for plan defaults; best A 2.42, best D 3.18). Tuned v3 recovers after reversal in 94% of seeds and under drift in 96%; it beats or matches v2 everywhere except disagreeing day parts (4.15 vs 2.88); on a new day part it is right 98% of the time immediately (v2 83.5%).
-- Proposal: these values replace the §9.3/§9.4 defaults as **Proposed** values, pending owner review of visible flips and board checks. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md) slice 2; plan §9.4 note.
+- Proposal: these values replace the §9.3/§9.4 defaults as **Proposed** values, pending owner review of visible flips and board checks. Evidence: [learner v3 record](docs/roadmap/learning/learner-v3-phase1-2026-10-15.md) slice 2; plan §9.4 note.
 - Git: uncommitted (firmware v3, bench, sweep, tests; root docs). No push.
 - Next: L2 persistence v2 (used shape only) + migration from the 96-byte v1 snapshot, §9.6 explanation mapping, then shadow wiring behind LifeCore (S18 gates still apply to production).
 
@@ -1135,7 +1140,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Added `LearningBridgeV3`; `LifeCore` now shadows learner v3 (`shadowConfig()` tuned Proposed values) instead of v2, exposes `shadowMetrics()`, resets the candidate on boot. Host core only; production BLE path unchanged.
 - Finding: the old v2 bridge credited ratings to v2's own (unshown) action; v3 bridge credits the shown action. Earlier v2 shadow agreement numbers are not valid evidence.
-- Validation: native 115/115 PASS; ESP32 build unchanged; LifeCore traces replay with identical bookkeeping. Evidence: [learner v3 record](docs/roadmap/learner-v3-phase1-2026-10-15.md) slice 4.
+- Validation: native 115/115 PASS; ESP32 build unchanged; LifeCore traces replay with identical bookkeeping. Evidence: [learner v3 record](docs/roadmap/learning/learner-v3-phase1-2026-10-15.md) slice 4.
 - Git: uncommitted. No push.
 - Next: §9.5 commit-failure parity in LifeCore (commit first, RAM unchanged, `not_ready`, retry), then E10 acceptance review; production stays gated by S18.
 
@@ -1156,7 +1161,7 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 ## E10 review packet (2026-10-15)
 
-- Added [E10 review packet](docs/roadmap/E10-review-packet-2026-10-15.md): decision requests E10-A (select v3 C UCB for M05a), E10-B (tuned starting parameters, provisional until board check), E10-C (capped v1 migration amendment); §9.9 status (B, C, D, isolation, spam met on host; E reboot parity partly; stated-vs-rated not started); owner board checks; remaining gates.
+- Added [E10 review packet](docs/roadmap/learning/E10-review-packet-2026-10-15.md): decision requests E10-A (select v3 C UCB for M05a), E10-B (tuned starting parameters, provisional until board check), E10-C (capped v1 migration amendment); §9.9 status (B, C, D, isolation, spam met on host; E reboot parity partly; stated-vs-rated not started); owner board checks; remaining gates.
 - Added §9.9 spam test (1,000 attempts → 1 apply, 1 commit). Native 118/118 PASS.
 - Git: D5 vocabulary, spam test and packet uncommitted. No push.
 - Next: owner decision on E10-A/B/C; then Phase 0 slice 2 (LifeCore time series) or S12a/D2 preparation.
@@ -1167,14 +1172,14 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Added `sim/life_timeline.cpp` (hours-long LifeCore runs, idle/casual/active owners), `sim/life_sweep.py`, and inactive Life Lab knobs: `ActivityThresholds` (incl. `wakeEnergy`, `resumeInterruptedRest`), `LifeTuning.actionCostPercent`/`stimulationPerInteraction`, `Needs::spend/stimulate`, `LifeCore` tuning parameters. Defaults keep the shipped behaviour; 2 new tests. Native 120/120 PASS; ESP32 RAM 46,224 B (+16), Flash 1,343,453 B (+116).
 - Fact (also true on the board): after ~49 min XUNA cycles 8 min awake / 4 min resting with energy 25–38% (91% of time below 37.5%); actions never spend energy; stimulation never rises, so excited/curious/overwhelmed moods are unreachable; interrupted rest is lost; sleep needs an explicit wake.
-- Proposal: life-feel targets (11 checks) and candidate values (restExit 64%, recovery 6144/min, action cost 10%, stimulation +4096, wake at 80%, resume interrupted rest) that pass all targets. Owner decision needed before enabling on the board. Evidence: [needs timeline record](docs/roadmap/life-lab-needs-timeline-2026-10-15.md).
+- Proposal: life-feel targets (11 checks) and candidate values (restExit 64%, recovery 6144/min, action cost 10%, stimulation +4096, wake at 80%, resume interrupted rest) that pass all targets. Owner decision needed before enabling on the board. Evidence: [needs timeline record](docs/roadmap/learning/life-lab-needs-timeline-2026-10-15.md).
 - Git: uncommitted. No push.
 - Owner approved the life-feel targets and enabling the candidate configuration for a board trial (2026-10-15). Added `xuna/life/LifeFeel.h`; production `main.cpp`/`BleManager` and `LifeCore` defaults use it; 1 more test. Native 121/121 PASS; ESP32 build SUCCESS (RAM 46,224 B, Flash 1,343,589 B). **Not uploaded:** the board was not connected (only COM1). Next: owner connects the board; back up NVS and the partition table, upload (NVS excluded), then a 1–2 hour owner observation.
 
 ## Learner v3 board-trial shortcut (2026-10-15)
 
 - Owner chose to skip LifeSnapshot v2 for a first board trial. Added `xuna/learning/BoardLearner.h` (v3 decides; v1 stays the durable 96-byte record; commit-first via `StorageCommit`; rebuild at boot), `approvedLearnerParameters()`/`v1CompatibleLearnerConfig()`, `LocalBehavior::choosePreferred`; wired into `BleManager` (opcodes 2/3/4, preference bytes) and `main.cpp`. 6 new tests; native 127/127 PASS; ESP32 build SUCCESS (RAM 48,328 B, Flash 1,347,081 B).
-- Known limits: recency lost across reboots; 2 × 2 shape only (no curious/greeting) until S12a. Evidence and board checklist: [board trial record](docs/roadmap/learner-v3-board-trial-2026-10-15.md).
+- Known limits: recency lost across reboots; 2 × 2 shape only (no curious/greeting) until S12a. Evidence and board checklist: [board trial record](docs/roadmap/learning/learner-v3-board-trial-2026-10-15.md).
 - Not uploaded: board not connected. Next: owner connects the board → NVS/partition backup → upload → Serial check → owner observation (life-feel + learning).
 - Commit checkpoint (2026-10-15): firmware child `efdd915` (`feat(firmware): enable life-feel tuning and learner v3 board trial`) with Life Lab slice 2 (needs timeline, knobs, LifeFeel) and the BoardLearner shortcut; the parent commit records the gitlink and docs. Not uploaded; no push.
 
@@ -1182,15 +1187,15 @@ Owner requested building the mobile UI from the Claude Design "XUNA App" project
 
 - Board not connected (only COM1). Rebuilt `efdd915`: matches the recorded size. Prepared a read-only backup script outside Git (session scratchpad) following session plan §5; target backup folder `C:\Users\Thao\xuna_backups\2026-10-15-learner-v3-trial\`.
 - Finding: the LCD shows only the sprite (resting draws idle), Serial/BLE carry no needs, and the board does not compute mood, so the life-feel trial was not measurable. Owner chose Serial instrumentation: `needs …` every 5 s, `activity_change …` on changes; `tools/serial_capture.py`, `sim/board_needs_report.py`. Firmware commit `5d872d3` (owner request). Native 127/127, ESP32 RAM 48,328 B, Flash 1,347,657 B. Not uploaded.
-- Owner chose S12a + S12b on host ahead of S11/D2. Added `xuna/persist/SnapshotCodec.h`, `Migrations.h`, `SnapshotStore.h` and `test/test_snapshot_v2` (16 tests). Layout frozen in plan §7.5 (544 B product snapshot). Native 143/143 PASS; ESP32 build unchanged; purity PASS; Xtensa compile smoke PASS. Evidence: [S12 record](docs/roadmap/S12-snapshot-v2-2026-10-15.md).
+- Owner chose S12a + S12b on host ahead of S11/D2. Added `xuna/persist/SnapshotCodec.h`, `Migrations.h`, `SnapshotStore.h` and `test/test_snapshot_v2` (16 tests). Layout frozen in plan §7.5 (544 B product snapshot). Native 143/143 PASS; ESP32 build unchanged; purity PASS; Xtensa compile smoke PASS. Evidence: [S12 record](docs/roadmap/sessions/S12-snapshot-v2-2026-10-15.md).
 - S13 notes: `recover` needs about 6 KB stack on Xtensa (use static scratch); log `corruptSlots`; NVS power-cut behaviour still needs S11/E5.
 - Editor: clangd on this machine cannot find the ESP32 toolchain's standard headers (`cstdint`); machine-local `--query-driver` setting, not a code issue.
 - Git: firmware `5d872d3` committed; S12 code and all root docs uncommitted. No push, no board operation.
-- S18 preparation (owner choice: replace the v1/v3-shadow composition): new `xuna/learning/ProductLearner.h`; `LifeCore` uses it (v3 3 × 5 × 3 decides, LifeSnapshot v2 via `ISnapshotCommit`), `Greeting` event for GPIO0 (device decision IDs ≥ 0x80000001), allowed-mask choices, direct-input invalidation, forget on both slots; `LifeCoreSnapshotLab` (`MemorySnapshotStore`) and `LifeCoreTrace` on v2. Recovery fix: lone torn v2 slot without v1 → Missing. Native 152/152 PASS; ESP32 build unchanged; Xtensa smoke PASS; `life_timeline` identical to HEAD; trace replays as expected. Evidence: [S18 preparation record](docs/roadmap/S18-prep-product-learner-2026-10-15.md). Production firmware unchanged; uncommitted.
-- S10 host part: `ClockModel` moved into `LifeCore` (`LifeCore::sync`), learner day parts from trusted time (coarse cell when unknown), LifeSnapshot v2 Clock section (watermark + offset, lazy commit), 32 → 64-bit monotonic extension (`millis()` wrap would otherwise block syncs after ~49.7 days). Trace `sync` verb + `c8_dayparts.trace`. Native 159/159 PASS; ESP32 unchanged; Xtensa smoke PASS; `life_timeline` identical; c1–c6 identical. Evidence: [S10 host record](docs/roadmap/S10-host-trusted-time-2026-10-15.md). Protocol/firmware/mobile/owner parts of S10 remain. Uncommitted.
+- S18 preparation (owner choice: replace the v1/v3-shadow composition): new `xuna/learning/ProductLearner.h`; `LifeCore` uses it (v3 3 × 5 × 3 decides, LifeSnapshot v2 via `ISnapshotCommit`), `Greeting` event for GPIO0 (device decision IDs ≥ 0x80000001), allowed-mask choices, direct-input invalidation, forget on both slots; `LifeCoreSnapshotLab` (`MemorySnapshotStore`) and `LifeCoreTrace` on v2. Recovery fix: lone torn v2 slot without v1 → Missing. Native 152/152 PASS; ESP32 build unchanged; Xtensa smoke PASS; `life_timeline` identical to HEAD; trace replays as expected. Evidence: [S18 preparation record](docs/roadmap/sessions/S18-prep-product-learner-2026-10-15.md). Production firmware unchanged; uncommitted.
+- S10 host part: `ClockModel` moved into `LifeCore` (`LifeCore::sync`), learner day parts from trusted time (coarse cell when unknown), LifeSnapshot v2 Clock section (watermark + offset, lazy commit), 32 → 64-bit monotonic extension (`millis()` wrap would otherwise block syncs after ~49.7 days). Trace `sync` verb + `c8_dayparts.trace`. Native 159/159 PASS; ESP32 unchanged; Xtensa smoke PASS; `life_timeline` identical; c1–c6 identical. Evidence: [S10 host record](docs/roadmap/sessions/S10-host-trusted-time-2026-10-15.md). Protocol/firmware/mobile/owner parts of S10 remain. Uncommitted.
 - D3 approved by the owner (120 s feedback window; direct input still invalidates). Recorded in AGENTS.md §3, plan §18/§9.5 and the decision index. Implemented in `ProductLearner`/`LifeCore` (`expire`, `feedbackExpired`, `decisionExpired`, late ratings report expired). 5 new tests; native 164/164 PASS; traces/`life_timeline`/ESP32 build unchanged. Production BLE and the board-trial firmware have no window yet (S18). Uncommitted.
-- S22 decision session: owner approved D4 (UCB exploration labelled in "Why?"), D6 off, "mình – bạn", Vietnamese first, follow-up for a missing context, the Layer A phrase table; D16 deferred. Recorded in AGENTS.md §3, plan §11/§18, decision index, [S22 packet](docs/roadmap/S22-decision-packet-2026-10-15.md). Documentation only. Next eligible without the board: S39 in `mobile/`.
+- S22 decision session: owner approved D4 (UCB exploration labelled in "Why?"), D6 off, "mình – bạn", Vietnamese first, follow-up for a missing context, the Layer A phrase table; D16 deferred. Recorded in AGENTS.md §3, plan §11/§18, decision index, [S22 packet](docs/roadmap/sessions/S22-decision-packet-2026-10-15.md). Documentation only. Next eligible without the board: S39 in `mobile/`.
 - Commit checkpoint (2026-10-15, owner request): firmware `5d872d3` (board-trial Serial log) and `8b1aa62` (`feat(firmware): add LifeSnapshot v2, product learner, day parts and feedback window`: S12a/S12b, S18 preparation, S10 host part, D3); the parent commit records the gitlink and all docs (S12, S18-prep, S10-host records, D3 and S22 decisions). Not pushed. The board-trial upload target stays `5d872d3`'s production path (the new core is not linked into `main.cpp`; `8b1aa62` builds the same production image, but later S24a work grows the shared learner cells: RAM +648 B).
-- S39 (mobile, pure Dart): Layer A LocalRuleExtractor `ExtractCandidateUseCase` + `CandidateEvent`/`ExtractionResult`/`PreferenceContext`/`DayPart` from the S22 phrase table; V1 parser untouched; not wired into the UI. Flutter 3.32.8 (called from `~/fvm/versions/3.32.8/bin`; `fvm` itself is not on PATH): lock unchanged, analyze clean, 39/39 PASS. Evidence: [S39 record](docs/roadmap/S39-layer-a-extractor-2026-10-15.md). Mobile changes uncommitted.
-- S24a (device core, host only): opcode 6 parse behind a flag, `user_stated` evidence in learner v3 (w_s 0.5, cap 2, decays with γ, latest statement wins [P]), `LifeCore` `StatedPreference` with validation/dedup/commit-first/ERROR_SAFE refusal, explanation `Told` + stated mass, snapshot section 12. Native 179/179 PASS; traces/timeline unchanged; ESP32 RAM 48,976 B (+648) because the board-trial learner shares the grown cells (behaviour unchanged). Evidence: [S24a record](docs/roadmap/S24a-stated-preference-2026-10-15.md). Firmware and mobile (S39) changes uncommitted.
+- S39 (mobile, pure Dart): Layer A LocalRuleExtractor `ExtractCandidateUseCase` + `CandidateEvent`/`ExtractionResult`/`PreferenceContext`/`DayPart` from the S22 phrase table; V1 parser untouched; not wired into the UI. Flutter 3.32.8 (called from `~/fvm/versions/3.32.8/bin`; `fvm` itself is not on PATH): lock unchanged, analyze clean, 39/39 PASS. Evidence: [S39 record](docs/roadmap/sessions/S39-layer-a-extractor-2026-10-15.md). Mobile changes uncommitted.
+- S24a (device core, host only): opcode 6 parse behind a flag, `user_stated` evidence in learner v3 (w_s 0.5, cap 2, decays with γ, latest statement wins [P]), `LifeCore` `StatedPreference` with validation/dedup/commit-first/ERROR_SAFE refusal, explanation `Told` + stated mass, snapshot section 12. Native 179/179 PASS; traces/timeline unchanged; ESP32 RAM 48,976 B (+648) because the board-trial learner shares the grown cells (behaviour unchanged). Evidence: [S24a record](docs/roadmap/sessions/S24a-stated-preference-2026-10-15.md). Firmware and mobile (S39) changes uncommitted.
 - Commit checkpoint (2026-10-15, owner request): firmware `9e51df9` (`feat(firmware): add stated preferences (opcode 6) to the learner core`), mobile `dd8430c` (`feat(conversation): add Layer A rule extractor and candidate events`); the parent commit records both gitlinks and the S22/S39/S24a docs. Not pushed. Board-trial upload target stays `5d872d3`.

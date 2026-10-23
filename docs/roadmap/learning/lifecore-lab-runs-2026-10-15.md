@@ -14,7 +14,7 @@ or a tuning decision.
   g++ -std=c++11 -Wall -Wextra -Werror -Ilib/xuna_core/include sim/lifecore_lab.cpp -o lifecore_lab
   ```
 
-- Traces: [firmware/sim/traces/](../../firmware/sim/traces/). Each file starts
+- Traces: [firmware/sim/traces/](../../../firmware/sim/traces). Each file starts
   with a comment that states the expected result. Both runners use seed 1,
   stream 3.
 - Determinism: rerunning every trace gives byte-identical CSV rows.
@@ -49,7 +49,7 @@ bookkeeping. They cannot tune the Proposed values (needs decay, energy recovery
 
 ### Finding: commit-failure semantics differ from production
 
-- Production [BleManager.h](../../firmware/include/BleManager.h) (opcode 3)
+- Production [BleManager.h](../../../firmware/include/BleManager.h) (opcode 3)
   applies feedback to a copy and saves it first. Only when the save succeeds
   does it replace `life`. On failure it returns result 7 and keeps the decision
   pending, so the app can retry.
@@ -61,9 +61,9 @@ bookkeeping. They cannot tune the Proposed values (needs decay, energy recovery
   every boot, so v1 and v2 disagree about what was learned.
 
 This is the "commit-failure semantics need parity coverage" item in the
-[S18 readiness review](S18-readiness-review.md). Before `LifeCore` replaces
+[S18 readiness review](../sessions/S18-readiness-review.md). Before `LifeCore` replaces
 the BLE path, it must follow the model that
-[plan §9.5](../architecture/XUNA_IMPLEMENTATION_PLAN.md) already specifies,
+[plan §9.5](../../architecture/XUNA_IMPLEMENTATION_PLAN.md) already specifies,
 which matches production: commit first; on failure the ACK reports
 `not_ready`, RAM is not mutated and the decision stays pending for retry. Add a
 parity test.

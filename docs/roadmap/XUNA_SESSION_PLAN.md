@@ -127,7 +127,7 @@ Session IDs are kept stable. Suffixes (`a`, `b`) mark splits or additions from t
 | S19a | M04.6 | Life Lab CLI + trace DSL + runner. **Done 2026-10-19** (`sim/lifecore_lab.cpp`; grammar frozen in `firmware/sim/README.md`) | firmware | S18 | M |
 | S19b | M04.6 | Scenarios D/E + 100-day invariants. **Done 2026-10-19 (host)**; boot policy moved to `xuna_core` `BootSequence` (board re-check pending) | firmware | S19a | M |
 | S20 | M04.6 | Golden vectors and Dart conformance. **Done 2026-10-19** (`sim/golden.cpp` → `mobile/test/fixtures/firmware/`; simulator learner removed) | firmware, mobile | S19b, D14 | M |
-| S21 | M04.6 | Target parity build and M04 acceptance review. **Steps 1–3 done 2026-10-22** (board bit-identical; [M04 record](M04-foundation.md)); owner review pending | firmware, root | S20 | M + Owner |
+| S21 | M04.6 | Target parity build and M04 acceptance review. **Steps 1–3 done 2026-10-22** (board bit-identical; [M04 record](milestones/M04-foundation.md)); owner review pending | firmware, root | S20 | M + Owner |
 | S22 | M05a/c-A | Learning + conversation decisions: D3–D6, D17, vocabulary, phrase scope (D16 optional) | root | can run any time after S02; must precede S23/S39 | Owner |
 | S23 | M05a | PreferenceLearner v2 + section migration (pure). **Superseded by E10 learner v3 / S18-prep** | firmware | S22, S21 | M |
 | S24 | M05a | Policy + ReactionTable (pure). **Superseded by E10 UCB + D3 in `ProductLearner`** | firmware | S23 | M |
@@ -296,7 +296,7 @@ Notes:
 - **Preconditions:** S00; a phone path decided (iPhone through the Mac, or Android, whose native build is unverified). A generic BLE inspector app (e.g. nRF Connect) is recommended for step 3.
 - **Steps:**
   1. Take the verified NVS backup (§5) before anything else.
-  2. Run items 1–10 of "Physical acceptance still open" in [MVP-local.md](MVP-local.md) and record pass/fail with short evidence (serial excerpt, screenshot, observation).
+  2. Run items 1–10 of "Physical acceptance still open" in [MVP-local.md](milestones/MVP-local.md) and record pass/fail with short evidence (serial excerpt, screenshot, observation).
   3. **Observed v1 transcript.** With the BLE inspector, run a scripted sequence and record the raw hex of every write and of the status, life and memory values after each step:
      - read capabilities, status and life;
      - suggest quiet, then approve;
@@ -335,7 +335,7 @@ Notes:
 
 - **Goal:** pure code lives in a library that builds for both the board and the host, with standard tests.
 - **Preconditions:** S03.
-- **Delivery (2026-10-12):** implemented and verified; see [S04 record](S04-portable-core.md). Old flat header/test paths below describe the migration input; current core/test paths are the listed targets. No board upload.
+- **Delivery (2026-10-12):** implemented and verified; see [S04 record](sessions/S04-portable-core.md). Old flat header/test paths below describe the migration input; current core/test paths are the listed targets. No board upload.
 - **Steps:**
   1. Create `firmware/lib/xuna_core/library.json` (name `xuna_core`, no framework dependency).
   2. Move the pure headers to `lib/xuna_core/include/xuna/` unchanged: `DebouncedButton.h`, `AnimationManager.h`, `LifeEngine.h`, `BleProtocol.h`, `LocalBehavior.h`. Update the includes to `<xuna/...>`.
@@ -358,7 +358,7 @@ Notes:
 
 ### S05 — Fixed-point, PCG32 and ClockModel (pure; M04.2a; T2)
 
-- **Delivery (2026-10-12):** pure logic implemented, native/sanitizer suites verified; see [S05 evidence](S05-foundation-primitives.md). No firmware wiring or board upload.
+- **Delivery (2026-10-12):** pure logic implemented, native/sanitizer suites verified; see [S05 evidence](sessions/S05-foundation-primitives.md). No firmware wiring or board upload.
 
 - **Preconditions:** S04.
 - **Steps (tests first for each item):**
@@ -379,7 +379,7 @@ Notes:
 
 ### S06 — Identity record, `bootc`, hatch/migration (M04.2b; T2, T10, T18)
 
-- **Partial delivery (2026-10-12):** CRC32, identity codec/service and host tests implemented; [S06 core record](S06-identity-core.md). Storage keys/bootc/RNG/wiring/gesture/test namespace and board checks remain pending. Full S06 is not Done.
+- **Partial delivery (2026-10-12):** CRC32, identity codec/service and host tests implemented; [S06 core record](sessions/S06-identity-core.md). Storage keys/bootc/RNG/wiring/gesture/test namespace and board checks remain pending. Full S06 is not Done.
 
 - **Preconditions:** S05; D7 (approved 2026-10-12). The **board step** additionally needs S01 recorded and a verified backup (§5), because this session adds NVS writes.
 - **Steps:**
@@ -419,7 +419,7 @@ Notes:
 
 ### S07 — In-RAM events, registry, ring buffer, queue (pure; M04.3a; T3)
 
-- **Delivery (2026-10-12):** implemented and host-tested; [S07 evidence](S07-events.md). No wiring. Follow-up [S05-fix-01](S05-fix-01-time-epoch.md) resolved the UTC-minute epoch mismatch on 2026-10-12.
+- **Delivery (2026-10-12):** implemented and host-tested; [S07 evidence](sessions/S07-events.md). No wiring. Follow-up [S05-fix-01](sessions/S05-fix-01-time-epoch.md) resolved the UTC-minute epoch mismatch on 2026-10-12.
 
 - **Preconditions:** S04. Can run in parallel with S05/S06.
 - **Scope note (audit):** the persisted 40-byte codec and CRC-16 move to **S32**, where the log is written. Its format then follows D2. This session only covers the in-RAM event model.
@@ -481,7 +481,7 @@ Notes:
 
 ### S10 — TimeSync and app hatch end-to-end (M04.2c)
 
-- **Host part done (2026-10-15); protocol design and pure codecs done (2026-10-16):** `ClockModel` inside `LifeCore` with `LifeCore::sync`, day-part learning cells, LifeSnapshot v2 Clock section and 64-bit monotonic extension. Opcode 5/7, Lifecycle V1, capabilities, app fallback, day-part defaults and durability/error contracts are approved; feature-gated C++/Dart codecs and golden tests now pass. See the [S10 record](S10-host-trusted-time-2026-10-15.md). CommandHandler, firmware/mobile transport/UI wiring and owner checks remain.
+- **Host part done (2026-10-15); protocol design and pure codecs done (2026-10-16):** `ClockModel` inside `LifeCore` with `LifeCore::sync`, day-part learning cells, LifeSnapshot v2 Clock section and 64-bit monotonic extension. Opcode 5/7, Lifecycle V1, capabilities, app fallback, day-part defaults and durability/error contracts are approved; feature-gated C++/Dart codecs and golden tests now pass. See the [S10 record](sessions/S10-host-trusted-time-2026-10-15.md). CommandHandler, firmware/mobile transport/UI wiring and owner checks remain.
 - **Preconditions:** S05, S06, S09; D14 for the mobile part.
 - **Steps:**
   1. **Design freeze — done 2026-10-16:** use the approved byte layouts and policies in the S10 record; append them to the MVP-local protocol section during implementation documentation.
@@ -548,7 +548,7 @@ Notes:
 
 ### S12a — Snapshot v2 layout freeze + sectioned codec (M04.4b-1; T6, T18)
 
-- **Status (2026-10-15):** done on host ahead of D2 (owner choice: the codec does not depend on the medium). Layout frozen in plan §7.5; evidence in the [S12 record](S12-snapshot-v2-2026-10-15.md). D2 still gates S13.
+- **Status (2026-10-15):** done on host ahead of D2 (owner choice: the codec does not depend on the medium). Layout frozen in plan §7.5; evidence in the [S12 record](sessions/S12-snapshot-v2-2026-10-15.md). D2 still gates S13.
 - **Preconditions:** S06 (CRC-32), D2 answered.
 - **Steps:**
   1. **Design freeze:** write the exact v2 layout into plan §7.5:
@@ -567,7 +567,7 @@ Notes:
 
 ### S12b — v1→v2 migration + torn-write simulation (M04.4b-2)
 
-- **Status (2026-10-15):** done on host (`xuna/persist/Migrations.h`, `SnapshotStore.h` with `ISnapshotStore`; torn-write sweep at every byte offset). Migration uses the E10-C capped mapping instead of `alpha = 1 + pos`. Evidence in the [S12 record](S12-snapshot-v2-2026-10-15.md).
+- **Status (2026-10-15):** done on host (`xuna/persist/Migrations.h`, `SnapshotStore.h` with `ISnapshotStore`; torn-write sweep at every byte offset). Migration uses the E10-C capped mapping instead of `alpha = 1 + pos`. Evidence in the [S12 record](sessions/S12-snapshot-v2-2026-10-15.md).
 - **Preconditions:** S12a, S03 fixtures.
 - **Steps:**
   1. **`xuna/persist/Migrations.h`:** `fromV1(bytes96)` maps:
@@ -638,7 +638,7 @@ Notes:
 
 ### S18 — `LifeCore::step` composition (M04.6a)
 
-- **Preparation (2026-10-15, host only):** `LifeCore` now uses the E10 learner v3 in the D5 product shape (incl. the GPIO0 `button_greeting` context and curious) through `ProductLearner`, with LifeSnapshot v2 as the durable record; this replaces "LifeEngine (v1 learner, still)" in step 1. Evidence: [S18 preparation record](S18-prep-product-learner-2026-10-15.md). Production wiring still needs S13, S10 and this session.
+- **Preparation (2026-10-15, host only):** `LifeCore` now uses the E10 learner v3 in the D5 product shape (incl. the GPIO0 `button_greeting` context and curious) through `ProductLearner`, with LifeSnapshot v2 as the durable record; this replaces "LifeEngine (v1 learner, still)" in step 1. Evidence: [S18 preparation record](sessions/S18-prep-product-learner-2026-10-15.md). Production wiring still needs S13, S10 and this session.
 - **Preconditions:** S17, S13, S10.
 - **Steps:**
   1. Compose ClockModel, Identity, EventQueue, CommandHandler, ActivityFsm, Needs/Mood, RequestValidator, BehaviorSelector and LifeEngine (v1 learner, still) behind `LifeCore::step(StepInput) → StepOutput` (plan T1 interface).
@@ -680,7 +680,7 @@ Notes:
 - **Steps:**
   1. `[env:xuna_parity]` embeds 3 traces, replays them at boot without BLE or display, prints the snapshot hashes and `step()` timing histograms, then halts. It must not write to `xuna_life`: it uses an in-RAM store.
   2. Compare with the Life Lab hashes, which must be bit-identical.
-  3. Write `docs/roadmap/M04-foundation.md`: acceptance table per slice, measurements (RAM, image, heap, render, loop gap, commit counts, `step()` p99), open issues and the decision log.
+  3. Write `docs/roadmap/milestones/M04-foundation.md`: acceptance table per slice, measurements (RAM, image, heap, render, loop gap, commit counts, `step()` p99), open issues and the decision log.
   4. Owner review: M04 is Implemented; it is **Validated** only for the rows that have evidence.
 - **Done when:** the record is written and the owner confirms.
 
@@ -704,7 +704,7 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S22 — Learning and conversation decisions (Owner)
 
-- **Done (2026-10-15):** D3, D4, D5, D6 approved, D16 deferred, Layer A scope and phrase table approved ([S22 packet](S22-decision-packet-2026-10-15.md)). No new art needed. S39 may start.
+- **Done (2026-10-15):** D3, D4, D5, D6 approved, D16 deferred, Layer A scope and phrase table approved ([S22 packet](sessions/S22-decision-packet-2026-10-15.md)). No new art needed. S39 may start.
 
 - **Direction check:** A11 device-first is approved product intent. Keep D17 text-first; freeze candidate/preference semantics independent of text/voice/simulation. Do not require voice hardware. D18–D20 remain separate gates.
 
@@ -748,7 +748,7 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S24a — Stated-preference evidence + opcode 6 (pure; M05c-A)
 
-- **Done on host (2026-10-15):** applied to learner v3 / `ProductLearner` / `LifeCore` (the v2 learner named in this plan was superseded by E10). Opcode 6 parse behind a flag, stated mass with weight/cap/decay, explanation `Told`, snapshot section 12. Evidence: [S24a record](S24a-stated-preference-2026-10-15.md).
+- **Done on host (2026-10-15):** applied to learner v3 / `ProductLearner` / `LifeCore` (the v2 learner named in this plan was superseded by E10). Opcode 6 parse behind a flag, stated mass with weight/cap/decay, explanation `Told`, snapshot section 12. Evidence: [S24a record](sessions/S24a-stated-preference-2026-10-15.md).
 
 - **Shared contract:** separate input channel from `user_stated`/`user_feedback` evidence; add simulated candidate fixtures without changing deployed source codes. No device audio work.
 
@@ -783,7 +783,7 @@ The track is developed together and accepted together in S28. This implements A6
 
 #### S39 — Conversation domain + LocalRuleExtractor (Dart; M05c-A)
 
-- **Done (2026-10-15):** `CandidateEvent`, `ExtractionResult`, `ExtractCandidateUseCase` from the S22 table; 10 table tests, mobile 39/39 PASS, analyze clean, lock unchanged. Speech/provider interfaces deferred with D16/D11. Evidence: [S39 record](S39-layer-a-extractor-2026-10-15.md).
+- **Done (2026-10-15):** `CandidateEvent`, `ExtractionResult`, `ExtractCandidateUseCase` from the S22 table; 10 table tests, mobile 39/39 PASS, analyze clean, lock unchanged. Speech/provider interfaces deferred with D16/D11. Evidence: [S39 record](sessions/S39-layer-a-extractor-2026-10-15.md).
 
 - **Foundation role:** define candidate/confirmation contracts shared conceptually with device and simulation adapters; Dart extraction is the first implementation. Layer B S40–S42 extends this Foundation. No mandatory interface hierarchy or voice dependency.
 
@@ -977,9 +977,9 @@ Updated 2026-10-16 after the owner smoke PASS and the gate simplification (AGENT
 
 | # | Session | Repo | Depends on | Minimum done when |
 |---|---|---|---|---|
-| 1 | **Done 2026-10-16 ([record](S13-S18-integration-prep-2026-10-16.md)).** **S08a + integration prep (host):** S01 observed transcript as a replay test; `BleManager` → `LifeCoreEvent` adapter design; `NvsSnapshotStore` (`life0/life1`, static recover scratch); v1 → v2 migration of the owner's real NVS backup decoded on host; `IdentityRecord` (`MigratedFromV1`) creation | firmware | — | Transcript replays byte-identically through the new path; migrated quiet/play preferences match `BoardLearner` (check the untried-curious prior edge case); native + ESP32 build PASS |
-| 2 | **Uploaded 2026-10-16; initial smoke PASS, remaining board checks owner-skipped ([record](S13-S18-switch-2026-10-16.md)).** **S13 + S18 merged (board):** production switch to `LifeCore` + LifeSnapshot v2 | firmware | 1, §5 backup | Real pet's learned preferences preserved; reboot ×3; forget + reboot; `slot0/slot1` untouched; owner smoke (four emotions, buttons, BLE) |
-| 3 | **Source/host/build done 2026-10-16; not uploaded; physical acceptance deferred ([record](S26-S27-lite-2026-10-16.md)).** **S26 + S27-lite:** opcode 6 + capability bit 5, explanation characteristic, D3 `expired` result; minimal "Why?" in the app | firmware, mobile | 2 | Chat statement → confirm → explanation shows `Told` → choice shifts → survives reboot with the phone off (S28-lite) |
+| 1 | **Done 2026-10-16 ([record](sessions/S13-S18-integration-prep-2026-10-16.md)).** **S08a + integration prep (host):** S01 observed transcript as a replay test; `BleManager` → `LifeCoreEvent` adapter design; `NvsSnapshotStore` (`life0/life1`, static recover scratch); v1 → v2 migration of the owner's real NVS backup decoded on host; `IdentityRecord` (`MigratedFromV1`) creation | firmware | — | Transcript replays byte-identically through the new path; migrated quiet/play preferences match `BoardLearner` (check the untried-curious prior edge case); native + ESP32 build PASS |
+| 2 | **Uploaded 2026-10-16; initial smoke PASS, remaining board checks owner-skipped ([record](sessions/S13-S18-switch-2026-10-16.md)).** **S13 + S18 merged (board):** production switch to `LifeCore` + LifeSnapshot v2 | firmware | 1, §5 backup | Real pet's learned preferences preserved; reboot ×3; forget + reboot; `slot0/slot1` untouched; owner smoke (four emotions, buttons, BLE) |
+| 3 | **Source/host/build done 2026-10-16; not uploaded; physical acceptance deferred ([record](sessions/S26-S27-lite-2026-10-16.md)).** **S26 + S27-lite:** opcode 6 + capability bit 5, explanation characteristic, D3 `expired` result; minimal "Why?" in the app | firmware, mobile | 2 | Chat statement → confirm → explanation shows `Told` → choice shifts → survives reboot with the phone off (S28-lite) |
 | 4 | **S10-sync:** opcode 5 after connect, 16-byte command packets, day-part cells on the board | firmware, mobile | 2 (parallel with 3) | Serial shows `Synced` + day part; S10-hatch stays deferred |
 
 ## 9. Proposed device voice feasibility sessions — separate workstream
@@ -997,4 +997,4 @@ VOICE-01 documents missing PCB/peripheral evidence instead of guessing pins. No 
 
 ## Completed focused fixes
 
-- **S05-fix-01 — compact time epoch:** align ClockModel minutes/watermark with 2020 epoch while preserving Unix millisecond input; [record](S05-fix-01-time-epoch.md). No session renumbering or board gate change.
+- **S05-fix-01 — compact time epoch:** align ClockModel minutes/watermark with 2020 epoch while preserving Unix millisecond input; [record](sessions/S05-fix-01-time-epoch.md). No session renumbering or board gate change.
