@@ -145,6 +145,12 @@ Status vocabulary:
     - **M04 accepted as proposed:** M04 is **Implemented**, and **Validated** for the rows with board evidence ([M04 record](docs/roadmap/M04-foundation.md)). Open issues 1–2 (real power cut during a commit, render ±20 %) move to M05b and do not block.
     - **D19 / D11a (spending):** stay on free tiers (Groq ASR/LLM, Edge TTS) with the owner's own test data only; no spending ceiling yet. Revisit with phone latency evidence and before any real user. D11a (final provider) stays open.
     - **D18 deferred until V1 is finished:** the INMP441 + MAX98357A the owner has are kept for V2; no wiring or purchase.
+    - **Personality direction ([plan](docs/roadmap/personality-plan-2026-10-23.md), [research](docs/research/personality-evolution-assessment-2026-10-23.md)):**
+      - P-D1: the device is the only authority on personality; conversation and cloud give evidence and express it. H2/H4 are unchanged, and the LLM never holds personality.
+      - P-D2: the model is a per-pet temperament genome driving drives, emotion/mood dynamics and emotions from expectation. Trait labels are derived, not preset. JPAF is not integrated.
+      - P-D3: PE-0/PE-1 start now, Life Lab only, ahead of M06.
+      - P-D4 (revises D6 for personality only): conversation shapes temperament without confirmation, as weak, capped, multi-session evidence that the owner can see and undo. Preferences keep D6.
+      - All parameters stay Proposed.
   - **Adapter behaviour for the switch (owner-confirmed 2026-10-16):** an expired rating (D3) returns result 4 until a dedicated code is frozen; GPIO0 stays a direct Happy request until the protocol/app can carry the greeting context (D5 learning deferred to S26/S27); app decision IDs ≥ 0x80000000 return 4; v1 preference bytes use the coarse cell until S10-sync; needs are not persisted (cold-boot reset).
 
 ### Proposed — not yet fixed

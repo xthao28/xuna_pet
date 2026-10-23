@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — Research: how XUNA could grow a personality
+
+- A research report looks at XUNA's code and at the open-source JPAF personality framework. XUNA does not have a personality yet; what makes each XUNA different today is what it learned from its owner. JPAF is not a good fit to plug in (it needs an AI model for every step and changes personality too fast), but a few of its ideas can be reused in XUNA's own small, offline design. Nothing is built; the owner decides next steps. [Report](docs/research/personality-evolution-assessment-2026-10-23.md).
+- More projects were studied (Creatures, desktop pets, emotion engines), and the owner approved a plan: each XUNA gets its own temperament at birth and grows into its own character from what happens with its owner, including how the owner talks to it, without asking for confirmation. Work starts with simulations on the computer; the board and the app come later. [Plan](docs/roadmap/personality-plan-2026-10-23.md).
+
 ## 2026-10-23 — XUNA starts speaking sooner; plan for hands-free voice
 
 - XUNA's spoken replies no longer wait sentence by sentence: the text keeps coming while the next sentences are turned into speech, and the first piece can stop at a comma so the first sound comes sooner. Sentences are still spoken in order, and the server now reports how long the first sound took. Tested on the computer only; it still needs a phone measurement.
