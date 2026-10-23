@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — Phone and board checks done; M04 approved
+
+- The owner finished the phone and board checks: the rebuilt iPhone app, spoken turns, QR camera, speaker route, microphone with the board connected, local export with the hash check, and the board's window scenes, status card and pairing QR. This meets the last Cloud gate condition (c). Timings were not written down in the repository.
+- The owner approved M04 (the life-core foundation) as proposed. The real power-cut test and the render-speed comparison move to M05b.
+- Spending: AI and voice stay on free services with the owner's own test data. Board audio hardware (D18) waits until phone voice is finished.
+
 ## 2026-10-23 — XUNA knows the time, the conversation and itself
 
 - AI replies now know the current time and day, remember the last few lines of the chat, and know XUNA's own age, what it is doing and what it has learned to like. XUNA answers knowledge questions properly, in short spoken-friendly sentences. Nothing is stored. Needs the iPhone app rebuilt.

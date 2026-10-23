@@ -1,6 +1,6 @@
 # M04 Foundation — acceptance record (S21)
 
-Date: 2026-10-22. Status: **Implemented; owner review pending** (plan S21 step 4). A row is **Validated** only where board evidence exists; host-only rows stay *Implemented*.
+Date: 2026-10-22. Status: **Implemented; owner-approved 2026-10-23** (plan S21 step 4). A row is **Validated** only where board evidence exists; host-only rows stay *Implemented*.
 
 Board: T-Display-S3, ESP32-S3 rev v0.2, `/dev/cu.usbmodem14101`. Firmware `d1b17b8` (S19b BootSequence, S20, reaction learning, routine learning) plus this session's parity env.
 
@@ -75,4 +75,4 @@ D1 (M04 before M05 features), D2a (snapshot v2 in NVS A/B, LittleFS → S32), S1
 
 ## Owner review (step 4)
 
-Pending. Proposed: M04 **Implemented**; **Validated** for the rows above that cite board evidence; open issues 1–2 carried into M05b (S29–S33) rather than blocking.
+Approved by the owner 2026-10-23 as proposed: M04 **Implemented**; **Validated** for the rows above that cite board evidence; open issues 1–2 carried into M05b (S29–S33) rather than blocking. The owner also reported issue 4 (gate (c) and the app checks) and the board visual check done the same day; measurements were not recorded here.

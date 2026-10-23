@@ -107,9 +107,9 @@ S and V0 first: no point racing on voice while the board is unvalidated, and no 
 
 | ID | Decision | Needed before |
 | --- | --- | --- |
-| D16 | Approve phone voice (microphone permission, audio sent to the backend) | V1 |
-| D19 / D11a | Voice provider research scope, security, **spending ceiling** for ASR/TTS/LLM tests | V0 provider runs, V1 |
-| D18 | Audio hardware path (add-on mic/amp vs codec board), budget, purchase | V2 |
+| D16 | Approve phone voice (microphone permission, audio sent to the backend) — **approved 2026-10-22** | V1 |
+| D19 / D11a | Voice provider research scope, security, **spending ceiling** for ASR/TTS/LLM tests — **2026-10-23: free tiers only, owner test data, no ceiling yet; revisit with phone latency evidence** | V0 provider runs, V1 |
+| D18 | Audio hardware path (add-on mic/amp vs codec board), budget, purchase — **2026-10-23: deferred until V1 is finished; owned INMP441 + MAX98357A kept for V2** | V2 |
 | — | Whether to reuse Xiaozhi code (MIT, notice kept) for device audio/Opus/protocol instead of ideas only | V2 |
 | — | Parity numbers in §2 after V0 | V1 acceptance |
 

@@ -1,6 +1,6 @@
 # V1 — Phone voice (started 2026-10-22)
 
-Status: **slices 1 (backend) and 2 (app) implemented; slice 3 release build installed on the iPhone 15, with voice measurements, QR scan, audio route and BLE microphone checks open.** Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
+Status: **slices 1 (backend) and 2 (app) implemented; slice 3 phone checks reported done by the owner 2026-10-23** (iOS rebuild with mobile `8a42784`, voice turns, QR scan, audio route, microphone with BLE connected). The five turn timings and the p50 against the ≤ 3 s target were not recorded in the repository. Plan: [voice parity plan](voice-parity-plan-2026-10-22.md) Phase V1. Owner approvals 2026-10-22: D16 (phone microphone, speech to the backend), V1 targets (free-tier milestone p50 ≤ 3 s per turn; long-term p50 ≤ 1.5 s / p95 ≤ 2.5 s; ASR WER ≤ 5 % clean / ≤ 8 % noisy after number normalisation).
 
 ## Design freeze
 
