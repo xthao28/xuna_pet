@@ -2,6 +2,15 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — Personality step 2: an inborn temperament and how it may change
+
+- Each XUNA can now get its own temperament at birth (ten traits such as curiosity, sociability and tempo), drawn from a number every pet already stores, so the same pet always gets the same temperament. What the owner does is collected as evidence, and a trait moves only a little at a time, only after several separate sessions that point the same way. One extreme day, an owner who keeps changing their mind and XUNA's own actions do not change who it is. Each change is written down with its reason for a future Journal. Computer tests only; the board does not use it yet.
+
+## 2026-10-23 — Personality step 1: measuring how XUNAs differ today
+
+- A computer simulation now lets many XUNAs live 30 days each with different kinds of owners (consistent, unsure, random, rarely reacting, always teaching, changing their mind). It shows that today every XUNA becomes exactly what its owner teaches, quickly and reliably, but two XUNAs with the same owner end up identical: they have no character of their own yet, and each mostly repeats one action. These numbers are the yardstick for the personality work that comes next. Simulation only; the board and the app are unchanged. [Report](docs/research/PE0-baseline.md).
+- Three firmware tests that failed only on the Windows computer now pass there too.
+
 ## 2026-10-23 — Roadmap documents sorted into folders
 
 - The roadmap documents are now grouped by topic (milestones, sessions, learning, cloud, voice, UI, personality) with a short index page. All links were updated and checked; nothing else changed.

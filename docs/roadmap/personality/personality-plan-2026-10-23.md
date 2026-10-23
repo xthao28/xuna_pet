@@ -62,12 +62,14 @@ flowchart TD
 
 Mỗi phase kết thúc bằng một **gate** có số liệu; owner xem và quyết định đi tiếp. Thứ tự tuân thủ session discipline hiện có: host test native (+ ASan trên Mac/WSL), ESP32 build, purity check, NVS backup trước mọi lần upload, ghi record trong `docs/roadmap/`.
 
-### PE-0 — Đo nền (1–2 session, chỉ Life Lab)
+### PE-0 — Đo nền (1–2 session, chỉ Life Lab) — **Xong 2026-10-23** ([báo cáo](../../research/PE0-baseline.md))
 
 - **Mục tiêu:** biết hiện các XUNA khác nhau tới đâu *chỉ nhờ learning*, để có chuẩn so sánh.
-- **Làm:** thêm owner model `Noisy`, `Sparse`, `Random`, `Teacher` vào `lab/OwnerModel.h` (đang có Oracle/Reversal/Drift/NoFeedback); runner `sim/personality_lab.cpp` chạy nhiều tuần mô phỏng (không bị giới hạn 64 lệnh của trace); metric: khoảng cách hành vi giữa 2 pet (JS divergence của phân bố action theo context), ổn định theo ngày, phản ứng khi owner im lặng.
+- **Làm:** thêm owner model `Noisy`, `Sparse`, `Random`, `Teacher` (và `Alternating` cho kịch bản xen kẽ) vào `lab/OwnerModel.h`; runner `sim/personality_lab.cpp` chạy nhiều tuần mô phỏng (không bị giới hạn 64 lệnh của trace); metric: khoảng cách hành vi giữa 2 pet (JS divergence của phân bố action theo context), ổn định theo ngày, phản ứng khi owner im lặng.
+- **Làm rõ khi bắt đầu (owner uỷ quyền 2026-10-23):** (1) runner chạy trên `BoardLab` và owner dạy bằng **reaction** (approve → pet GPIO0, không → shoo GPIO14, trong cửa sổ 10 s) như D6 revised, không dùng rating app; (2) các kịch bản §5 chỉ có ý nghĩa với trait (sự kiện cực đoan trước consolidation, trait không đè learning, spam chat, reboot giữ trait) ghi **N/A tới PE-1+**, còn lại đo ở tầng hành vi; (3) định nghĩa owner [P]: Noisy 0.6/0.4, Sparse phản ứng 5 %, Random 0.5 mọi action, Teacher luôn phản ứng 1/0; (4) owner TimeSync khi đến để các day part và context greeting đều được dùng.
 - **Không làm:** thay đổi `xuna_core` production.
-- **Xong khi:** báo cáo `docs/research/PE0-baseline.md` có số liệu cho mọi kịch bản ở §5.
+- **Xong khi:** báo cáo `docs/research/PE0-baseline.md` có số liệu cho mọi kịch bản ở §5 đo được ở tầng hành vi.
+- **Kết quả chính:** learning tách owner rất rõ (104× ngưỡng §5 dòng 1), nhưng cùng owner thì XUNA giống hệt nhau tới từng bit (RNG `LifeCore` cố định = 1; `IdentityRecord.seed` có nhưng chưa dùng) và mỗi ô gần như chỉ một action (97,6 %). Đề xuất bổ sung §5 ở dưới.
 
 ### PE-1 — PoC mô hình tính cách (4–6 session, chỉ Life Lab) → **Gate G1**
 
@@ -75,12 +77,22 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 
 | Session | Module | Nội dung | Lấy ý từ |
 |---|---|---|---|
-| PE-1a | `xuna/personality/Temperament.h` + `EvidenceLedger.h` | Genome ~10 tham số Q1.14 (baseline + offset + pending); evidence có `source`, `weight`; consolidation khi đủ importance và ≥ 3 buổi khác nhau; nhất quán dấu ≥ 2/3, ngược lại pending ×0.2; |Δ| ≤ 0.03 mỗi lần; journal entry có reason code | JPAF, Generative Agents |
+| PE-1a | `xuna/personality/Temperament.h` + `EvidenceLedger.h` | Genome ~10 tham số Q1.14 (baseline + offset + pending; baseline seed từ `IdentityRecord.seed` [P], đã bền và có cho pet `d945…`); evidence có `source`, `weight`; consolidation khi đủ importance và ≥ 3 buổi khác nhau; nhất quán dấu ≥ 2/3, ngược lại pending ×0.2; |Δ| ≤ 0.03 mỗi lần; journal entry có reason code | JPAF, Generative Agents |
 | PE-1b | `xuna/life/Drives.h` | Explore, social, play, boredom; tốc độ tăng do genome điều chỉnh; `social` bão hoà rồi tự lắng, không tích thành buồn; `Needs` giữ nguyên | qs-vpets, Creatures |
 | PE-1c | `xuna/life/Affect.h` | Emotion ⇄ mood springs (tension, mass, slope, prevalence, boredom) với tham số từ genome; appraisal từ `predictedQ16` của learner và `HabitPredictor`; competence = độ dự đoán đúng (EMA) | WASABI, GAMYGDALA, MicroPsi |
 | PE-1d | `sim/personality_lab.cpp` | Nối 1a–1c vào lab cùng `BehaviorSelector` (đã có, chưa wire) ở chế độ shadow; quét tham số; báo cáo | — |
 
 - **Test:** `test/test_personality/`, `test/test_drives/`, `test/test_affect/`; golden vectors cho một vài lịch sử.
+- **PE-1a xong 2026-10-23 (host, lab-only):** `xuna/personality/Temperament.h` + `EvidenceLedger.h`, 11 test (`test_personality`).
+  - **Genome:** 10 trait (curiosity, sociability, playfulness, tempo, sensitivity, moodInertia, moodBaseline, persistence, boredom, restfulness). Baseline ±0.15 seed từ `IdentityRecord.seed`, offset ±0.6, ForgetAll giữ baseline.
+  - **Nguồn bằng chứng và trọng số:** rating 1, stated 0.5, reaction 0.3, device 0.1, conversation 0.1, Self 0.
+  - **Thêm so với §9.2 của research (tự quyết, [P]):**
+    - Mỗi buổi chỉ đóng góp tối đa ±0.5 vào `pending` và `importance`. Với `importance` tối thiểu 1.5, nghĩa là cần ≥ 3 buổi mạnh.
+    - Chốt nhất quán: |pending| ≥ importance/2.
+    - Bước dịch = 0.03 × pending/importance.
+    - Một buổi cực đoan, "2 buổi xấu + 1 buổi tốt" và owner xen kẽ đều không làm dịch trait (có test).
+  - **Tín hiệu sớm cho PE-1d:** owner ngẫu nhiên (mỗi lần khen/chê 50/50, 60 buổi) vẫn dịch trung bình 0.031, tối đa 0.15; owner pet 80 % dịch +0.35. Cần quét `kMinSessions` và ngưỡng nhất quán ở PE-1d.
+  - Owner chỉ khen 2/3 số lần thì không dịch (độ nhất quán 1/3), có thể quá bảo thủ.
 - **Gate G1 (owner):** đạt các ngưỡng §5 trong lab; báo cáo nêu rõ những khác biệt nào **nhìn thấy được với 3 action hiện có** và khác biệt nào cần animation mới.
 
 ### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2**
@@ -132,6 +144,10 @@ Với 3 animation, tính cách chủ yếu thấy qua *khi nào / bao lâu / nh�
 | Trait không đè learning | Sau 3 rating, lựa chọn giống nhau ở mọi genome |
 | Spam chat khen/chê một buổi | Δ tính cách ≤ cap ngày; cảm xúc tức thời có, rồi hồi |
 | Reboot / restore / ESP32 | Bit-identical |
+| *(PE-0 đề xuất)* Cùng owner, khác `IdentityRecord.seed` | Khác biệt nhìn thấy được (JS hành vi hoặc thời điểm/nhịp ≥ 0,1); nền hôm nay = 0 |
+| *(PE-0 đề xuất)* Đa dạng trong một ô | Entropy action > nền 0,09 bit, hoặc G1 nói thẳng là không thấy được với 3 action |
+
+Nền PE-0 cho các dòng trên ([báo cáo](../../research/PE0-baseline.md) §3–§4): dòng 1 hiện đã đạt 104× chỉ nhờ learning, nên chỉ là chốt "không được làm hỏng"; learning đổi 75 % ô sau 3,6 ngày khi preference đảo, nên tính cách cần ≥ 18 ngày; owner ngẫu nhiên làm learning flip 1,97 ô/ngày, xen kẽ 2 ngày làm flip 3,17 ô/ngày.
 
 ## 6. Chốt an toàn cho giao tiếp không xác nhận (P-D4)
 
