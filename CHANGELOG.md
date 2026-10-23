@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
 
+## 2026-10-23 — The app reconnects to XUNA by itself
+
+- Opening the app now finds and connects the XUNA it was connected to last time, and checks that it is still the same pet. The "Tự động kết nối khi mở app" setting works (on by default) and can be turned off. If XUNA is not nearby, the status line says so without a pop-up. Tested on the computer only; it still needs a phone and the board.
+- After "TÌM XUNA" finds the pet, the same big button becomes "KẾT NỐI XUNA", so a new owner knows what to tap next. With several XUNA nearby, each one gets its own connect button.
+- The chat microphone button is smaller and sits in the middle of the screen.
+
 ## 2026-10-23 — Phone and board checks done; M04 approved
 
 - The owner finished the phone and board checks: the rebuilt iPhone app, spoken turns, QR camera, speaker route, microphone with the board connected, local export with the hash check, and the board's window scenes, status card and pairing QR. This meets the last Cloud gate condition (c). Timings were not written down in the repository.
