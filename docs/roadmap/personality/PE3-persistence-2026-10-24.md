@@ -1,7 +1,7 @@
 # PE-3 — Tính cách sống qua reboot (2026-10-24)
 
 > Plan: [personality-plan-2026-10-23.md](personality-plan-2026-10-23.md) §4 PE-3. Owner: "PE-3 đi, còn lại bạn tự quyết, hợp lý là được".
-> Trạng thái: **Implemented, đã upload board**. Kiểm tra reboot trên board đang chờ owner thao tác (§5). Mọi tham số vẫn **[P]**.
+> Trạng thái: **Implemented, kiểm tra reboot trên board đạt** (§5). Gate G3 chờ owner xác nhận. Mọi tham số vẫn **[P]**.
 
 ## 1. Quyết định (uỷ quyền)
 
@@ -53,6 +53,11 @@
 
 ## 5. Còn lại
 
-- Kiểm tra reboot trên board: owner chào và vuốt → chờ checkpoint 5 phút → reset → `persona_restored` phải có dữ liệu khớp với trước reset. **Đang chờ.**
-- Gate G3 (owner): golden ✓, reboot/restore bit-identical trên host ✓, parity ESP32 ✓, snapshot ≤ 1536 ✓; reboot trên board đang chờ.
+- **Kiểm tra reboot trên board: đạt.**
+  - 13:58: owner chào + vuốt 2 lần, mở card, rồi shoo 1 lần. Lần shoo commit urgent, mang theo section 5 đã sync sau 2 lần vuốt.
+  - USB rời lúc 13:58:52, không phải crash (log bình thường tới giây cuối).
+  - Cắm lại 18:56: `recover=Ok slot=1 boot=57`, cùng PetId, **`persona_restored bytes=104 sessions=1 evidence=2`**.
+  - Bằng chứng của lần shoo chưa có trong bản lưu: đúng với lưu lazy (PE3-d), vì nó tới flash ở commit sau.
+  - Stack setup còn trống **5,796 B** (khi không có section 5 là 6,184 B): `load()` dựng bản tạm ~0,7 KB trên stack lúc boot. Vẫn ổn, nhưng nếu snapshot còn lớn thêm thì nên chuyển bản tạm sang static.
+- Gate G3 (owner): golden ✓, reboot/restore bit-identical trên host ✓ và trên board ✓, parity ESP32 ✓, snapshot ≤ 1536 ✓.
 - Mobile đọc `000e` ở PE-4d.
