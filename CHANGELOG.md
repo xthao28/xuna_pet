@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — XUNA's character starts to show in what it chooses
+
+- Where you have not taught XUNA anything yet, its character now tips the choice: a curious XUNA is curious more often, a playful one gets happy more often, and one you made calmer simply idles more. Before, XUNA picked at random in those moments.
+- Anything you taught it, even with a single pet or shoo, still wins. A XUNA you rewarded for being curious for three months chose curious about half the time in situations it was never taught, against a third before (simulation).
+- Only tried in the simulator so far. The strength of the effect is the owner's choice before it goes on the board.
+
 ## 2026-10-24 — Try XUNA's new animations from the app
 
 - The app's device tab gets four buttons under "Xem thử động tác": look around, yawn and stretch, bounce, and greet. Tapping one makes XUNA play it on the board right away.

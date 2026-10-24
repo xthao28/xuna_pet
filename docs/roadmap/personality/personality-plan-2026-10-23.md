@@ -101,22 +101,22 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
   - **Owner quyết 2026-10-24: qua G1, phương án A cho cả G1-a…d** (ghi ở [PE-2 record](PE2-board-shadow-2026-10-24.md) §1).
 - **Gate G1 (owner):** đạt các ngưỡng §5 trong lab; báo cáo nêu rõ những khác biệt nào **nhìn thấy được với 3 action hiện có** và khác biệt nào cần animation mới. — **Qua 2026-10-24.**
 
-### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2** — **host xong 2026-10-24, chờ board** ([record](PE2-board-shadow-2026-10-24.md))
+### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2** — **trên board 2026-10-24, Gate G2 chờ owner quan sát** ([record](PE2-board-shadow-2026-10-24.md))
 
 - Wire `Temperament`/`Drives`/`Affect` vào `LifeCore` ở **shadow** (tính và log, chưa đổi quyết định hành vi).
 - Biểu hiện an toàn đầu tiên: mood/tempo đổi tốc độ frame (±15 %) và thời lượng reaction qua `VisualIntent`/animation; đo render trong budget (M04: ±20 %).
 - Status card (giữ GPIO0) thêm 1 dòng tâm trạng.
 - Board: NVS backup → upload → owner quan sát vài ngày.
-- **PE-2a xong (host) 2026-10-24:**
+- **PE-2a xong 2026-10-24:**
   - `Personality` nằm trong `LifeCore`, seed từ identity, chỉ chạy shadow;
   - `Expression`: frame 100 ms ∓ 15 %, reaction 2400 ms ± 15 %;
   - dòng "tâm trạng" trên status card, log `persona`;
   - native/ASan 282/282, ESP32 build +824 B RAM.
-  - Board chưa upload.
+  - Đã upload board cùng ngày: parity PASS, `step()` p99 tăng ≤ 15 µs.
 - **PE-2b xong 2026-10-24 (owner chọn "chỉ theo khí chất"):** XUNA tự hành động sau 51–69 s yên tĩnh theo curiosity + playfulness (trước 60 s cố định). Drive bị loại vì gần như luôn đầy. Pet cùng owner giờ khác nhau 10,7 % về nhịp; §5 dòng 1 ngày 89 = 0,98 (theo dõi). [Record §8](PE2-board-shadow-2026-10-24.md).
 - **Gate G2:** owner thấy nhịp và tâm trạng khác hợp lý; không flicker; `step()` p99 tăng < 50 µs.
 
-### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3** — **xong 2026-10-24, chờ kiểm tra reboot trên board** ([record](PE3-persistence-2026-10-24.md))
+### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3** — **trên board 2026-10-24, kiểm tra reboot đạt; Gate G3 chờ owner xác nhận** ([record](PE3-persistence-2026-10-24.md))
 
 - Snapshot section 5 `Personality` v1 (~80 B: genome baseline/offset/pending, evidence counters, journal ring 4 mục); chọn required/optional (câu hỏi O2); migration cho pet hiện tại.
 - BLE: characteristic read-only cho trait + journal (dạng giống explanation `000b`); capability bit mới.
@@ -127,7 +127,7 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 
 | Session | Repo | Nội dung |
 |---|---|---|
-| PE-4a | firmware | Bật ảnh hưởng thật: genome scale UCB bonus và prior ô chưa học; drives vào `BehaviorSelector` cho hành động tự phát; test "trait không đè learning" |
+| PE-4a | firmware | Bật ảnh hưởng thật: genome scale UCB bonus và prior ô chưa học; drives vào `BehaviorSelector` cho hành động tự phát; test "trait không đè learning". **Host xong 2026-10-24** ([record](PE4a-leaning-2026-10-24.md)): chỉ giữ "prior ô chưa học" (bốc theo trọng số khi hoà). UCB scale và drive đã thử trong lab và bỏ. Chờ owner chọn mức rồi mới upload |
 | PE-4b | backend + mobile | `PetSelf` thêm nhãn suy ra + mood (closed set); `describe_context` sinh giọng từ đó; bỏ chữ "tò mò" cố định khỏi `PERSONA_VI`; mobile `cloud_turn_context.dart` gửi field mới |
 | PE-4c | backend + mobile + firmware | **Giao tiếp → tính cách, không xác nhận (P-D4):** mỗi lượt backend trả thêm 0–2 tag đóng (vd. `praise`, `scold`, `affection`, `playful`, `curious_question`, `long_chat`), lấy từ cùng LLM call (không gọi thêm) hoặc bộ phân loại rẻ; app chuyển qua BLE `ConversationSignal`; device: (1) cảm xúc tức thời qua `Affect`, (2) evidence `conversation_inferred` vào ledger với chốt §6 |
 | PE-4d | mobile | Thẻ "Tính cách" (chữ + lý do), Journal, nút **"Đặt lại tính cách"** và **"Bỏ thay đổi gần nhất"**. **Thẻ chỉ đọc + journal đã làm 2026-10-24** (mobile, chưa build); hai nút còn chờ lệnh mới của firmware |

@@ -11,6 +11,6 @@ Plans and session records, grouped by topic. The master session list is [XUNA_SE
 | [cloud/](cloud/) | [Cloud gate sprint](cloud/cloud-gate-sprint-2026-10-17.md), [Identity V2](cloud/identity-v2-2026-10-17.md), [CLD-13 benchmark](cloud/CLD-13-benchmark-2026-10-17.md) |
 | [voice/](voice/) | [Voice parity plan](voice/voice-parity-plan-2026-10-22.md), [V1 phone voice](voice/V1-phone-voice-2026-10-22.md), [WebSocket design](voice/voice-websocket-design-2026-10-23.md), [Xiaozhi research](voice/xiaozhi-stack-research-2026-10-22.md), [iOS build prompt](voice/ios-build-prompt-2026-10-22.md) |
 | [ui/](ui/) | [Static](ui/UI-static-scene.md) and [animated](ui/UI-animated-scene.md) scenes, [device scenes](ui/device-scenes-2026-10-22.md), [mobile design system](ui/mobile-ui-design-system.md) |
-| [personality/](personality/) | [Personality plan](personality/personality-plan-2026-10-23.md) (PE-0 → PE-5), [PE-2 board shadow](personality/PE2-board-shadow-2026-10-24.md), [PE-3 persistence](personality/PE3-persistence-2026-10-24.md), [Track A variants](personality/trackA-variants-2026-10-24.md) |
+| [personality/](personality/) | [Personality plan](personality/personality-plan-2026-10-23.md) (PE-0 → PE-5), [PE-2 board shadow](personality/PE2-board-shadow-2026-10-24.md), [PE-3 persistence](personality/PE3-persistence-2026-10-24.md), [Track A variants](personality/trackA-variants-2026-10-24.md), [PE-4a leaning](personality/PE4a-leaning-2026-10-24.md) |
 
 New records go into the matching folder; add a folder only when a new topic has several records.
