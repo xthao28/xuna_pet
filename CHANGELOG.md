@@ -2,6 +2,23 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — The board runs cooler, second pass
+
+- The processor now runs at a third of its speed, which is still plenty: XUNA draws each frame in under 8 ms of its 100 ms. It speeds up for a moment only when it signs something for the app, so nothing stalls.
+- The screen is a little less bright while XUNA is awake (about 90 % to the eye), dims gently when XUNA sleeps or rests, and goes full bright for the status and pairing cards. Changes fade over a fraction of a second.
+- XUNA announces itself over Bluetooth about 4 times less often (every 0.1–0.15 s); the app searches for up to 12 s, so it should still find XUNA quickly (not yet tried with the phone).
+- The chip went from about 45 °C to about 42 °C in the same room. XUNA kept everything it had learned, and buttons and cards respond the same.
+
+## 2026-10-24 — The app shows XUNA's personality
+
+- In the app's Journal there is now a "Tính cách" card: XUNA's personality word (for example "Lanh lợi" or "Ham chơi"), its mood, how many times it has spent time with you, five traits as bars, and its latest character changes with the reason ("bạn hay vuốt khi XUNA tò mò, qua 4 buổi").
+- Everything is read from the board; the app does not change it. Older boards and the demo mode show that the information is not available. A new app build on the phone is needed to see it.
+
+## 2026-10-24 — XUNA has four new animations
+
+- XUNA now greets you warmly when you come back, bounces when it is happy right after being petted, looks around when it feels like exploring or is waiting for you, and yawns and stretches before resting and after waking up.
+- What XUNA chooses to do is unchanged; these only change how it looks while doing it. A greeting and the bouncing were already seen on the board. The new animations are drawn from XUNA's own sprite, with the same face, colours and crisp pixels as its existing animations; the owner's drawings served as the guide for the movements.
+
 ## 2026-10-24 — XUNA remembers its character after a restart
 
 - Until now, what XUNA learned about its own character was lost every time the board restarted; only its inborn temperament came back. Now it is saved with everything else it learned, so its character keeps growing across restarts and power cuts. A pet that has learned nothing yet saves nothing extra.

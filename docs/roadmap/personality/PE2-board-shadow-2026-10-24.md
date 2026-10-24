@@ -177,3 +177,32 @@ Dòng 1 theo cách diễn đạt G1-b **đạt sát nút** ở ngày 89 (1,10 > 
 - Board: backup NVS 2 lần khớp `42de3abf…`; upload SUCCESS, app `9880a767…`.
   - Boot `recover=Ok slot=1 boot=52 ready=1`, cùng PetId, quiet=1 play=0, stack 7,192 B.
   - Owner mở card lúc 13:35:10. Pet `d945…` hiện **"ham chơi"** (playfulness +0,13).
+
+## 10. Board vẫn nóng: lượt 2 (owner 2026-10-24: "board đang khá nóng… xử lý triệt để", tự quyết miễn không ảnh hưởng trải nghiệm)
+
+- **Còn lại sau §7:** CPU đã nghỉ khoảng 95 % thời gian, vẽ theo vùng bẩn. Nhiệt còn lại là công suất tĩnh: CPU idle ở 240 MHz, đèn nền 100 %, BLE quảng bá mỗi 20–40 ms, LDO 5 V → 3,3 V tỏa nhiệt theo dòng tổng.
+- **Không làm được:** light sleep tự động và DFS. Arduino 2.0.14 build sẵn với `CONFIG_PM_ENABLE` tắt và `CONFIG_BT_CTRL_MODEM_SLEEP` tắt, nên muốn có phải build lại framework (ESP-IDF / arduino-as-component), quá lớn so với lợi ích.
+- **Đã làm (firmware):**
+  - `kCpuMhz = 80` (`src/BoardConfig.h`, `setCpuFrequencyMhz` đầu `setup()`). Đây là mức thấp nhất còn giữ BLE; APB vẫn 80 MHz. Env parity vẫn chạy 240 MHz để số `step()` còn so được.
+  - `CpuBoost` (`include/DeviceKey.h`): nạp khóa và ký ECDSA chạy 240 MHz rồi trở lại 80 MHz, để ký proof không làm animation khựng (ở 80 MHz chậm khoảng 3 lần).
+  - Đèn nền: chip LED của T-Display-S3 có 16 mức, chỉnh bằng xung (theo factory example của LilyGO), không phải PWM. `xuna/visual/Backlight.h` (core, thuần) chọn mức: **thức 12** (75 % dòng LED, trông khoảng 90 % độ sáng), **ngủ/nghỉ 7**, **card 16**. Đổi mức 1 bước mỗi 60 ms, nên chuyển mờ dần. `DisplayManager::setBacklight` phát xung 1 µs. Trên board đời cũ không có chip này, xung chỉ là nhiễu µs và đèn giữ 100 %, không hại gì.
+  - BLE quảng bá 100–152,5 ms (`0xA0`–`0xF4`) thay vì 20–40 ms. App quét tối đa 12 s.
+  - Diagnostics: `power loops=… chip_temp_c=… cpu_mhz=… backlight=…`; boot in `cpu_mhz=`.
+- **Commit:** firmware `e4f5fe5` (Track A, đã có trên board từ trước) + `8b4e42b` (lượt nhiệt 2). Bản trên board build đúng từ cây này.
+- **Kiểm tra:** native/ASan **304/304** (thêm `test_backlight` 5 case); ESP32 và parity build SUCCESS.
+- **Board** (Mac, `/dev/cu.usbmodem14201`, buổi tối). Backup NVS trước mỗi upload, đọc 2 lần đều khớp, ở `~/xuna_backups/2026-10-24-heat2/` (`db77158c…` trước C1, `162234ef…` trước C2):
+
+| | C0: bản đang chạy (240 MHz, đèn 100 %) | C1: 80 MHz + đèn + BLE | C2: C1 + CpuBoost (bản cuối, app `398d475c…`) |
+|---|---|---|---|
+| Thời gian log | 9 phút | 12 phút | 10 phút |
+| Nhiệt chip ổn định | **44,8 °C** | **42,8 °C** | **41,8–42,8 °C** |
+| Vòng/5 s | 495 | 495 | 494 |
+| draw max | 4,96 ms | 7,56 ms | 7,57 ms |
+| card push (scene max) | — | 43,8 ms | 43,8 ms |
+| `device_key` lúc boot | 159 ms | 453 ms | 160 ms |
+| Boot | — | `recover=Ok slot=1 boot=65`, cùng PetId, quiet=1 play=0 | `recover=Ok slot=0 boot=68`, cùng PetId, quiet=1 play=0 |
+
+- Trong C1/C2 owner bấm nút nhiều lần (pet, shoo, greeting, status card). Mọi phản hồi bình thường; card hiện đèn 16 rồi mờ dần về 12. Heap đứng yên ở khoảng 230,5 KB. Không reset ngoài lần mở cổng, không lỗi.
+- **Giới hạn đo:** cảm biến trong chip có bước khoảng 1 °C và không đo bề mặt board, LDO hay đèn nền. Phần lợi lớn nhất của việc giảm đèn và giảm dòng nằm ở LED và LDO, nên cảm biến chip chỉ thấy một phần. Nhiệt phòng buổi tối thấp hơn buổi trưa, nên không so trực tiếp với §7.
+- **Chưa xác minh:** (1) mắt owner thấy đèn có mờ thật không (nếu board không có chip LED thì `backlight=12` vẫn in ra nhưng đèn giữ 100 %); (2) mức 7 lúc ngủ/nghỉ chưa gặp trên board trong 3 lần đo (chỉ có unit test); (3) app kết nối/ký proof ở 80 MHz + boost chưa thử bằng điện thoại trong buổi này.
+- **Nếu vẫn nóng:** pin LiPo đang sạc qua USB (chip sạc tỏa nhiệt), hoặc đặt board nơi thoáng. Bước firmware tiếp theo là build lại framework có PM (light sleep), việc lớn, cần owner đồng ý.

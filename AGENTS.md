@@ -160,6 +160,7 @@ Status vocabulary:
         - O2: snapshot section 5 is optional, so an older firmware skips it. Invalid section-5 content is skipped, never Corrupt.
         - The section is written only once something has been learned and is capped at 482 B.
         - BLE personality projection `7a6e000e` (capability byte 3 bit 1).
+      - **Track A (owner-provided sheet 2026-10-24, [record](docs/roadmap/personality/trackA-variants-2026-10-24.md)):** 4 variants (`look_around`, `yawn_stretch`, `bounce_play`, `greet_nuzzle`). They are expression only (option A): drives, arrival and rest transitions choose *how* a learner choice looks, never the choice. A fourth learnable action still needs its own D5 decision.
   - **Adapter behaviour for the switch (owner-confirmed 2026-10-16):** an expired rating (D3) returns result 4 until a dedicated code is frozen; GPIO0 stays a direct Happy request until the protocol/app can carry the greeting context (D5 learning deferred to S26/S27); app decision IDs ≥ 0x80000000 return 4; v1 preference bytes use the coarse cell until S10-sync; needs are not persisted (cold-boot reset).
 
 ### Proposed — not yet fixed
