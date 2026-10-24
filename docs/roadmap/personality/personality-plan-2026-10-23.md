@@ -98,15 +98,22 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 - **PE-1d xong 2026-10-23:** `xuna/lab/PersonalityShadow.h` + `sim/personality_lab.cpp` (shadow cạnh BoardLab, hành vi thật không đổi), 4 test shadow; `LedgerConfig` để quét tham số. Sociability đổi sang sai số dự đoán vì ±1 cố định tự phình. **Báo cáo G1:** [PE1-G1-report.md](../../research/PE1-G1-report.md).
   - **Đạt:** mọi chốt an toàn (vắng chủ, ngày tệ, im lặng, owner ngẫu nhiên, đảo sở thích, không đè learning).
   - **Chưa đạt:** tỉ lệ dòng 1 (0,49 ở ngày 30, 1,35 ở ngày 90), và khí chất bẩm sinh không nhìn thấy được qua lựa chọn action (JS 0).
-  - **Chờ owner:** G1-a…d.
-- **Gate G1 (owner):** đạt các ngưỡng §5 trong lab; báo cáo nêu rõ những khác biệt nào **nhìn thấy được với 3 action hiện có** và khác biệt nào cần animation mới.
+  - **Owner quyết 2026-10-24: qua G1, phương án A cho cả G1-a…d** (ghi ở [PE-2 record](PE2-board-shadow-2026-10-24.md) §1).
+- **Gate G1 (owner):** đạt các ngưỡng §5 trong lab; báo cáo nêu rõ những khác biệt nào **nhìn thấy được với 3 action hiện có** và khác biệt nào cần animation mới. — **Qua 2026-10-24.**
 
-### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2**
+### PE-2 — Shadow trên board + biểu hiện (2–3 session) → **Gate G2** — **host xong 2026-10-24, chờ board** ([record](PE2-board-shadow-2026-10-24.md))
 
 - Wire `Temperament`/`Drives`/`Affect` vào `LifeCore` ở **shadow** (tính và log, chưa đổi quyết định hành vi).
 - Biểu hiện an toàn đầu tiên: mood/tempo đổi tốc độ frame (±15 %) và thời lượng reaction qua `VisualIntent`/animation; đo render trong budget (M04: ±20 %).
 - Status card (giữ GPIO0) thêm 1 dòng tâm trạng.
 - Board: NVS backup → upload → owner quan sát vài ngày.
+- **PE-2a xong (host) 2026-10-24:**
+  - `Personality` nằm trong `LifeCore`, seed từ identity, chỉ chạy shadow;
+  - `Expression`: frame 100 ms ∓ 15 %, reaction 2400 ms ± 15 %;
+  - dòng "tâm trạng" trên status card, log `persona`;
+  - native/ASan 282/282, ESP32 build +824 B RAM.
+  - Board chưa upload.
+- **PE-2b (chưa làm):** tần suất hành động tự phát theo drive (G1-c). Nó đổi thời điểm XUNA tự hành động, nên đo riêng trong Life Lab trước.
 - **Gate G2:** owner thấy nhịp và tâm trạng khác hợp lý; không flicker; `step()` p99 tăng < 50 µs.
 
 ### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3**
@@ -140,7 +147,7 @@ Với 3 animation, tính cách chủ yếu thấy qua *khi nào / bao lâu / nh�
 
 | Kịch bản | Ngưỡng [P] |
 |---|---|
-| Cùng seed, owner khác nhau, 30 ngày | Khoảng cách tính cách ≥ 3× so với cùng owner, khác seed |
+| Cùng seed, owner khác nhau | **G1-b (2026-10-24):** ảnh hưởng của owner vượt khí chất bẩm sinh (tỉ lệ > 1) sau ≤ 3 tháng và tiếp tục tăng. Ngưỡng cũ "≥ 3× sau 30 ngày" bỏ. PE-2: 0,40 / 0,72 / 1,10 ở ngày 29 / 59 / 89 |
 | Không tương tác dài | Δ tính cách = 0 |
 | Owner ngẫu nhiên / noisy | Drift ≈ 0 |
 | Một sự kiện cực đoan | Δ = 0 trước consolidation |

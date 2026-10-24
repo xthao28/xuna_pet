@@ -151,6 +151,11 @@ Status vocabulary:
       - P-D3: PE-0/PE-1 start now, Life Lab only, ahead of M06.
       - P-D4 (revises D6 for personality only): conversation shapes temperament without confirmation, as weak, capped, multi-session evidence that the owner can see and undo. Preferences keep D6.
       - All parameters stay Proposed.
+      - **Gate G1 passed (owner 2026-10-24, option A for G1-a…d; [PE-2 record](docs/roadmap/personality/PE2-board-shadow-2026-10-24.md)):**
+        - G1-a: consolidation needs ≥ 4 sessions; coherence stays 0.5.
+        - G1-b: plan §5 row 1 becomes "owner influence exceeds the innate temperament within ≤ 3 months and keeps growing".
+        - G1-c: PE-2 expresses personality only through pace and emotion (frame period, reaction length, spontaneous frequency), scaled to the real trait range. Drives never override learning. Track A runs in parallel.
+        - G1-d: sociability stays mostly innate until PE-4 adds device-observed evidence.
   - **Adapter behaviour for the switch (owner-confirmed 2026-10-16):** an expired rating (D3) returns result 4 until a dedicated code is frozen; GPIO0 stays a direct Happy request until the protocol/app can carry the greeting context (D5 learning deferred to S26/S27); app decision IDs ≥ 0x80000000 return 4; v1 preference bytes use the coarse cell until S10-sync; needs are not persisted (cold-boot reset).
 
 ### Proposed — not yet fixed

@@ -125,3 +125,5 @@ Trọng số drive trong lựa chọn shadow (0 → 0,5) cho độ đa dạng 0 
 - (B) Quay lại ±1 cố định. Không khuyến nghị: đã thấy nó tự phình.
 
 **Go / no-go:** khuyến nghị **qua G1 sang PE-2** (shadow trên board + biểu hiện), áp dụng (A) cho cả bốn quyết định trên.
+
+**Owner quyết định (2026-10-24):** qua G1, áp dụng (A) cho cả bốn. Kết quả áp dụng: [PE-2 record](../roadmap/personality/PE2-board-shadow-2026-10-24.md).

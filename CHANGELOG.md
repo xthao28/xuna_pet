@@ -1,6 +1,16 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-23** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
+
+## 2026-10-24 — The board runs cooler
+
+- The board got hot because the firmware kept the processor busy all the time, checking for work about 25,000 times a second. Now it checks 100 times a second and rests in between. The chip went from about 52 °C to under 47 °C, and it was still cooling when the test ended. XUNA looks and responds the same.
+
+## 2026-10-24 — Personality step 4: XUNA's temperament starts to show
+
+- The owner approved going on. A trait now changes only after at least four separate sessions point the same way (before: three). In the simulation, an owner who reacts at random now changes XUNA's character less than half as much, and a caring owner still shapes it clearly over a few months.
+- The personality now runs inside XUNA's real firmware. It only watches and never changes what XUNA chooses. Its inborn temperament and current mood show in how it moves: a lively XUNA animates up to 15 % faster, a calm one slower, and a sensitive one keeps its reaction on screen a little longer. Holding GPIO0 shows the status card, which now also says XUNA's mood (for example "vui" or "hơi chán").
+- What XUNA learns about its own character is not kept after a restart yet; that comes in a later step. Computer tests pass. The new firmware is now on the board: XUNA kept everything it had learned, and the extra work per step is tiny. This XUNA was born with an almost neutral pace, so at first its movement looks nearly the same; its mood is what will change it.
 
 ## 2026-10-23 — XUNA's voice no longer breaks off in long answers
 
