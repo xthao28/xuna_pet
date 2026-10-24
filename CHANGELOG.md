@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — The status card shows XUNA's personality
+
+- Holding GPIO0 now shows a "Tính cách" line with a word for XUNA's clearest tendency, such as "ham chơi" (playful), "tò mò" (curious) or "thong thả" (unhurried). It reads "cân bằng" (balanced) when nothing stands out. This XUNA shows "ham chơi". The word can change slowly as XUNA's character changes.
+- It replaces the "Lúc chơi thích" line, which no longer changed because play is only taught through the app. "Đã sống" is now "Đã thức", because it counts the time the board has been on, not XUNA's age.
+
 ## 2026-10-24 — Each XUNA keeps its own rhythm
 
 - When left alone, XUNA used to do something on its own every 60 seconds, exactly like every other XUNA. Now an eager, curious or playful XUNA acts a little sooner and a placid one a little later (51–69 seconds). What it chooses to do still comes from what it learned. In the simulation, XUNAs with the same owner now live noticeably different days. This one acts about every 58 seconds. It is on the board.

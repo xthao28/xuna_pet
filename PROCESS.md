@@ -59,6 +59,10 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
   - Trade-offs: row 1 at day 89 = 0.98 (G1-b wants > 1; watch it); learning reversal 3.6 → 5.0 days.
   - Checks: native/ASan 284/284; golden S20 byte-identical; [output](docs/research/artifacts/PE2b-shadow-output.txt).
   - Board: two uploads failed with "No serial data received" (nothing written). After the owner replugged, a new NVS backup, then upload SUCCESS (app `cd559d88…`). Boot Ok, same PetId and preferences; XUNA acted every 58 s as computed.
+- **Status card** (owner: "oke thêm vào đi"; [record](docs/roadmap/personality/PE2-board-shadow-2026-10-24.md) §9):
+  - A derived **"Tính cách"** label (`Expression::traitWord`, most pronounced of five traits, threshold 0.05) replaces the stale "Lúc chơi thích" cell. "Đã sống" becomes "Đã thức".
+  - native/ASan 285/285.
+  - Board: NVS backup `42de3abf…`, app `9880a767…`, boot Ok, same PetId. `d945…` shows "ham chơi".
   - **Next:** the owner observes for a few days → Gate G2. Then PE-3 (needs O2: section 5 required or optional).
 
 ## 2026-10-23 — Voice fixes: long spoken replies cut off; flaky Edge TTS (backend + mobile, host only)

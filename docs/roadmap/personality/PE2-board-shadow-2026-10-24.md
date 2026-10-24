@@ -156,3 +156,24 @@ Dòng 1 theo cách diễn đạt G1-b **đạt sát nút** ở ngày 89 (1,10 > 
   - Boot `recover=Ok slot=0 boot=50 ready=1`, PetId `d945…`, quiet=1 play=0, stack 7,128 B.
   - Tự hành động ở giây 85 / 143 / 201 sau lần pet cuối ở giây 28: **mỗi 58 s**, đúng như tính toán.
   - Owner chào, vuốt, mở card: mood lên +0,18 ("vui"). Chip 44,8 °C.
+
+## 9. Status card: nhãn tính cách (owner 2026-10-24: "oke thêm vào đi")
+
+- Ô **"Tính cách"** thay "Lúc chơi thích". Ngữ cảnh chơi chỉ dạy được qua app, mà app đã bỏ đánh giá (D6 revised), nên ô đó luôn cũ.
+- Nhãn suy ra bằng `Expression::traitWord`: lấy nét rõ nhất trong curiosity / sociability / playfulness / tempo / sensitivity (bẩm sinh + đã học), theo dấu:
+
+| Trait | Dương | Âm |
+|---|---|---|
+| curiosity | tò mò | điềm tĩnh |
+| sociability | quấn chủ | tự lập |
+| playfulness | ham chơi | trầm |
+| tempo | lanh lợi | thong thả |
+| sensitivity | nhạy cảm | vô tư |
+
+  Không nét nào đạt |0,05| thì hiện "cân bằng". PE-4b dùng lại nhãn này cho `PetSelf`. Ngưỡng là [P].
+- "Đã sống" đổi thành **"Đã thức"**: đây là thời gian máy chạy, không phải tuổi tính từ lúc nở.
+- Font sinh lại, +4 glyph (ô, ậ, ằ, ự), tổng 51,423 B.
+- Kiểm tra: native/ASan **285/285**; ESP32 build SUCCESS (Flash 3,006,013 B).
+- Board: backup NVS 2 lần khớp `42de3abf…`; upload SUCCESS, app `9880a767…`.
+  - Boot `recover=Ok slot=1 boot=52 ready=1`, cùng PetId, quiet=1 play=0, stack 7,192 B.
+  - Owner mở card lúc 13:35:10. Pet `d945…` hiện **"ham chơi"** (playfulness +0,13).
