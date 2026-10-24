@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — Try XUNA's new animations from the app
+
+- The app's device tab gets four buttons under "Xem thử động tác": look around, yawn and stretch, bounce, and greet. Tapping one makes XUNA play it on the board right away.
+- It is only a show: XUNA does not get tired, learn anything or change its character from it. The buttons appear only when the board supports them. Not yet on the board or the phone; it needs an upload and a new app build.
+
 ## 2026-10-24 — The board runs cooler, second pass
 
 - The processor now runs at a third of its speed, which is still plenty: XUNA draws each frame in under 8 ms of its 100 ms. It speeds up for a moment only when it signs something for the app, so nothing stalls.

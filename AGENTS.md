@@ -161,6 +161,7 @@ Status vocabulary:
         - The section is written only once something has been learned and is capped at 482 B.
         - BLE personality projection `7a6e000e` (capability byte 3 bit 1).
       - **Track A (owner-provided sheet 2026-10-24, [record](docs/roadmap/personality/trackA-variants-2026-10-24.md)):** 4 variants (`look_around`, `yawn_stretch`, `bounce_play`, `greet_nuzzle`). They are expression only (option A): drives, arrival and rest transitions choose *how* a learner choice looks, never the choice. A fourth learnable action still needs its own D5 decision.
+        - **App preview (owner 2026-10-24, "chỉ diễn"):** opcode 1 args 4–7 play a variant on the board, advertised by capability byte 4 bits 4–7. It is shown only and never changes needs, drives, personality, learning or the snapshot ([record](docs/roadmap/personality/trackA-variants-2026-10-24.md) §4).
   - **Adapter behaviour for the switch (owner-confirmed 2026-10-16):** an expired rating (D3) returns result 4 until a dedicated code is frozen; GPIO0 stays a direct Happy request until the protocol/app can carry the greeting context (D5 learning deferred to S26/S27); app decision IDs ≥ 0x80000000 return 4; v1 preference bytes use the coarse cell until S10-sync; needs are not persisted (cold-boot reset).
 
 ### Proposed — not yet fixed

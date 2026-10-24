@@ -50,3 +50,18 @@
   - owner test: first press → `variant=greet_nuzzle`; petted → the next happy greetings → `variant=bounce_play` (×3); draw ≤ 4.9 ms, loop gap ≤ 11 ms.
 - **Not seen yet on the board:** `look_around` (needs about 1 h without a curious choice) and `yawn_stretch` (needs a rest or a wake).
 - **Board, redrawn frames:** NVS `71343573…` read twice (`tracka/redraw/`); app `e63e9c7a…`; boot `recover=Ok boot=61`, same PetId, `persona_restored bytes=107 sessions=3 evidence=8`.
+
+## 4. Preview from the app (owner 2026-10-24: "tab vào xuna sẽ thực hiện trên board"; chose "chỉ diễn", firmware + app + board, no iPhone build)
+
+- **Protocol (additive):**
+  - opcode 1 args **4 look_around, 5 yawn_stretch, 6 bounce_play, 7 greet_nuzzle**;
+  - capability byte 4 (animation mask) bits 4–7 (`0xff`, was 15);
+  - result ok; the status keeps reporting the base pose 0–3.
+  - Older firmware answers args 4–7 with invalid_argument (4). Older apps ignore the new bits.
+- **Shown only:** `LifeCore::previewVariant` latches the variant for the display. Needs, drives, personality (`expressed` is not called), learning and the snapshot are untouched; no step, no commit. Only the enhanced production adapter accepts it; the baseline v1 adapter keeps 0–3.
+- **App:** device tab, under "Thử biểu cảm": "XEM THỬ ĐỘNG TÁC" with 4 pills (Ngó quanh, Ngáp vươn vai, Nhún nhảy, Chào dụi) and the note that XUNA does not tire, learn or change. They are shown only when connected and the board has all four bits. The simulator reports unsupported.
+  - Layers: `AnimationVariant`, `PreviewVariantUseCase`, `DeviceRepository.supportsVariantPreview`/`previewVariant`, codec `supportsVariantPreview`, `DeviceCodes.variant`.
+- **Checks:**
+  - firmware native/ASan **306/306** (`test_v1_adapter`: preview shown only, cache replay does not replay it, arg 8 and source ≠ 0 rejected, baseline rejects); ESP32 build SUCCESS (RAM 54,896 B, Flash 3,894,705 B);
+  - mobile `analyze` clean, **198/198**, `pubspec.lock` unchanged.
+- **Not done:** board upload (the board was not plugged in when the session reached that step; nothing was written). iPhone not rebuilt (owner: not needed yet). So the buttons have not been tried end to end.
