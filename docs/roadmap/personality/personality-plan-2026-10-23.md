@@ -116,7 +116,7 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 - **PE-2b xong 2026-10-24 (owner chọn "chỉ theo khí chất"):** XUNA tự hành động sau 51–69 s yên tĩnh theo curiosity + playfulness (trước 60 s cố định). Drive bị loại vì gần như luôn đầy. Pet cùng owner giờ khác nhau 10,7 % về nhịp; §5 dòng 1 ngày 89 = 0,98 (theo dõi). [Record §8](PE2-board-shadow-2026-10-24.md).
 - **Gate G2:** owner thấy nhịp và tâm trạng khác hợp lý; không flicker; `step()` p99 tăng < 50 µs.
 
-### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3**
+### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3** — **xong 2026-10-24, chờ kiểm tra reboot trên board** ([record](PE3-persistence-2026-10-24.md))
 
 - Snapshot section 5 `Personality` v1 (~80 B: genome baseline/offset/pending, evidence counters, journal ring 4 mục); chọn required/optional (câu hỏi O2); migration cho pet hiện tại.
 - BLE: characteristic read-only cho trait + journal (dạng giống explanation `000b`); capability bit mới.
@@ -178,7 +178,7 @@ Nền PE-0 cho các dòng trên ([báo cáo](../../research/PE0-baseline.md) §3
 | ID | Câu hỏi | Khi nào cần |
 |---|---|---|
 | O1 | Tính "nhạy cảm" có được làm XUNA dè dặt lâu dài không (có sàn và hồi phục), hay chỉ ảnh hưởng mood tạm? | Trước PE-1c — **mặc định theo uỷ quyền 2026-10-23: chỉ mood tạm** (đổi được) |
-| O2 | Section 5 required (firmware cũ chỉ đọc) hay optional (mất trait khi rollback)? | Trước PE-3 |
+| O2 | Section 5 required (firmware cũ chỉ đọc) hay optional (mất trait khi rollback)? | Trước PE-3 — **optional (uỷ quyền 2026-10-24)** |
 | O3 | Duyệt và vẽ animation mới nào (Track A)? | Trước PE-4a |
 | O4 | "Không xác nhận" có áp luôn cho **sở thích** học từ chat không? Plan hiện chỉ áp cho tính cách | Trước PE-4c |
 | O5 | Tag hội thoại dùng consent U3 hiện có hay một lớp consent riêng? | PE-4c |

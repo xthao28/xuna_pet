@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — XUNA remembers its character after a restart
+
+- Until now, what XUNA learned about its own character was lost every time the board restarted; only its inborn temperament came back. Now it is saved with everything else it learned, so its character keeps growing across restarts and power cuts. A pet that has learned nothing yet saves nothing extra.
+- If the board is ever put back on an older firmware, XUNA keeps working and only forgets this new part. Forgetting everything (reset) also clears it.
+- The app can now read XUNA's personality, mood and its last changes from the board. The app screen for it comes later.
+
 ## 2026-10-24 — The status card shows XUNA's personality
 
 - Holding GPIO0 now shows a "Tính cách" line with a word for XUNA's clearest tendency, such as "ham chơi" (playful), "tò mò" (curious) or "thong thả" (unhurried). It reads "cân bằng" (balanced) when nothing stands out. This XUNA shows "ham chơi". The word can change slowly as XUNA's character changes.
