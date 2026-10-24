@@ -2,6 +2,10 @@
 
 Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
 
+## 2026-10-24 — Each XUNA keeps its own rhythm
+
+- When left alone, XUNA used to do something on its own every 60 seconds, exactly like every other XUNA. Now an eager, curious or playful XUNA acts a little sooner and a placid one a little later (51–69 seconds). What it chooses to do still comes from what it learned. In the simulation, XUNAs with the same owner now live noticeably different days. This one acts about every 58 seconds. It is on the board.
+
 ## 2026-10-24 — The board runs cooler
 
 - The board got hot because the firmware kept the processor busy all the time, checking for work about 25,000 times a second. Now it checks 100 times a second and rests in between. The chip went from about 52 °C to under 47 °C, and it was still cooling when the test ended. XUNA looks and responds the same.

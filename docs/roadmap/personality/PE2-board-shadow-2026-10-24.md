@@ -117,3 +117,42 @@ Dòng 1 theo cách diễn đạt G1-b **đạt sát nút** ở ngày 89 (1,10 > 
 
 - Bản B: heap giảm 3,5 KB một lần ở phút thứ 2 rồi đứng yên ở 229,116 B, không phải leak. Có thể do app trên điện thoại kết nối BLE, nhưng **chưa xác minh**. Owner shoo một lần và mở status card một lần; cả hai đều phản hồi bình thường.
 - **Chưa làm:** giảm độ sáng đèn nền (PWM), hạ CPU 160 MHz, light sleep tự động (cần bật power management của ESP-IDF). Nếu board vẫn nóng thì làm tiếp theo thứ tự đó, mỗi bước đều đo.
+
+## 8. PE-2b — nhịp tự hành động theo khí chất (owner 2026-10-24: "tiếp tục làm phần tiếp theo")
+
+- **Trước PE-2b:** để một mình, XUNA tự chọn một hành động sau mỗi 60 s yên tĩnh. Đó là khoảng 1,200 lựa chọn/ngày, mọi pet giống nhau.
+- **Đã thử ba cách** trong Life Lab (30 ngày, 5 pet mỗi kịch bản; ngày 23–29):
+
+| | 60 s cố định | Drive (75→45 s) | Khí chất + drive (45–75 s) | **Chỉ khí chất (51–69 s)** |
+|---|---|---|---|---|
+| Tự hành động/ngày (owners) | 1,203 | 1,529 | 1,355 | **1,251** |
+| Chênh giữa pet cùng owner | 0 % | 3,5 % | 10,3 % | **10,7 %** |
+| Đời giống hệt pet seed 1 (entropy_only) | 4/4 | — | 0/4 | **0/4** |
+| Owner ngẫu nhiên, \|offset\| ngày 29 | 0,0033 | — | 0,0079 | **0,0035** |
+| Owner xen kẽ, biên độ | 0,0088 | — | 0,0103 | **0,0086** |
+| Ngày tệ, mood thấp nhất tuần thường | −0,07 | — | −0,17 | **−0,10** |
+| Phút nghỉ/ngày | 240 | 247 | 243 | **≈ 240** |
+| §5 dòng 1 ngày 89 (G1-b: > 1) | 1,10 | — | 1,02 | **0,98** |
+| Learning đảo sở thích (ngày tới 75 % ô) | 3,6 | — | 2,8 | **5,0** |
+
+  (— = không đo đủ chỉ số này, vì cách đó bị loại ngay ở hai dòng đầu.)
+- **Owner chọn "chỉ theo khí chất":** chờ = 60 s × (1 − 0,15·t), t = (curiosity + playfulness)/2, hiệu ứng tối đa ở ±0,3 (`Expression::spontaneousWaitMs`).
+  - Bỏ drive vì drive gần như luôn đầy: chúng chỉ làm XUNA bận hơn và làm độ trôi của owner ngẫu nhiên tăng gấp đôi.
+  - Learner vẫn quyết *làm gì*.
+- **Đánh đổi đã chấp nhận:**
+  - §5 dòng 1 ở ngày 89 xuống 0,98, dưới mức G1-b. Lý do là các pet cùng owner giờ khác nhau hơn (gap trong owner 0,104 → 0,117). Với 5 pet thì chênh này nằm trong nhiễu, nhưng cần theo dõi.
+  - Learning đảo chậm hơn (3,6 → 5,0 ngày), vẫn nhanh hơn rất nhiều so với tính cách.
+- **Đạt dòng PE-0 đề xuất** "cùng owner, khác seed → khác biệt nhìn thấy được (thời điểm/nhịp ≥ 0,1)": chênh 10,7 %. JS của lựa chọn hành động vẫn ≈ 0: khí chất lộ ra ở *khi nào*, chưa ở *chọn gì*.
+- **Pet `d945…`:** chờ ≈ 58 s (trước 60 s).
+- **Kiểm tra:**
+  - native/ASan **284/284** (`test_personality_board` +2; một test cũ chào ở mốc giờ cứng, giờ chờ XUNA rảnh);
+  - ESP32 build SUCCESS;
+  - golden S20 `learning_v1.json` byte-identical;
+  - output: [PE2b-shadow-output.txt](../../research/artifacts/PE2b-shadow-output.txt).
+- **Board 2026-10-24:**
+  - **Hai lần upload đầu thất bại** ("Failed to connect to ESP32-S3: No serial data received"). Lỗi xảy ra ở bước kết nối nên không ghi gì lên flash. Sau đó board không xuất log, có thể bị kẹt ở chế độ download (chưa xác minh).
+  - Owner rút cắm lại: bản cũ boot bình thường (`boot=48`, chip 40,8 °C).
+  - Backup NVS lại, đọc 2 lần khớp `a5a2c66a…`. Upload SUCCESS, app `cd559d88…`.
+  - Boot `recover=Ok slot=0 boot=50 ready=1`, PetId `d945…`, quiet=1 play=0, stack 7,128 B.
+  - Tự hành động ở giây 85 / 143 / 201 sau lần pet cuối ở giây 28: **mỗi 58 s**, đúng như tính toán.
+  - Owner chào, vuốt, mở card: mood lên +0,18 ("vui"). Chip 44,8 °C.

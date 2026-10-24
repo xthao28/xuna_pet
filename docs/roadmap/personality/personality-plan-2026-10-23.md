@@ -113,7 +113,7 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
   - dòng "tâm trạng" trên status card, log `persona`;
   - native/ASan 282/282, ESP32 build +824 B RAM.
   - Board chưa upload.
-- **PE-2b (chưa làm):** tần suất hành động tự phát theo drive (G1-c). Nó đổi thời điểm XUNA tự hành động, nên đo riêng trong Life Lab trước.
+- **PE-2b xong 2026-10-24 (owner chọn "chỉ theo khí chất"):** XUNA tự hành động sau 51–69 s yên tĩnh theo curiosity + playfulness (trước 60 s cố định). Drive bị loại vì gần như luôn đầy. Pet cùng owner giờ khác nhau 10,7 % về nhịp; §5 dòng 1 ngày 89 = 0,98 (theo dõi). [Record §8](PE2-board-shadow-2026-10-24.md).
 - **Gate G2:** owner thấy nhịp và tâm trạng khác hợp lý; không flicker; `step()` p99 tăng < 50 µs.
 
 ### PE-3 — Lưu lâu dài (2–3 session) → **Gate G3**
