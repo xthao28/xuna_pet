@@ -65,8 +65,14 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
 { "schemaVersion": 1, "text": "…", "locale": "vi", "speak"?: false,
   "clientTime"?: "2026-10-23T21:05:00+07:00",                       (turn context, 2026-10-23)
   "history"?: [{ "role": "owner"|"xuna", "text": "…" }],            (≤ 12 lines, each ≤ 500 chars)
-  "pet"?: { "activeSeconds", "learnedEvents", "current"?, "quietChoice"?, "playChoice"? } }
+  "pet"?: { "activeSeconds", "learnedEvents", "current"?, "quietChoice"?, "playChoice"?,
+            "personality"?, "mood"? } }
                                                                       (actions: idle|happy|curious)
+                                                                      (PE-4b, 2026-10-25: personality = device label
+                                                                       balanced|curious|composed|affectionate|independent|
+                                                                       playful|quiet|lively|unhurried|sensitive|carefree;
+                                                                       mood calm|glad|joyful|low|sad|bored; sent only
+                                                                       for a pet with an identity)
 → SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?}
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
