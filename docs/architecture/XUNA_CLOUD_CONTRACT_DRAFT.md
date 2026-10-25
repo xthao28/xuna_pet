@@ -73,7 +73,10 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
                                                                        playful|quiet|lively|unhurried|sensitive|carefree;
                                                                        mood calm|glad|joyful|low|sad|bored; sent only
                                                                        for a pet with an identity)
-→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?}
+→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?, signals?}
+             (PE-4c, 2026-10-25: signals = 0–2 closed tags from the owner's text,
+              praise|scold|affection|playful|curious_question|long_chat; never stored;
+              the app forwards them to the device as BLE opcode 8)
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
              | speech_unavailable {code: "voice_unavailable"|"provider_unavailable"} (speak only, once)

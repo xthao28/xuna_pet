@@ -129,7 +129,7 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 |---|---|---|
 | PE-4a | firmware | Bật ảnh hưởng thật: genome scale UCB bonus và prior ô chưa học; drives vào `BehaviorSelector` cho hành động tự phát; test "trait không đè learning". **Host xong 2026-10-24** ([record](PE4a-leaning-2026-10-24.md)): chỉ giữ "prior ô chưa học" (bốc theo trọng số khi hoà). UCB scale và drive đã thử trong lab và bỏ. **Gain A, trên board 2026-10-25** |
 | PE-4b | backend + mobile | `PetSelf` thêm nhãn suy ra + mood (closed set); `describe_context` sinh giọng từ đó; bỏ chữ "tò mò" cố định khỏi `PERSONA_VI`; mobile `cloud_turn_context.dart` gửi field mới. **Host xong 2026-10-25:** `pet.personality` (11 nhãn) + `pet.mood` (6), mỗi nhãn có một câu chỉ giọng; "tò mò" bỏ khỏi `PERSONA_VI`; backend 145/145, mobile 198/198. Chưa thử với LLM thật / iPhone |
-| PE-4c | backend + mobile + firmware | **Giao tiếp → tính cách, không xác nhận (P-D4):** mỗi lượt backend trả thêm 0–2 tag đóng (vd. `praise`, `scold`, `affection`, `playful`, `curious_question`, `long_chat`), lấy từ cùng LLM call (không gọi thêm) hoặc bộ phân loại rẻ; app chuyển qua BLE `ConversationSignal`; device: (1) cảm xúc tức thời qua `Affect`, (2) evidence `conversation_inferred` vào ledger với chốt §6 |
+| PE-4c | backend + mobile + firmware | **Giao tiếp → tính cách, không xác nhận (P-D4):** mỗi lượt backend trả thêm 0–2 tag đóng (vd. `praise`, `scold`, `affection`, `playful`, `curious_question`, `long_chat`), lấy từ cùng LLM call (không gọi thêm) hoặc bộ phân loại rẻ; app chuyển qua BLE `ConversationSignal`; device: (1) cảm xúc tức thời qua `Affect`, (2) evidence `conversation_inferred` vào ledger với chốt §6. **Host xong 2026-10-25** ([record](PE4c-conversation-2026-10-25.md)): bộ phân loại từ khoá (không gọi thêm LLM), BLE opcode 8, cap 8 tag/ngày; firmware 321/321, backend 159, mobile 204/204. **Trên board 2026-10-25**; chưa iPhone |
 | PE-4d | mobile | Thẻ "Tính cách" (chữ + lý do), Journal, nút **"Đặt lại tính cách"** và **"Bỏ thay đổi gần nhất"**. **Thẻ chỉ đọc + journal đã làm 2026-10-24** (mobile, chưa build); hai nút còn chờ lệnh mới của firmware |
 
 - **Xong khi:** đổi provider → context gửi LLM giống hệt; chat làm XUNA vui/buồn ngay lập tức nhưng tính cách chỉ dịch qua nhiều buổi; tất cả test cũ vẫn pass.
@@ -180,8 +180,8 @@ Nền PE-0 cho các dòng trên ([báo cáo](../../research/PE0-baseline.md) §3
 | O1 | Tính "nhạy cảm" có được làm XUNA dè dặt lâu dài không (có sàn và hồi phục), hay chỉ ảnh hưởng mood tạm? | Trước PE-1c — **mặc định theo uỷ quyền 2026-10-23: chỉ mood tạm** (đổi được) |
 | O2 | Section 5 required (firmware cũ chỉ đọc) hay optional (mất trait khi rollback)? | Trước PE-3 — **optional (uỷ quyền 2026-10-24)** |
 | O3 | Duyệt và vẽ animation mới nào (Track A)? | Trước PE-4a — **owner cung cấp sheet 4 animation 2026-10-24; gắn theo hướng A** |
-| O4 | "Không xác nhận" có áp luôn cho **sở thích** học từ chat không? Plan hiện chỉ áp cho tính cách | Trước PE-4c |
-| O5 | Tag hội thoại dùng consent U3 hiện có hay một lớp consent riêng? | PE-4c |
+| O4 | "Không xác nhận" có áp luôn cho **sở thích** học từ chat không? Plan hiện chỉ áp cho tính cách | Trước PE-4c — **Không (owner 2026-10-25):** sở thích vẫn qua xác nhận (D6) |
+| O5 | Tag hội thoại dùng consent U3 hiện có hay một lớp consent riêng? | PE-4c — **Dùng U3 hiện có (owner 2026-10-25)** |
 
 ## 8. Rủi ro chính
 
