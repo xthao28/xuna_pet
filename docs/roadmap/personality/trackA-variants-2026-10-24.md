@@ -64,4 +64,4 @@
 - **Checks:**
   - firmware native/ASan **306/306** (`test_v1_adapter`: preview shown only, cache replay does not replay it, arg 8 and source ≠ 0 rejected, baseline rejects); ESP32 build SUCCESS (RAM 54,896 B, Flash 3,894,705 B);
   - mobile `analyze` clean, **198/198**, `pubspec.lock` unchanged.
-- **Not done:** board upload (the board was not plugged in when the session reached that step; nothing was written). iPhone not rebuilt (owner: not needed yet). So the buttons have not been tried end to end.
+- **Board upload done 2026-10-25** together with PE-4a (firmware `8ea50d2`; [PE-4a record §7](PE4a-leaning-2026-10-24.md)). The owner builds the app on another machine; the buttons have not been tried end to end yet.

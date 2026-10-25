@@ -1,7 +1,7 @@
 # PE-4a — Tính cách nghiêng lựa chọn của XUNA (2026-10-24)
 
 > Plan: [personality-plan-2026-10-23.md](personality-plan-2026-10-23.md) §4 PE-4a. Owner: "oke làm PE-4a thôi".
-> Trạng thái: **Implemented (host, Windows), chưa upload board**. Mọi tham số vẫn **[P]**; owner chọn mức trước khi upload (§6).
+> Trạng thái: **Implemented (host, Windows), chưa upload board**. Mọi tham số vẫn **[P]**; mức đã chọn: **A (±1, chỉ hoà tuyệt đối)**, 2026-10-25 (§6).
 > Máy: Windows (MSYS2 UCRT64 g++, PlatformIO). `native_asan` chưa chạy (chỉ có trên Mac/WSL).
 
 ## 1. Ý tưởng
@@ -100,11 +100,18 @@ Lần quét đầu (lúc đó idle còn gắn với −tempo, và còn hai đòn
 - (C) Thêm margin 0,03: tính cách quyết cả khi bài học của owner "huề nhau". Số liệu không cho thấy lợi rõ, và nó nới nguyên tắc §5.
 - (D) Tắt: tính cách chỉ ở nhịp như PE-2.
 
+**Quyết định (owner 2026-10-25: "oke chọn gain đi", giao cho Claude chọn): A.** Giữ `tieGainQ8 = 256`, `marginQ16 = 0` như mặc định trong code, không sửa firmware. Lý do: chuyển giao rõ nhất, không bao giờ đè bài học của owner; C nới nguyên tắc §5 mà không có lợi rõ.
+
 **Pet trên board (`d945…`):** khí chất gần trung tính (PE-2 record: tempo −0,04, sensitivity +0,02, playfulness +0,13). Ô nào owner đã dạy thì giữ nguyên; thay đổi chỉ ở các ô chưa dạy (ví dụ ngữ cảnh play từ app, các buổi trong ngày ít gặp). Chưa đọc NVS để biết bao nhiêu ô còn trống.
 
-## 7. Chưa làm
+## 7. Board (Mac, 2026-10-25, gain A; cùng lần upload có Track A preview `4d9fb5b`)
 
-- Upload board: NVS backup → parity (`step()` p99) → production → owner quan sát.
-- `native_asan`.
+- `native_asan` trên Mac: **312/312**.
+- Backup `~/xuna_backups/2026-10-25-pe4a/`: NVS đọc 3 lần liên tiếp trong bootloader (`--after no_reset`) đều `814701b2…`. Hai lần đọc đầu bị lỗi serial ("Corrupt data", esptool từ chối) và có reset giữa chừng nên app ghi NVS: giữ ở `nvs-stale-*.bin`, không dùng.
+- Parity `xuna_parity`: 4 lượt PASS; `step()` p99 c3 274–276 / c8 322–326 / c9 10 µs (như 2026-10-24).
+- Production firmware `8ea50d2` (`69fd74ef…`), RAM 54,904 B, Flash 3,895,257 B: `recover=Ok boot=73`, cùng PetId `d945…`, `persona_restored bytes=139 sessions=7 evidence=45`.
+- Chờ: owner quan sát; nút xem thử động tác từ app (owner tự build app).
+
+## 8. Chưa làm
 - Journal / "Vì sao?" chưa nói "XUNA chọn vì tính cách". Nhãn explore trong explanation vẫn như cũ.
 - PE-4b (PetSelf + giọng LLM), PE-4c (cần O4/O5), PE-4d (nút đặt lại / bỏ thay đổi).

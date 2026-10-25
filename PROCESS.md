@@ -30,7 +30,9 @@ Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots 
   - traces c3/c8/c9 unchanged;
   - golden S20 changed on purpose (pet with identity), regenerated and copied to mobile; mobile golden test 5/5.
 - Lab: learned character carries into untaught situations (P1 curious 0.48, P2 happy 0.47, vs 1/3); safety rows unchanged. **Watch:** G1-b row 1 at day 89 = 0.86 (PE-2b 0.98).
-- **Next:** owner picks A/B/C/D (record §6); then NVS backup → parity → upload → observation. The pending Track A preview firmware would go up in the same upload.
+- **Gain chosen 2026-10-25: A** (±1, exact ties only; owner delegated the pick). Code defaults already match, no firmware change.
+- **Uploaded 2026-10-25 (Mac)** with the Track A preview: native_asan 312/312; NVS backup `~/xuna_backups/2026-10-25-pe4a/` (3 matching reads `814701b2…`); parity 4 × PASS, p99 unchanged; boot `recover=Ok boot=73`, same PetId, `persona_restored sessions=7 evidence=45`. Backend running on the Mac (`0.0.0.0:8000`, Groq env, `xuna_local`) for the owner's app build on another machine.
+- **Next:** owner observation; try the 4 preview buttons from the app. The pending Track A preview firmware would go up in the same upload.
 - Notes for this Windows machine: Life Lab output is CRLF (strip `\r` before md5); `lifecore_lab` needs `-Wl,--stack,67108864`; Flutter 3.32.8 is at `~/fvm/versions/3.32.8/bin/flutter`.
 
 ## 2026-10-24 — App: personality card from BLE 000e (mobile, host only)
