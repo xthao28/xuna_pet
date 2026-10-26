@@ -1,8 +1,40 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**. Before that: **Cloud: commit confirmed memory candidates to device via BLE opcode 6 (mobile 229/229 tests PASS, commit `12b829e`)**. Before that: **Cloud: automatic memory candidate extraction from conversation turns (CLD-14/D17, backend 177/177 tests PASS, mobile auto-refresh 228/228 PASS, commit `916484f` & `19768cb`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**. Before that: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**. Before that: **Cloud: commit confirmed memory candidates to device via BLE opcode 6 (mobile 229/229 tests PASS, commit `12b829e`)**.
 
-## 2026-10-26 — Cloud: Layer B recall of confirmed personal facts in conversation (backend, Windows)
+## 2026-10-26 — Cloud: Phase 2 encrypted backup, restore & tombstones (CLD-20, backend, Windows)
+
+- **User requirement:** "làm phase 2 đi" (Cloud Phase 2 — CLD-20: Encrypted backup, restore to replacement hardware, and deletion tombstones).
+- **Core Architecture & Threat Model Mitigations (`xuna_backend.modules.backups`):**
+  - **Encrypted Snapshots (AES-256-GCM, `crypto.py`):**
+    - Payloads encrypted with 256-bit AES-GCM (12-byte random nonce, 16-byte authentication tag).
+    - Supports client-side pre-encrypted uploads or server envelope encryption.
+    - Integrity-checked with SHA-256 before encryption and after decryption; corrupted ciphertext or tampered tag fails safely with `422 corrupt_backup`.
+  - **Hardware Replacement & Device Rebind (Threat Model T14 & §4.2, `identity` + `backups`):**
+    - Restoring to replacement hardware rebinds to a new `DeviceId` via ECDSA P-256 challenge-response proof, while **strictly preserving `PetId` and `BrainId`** (device replacement is not a new pet).
+    - Old device credential revoked automatically.
+  - **Memory Resurrection Protection via Tombstones (Threat Model T10, `tombstones`):**
+    - Tombstone registry keyed by `(pet_id, item_type, item_id)`.
+    - On backup restore: any memory or fact matching an active tombstone is suppressed/stripped from the restored payload, ensuring stale backups can never resurrect deleted personal data.
+    - On candidate deletion: endpoint `DELETE /v1/pets/{pet_id}/memory-candidates/{candidate_id}` marks candidate `status = "deleted"` and records a tombstone.
+  - **ForgetAll / Reset (Threat Model §4.2, `forget_all`):**
+    - Archives current `BrainId` to `archived`, generates a fresh active `BrainId`, records a master tombstone `(item_type="memory", item_id="*")`, and marks all candidates as deleted, keeping `PetId` unchanged.
+- **Backend Implementation:**
+  - Domain: `BackupManifest`, `EncryptedData`, `DeletionTombstone`, `RestoreResult` in `entities.py`.
+  - Application: `create_backup`, `get_backup`, `list_backups`, `delete_backup`, `restore_backup`, `create_tombstone`, `list_tombstones`, `forget_all` in `use_cases.py`.
+  - Infrastructure: `BackupManifestRow` (`backup_manifests`), `DeletionTombstoneRow` (`deletion_tombstones`), `SqlBackupRepository`.
+  - API: `POST/GET/DELETE /v1/pets/{pet_id}/backups`, `POST /v1/pets/{pet_id}/backups/{backup_id}/restore`, `POST/GET /v1/pets/{pet_id}/tombstones`, `DELETE /v1/pets/{pet_id}/memory-candidates/{candidate_id}`, `POST /v1/pets/{pet_id}/forget`.
+  - Database Migration: `0006_backup_manifests_and_tombstones.py`.
+  - Identity port enhanced: `rebind_device` and `rotate_brain` in `SqlIdentityRepository`.
+  - Audit actions: `BACKUP_CREATED`, `BACKUP_RESTORED`, `TOMBSTONE_CREATED`, `PET_FORGOTTEN`.
+- **Validation:**
+  - `pytest tests/modules/backups/`: **17/17 PASS** (5 crypto, 3 entities, 4 use cases, 5 integration tests against PostgreSQL).
+  - Migration round-trip `test_migrations.py`: PASS (upgrade -> downgrade -> upgrade).
+  - Clean Architecture `test_architecture.py`: 2/2 PASS (100% layer purity).
+  - Full suite: **197/197 PASS** in 44.62s.
+  - `ruff check`: 0 errors.
+  - `mypy --strict`: 0 errors in 115 source files.
+  - Committed in `backend` submodule: `ace2858`.
 
 - **User requirement:** "Triển khai Layer B Recall: Nạp các sự thật đã duyệt (Confirmed Facts như tên, màu sắc, thú cưng) vào ngữ cảnh hội thoại để XUNA nhớ thông tin của chủ khi chat".
 - **Layer B Architecture & System Prompt Injection (`xuna_backend.modules.conversation`):**
@@ -39,7 +71,7 @@ Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Layer B recall
   - `fvm flutter analyze`: **0 issues**.
   - Full mobile test suite: **229/229 PASS**.
   - Committed in `mobile` submodule: `12b829e`. Before that: **new app icon from the owner's sticker (cream background, XUNA smiling with coin and sparkles; iOS + Android, `mobile/tools/generate_app_icon.py`; not built yet)**. Before that: **PE-4d on host: "Bỏ thay đổi gần nhất" / "Đặt lại tính cách" over BLE opcode 9, commit-first (firmware 325/325, mobile 209/209; on the board, entry below)**. Before that: **PE-4c on host: chat tags (praise/scold/affection/playful/curious_question/long_chat) from the backend reach the board over BLE opcode 8 and move feelings at once, temperament only slowly (firmware 321/321, backend 159, mobile 204/204; on the board, entry below)**. Before that: **PE-4b on host: AI replies speak in the device personality label and mood (backend 145/145, mobile 198/198; not tried with a real LLM or iPhone, entry below)**. Before that: **PE-4a gain A uploaded to the board with the Track A preview (2026-10-25)**. Before that: **personality Gate G1 passed (option A for G1-a…d); PE-2a uploaded to the board 2026-10-24: parity PASS, `step()` p99 +≤ 15 µs, boot Ok, same PetId; heat fix (10 ms loop pacing: chip 51.8 → 46.8 °C); **heat pass 2 on the board: CPU 80 MHz (ECDSA boosted to 240), backlight 12/16 awake · 7 asleep · 16 cards, BLE advertising 100–152.5 ms: chip 44.8 → 41.8–42.8 °C**; **PE-2b on the board: XUNA acts on its own after 51–69 s by temperament (`d945…`: 58 s)**; **PE-3 on the board: personality survives reboots (snapshot section 5, optional), BLE `000e`; board reboot check passed (`persona_restored bytes=104 sessions=1 evidence=2`)**; **Track A: 4 variant animations from the owner's sheet on the board (greet, yawn, look around, bounce)**; **variant preview from the app (opcode 1 args 4–7, capability byte 4 bits 4–7, shown only): firmware 306/306 and mobile 198/198, not uploaded (board unplugged), iPhone not rebuilt**; **app reads the personality (Journal → "Tính cách" card), mobile 192/192; iPhone not rebuilt**; Gate G2 waits for the owner's observation** (entry below). Before that: **voice fixes: long spoken replies no longer cut mid-sentence (mobile `3d05072`), Edge TTS retried per sentence (backend `70b8361`); iPhone not rebuilt yet** (entry below). Before that: **personality PE-1 done (drives, affect, Life Lab shadow); Gate G1 report waits for the owner** (firmware lab only, host; entry below). Before that: PE-1a genome + evidence ledger and PE-0 baseline (committed firmware `552eb4c`, parent `eb81e00`). Before that: **spoken replies overlap TTS with the text stream; WebSocket voice design Proposed** (backend host tests only). Before that: **app reconnects to the last XUNA on open** (mobile, host tests only). Before that: **owner reports all phone and board checks done; Cloud gate (c) met; M04 approved; free tiers only (D19/D11a); D18 deferred until V1 is finished** (entry below; no measurements recorded). The "Next"/"open" items further down this line are superseded by that entry. Previously: **XUNA's AI replies get context** (2026-10-23, owner: smart like Xiaozhi): each turn carries phone time, the last ≤ 12 chat lines and the device's view of XUNA (age, current action, learned likes), transient under U3; persona answers knowledge questions (backend `e150330`, mobile `8a42784`, 129/155 tests). Server restarted with it. Next: rebuild iOS, measure five spoken turns (Edge TTS is the latency risk). Previously: **mobile 006cf5b rebuilt and installed on the owner's iPhone 15** ([V1 record](docs/roadmap/voice/V1-phone-voice-2026-10-22.md)). This fixes SSE decoding for Dio's Uint8List chunks; the recorded mobile validation is 152/152, and the release build succeeded with Flutter 3.32.8 / Dart 3.8.1 and Xcode 27.1. The owner also rebound the test pet to the Google account. Backend probe: spoken Edge turns took 4.9–11 s, so phone timing remains open. Next: measure at least five real phone turns, confirm QR camera, output route, and microphone while BLE is connected. CocoaPods 1.16.2; no package or lockfile changes in this rebuild. Firebase plist is local and ignored now, but remains in old mobile history at 7ebd06d. Board firmware 0a392c5 is uploaded; visual check of scenes/status card/QR, Cloud gate (c), and M04 review remain open.
-Current milestone: **M04 approved; Cloud gate (a)–(c) met (c owner-reported 2026-10-23); Cloud Phase 1 completed (CLD-14 implemented). Board runs the PE-2a + loop-pacing firmware (2026-10-24, see the newest entry; was `0a392c5`); iPhone runs mobile `8a42784`.** Extended life-feel/power-cut checks remain unvalidated.
+Current milestone: **M04 approved; Cloud gate (a)–(c) met; Cloud Phase 1 completed (CLD-14); Cloud Phase 2 completed (CLD-20 implemented). Board runs the PE-2a + loop-pacing firmware (2026-10-24); iPhone runs mobile `8a42784`.** Extended life-feel/power-cut checks remain unvalidated.
 Current status (2026-10-16):
 
 ## 2026-10-26 — Cloud: automatic candidate extraction from conversation (backend & mobile, Windows)
