@@ -16,6 +16,13 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## 2026-10-26 — Personality plan progress review (docs only)
+
+- Owner: "check xem làm đến đâu rồi" for the [personality plan](docs/roadmap/personality/personality-plan-2026-10-23.md).
+- Plan now carries a progress line at the top and a check of the PE-4 "Xong khi" criteria: provider-independent context holds by design (`describe_context` sits before the adapter, no two-provider test); the Life Lab chat-spam scenario and a real iPhone ↔ board chat are not run; old tests pass on host.
+- Parent records the owner's firmware commit `ece6ae2` (avatar assets only, no code).
+- **Next:** unchanged: owner builds the app, chats with the board connected and tries the PE-4d buttons; owner closes Gate G2/G3; then PE-5.
+
 ## 2026-10-25 — Personality PE-4d: undo the newest change / reset personality (firmware + mobile, host only)
 
 - Owner: "làm nốt PE-4d đi". [Record](docs/roadmap/personality/PE4d-controls-2026-10-25.md).

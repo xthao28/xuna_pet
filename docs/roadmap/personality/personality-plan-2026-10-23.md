@@ -2,6 +2,8 @@
 
 > Nguồn nghiên cứu: [personality-evolution-assessment-2026-10-23.md](../../research/personality-evolution-assessment-2026-10-23.md) (§7–§14, Addendum A–C).
 > Trạng thái: **hướng đi owner-approved 2026-10-23**; mọi tham số, ngưỡng và tên trong plan này là **[P] Proposed** cho tới khi Life Lab và board trial đo xong.
+>
+> **Tiến độ (2026-10-26):** PE-0, PE-1 (qua G1), PE-2, PE-3, PE-4a–d và Track A đã có code và đã lên board (firmware `fba10f7`). Còn mở: Gate G2/G3 chờ owner xác nhận; PE-4b/c/d chưa thử trên iPhone với LLM thật; tiêu chí "Xong khi" của PE-4 chưa đủ (xem dưới PE-4); PE-5 chưa bắt đầu.
 
 ## 1. Mục tiêu
 
@@ -133,6 +135,10 @@ Header mới, pure C++11, không alloc, lab-only như `LearningShadow`:
 | PE-4d | mobile | Thẻ "Tính cách" (chữ + lý do), Journal, nút **"Đặt lại tính cách"** và **"Bỏ thay đổi gần nhất"**. **Thẻ chỉ đọc + journal đã làm 2026-10-24**; **hai nút host xong 2026-10-25** ([record](PE4d-controls-2026-10-25.md)): BLE opcode 9, commit-first; firmware 325/325, mobile 209/209. **Trên board 2026-10-25**; chưa iPhone |
 
 - **Xong khi:** đổi provider → context gửi LLM giống hệt; chat làm XUNA vui/buồn ngay lập tức nhưng tính cách chỉ dịch qua nhiều buổi; tất cả test cũ vẫn pass.
+- **Kiểm 2026-10-26 (chưa xong):**
+  - Context giống hệt khi đổi provider: đạt theo thiết kế (`describe_context` dùng chung cho mọi adapter), chưa có test so 2 provider.
+  - Chat → cảm xúc ngay, tính cách chậm: có test host firmware (cap 8 tag/ngày, ≥ 3 buổi); **chưa chạy** kịch bản spam chat trong Life Lab (§5) và chưa chat thật iPhone ↔ board.
+  - Test cũ vẫn pass: đạt trên host (firmware 325/325, backend 159, mobile 209/209).
 
 ### PE-5 — Thử thật dài hạn (nhiều tuần)
 
