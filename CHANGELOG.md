@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-26** (Asia/Ho_Chi_Minh).
 
+## 2026-10-26 — XUNA's growth journey waits for the board
+
+- The Journal's growth card now shows XUNA's four stages: egg, first days, exploring and understanding you.
+- The pictures were redrawn from XUNA itself instead of being made by AI: a cream egg with a small crack, then a small XUNA with a square head and no gold, then a bigger square-headed XUNA with a first touch of gold on top, and finally today's XUNA as the grown-up stage.
+- The app no longer guesses XUNA's stage from how many times you gave feedback. The stage will only light up once the board itself decides and reports it, so until then the card stays dimmed with "SẮP CÓ".
+- When and why XUNA grows up is still the owner's decision, and the board does not track it yet. Only tested on the computer.
+
 ## 2026-10-26 — XUNA's spoken replies should break off less
 
 - When you press the microphone while XUNA is talking, it now goes quiet for good: the rest of that answer no longer plays into your recording, and what you say next is always answered (before, it could be lost).

@@ -1,6 +1,38 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **M06 review fix: Growth card shows only a device-reported stage, stage sprites redrawn as temporary art (252 mobile tests PASS, mobile `9a9c607`, firmware `d42ae88`)**. Before that: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
+
+## 2026-10-26 — M06 review fix: device-owned growth stage (Mobile)
+
+- **User requirement:** "review code cho tôi phần Digital Life Milestone M06", then "oke theo ý bạn đi" (option A of the review).
+- **Review findings fixed:**
+  - `HomeGrowthCard` decided the stage itself from `LifeSummary.events`/`memories` (10/30 feedback events, 1/3 memories). That was a business rule in presentation, broke the device-authority invariant (parent AGENTS §6, mobile AGENTS §6.1) and invented D13 thresholds without Life Lab data. Removed.
+  - The card now takes a domain `GrowthStage?` (`device/domain/entity/growth_stage.dart`: egg, newborn, child, mature, matching Lifecycle V1 byte 3) and shows all four stages including Egg (`home_growthStage0` "TRỨNG"). Null keeps the whole journey dimmed with "SẮP CÓ"; a stage lights the stages reached and badges the current one.
+  - `HomeJournalTab` passes no stage: no firmware exposes Lifecycle V1 over BLE and mobile does not read it, so the card stays "coming soon" until a session wires it.
+  - `AppXunaPet.stage` documents that egg/newborn/mature override expression and scene art. New `AppDimens.iconSize12` for the stage arrows.
+  - Restored the Voice entry heading that the M06 entry had overwritten, and recorded the follow-up commits `c458f88`/`739886e`.
+- **Tests:** `home_growth_card_test.dart` (coming soon without stage, lit stages and badge with a stage, no overflow for every stage), `app_xuna_pet_test.dart` stage asset paths. `fvm flutter analyze` 0 issues; `fvm flutter test` **252/252 PASS**; `pubspec.lock` unchanged. Not run: phone, board.
+- **Still open (owner decision / own session):**
+  - D13 growth gates, stage names and thresholds (needs Life Lab data).
+  - Firmware: nothing sets `LifecycleProjection.stage`, emits `GrowthStageChanged (0x61)` or persists the `Lifecycle` snapshot section; no BLE characteristic or capability bit carries Lifecycle V1; the board does not draw stage sprites (`firmware/assets/stages/*.png` are not used by any build).
+  - M06 minimum outcome (two histories → explainable behavior/appearance differences, Evolution Journal) is not met yet.
+- **Stage sprites redrawn (owner: "trông lỏ quá… thiết kế lại từ đầu… giống style XUNA hiện tại", then the stage brief below):**
+  - The AI sprites were off-model: a round blob, gradients, a thin outline, wings/crown, and a pixel grid that did not match XUNA's.
+  - Owner stage brief: "hình ảnh xuna hiện tại là trong giai đoạn trưởng thành… trứng thì bỏ cái mào tóc đi, giai đoạn tiếp theo thì đầu vẫn vuông, và chưa có mào vàng, giai đoạn thứ 3 là đầu vẫn vuông nhưng có một chút màu vàng còn giai đoạn cuối là hình ảnh xuna hiện tại". So **today's XUNA is Mature (HIỂU BẠN)**.
+  - Replaced by `firmware/tools/generate_growth_stages.py` (no AI). It starts from the in-game idle frame (`assets/generated/pet_frames.png`) reduced to its flat palette, and the younger stages are cut from it:
+    - Square head: the crest is replaced by a flat top. XUNA's eyes, brow (with its raised ends), mouth and feet are kept.
+    - Newborn: the square head with no gold, made smaller by removing plain rows and columns.
+    - Child: the full-size square head with a low stepped golden cap (low left, tall centre, medium right, like a small mature crest) and a fringe.
+    - Egg: a cream shell (`#f1e4c8`) with orange marks and a zigzag crack, no crest.
+    - A 3 px ink outline is redrawn. Every stage is bottom-anchored on the idle ground row of the shared 96×72 canvas.
+    - Heights: egg 31, newborn 31, child 43, mature 53 px.
+  - Outputs `firmware/assets/stages/xuna_stage_{egg,newborn,child}.png` and `assets/generated/growth_stages_preview.png`. `xuna_stage_mature.png` was removed. `mobile/tools/export_pet_animation.py` copies the stage PNGs into `mobile/assets/images/` (this time they were copied directly, see the drift note below). `AppXunaPet`: `child` → `xuna_stage_child.png`; `mature` (and no stage) → the regular expression art.
+  - `HomeGrowthCard` draws every stage at one height (52) so the artwork shows the growth.
+  - Found while exporting: the committed mobile pet loops (`xuna_*.png/gif`, the `xuna_pet_*` GIFs) no longer match the current firmware `pet_frames.png`/`room_background.png` pixel for pixel. They were restored and not re-exported here; re-export them in their own change.
+  - Not done: the board does not draw the stages yet (no RGB565 arrays).
+  - **Temporary art (owner 2026-10-26: "tạm thời commit lại đi, nhưng thêm note là sẽ sửa lại hình ảnh stages sau"):** the egg, newborn and child sprites are committed as placeholders and **will be revised later**. Change `generate_growth_stages.py` and regenerate; do not hand-edit the PNGs.
+  - Tooling: VS Code flags `from PIL import …` in every art tool because no local Python has Pillow (`python` is the Store alias; the PlatformIO penv has no Pillow). Install Python 3 and `pillow==13.0.0` and select it as the interpreter before regenerating art.
+  - The old `scratch/process_stages.py` from the M06 entry was never in the repository and is now obsolete.
 
 ## 2026-10-26 — Digital Life M06: Growth & Evolution Stage Sprites (Mobile & Firmware)
 
@@ -27,6 +59,9 @@ Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Digital Life M06: Gro
   - `fvm flutter test`: **248/248 tests PASS** (all widget, home page, and controller tests green).
   - Committed in `mobile` submodule: `96b25d9`.
   - Committed in `firmware` submodule: `c500bba`.
+- **Follow-up commit (protocol bounds):** firmware `c458f88` extends `GrowthWireStage` with `Child=2`, `Mature=3` and the encoder bound to `stage<=3`; mobile `739886e` accepts `growthStage <= 3` in `ProtocolCodec.decodeLifecycle`. Both sides are tested but neither is used outside tests yet (see review entry above).
+
+## 2026-10-26 — Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 & WS-2, Backend & Mobile)
 
 - **User requirement:** "hướng 2 đi không cần phải hỏi ý kiến tôi, cứ tự quyết định nếu bạn thấy nó hợp lý" & "có gì khó khăn cứ tham khảo repo xiaozhi ai server".
 - **Architecture & Design Principles (Xiaozhi AI Server inspired + XUNA Invariants):**
