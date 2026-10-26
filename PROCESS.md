@@ -16,6 +16,22 @@ Backend: CLD-10 scaffold, CLD-11 owner auth + device-proof pet binding done; CLD
 
 Sections §0–§8 and dated entries before 2026-10-16 are historical snapshots (§9 prompt is current); trust this header and the newest entries first.
 
+## 2026-10-26 — Voice: spoken replies still cut off sometimes (mobile + backend, host only, Windows)
+
+- Owner: replies on the iPhone (mobile with `3d05072`, Mac backend with `70b8361`) still break now and then, in four ways: silent for the rest of the reply (text still shows), cut mid-sentence and jump on, short gaps at commas/between sentences, the microphone recording lost. "làm cả 4 đê".
+- Causes found in code (not reproduced on a phone):
+  1. Pressing the mic only dropped sentences already queued; sentences still arriving from the server played into the recording and ahead of the next reply. A new turn sent while the old stream was still open was dropped (`isBusy`), so the spoken turn vanished.
+  2. Backend: one Edge TTS failure (after 3 tries in 10 s) turned speech off for the rest of the reply.
+  3. One file per sentence, loaded only after the previous one ended: a load gap every sentence.
+  4. No audio session setup; an interruption (notification, Siri, route change) pauses just_audio, `play()` returns, and the next sentence started over the paused one.
+- Fixes:
+  - Mobile controller: a speech-turn token (mic press or new turn mutes the earlier reply for good); the reply stream is a cancellable subscription that a new turn ends before it starts (cancel not awaited: an async* stream inside `await for` finishes cancelling only on the next HTTP event); `speak` passed explicitly instead of a shared flag.
+  - Mobile voice: two just_audio players, the next sentence written to disk on arrival and preloaded while the current plays; one `audio_session` configuration matching what `record` sets (play-and-record, speaker, Bluetooth); a sentence paused by an interruption waits for just_audio's resume (given up and stopped after 10 s); loads wait for an in-flight stop. `audio_session: 0.2.4` now a direct dependency (already locked; lock only changes transitive → direct).
+  - Backend `spoken_turn.py`: a failed sentence is skipped, later ones are still spoken; `speech_unavailable` still once; `spoken` false when anything was skipped.
+- Checks (Windows): mobile analyze clean, **215/215**; backend `check.sh` with `xuna_test`: ruff/format/mypy clean, **160 passed**.
+- Not run: iPhone rebuild and real turns, Android. Interruption handling and the gap reduction can only be judged by ear on the phone.
+- **Next:** on the Mac pull and restart the backend; rebuild the iPhone app; try long replies, pressing the mic while XUNA talks, and a notification during a reply.
+
 ## 2026-10-26 — Personality plan progress review (docs only)
 
 - Owner: "check xem làm đến đâu rồi" for the [personality plan](docs/roadmap/personality/personality-plan-2026-10-23.md).

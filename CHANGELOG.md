@@ -1,6 +1,14 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-24** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh).
+
+## 2026-10-26 — XUNA's spoken replies should break off less
+
+- When you press the microphone while XUNA is talking, it now goes quiet for good: the rest of that answer no longer plays into your recording, and what you say next is always answered (before, it could be lost).
+- If the free voice service fails on one sentence, XUNA skips just that sentence and keeps talking (before, it went silent for the rest of the answer).
+- The next sentence is loaded while the current one plays, so the pauses between sentences should be shorter.
+- A notification or Siri that interrupts XUNA now pauses the sentence, which continues afterwards, instead of jumping to the next one.
+- Only tested on the computer so far; it needs a new app build and the server restarted before you can hear it on the phone.
 
 ## 2026-10-24 — XUNA's character starts to show in what it chooses
 
