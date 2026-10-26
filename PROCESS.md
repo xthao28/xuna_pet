@@ -1,6 +1,25 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: commit confirmed memory candidates to device via BLE opcode 6 (mobile 229/229 tests PASS, commit `12b829e`)**. Before that: **Cloud: automatic memory candidate extraction from conversation turns (CLD-14/D17, backend 177/177 tests PASS, mobile auto-refresh 228/228 PASS, commit `916484f` & `19768cb`)**. Before that: **Mobile: memory candidates UI & reusable base widgets implemented (AppStatusBadge, AppEmptyState, AppFilterPillBar, HomeCandidateCard, HomeCandidateDetailSheet, 228/228 tests PASS, commit `6e94fac`)**. Before that: **Cloud CLD-14: device-data projections & memory candidate pipeline implemented in backend (migration 0005, 172/172 tests PASS, architecture & mypy clean)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**. Before that: **Cloud: commit confirmed memory candidates to device via BLE opcode 6 (mobile 229/229 tests PASS, commit `12b829e`)**. Before that: **Cloud: automatic memory candidate extraction from conversation turns (CLD-14/D17, backend 177/177 tests PASS, mobile auto-refresh 228/228 PASS, commit `916484f` & `19768cb`)**.
+
+## 2026-10-26 — Cloud: Layer B recall of confirmed personal facts in conversation (backend, Windows)
+
+- **User requirement:** "Triển khai Layer B Recall: Nạp các sự thật đã duyệt (Confirmed Facts như tên, màu sắc, thú cưng) vào ngữ cảnh hội thoại để XUNA nhớ thông tin của chủ khi chat".
+- **Layer B Architecture & System Prompt Injection (`xuna_backend.modules.conversation`):**
+  - Application layer (`chat_turn.py`):
+    - `TurnContext` augmented with `confirmed_facts: tuple[str, ...]`.
+    - `describe_context`: injects confirmed personal facts under `"Những điều bạn biết chắc chắn về người bạn đang trò chuyện cùng (do bạn ấy đã chia sẻ và xác nhận): ..."` and identifies the owner's name to instruct natural, friendly address (`"Người bạn đang nói chuyện cùng tên là [Tên]. Khi xưng hô, bạn có thể gọi bạn ấy là [Tên] hoặc bạn [Tên] một cách thân thiện."`).
+  - API layer (`routes.py`):
+    - In `POST /v1/conversations/{pet_id}/turns`: queries `SqlMemoryRepository.list_candidates(PetId(pet_id), status=CandidateStatus.CONFIRMED)` before closing the DB session.
+    - Filters for `CandidateType.FACT`, deduplicates by fact key (latest wins), and formats facts into natural Vietnamese sentences (`_format_fact`), capped at 10 items.
+    - Passes `confirmed_facts` into `TurnBody.context()`.
+- **Validation:**
+  - `pytest tests/modules/conversation/test_chat_turn.py`: 12/12 PASS (tested fact injection, owner name address, and empty fallback).
+  - `pytest tests/modules/conversation/test_conversation_api.py`: 8/8 PASS (including `test_conversation_injects_confirmed_facts_into_prompt` full end-to-end turn -> unconfirmed -> confirm + commit -> next turn prompt recall).
+  - Full suite: **180/180 PASS** in 39s.
+  - `test_architecture.py`: 2/2 PASS (clean architecture and purity 100% maintained).
+  - `ruff check`: 0 errors, `mypy --strict`: 0 errors (102 source files).
+  - Committed in `backend` submodule: `708dc13`.
 
 ## 2026-10-26 — Cloud: commit confirmed memory candidates to device (BLE opcode 6, mobile, Windows)
 
