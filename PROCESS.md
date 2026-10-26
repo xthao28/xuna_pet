@@ -23,7 +23,13 @@ Current status (2026-10-16):
   - Full suite: **172/172 passed** in 43.69s.
   - `ruff check` + `ruff format`: clean (0 errors).
   - `mypy --strict`: clean (`Success: no issues found in 101 source files`).
-- **Next:** Phase 2 (CLD-20: Encrypted backup, restore to new board, deletion tombstones) or mobile integration of candidate/projection endpoints.
+- **Mobile integration (CLD-14 client, commit `f379b62`):**
+  - Codec & Result: `ExportDocumentCodec.envelope()` helper and `DeviceExportResult.envelope` expose the exact `xuna.export.v1` document.
+  - Data & Domain: added `putProjection`, `getLatestProjection`, `postMemoryCandidate`, `getMemoryCandidates`, `patchMemoryCandidate` to `CloudRemoteDataSource` / `CloudRepository`. Memory validation error codes mapped to `AccountExceptionKind.invalidInput`.
+  - Use case: `UploadProjectionUseCase(UploadProjectionInput)`.
+  - Offline-first export: `HomeController.exportData()` uploads projection to cloud when signed in; cloud network/consent errors are logged and never block local file export.
+  - Verification: `fvm flutter analyze` (0 issues), `fvm flutter test` (**221/221 PASS**).
+- **Next:** Phase 2 (CLD-20: Encrypted backup, restore to new board, deletion tombstones) or end-to-end device export sync check.
 
 
 - Board firmware: owner-authorized 2026-10-16 S13+S18 production switch (intermediate S13/S18 build with current artwork, before the S26 changes), LifeCore/ProductLearner + LifeSnapshot v2; first boot Migrated, subsequent boot Ok. PetId `d945c77026fd4f4a8a899bbff4aeed86`; Happy/Idle preserved. GPIO0 is direct Happy, not learnable greeting. Stack setup 8,228 B first boot / 8,036 B first reboot (16 KiB stack).
