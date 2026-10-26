@@ -1,8 +1,32 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**. Before that: **Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, backend `bfd4a5b`, mobile `288862c`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
 
-## 2026-10-26 — Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 & WS-2, Backend & Mobile)
+## 2026-10-26 — Digital Life M06: Growth & Evolution Stage Sprites (Mobile & Firmware)
+
+- **User requirement:** "về mắt thiết kế thì cứ theo bạn gợi ý chọn cách 1 đi, chuẩn bị hình ảnh thì bạn dựa vào hình ảnh xuna hiện tại rồi dùng AI gen ra nhé, phải đúng theo style của nó nha, tôi sẽ kiểm tra sau, bây giờ thí bắt đầu làm đi".
+- **Visual Design & Asset Pipeline (Option 1: Distinct Stage-based Sprites):**
+  - **Style Parity & Alignment:** Generated high-resolution 16-bit retro pixel art game sprites keeping 100% fidelity with XUNA's character silhouette, palette (orange `#D87949`, shading `#AC5336`, golden crest `#F7B855`, dark outline `#211E29`, white pixel eye sclera `#FFF9EB`):
+    - **Stage 0 (Egg / Trứng):** `xuna_stage_egg.png` — cream shell with warm orange bands and golden zigzag crack pattern.
+    - **Stage 1 (Newborn / Ngày Đầu):** `xuna_stage_newborn.png` — round, chubby baby blob with single golden sprout and large innocent pixel eyes.
+    - **Stage 2 (Child / Khám Phá):** `xuna_pet_idle.png` — classic iconic XUNA with full 3-spike crest and playful posture.
+    - **Stage 3 (Mature / Hiểu Bạn):** `xuna_stage_mature.png` — grown, confident digital lifeform with majestic golden crown and cute pixel wings.
+  - **Preprocessing & Canvas Alignment (`scratch/process_stages.py`):**
+    - Clean chroma-key background removal with alpha transparency.
+    - Precise aspect-ratio nearest-neighbor downsampling to match XUNA's native $96 \times 72$ canvas, bottom-aligned at ground line $y=66$ and centered horizontally at $x=48$.
+    - Assets deployed to both `mobile/assets/images/` and `firmware/assets/stages/`.
+- **Mobile Companion App Integration (`mobile`):**
+  - **Shared Widget (`AppXunaPet`):** Added `AppPetStage` enum (`egg`, `newborn`, `child`, `mature`) with stage-aware asset routing, fully backward-compatible with expression animations.
+  - **Growth Card (`HomeGrowthCard`):**
+    - Unlocked real developmental progression replacing placeholder dimmed state.
+    - Dynamically resolves current active stage from `LifeSummary` events and memories.
+    - Shows sequential flow with directional indicators, active stage highlighted with `xunaLime` border badge, unlocked stages in full opacity, and future stages softly previewed.
+  - **Journal Integration (`HomeJournalTab`):** Binds connected pet life state to `HomeGrowthCard`.
+- **Validation:**
+  - `fvm flutter analyze`: **0 issues**.
+  - `fvm flutter test`: **248/248 tests PASS** (all widget, home page, and controller tests green).
+  - Committed in `mobile` submodule: `96b25d9`.
+  - Committed in `firmware` submodule: `c500bba`.
 
 - **User requirement:** "hướng 2 đi không cần phải hỏi ý kiến tôi, cứ tự quyết định nếu bạn thấy nó hợp lý" & "có gì khó khăn cứ tham khảo repo xiaozhi ai server".
 - **Architecture & Design Principles (Xiaozhi AI Server inspired + XUNA Invariants):**
