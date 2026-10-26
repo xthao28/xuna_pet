@@ -1,6 +1,43 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**. Before that: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**. Before that: **Cloud: commit confirmed memory candidates to device via BLE opcode 6 (mobile 229/229 tests PASS, commit `12b829e`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 2 Mobile Companion App Integration (Encrypted Backups, Restore, Tombstones & ForgetAll, mobile 237/237 tests PASS, commit `07dc682`)**. Before that: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**. Before that: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**.
+
+## 2026-10-26 — Cloud: Phase 2 Encrypted Backup, Restore & Tombstones (CLD-20, Mobile Flutter App, Windows)
+
+- **User requirement:** "phase 2 cho mobile đi" (Cloud Phase 2 — CLD-20: Encrypted backup, restore to replacement hardware, deletion tombstones, and forget_all on Mobile companion app).
+- **Core Architecture & Client Implementation (`features/account` & `features/home`):**
+  - **Domain Entities & Mappers:**
+    - `CloudBackupManifest`: `backupId`, `petId`, `brainId`, `snapshotGeneration`, `schemaVersion`, `payloadSha256`, `createdAt`.
+    - `CloudRestoreResult`: `petId`, `brainId`, `deviceId`, `snapshotGeneration`, `tombstonesApplied`, `restoredPayload`.
+    - `CloudTombstone`: `tombstoneId`, `petId`, `itemType`, `itemId`, `deletedAt`, `reason`.
+    - `CloudBackupMapper` and `CloudTombstoneMapper` extending `BaseDataMapper`.
+  - **Data Source & Repository:**
+    - `CloudRemoteDataSource`: added `postBackup`, `getBackups`, `deleteBackup`, `postRestore`, `postTombstone`, `getTombstones`, `deleteMemoryCandidate`, `postForget`.
+    - `CloudRepository` and `CloudRepositoryImpl`: added `createBackup`, `listBackups`, `deleteBackup`, `restoreBackup`, `createTombstone`, `listTombstones`, `deleteMemoryCandidateWithTombstone`, `forgetAll`.
+    - `AccountExceptionKind.backupNotFound` mapped from backend problem code `backup_not_found`.
+  - **Domain Use Cases:**
+    - `CreateBackupUseCase`, `ListBackupsUseCase`, `DeleteBackupUseCase`, `RestoreBackupUseCase`, `DeleteCandidateWithTombstoneUseCase`, `ForgetAllUseCase`.
+    - Exported in `domain.src.dart` and registered in `HomeBinding`.
+  - **Presentation & UI:**
+    - `HomeController`:
+      - `cloudBackups` observable list.
+      - `fetchCloudBackups`: loads manifests for bound pet.
+      - `createCloudBackup`: takes latest device export (`xuna.export.v1`), uploads encrypted backup to Cloud.
+      - `restoreCloudBackup`: restores backup, applying server-side tombstones to strip deleted memories, and displays tombstones applied count.
+      - `deleteCloudBackup`: permanently removes backup manifest.
+      - `deleteCandidateWithTombstone`: permanent deletion of memory candidates with tombstone recording to prevent resurrection (Threat Model T10).
+      - `forgetAllCloud`: archives current Brain, issues new BrainId with master tombstone `*`.
+    - `HomeBackupsSheet`: bottom sheet displaying backup history (generation #, SHA-256 hash, date), actions to Create Backup, Restore, Delete, and danger section for ForgetAll with confirmation dialogs.
+    - `HomeCandidateDetailSheet`: added "Xóa vĩnh viễn (Tombstone)" action.
+    - `HomeAccountCard` & `HomeDeviceTab`: added "Sao lưu & Khôi phục" entry point for bound pets.
+    - Localization: Vietnamese strings in `vi_VN.json` and `locales.g.dart`.
+- **Validation:**
+  - `fvm flutter analyze`: **0 issues** across entire mobile codebase.
+  - `backups_use_cases_test.dart`: **5/5 PASS** (full use case test suite).
+  - `cloud_repository_impl_test.dart`: **15/15 PASS** (tested backups, restore, tombstones, and forget round-trip).
+  - `home_controller_test.dart`: **46/46 PASS** (including candidate permanent delete with tombstone, backup creation from device export, list, restore with tombstone application, delete, and forget all).
+  - Full suite `fvm flutter test`: **237/237 tests PASS** in 24s.
+  - Committed in `mobile` submodule: `07dc682`.
 
 ## 2026-10-26 — Cloud: Phase 2 encrypted backup, restore & tombstones (CLD-20, backend, Windows)
 
