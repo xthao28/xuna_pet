@@ -1,8 +1,41 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, Backend & Mobile Flutter App, 211 backend tests PASS, 246 mobile tests PASS, backend `bfd4a5b`, mobile `288862c`)**. Before that: **Cloud: Phase 2 Mobile Companion App Integration (Encrypted Backups, Restore, Tombstones & ForgetAll, mobile 237/237 tests PASS, commit `07dc682`)**. Before that: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**. Before that: **Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, backend `bfd4a5b`, mobile `288862c`)**.
 
-## 2026-10-26 — Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, Backend & Mobile, Windows)
+## 2026-10-26 — Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 & WS-2, Backend & Mobile)
+
+- **User requirement:** "hướng 2 đi không cần phải hỏi ý kiến tôi, cứ tự quyết định nếu bạn thấy nó hợp lý" & "có gì khó khăn cứ tham khảo repo xiaozhi ai server".
+- **Architecture & Design Principles (Xiaozhi AI Server inspired + XUNA Invariants):**
+  - **Full-Duplex Streaming:** WebSocket endpoint `/v1/voice` handles push-to-talk microphone audio streaming (16kHz PCM16), real-time STT (`stt.final`), prompt execution with digital life turn context, and streaming speech synthesis (`tts.start`, binary MP3 chunks, `tts.end`, `reply.finished`).
+  - **Barge-in / Interruptible Support (`abort`):** Immediately cancels active LLM text generation tasks and TTS synthesis pipelines when a user interrupts or cancels.
+  - **Privacy & Security Guarantee (U3V Consent):** Mandatory 5-second handshake auth with Firebase ID token. Rejects connection with `consent_required` (code 4008) if U3V (`conversation_voice`) opt-in is not active. Raw audio is never stored or logged (ephemeral buffer in memory only, capped at 30s `MAX_AUDIO_BYTES`).
+  - **Device Authority & Teaching Safeguards:** Voice responses remain untrusted candidate text. They never directly mutate learner preferences without owner review.
+- **Backend Implementation (`xuna_backend.modules.conversation`):**
+  - Session State Machine (`voice_session.py`): `VoiceSession` managing states (`IDLE`, `LISTENING`, `TRANSCRIBING`, `AWAITING_COMMIT`, `REPLYING`), audio buffer accumulation, and sentence-interleaved speech streaming.
+  - API WebSocket Route (`websocket.py`): Mounted under `/v1/voice`. Supports `hello`, `hello.ok`, `listen.start`, binary PCM audio chunks, `listen.stop`, `stt.final`, `turn.commit`, `reply.delta`, `tts.start`, `tts.end`, `reply.finished`, `abort`, and `bye`.
+  - Quality & Testing (`test_voice_websocket.py`):
+    - Handshake validation, missing/invalid token, pet ownership verification, U3V consent check.
+    - Full push-to-talk stream with audio chunks, STT transcription, and streaming TTS audio response.
+    - Barge-in abort and session cleanup.
+    - Backend test suite: **226/226 tests PASS** (PostgreSQL `xuna_test`), `ruff` clean, `mypy` clean.
+- **Mobile Companion App Implementation (`mobile`):**
+  - Data Source (`voice_websocket_data_source.dart`): `VoiceWebSocketDataSource` interface and `VoiceWebSocketDataSourceImpl` using `dart:io` `WebSocket`. Converts `http(s)` base URL to `ws(s)://.../v1/voice`. Emits typed events (`VoiceWsHelloOk`, `VoiceWsSttFinal`, `VoiceWsReplyDelta`, `VoiceWsTtsAudio`, `VoiceWsReplyFinished`, `VoiceWsError`).
+  - Integration (`home_binding.dart`, `data.src.dart`): bound in DI.
+  - Unit tests (`voice_websocket_data_source_test.dart`): URI mapping, full handshake, binary chunk streaming, event parsing, clean close.
+  - Mobile test suite: **248/248 flutter tests PASS**, `flutter analyze` 0 issues.
+
+## 2026-10-26 — Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11)
+
+- **User requirement:** "Hướng 1: Cloud Phase 4 Direct Device Transport (CLD-40, CLD-41, E14)".
+- **Backend Implementation (`xuna_backend.modules.transport`):**
+  - Domain: `MqttTopic`, `TransportChannel`, `TransportDirection`, `DeviceConnectionStatus`, `DeviceStatusRecord`, `DownlinkCommand`.
+  - Application: `ports.py`, `schemas.py`, use cases `handle_uplink_message`, `send_downlink_suggestion`, `send_downlink_command`, `get_device_status`.
+  - Infrastructure: `device_transport_statuses` table (`0008_device_transport.py`), `SqlTransportStatusRepository`, `InMemoryMqttBroker`.
+  - API: `POST /v1/transport/mqtt/uplink`, `GET /v1/devices/{device_id}/transport/status`, `POST /v1/devices/{device_id}/transport/command`.
+  - Tests: `test_transport_api.py`, `test_transport_entities.py`, `test_transport_use_cases.py` (9/9 tests PASS).
+- **Firmware Implementation (`firmware`):**
+  - C++11 header `include/MqttTransport.h`: static topic builders and payload serializers (`kMaxTopicLen = 128`, `kMaxPayloadLen = 512`, zero dynamic allocation).
+  - Host test `test/test_mqtt_transport.cpp` built and verified PASS.
 
 - **User requirement:** "oke làm phase 3 đi" (Cloud Phase 3 — CLD-30: Sleep Learning / Batch Consolidation Service, E15, O1 & CLD-31: Bounded Suggestion Service under approved H1–H8 contract).
 - **Architecture & Strict Boundary Guarantees (ADR-0007, Implementation Plan §22, Cloud Implementation Plan §7):**
