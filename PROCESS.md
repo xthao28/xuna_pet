@@ -1,6 +1,45 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 2 Mobile Companion App Integration (Encrypted Backups, Restore, Tombstones & ForgetAll, mobile 237/237 tests PASS, commit `07dc682`)**. Before that: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**. Before that: **Cloud: Layer B recall of confirmed personal facts into conversation prompt context (CLD-14/D17, backend 180/180 tests PASS, commit `708dc13`)**.
+Last updated: **2026-10-26** (Asia/Ho_Chi_Minh). Latest: **Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, Backend & Mobile Flutter App, 211 backend tests PASS, 246 mobile tests PASS, backend `bfd4a5b`, mobile `288862c`)**. Before that: **Cloud: Phase 2 Mobile Companion App Integration (Encrypted Backups, Restore, Tombstones & ForgetAll, mobile 237/237 tests PASS, commit `07dc682`)**. Before that: **Cloud: Phase 2 Encrypted Backup, Hardware Rebind Restore, and Deletion Tombstones (CLD-20, backend 197/197 tests PASS, commit `ace2858`)**.
+
+## 2026-10-26 — Cloud: Phase 3 Sleep Learning & Bounded Suggestions (CLD-30, CLD-31, Backend & Mobile, Windows)
+
+- **User requirement:** "oke làm phase 3 đi" (Cloud Phase 3 — CLD-30: Sleep Learning / Batch Consolidation Service, E15, O1 & CLD-31: Bounded Suggestion Service under approved H1–H8 contract).
+- **Architecture & Strict Boundary Guarantees (ADR-0007, Implementation Plan §22, Cloud Implementation Plan §7):**
+  - **H1 (Offline-complete):** Digital life, learner, and state engine remain 100% offline-complete on ESP32 hardware. Cloud is an optional cognitive optimization service.
+  - **H2 (Device authority):** Cloud never writes hardware state directly. All recommendations are bounded, expiring, revertible `CloudSuggestion`s.
+  - **H3 (Bounded suggestions):** Kinds: `learner_parameter` ($\gamma$ learning rate in `[0.70, 0.95]`, curiosity exploration bonus in `[0.05, 0.30]`), `habit_prior` (day-part routine priors in `[0.0, 1.0]`), `content_pack`. Each suggestion carries `suggestion_id`, `pet_id`, `brain_id`, `kind`, `target`, `delta`, `bounds`, `provenance`, `expires_at`, `status`.
+  - **H4 (Owner evidence wins):** Suggestions change parameters/priors only; they never overwrite direct owner feedback (`user_feedback` or `user_stated`) and never invent life facts.
+  - **H5 (Provenance & Transparency):** Explicit provenance tags: `cloud_inferred` (batch consolidation over pet projection) or `population`.
+  - **H6 (Opt-in Consent):** Strictly requires U1 (`aggregate_metrics`) or U2 (`experience_events`) consent. Default U0 returns `403 consent_required`.
+  - **H7 (Graceful Degradation):** Unapplied suggestions expire automatically after 7-day TTL.
+  - **H8 (Per-owner / Per-device Security):** Asymmetric token auth, scoped to owner's bound `PetId` and active `BrainId`.
+- **Backend Implementation (`xuna_backend.modules.suggestions`):**
+  - Database Migration: `migrations/versions/0007_cloud_suggestions.py` (table `cloud_suggestions` with cascade FKs to `pets.pet_id` and `brains.brain_id`, composite index `(pet_id, status)`, indices on `pet_id`, `brain_id`, `expires_at`).
+  - Domain: `CloudSuggestion`, `SuggestionKind`, `SuggestionProvenance`, `SuggestionStatus`, bounds validation, timezone-aware datetime validation, and lifecycle state transitions (`pending` $\rightarrow$ `applied`/`rejected`, `applied` $\rightarrow$ `reverted`).
+  - Consolidation Algorithm (`consolidation.py`): computes adaptive tuning for learner $\gamma$ and curiosity bonus based on projection stability and exploration activity, bounds-clamped with 7-day TTL.
+  - Application & Use Cases: `consolidate_suggestions`, `list_suggestions`, `get_suggestion`, `update_suggestion_status`, `delete_suggestion`.
+  - Infrastructure: `CloudSuggestionRow` ORM and `SqlSuggestionRepository`.
+  - API Routes: `POST /v1/pets/{pet_id}/suggestions/consolidate`, `GET /v1/pets/{pet_id}/suggestions`, `GET /v1/pets/{pet_id}/suggestions/{suggestion_id}`, `PATCH /v1/pets/{pet_id}/suggestions/{suggestion_id}`, `DELETE /v1/pets/{pet_id}/suggestions/{suggestion_id}`.
+  - Audit Events: `SUGGESTION_CONSOLIDATED`, `SUGGESTION_APPLIED`, `SUGGESTION_REJECTED`, `SUGGESTION_REVERTED`.
+- **Mobile Companion App Implementation (`mobile`):**
+  - Domain: `CloudSuggestion` entity, use cases `ConsolidateSuggestionsUseCase`, `FetchSuggestionsUseCase`, `ApplySuggestionUseCase`, `RejectSuggestionUseCase`, `RevertSuggestionUseCase`.
+  - Data: `CloudSuggestionMapper`, `CloudRemoteDataSource`, `CloudRepository` & `CloudRepositoryImpl` implementation.
+  - Presentation & UI:
+    - `HomeController`: reactive `cloudSuggestions`, `isConsolidating`, `fetchCloudSuggestions()`, `consolidateSleepLearning()`, `applyCloudSuggestion()`, `rejectCloudSuggestion()`, `revertCloudSuggestion()`.
+    - `HomeSuggestionsSheet`: bottom sheet displaying pending/applied suggestions, delta, bounds, status badges, and actions (Áp dụng, Từ chối, Khôi phục, Hợp nhất Sleep Learning).
+    - `HomeAccountCard` & `HomeDeviceTab`: added "Gợi ý & Sleep Learning" entry point for bound pets.
+    - Localization: full Vietnamese localization in `vi_VN.json` & `locales.g.dart`.
+- **Validation Results:**
+  - **Backend:**
+    - Unit & Integration: **211/211 tests PASS** against PostgreSQL (`xuna_test`) in 48.41s.
+    - Code quality: `ruff check .` 0 issues, `mypy src` 0 issues across 128 source files.
+    - Commits: `3af6926` (features), `bfd4a5b` (lint format).
+  - **Mobile:**
+    - Static analysis: `fvm flutter analyze` **0 issues found**.
+    - Unit tests: `suggestions_use_cases_test.dart` (5/5 PASS), `cloud_suggestion_mapper_test.dart` (2/2 PASS), `cloud_repository_impl_test.dart` (21/21 PASS), `home_controller_test.dart` (47/47 PASS), `home_page_test.dart` (5/5 PASS), `locales_sync_test.dart` (PASS).
+    - Full test suite: `fvm flutter test` **246/246 tests PASS** in 25s.
+    - Commit: `288862c`.
 
 ## 2026-10-26 — Cloud: Phase 2 Encrypted Backup, Restore & Tombstones (CLD-20, Mobile Flutter App, Windows)
 
