@@ -2,6 +2,18 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Cài WiFi cho XUNA từ ứng dụng (DC-2, bản thử)
+
+- **Kết nối WiFi cho XUNA:** Tab Thiết bị có thêm nút mở trang cài WiFi: nhập tên mạng, mật khẩu và máy chủ, rồi gửi cho board qua Bluetooth. Trang hiện trạng thái WiFi do board báo về. Có nút "Quên WiFi" (phải xác nhận).
+- **Riêng tư:** Tên mạng và mật khẩu chỉ nằm trên board, trong vùng lưu riêng, tách khỏi dữ liệu cuộc sống của XUNA. Ứng dụng không lưu và không đọc lại được; mật khẩu không bao giờ hiện trong log.
+- **Chưa bật mặc định:** Tính năng chỉ có trong bản firmware thử `xuna_net`; firmware thường không đổi cho tới khi E14 đạt. Nút chỉ hiện khi board có hỗ trợ.
+- Firmware 364/364 bài kiểm thử PASS, ứng dụng 309/309 PASS. Chưa thử trên board và điện thoại.
+
+## 2026-10-27 — Máy chủ nhận kết nối trực tiếp từ board (DC-3)
+
+- Backend có cổng WebSocket riêng cho board: board phải ký bằng khóa của chính nó mỗi lần kết nối, chỉ pet đã liên kết và chủ đã bật quyền chia sẻ U1/U2 mới được nhận; trạng thái online hiện trong API. Rút quyền giữa chừng thì kết nối bị đóng ở nhịp kế tiếp.
+- Backend 324/324 bài kiểm thử PASS. Chưa chạy với board thật.
+
 ## 2026-10-27 — Chuẩn bị để board tự kết nối cloud (DC-0, DC-1)
 
 - **Hợp đồng và quyết định:** Ghi lại quyết định dùng WebSocket qua TLS thay cho MQTT (ADR-0010), cách board chứng minh danh tính mỗi lần kết nối, và các rủi ro bảo mật mới (WiFi giả, mất board, phát lại chữ ký, lộ mật khẩu WiFi, kết nối lại dồn dập).

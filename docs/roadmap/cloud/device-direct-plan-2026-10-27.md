@@ -80,7 +80,10 @@ Run it with the [E14 runbook](E14-runbook.md). Firmware envs `xuna_e14_baseline`
 - Output: `docs/roadmap/cloud/E14-results-<date>.md`. **Fail** → Stage 2 stays phone-gateway only, or a mitigation session (smaller TLS buffers, Wi-Fi only while idle) is proposed. **Pass** → DC-2.
 - Needs: owner flashes the board (verified NVS backup first), dev machine running the server, Windows firewall rule for the port.
 
-### DC-2 — Wi-Fi setup over BLE
+### DC-2 — Wi-Fi setup over BLE — implemented 2026-10-27 (host tests, ahead of the gate)
+
+Done as below, behind a new firmware build flag **`XUNA_NET`** (env `xuna_net`, off by default): the default firmware stays byte-for-byte the same size and advertises no new capability until the E14 gate passes and the owner switches it on. `NetManager` (core 0) only joins Wi-Fi in this session; the cloud session is DC-4. Not done: the status-card line "WiFi: …, Cloud: …" (needs card layout and font work; the app shows the state). The app polls `7a6e0012` every 2 s while the sheet is open instead of subscribing to notifications.
+
 
 - Firmware:
   - Characteristic `7a6e0011` (write): `[version 1, op, …]`; op 1 = set (SSID ≤ 32 B, password ≤ 64 B, server host ≤ 64 B, port u16), op 2 = forget. Chunked like the subtitle frames if longer than the MTU. Validated in a pure `NetConfigCodec` (host tests).
