@@ -109,7 +109,7 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 `confirmed` only after the app reports the device commit (generation that contains it).
 
-### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); not implemented)
+### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 implemented 2026-10-27 without `projection`)
 
 The board connects by itself over Wi-Fi. One WebSocket over TLS per board, authenticated by the device key on every connect. In this slice data goes **up only**: the server never sends anything that changes device state (H2).
 
@@ -138,7 +138,7 @@ server → ack        { "type": "ack", "schemaVersion": 1, "ref": "projection", 
 
 Handshake rules:
 
-- `hello` within 10 s of the upgrade, `proof` before the challenge expires (60 s, single-use, from the same store as `POST /v1/devices/challenges`). Nothing but `ping` and `projection` is accepted after `ready`, and nothing but `hello` → `proof` before it.
+- `hello` within 10 s of the upgrade, `proof` before the challenge expires (60 s). The nonce belongs to the WebSocket session: one per connection, single-use, never stored (an unauthenticated board has no owner to attach a stored challenge to, and a retry storm then costs no database writes). Nothing but `ping` and `projection` is accepted after `ready`, and nothing but `hello` → `proof` before it.
 - The proof is the §4 device proof with **purpose 3 (Session)**: `nonce` from `challenge`, `petId` from `hello`, `generation` the device's current snapshot generation, payload = the device's 65-byte public key (same layout as bind). The server verifies against the key pinned at bind time. `publicKey` is optional; when present it must equal the pinned key.
 - Accepted only for a pet that is bound and not revoked, whose owner has `aggregateMetrics` (U1) or `experienceEvents` (U2) on. Unbinding the pet revokes the board at its next connect, and closes a live session.
 - One session per pet: a newer verified session closes the older one with `replaced`.
@@ -160,7 +160,7 @@ Close codes (WebSocket code + reason string = stable code; no other detail):
 | 1001 | `idle_timeout` / `going_away` | no frame within 3 × heartbeat / server shutdown | normal backoff from 2 s |
 | 4000 | `replaced` | a newer session for this pet was verified | do not reconnect for 5 min (avoids two boards fighting) |
 
-The device ignores any server message type it does not know (additive server changes) and never acts on one. Audit events `DEVICE_CONNECTED` / `DEVICE_REJECTED` carry the close code only. Online status: `GET /v1/devices/{deviceId}/transport/status` (connected at, last seen, firmware).
+The device ignores any server message type it does not know (additive server changes) and never acts on one. Audit events `DEVICE_CONNECTED` / `DEVICE_REJECTED` carry the close code only. Online status: `GET /v1/devices/{deviceId}/transport/status` → `{ deviceId, petId, status: online|offline, lastSeenAt, firmware?, connectedAt? }` (the peer address is not stored for device-direct sessions). Rate limits and the one-session-per-pet registry are process-local in DC-3 (one API process). Serving it with uvicorn needs a WebSocket library (`websockets` or `wsproto`), which is not installed yet.
 
 ### Backups and suggestions
 

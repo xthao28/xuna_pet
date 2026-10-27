@@ -1,6 +1,15 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-0 (ADR-0010, contract, threat model) + DC-1 E14 tools (firmware 359/359 native, backend 296/296; E14 not run, no board)**. Before that: **Device-direct cloud plan: owner decisions DC-D1…D8 recorded**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-3 backend gateway `/v1/devices/connect` (backend 324/324; host only, ahead of the E14 gate)**. Before that: **DC-0 docs + DC-1 E14 tools (E14 not run, no board)**.
+
+## 2026-10-27 — Device-direct DC-3: backend device gateway (host only)
+
+- **User requirement:** "xong thì cứ commit và làm các DC tiếp theo không cần hỏi ý kiến tôi" → DC-3 built ahead of the E14 gate (backend only, no board needed); if E14 fails it waits for the mitigation decision.
+- **Backend (`transport` module):** WebSocket `GET /v1/devices/connect` (subprotocol `xuna.device.v1`): hello (10 s) → challenge (32-byte nonce held by the session, 60 s, single-use) → proof (purpose 3 Session over the key pinned at bind; optional `publicKey` must match) → ready (`heartbeatS` 30) → ping/pong. Strict Pydantic frames (`application/device_frames.py`), use cases `open_device_session` / `touch_device_session` / `close_device_session` (`application/device_gateway.py`), close codes and limits in `domain/device_session.py` (frames ≤ 4 KiB, idle 3 × heartbeat, challenges 10 / 10 min per pet, connects 30 / min per peer), `InMemoryDeviceSessionHub` (newest session wins, older closed 4000 `replaced`, the replaced one never marks offline). Every heartbeat re-checks binding and U1/U2, so withdrawn consent or a rebound device ends the live session. Offline write shielded against cancellation. Status gains `firmware`, `connectedAt` (migration 0010); peer address not stored. Audit `device.connected` / `device.rejected` (codes only; unknown pets are not audited, no owner).
+- **Contract:** nonce wording changed to session-held (the challenge table needs an owner); status response documented.
+- **Validation (Windows, PostgreSQL `xuna_test`):** `test_device_session.py` 14/14 (limiter, strict frames, base64 sizes, open/reject paths incl. bind-purpose and replayed proofs, touch/close, hub), `test_device_socket_api.py` 14/14 (handshake + heartbeat + online/offline status + audit, wrong key, consent off, not bound, out of order, binary, unknown type, oversize, earlier-session proof, missing subprotocol, hello timeout, expired challenge, rate limit, replacement, consent withdrawn mid-session); full pytest **324/324**, ruff check 0, mypy 0 (166 files), alembic head; `ruff format --check` lists only the 5 old files.
+- **Not run:** uvicorn over real TLS (no `websockets`/`wsproto` in the environment; the voice WebSocket has the same gap), no board.
+- **Open points:** (1) add `websockets` (BSD-3) or `wsproto` (MIT) for uvicorn: new dependency, owner approval; (2) there is no "unbind pet" endpoint; DC-6 "unbind → refused" needs one, with a decision on what happens to the pet's cloud data.
 
 ## 2026-10-27 — Device-direct DC-0 (contract, ADR-0010, threat model) and DC-1 E14 tools
 

@@ -90,7 +90,10 @@ Run it with the [E14 runbook](E14-runbook.md). Firmware envs `xuna_e14_baseline`
 - Mobile: Device tab "Kết nối WiFi cho XUNA" sheet: SSID (typed; scanning needs location permission on Android and is impossible on iOS), password, server prefilled from the app's `XUNA_API_BASE_URL`; status chip from `7a6e0012`; "Quên WiFi" with confirmation. Codec, data source, repository, use cases, controller and widget tests; locales vi/en.
 - Acceptance (host): codec round trips and malformed frames; firmware never echoes the password; mobile tests. Board: join a real network and show the state in the app.
 
-### DC-3 — Backend device gateway
+### DC-3 — Backend device gateway — implemented 2026-10-27 (host tests, ahead of the gate)
+
+Done: `GET /v1/devices/connect` (transport module), `ProofPurpose.SESSION = 3`, status columns `firmware` / `connected_at` (migration 0010), audit `device.connected` / `device.rejected`, process-local limits and one-session hub. Differences from the bullets below: the nonce lives in the WebSocket session instead of the challenge table (challenges need an owner; the board has none until it proves itself), and "unbound" means unknown pet or a device rebound to another key, because no unbind endpoint exists yet (open product point). Not run with uvicorn: it needs `websockets` or `wsproto` (new dependency, owner approval).
+
 
 - Module `transport` (existing, MQTT-shaped) gets a WebSocket route `GET /v1/devices/connect` and use cases `open_device_session`, `close_device_session`.
 - `identity`: `ProofPurpose.SESSION = 3`; challenge store reused (single-use, 60 s); the proof is verified against the public key stored at bind time; an unbound or revoked pet closes with `not_bound`.
