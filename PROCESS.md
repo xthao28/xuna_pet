@@ -1,8 +1,58 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: protocol, board & mobile integration KD-2 (Opcode 10 subOps 1..7, characteristic 7a6e000f, capability byte 3 bit 4, LifeCore commit-first, BleManager, golden fixture generator knowledge_v1.json, mobile entities/usecases/models/mappers/codec/simulator/tests; 343/343 firmware tests PASS, 258/258 mobile tests PASS, flutter analyze 0 issues)**. Before that: **M06 knowledge domains: device knowledge core KD-1 (KnowledgeProfile, KnowledgeCodec section 13, KnowledgeProjection 64 B, Life Lab scenario, 15/15 test_knowledge PASS, 340/340 native suite PASS, budget measured)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: backend core KD-3 (module knowledge, migration 0009, lexical matcher, domain lifecycle, suggestions, memory candidate integration, chat turn context; 196 pytest PASS, ruff check/format PASS, mypy PASS, clean architecture PASS)**. Before that: **M06 knowledge domains: protocol, board & mobile integration KD-2 (Opcode 10 subOps 1..7, characteristic 7a6e000f, capability byte 3 bit 4, LifeCore commit-first, BleManager, golden fixture generator knowledge_v1.json, mobile entities/usecases/models/mappers/codec/simulator/tests; 343/343 firmware tests PASS, 258/258 mobile tests PASS, flutter analyze 0 issues)**.
 
-## 2026-10-27 — M06 knowledge domains: protocol, board & mobile integration KD-2 (Firmware + Mobile)
+## 2026-10-27 — M06 knowledge domains: backend core KD-3 (Backend)
+
+- **User requirement:** Hoàn thành session KD-3 của milestone M06 Knowledge Domains: module `knowledge` backend (domain entities, pure stdlib Vietnamese lexical matcher & text normalizer, application ports/schemas/use cases, infrastructure SQLAlchemy models & repositories, API routes RFC 9457), tích hợp `CandidateType.KNOWLEDGE` với `fact_key`, cập nhật memory use cases/schemas (`retag`, `confirm` với `domain_id`), cập nhật conversation `TurnContext` & chat prompt, migration Alembic 0009, và bộ test toàn diện.
+- **Backend Implementation:**
+  - `src/xuna_backend/modules/knowledge/domain/`:
+    - `entities.py`: `KnowledgeDomain`, `KnowledgeSuggestion`, `KnowledgeSummary`, `compute_fact_key(text)` sinh u32 deterministic từ SHA-256 NFC normalized string trong dải `[1, 0xFFFFFFFF]`.
+    - `vietnamese_text.py`: chuẩn hóa tiếng Việt stdlib không dùng thư viện ngoài (`normalize_vietnamese`, `remove_accents` hỗ trợ đ/Đ, `extract_syllables_and_bigrams`).
+    - `lexical_matcher.py`: tính toán độ tương đồng từ vựng/Jaccard (`compute_lexical_similarity`) kết hợp containment query n-grams và domain n-grams.
+  - `src/xuna_backend/modules/knowledge/application/`:
+    - `ports.py`: `KnowledgeRepository` và `KnowledgeCandidatePort` protocols.
+    - `schemas.py`: Pydantic DTOs cho domains (`CreateDomainRequest`, `UpdateDomainRequest`, `DomainResponse`), suggestions (`DecideSuggestionRequest`, `KnowledgeSuggestionResponse`), và teaching (`TeachKnowledgeRequest`, `TeachKnowledgeResponse`).
+    - `use_cases.py`:
+      - `CreateDomainUseCase`: giới hạn tối đa 5 domains không bị xóa, ràng buộc `deviceSlot` 0..4 duy nhất.
+      - `ListDomainsUseCase`: hỗ trợ lọc hoặc bao gồm domain đã xóa.
+      - `GetDomainUseCase`: tìm domain theo ID.
+      - `UpdateDomainUseCase`: xử lý các action `device_ack`, `rename`, `describe`, `rest` (giải phóng slot thiết bị), `activate`, `delete` (chuyển facts sang unsorted hoặc xóa).
+      - `TeachKnowledgeUseCase`: tự động phân loại vào domain phù hợp bằng lexical matching (ngưỡng 0.20), phát hiện quan hệ `refines` (ngưỡng 0.60) so với fact cũ, tạo memory candidate kèm `fact_key`.
+      - `ListSuggestionsUseCase` & `DecideSuggestionUseCase`: xem và quyết định accept/dismiss gợi ý domain/facts.
+  - `src/xuna_backend/modules/knowledge/infrastructure/`:
+    - `models.py`: `KnowledgeDomainRow` (bảng `knowledge_domains`), `KnowledgeSuggestionRow` (bảng `knowledge_suggestions`), `KnowledgeSummaryRow` (bảng `knowledge_summaries`).
+    - `repository.py`: `SqlKnowledgeRepository` triển khai `KnowledgeRepository`, `SqlKnowledgeCandidateAdapter` triển khai `KnowledgeCandidatePort`.
+  - `src/xuna_backend/modules/knowledge/api/`:
+    - `routes.py`:
+      - `GET /v1/pets/{pet_id}/knowledge-domains`
+      - `POST /v1/pets/{pet_id}/knowledge-domains` (HTTP 201)
+      - `GET /v1/knowledge-domains/{domain_id}`
+      - `PATCH /v1/knowledge-domains/{domain_id}`
+      - `POST /v1/pets/{pet_id}/knowledge` (yêu cầu consent `CONVERSATION_TEXT` U3)
+      - `GET /v1/pets/{pet_id}/knowledge-suggestions`
+      - `PATCH /v1/knowledge-suggestions/{suggestion_id}`
+  - `src/xuna_backend/modules/memory/`:
+    - `entities.py`: thêm `CandidateType.KNOWLEDGE = "knowledge"`, các thuộc tính `domain_id`, `relation`, `related_candidate_id`, `fact_key`, `embedding` vào `MemoryCandidate`.
+    - `models.py`: bổ sung các cột tương ứng và khóa ngoại tới `knowledge_domains.domain_id`.
+    - `repository.py`: map đầy đủ các trường knowledge khi lưu và cập nhật candidate.
+    - `schemas.py`: bổ sung trường `domainId`, `relation`, `relatedCandidateId`, `factKey` vào `CreateCandidateRequest`, `domainId` và action `retag` vào `PatchCandidateRequest`.
+    - `use_cases.py`: bảo toàn các trường knowledge qua tất cả các transition của candidate (`confirm`, `reject`, `commit`, `retag`, `delete`).
+    - `api/routes.py`: đưa các trường knowledge vào response dictionary của candidate.
+  - `src/xuna_backend/modules/conversation/`:
+    - `application/chat_turn.py`: thêm trường `knowledge` vào `TurnContext`, đưa kiến thức đã học vào prompt trong `describe_context`.
+    - `api/routes.py`: nhận `knowledge` trong `TurnBody`, nạp và định dạng tối đa 5 facts kiến thức đã xác nhận để đưa vào prompt turn.
+  - `migrations/`:
+    - `versions/0009_knowledge_domains.py`: migration tạo các bảng `knowledge_domains`, `knowledge_suggestions`, `knowledge_summaries`, và thêm các cột knowledge vào bảng `memory_candidates`.
+    - `env.py`: đăng ký models của module `knowledge`.
+  - `src/xuna_backend/main.py`: đăng ký `knowledge_repository`, `knowledge_candidate_adapter`, và mount `knowledge_router`.
+- **Validation:**
+  - Unit & Integration tests (`tests/modules/knowledge/`): **12/12 PASS** (`test_entities.py`, `test_lexical_matcher.py`, `test_use_cases.py`).
+  - Toàn bộ backend test suite: **196 passed**, 42 skipped (database integration tests cần live DB).
+  - Linter & Formatter: `ruff check .` **All checks passed!**, `ruff format --check .` **217 files already formatted**.
+  - Type checking: `mypy src` **Success: no issues found in 157 source files**.
+  - Architecture boundaries: `pytest tests/test_architecture.py` **2/2 PASS** (domain stdlib-only, application framework-free, api không chạm data frameworks, layer DAG tuân thủ tuyệt đối).
+- **Next steps:** KD-4 (Knowledge UI & Settings trong companion app mobile: danh sách domains, chi tiết slot 0..4, tiến trình level, nhật ký knowledge journal, chat input gợi ý domain, test UI).
 
 - **User requirement:** Hoàn thành session KD-2 của milestone M06 Knowledge Domains: wire Opcode 10, BLE characteristic `7a6e000f`, capability, events, NVS persistence, commit-first pipeline trong firmware, sinh fixture vàng `knowledge_v1.json`, và tích hợp toàn diện trên mobile companion app (entity, use cases, models, mappers, codec, BleDataSourceImpl, simulator, golden + unit tests).
 - **Firmware Implementation:**

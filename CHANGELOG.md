@@ -2,6 +2,15 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Backend core for knowledge domains, matching, and memory integration (KD-3)
+
+- Implemented backend module `knowledge`: domain entities, Vietnamese text normalizer (pure stdlib, handling diacritics and đ/Đ), and lexical overlap matcher combining n-grams containment and Jaccard similarity.
+- Added full domain lifecycle management: creating up to 5 non-deleted domains with unique device slots 0..4, device acknowledgement, rename, description update, rest (freeing hardware slot), activation, and deletion.
+- Integrated `CandidateType.KNOWLEDGE` into the memory system with deterministic uint32 `fact_key`, relation detection (`refines` vs `new`), and domain association.
+- Extended conversation chat prompt (`chat_turn.py`) to recall up to 5 confirmed knowledge facts in `TurnContext` so XUNA's answers naturally utilize learned domain knowledge.
+- Created Alembic database migration `0009_knowledge_domains` for tables `knowledge_domains`, `knowledge_suggestions`, `knowledge_summaries` and candidate columns.
+- All 196 backend tests pass, clean architecture boundaries verified, 0 linter/mypy issues.
+
 ## 2026-10-27 — Knowledge commands connected to board storage and companion app (KD-2)
 
 - Firmware now supports Bluetooth Opcode 10 with 7 operations: open a subject slot, set active, set resting, clear, add a confirmed fact, remove a fact, and move a fact between slots.
