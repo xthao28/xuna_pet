@@ -1,8 +1,43 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: backend core KD-3 (module knowledge, migration 0009, lexical matcher, domain lifecycle, suggestions, memory candidate integration, chat turn context; 196 pytest PASS, ruff check/format PASS, mypy PASS, clean architecture PASS)**. Before that: **M06 knowledge domains: protocol, board & mobile integration KD-2 (Opcode 10 subOps 1..7, characteristic 7a6e000f, capability byte 3 bit 4, LifeCore commit-first, BleManager, golden fixture generator knowledge_v1.json, mobile entities/usecases/models/mappers/codec/simulator/tests; 343/343 firmware tests PASS, 258/258 mobile tests PASS, flutter analyze 0 issues)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: mobile UI & orchestration KD-5 (entities, mappers, remote data source, repository, 13 use cases, multi-step orchestration flows, Vietnamese locales sync, HomeKnowledgeCard with 3-dot levels, HomeKnowledgeManageSheet with 5 slots & preset chips, HomeTeachKnowledgeSheet with 280-char input & confirmation, HomeKnowledgeSuggestionBanner, journal tab integration; 269/269 mobile tests PASS, flutter analyze 0 issues)**. Before that: **M06 knowledge domains: backend core KD-3 (module knowledge, migration 0009, lexical matcher, domain lifecycle, suggestions, memory candidate integration, chat turn context; 196 pytest PASS, ruff check/format PASS, mypy PASS, clean architecture PASS)**.
 
-## 2026-10-27 — M06 knowledge domains: backend core KD-3 (Backend)
+## 2026-10-27 — M06 knowledge domains: mobile UI & orchestration KD-5 (Mobile)
+
+- **User requirement:** Hoàn thành session KD-5 của milestone M06 Knowledge Domains: companion app UI và multi-step orchestration flows (plan §7.2, §7.3, §7.4, §9 KD-5) trên Flutter companion app (`mobile/`).
+- **Mobile Implementation:**
+  - **Account Domain & Data Layer:**
+    - `entities/`: thêm `CloudKnowledgeDomain`, `CloudKnowledgeSuggestion`, `TeachKnowledgeResult`, mở rộng `MemoryCandidate` với các trường `domainId`, `relation`, `relatedCandidateId`, `factKey`.
+    - `mappers/`: `CloudKnowledgeDomainMapper`, `CloudKnowledgeSuggestionMapper`, `TeachKnowledgeResultMapper`, cập nhật `MemoryCandidateMapper`.
+    - `data_source/`: thêm các endpoints REST API (`fetchKnowledgeDomains`, `createKnowledgeDomain`, `updateKnowledgeDomain`, `teachKnowledge`, `fetchKnowledgeSuggestions`, `decideKnowledgeSuggestion`, `retagMemoryCandidate`) vào `CloudRemoteDataSource` / `CloudRemoteDataSourceImpl`.
+    - `repository/`: cập nhật `CloudRepository` và `CloudRepositoryImpl` xử lý typed RFC 9457 errors (`slot_occupied`, `domain_limit_reached`, `slot_required`).
+    - `usecase/`:
+      - CRUD & Queries: `ReadKnowledgeDomainsUseCase`, `CreateKnowledgeDomainUseCase`, `UpdateKnowledgeDomainUseCase`, `TeachKnowledgeUseCase`, `ReadKnowledgeSuggestionsUseCase`, `DecideKnowledgeSuggestionUseCase`, `RetagMemoryCandidateUseCase`.
+      - Multi-step Orchestration:
+        - `CreateDomainFlowUseCase`: đọc profile thiết bị tìm slot trống (0..4) -> tạo domain cloud (pending_device) -> gọi lệnh `open` trên thiết bị -> gọi `device_ack` xác nhận trên cloud. Rollback xóa cloud domain nếu thiết bị fail.
+        - `DeleteDomainFlowUseCase`: dọn slot trên thiết bị qua lệnh `clear` -> gọi xóa domain trên cloud (kèm cờ `keepKnowledge`).
+        - `CommitKnowledgeUseCase`: xác nhận candidate trên cloud -> thêm fact key vào slot trên thiết bị -> đọc `snapshotGeneration` -> commit candidate lên cloud.
+        - `RetagKnowledgeFlowUseCase`: di chuyển evidence trên thiết bị từ slot cũ sang slot mới -> cập nhật candidate trên cloud.
+  - **Locales Synchronization:**
+    - Cập nhật song song `assets/locales/vi_VN.json` và `lib/generated/locales.g.dart` với các khóa bản địa hóa tiếng Việt hoàn chỉnh cho knowledge domains, manage sheet, teach sheet, suggestion banner, journal transitions.
+  - **Presentation & Widgets:**
+    - `HomeKnowledgeCard`: thẻ hiển thị tối đa 5 slots hoạt động kết hợp tên domain từ cloud với 3 chấm level competence và thống kê facts/ngày từ thiết bị, nút CTA "Dạy kiến thức", và chế độ fallback offline tự động khi chưa có mạng.
+    - `HomeKnowledgeManageSheet`: bottom sheet quản lý 5 slots, bật/tắt nghỉ ngơi (`rest`/`activate`), đổi tên, xóa domain với tùy chọn giữ hay xóa facts, và form tạo domain mới với preset chips gợi ý.
+    - `HomeTeachKnowledgeSheet`: giao diện dạy kiến thức với text input tối đa 280 ký tự, bộ chọn domain (tự động hoặc thủ công), thẻ xác nhận phân loại (quan hệ `new`/`refines`/`contradicts`), và nút lưu vào thiết bị.
+    - `HomeKnowledgeSuggestionBanner`: banner thông báo gợi ý domain/facts mới từ cloud khi phát hiện kiến thức liên quan từ hội thoại.
+    - `HomeCandidateCard` & `HomeJournalTab`: tích hợp tag/badge `KNOWLEDGE`, render `HomeKnowledgeCard` và các thẻ chuyển cấp level trong tab Nhật ký.
+    - `HomeController` & `HomeBinding`: đăng ký DI và kết nối 13 use cases, lắng nghe reactive streams, tự động refresh khi kết nối thiết bị hoặc đăng nhập cloud.
+  - **Testing & Verification:**
+    - `test/features/account/domain/usecase/knowledge_domain_use_cases_test.dart`: 8 unit test cases kiểm thử độc lập toàn bộ các use cases và flows orchestration kết hợp `FakeCloud` và `SimulatorDeviceBleDataSource`.
+    - `test/features/home/presentation/widgets/home_knowledge_card_test.dart`: 3 widget test cases kiểm tra trạng thái rỗng, hiển thị domain + chấm level, và fallback offline.
+    - `test/features/home/presentation/controller/home_controller_test.dart`: bổ sung test case kiểm thử toàn bộ luồng tạo domain, dạy kiến thức, và duyệt suggestion trong controller.
+    - `test/features/home/presentation/home_page_test.dart`: cập nhật test case kiểm tra hiển thị `HomeKnowledgeCard` trên tab Nhật ký.
+- **Validation:**
+  - `fvm flutter analyze`: **No issues found! (0 errors, 0 warnings)**.
+  - `fvm flutter test`: **269/269 test cases PASSED (100%)** qua toàn bộ test suite companion app.
+  - `test/generated/locales_sync_test.dart`: **PASS** (100% khớp khóa giữa vi_VN.json và locales.g.dart).
+- **Next steps:** KD-4 (Life Lab: offline verification & stress test chu kỳ 5 slot, retention, 30 days time-jump, power-cut matrix, telemetry check).
+
 
 - **User requirement:** Hoàn thành session KD-3 của milestone M06 Knowledge Domains: module `knowledge` backend (domain entities, pure stdlib Vietnamese lexical matcher & text normalizer, application ports/schemas/use cases, infrastructure SQLAlchemy models & repositories, API routes RFC 9457), tích hợp `CandidateType.KNOWLEDGE` với `fact_key`, cập nhật memory use cases/schemas (`retag`, `confirm` với `domain_id`), cập nhật conversation `TurnContext` & chat prompt, migration Alembic 0009, và bộ test toàn diện.
 - **Backend Implementation:**

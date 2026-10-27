@@ -2,6 +2,15 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Dạy và theo dõi kiến thức của XUNA trực tiếp trên ứng dụng (KD-5)
+
+- Thêm thẻ "Lĩnh vực của XUNA" trên màn hình chính: hiển thị 5 ô lĩnh vực với cấp độ hiểu biết tương ứng qua các chấm tròn (từ Mới nghe qua đến Biết nhiều) và số kiến thức/số ngày đã học lấy trực tiếp từ thiết bị.
+- Màn hình quản lý lĩnh vực: tự tạo chủ đề mới (kèm gợi ý nhanh), đổi tên, cho chủ đề tạm nghỉ (giải phóng ô trên thiết bị) hoặc xoá khi không còn muốn XUNA nhớ.
+- Tính năng "Dạy kiến thức": nhập nội dung ngắn (tối đa 280 ký tự), tự động hoặc chọn tay chủ đề phù hợp, kiểm tra câu trả lời xem có trùng hoặc bổ sung cho điều XUNA đã biết hay không trước khi lưu vào thiết bị.
+- Tự động gợi ý chủ đề mới khi phát hiện bạn và XUNA trò chuyện nhiều về một chủ đề chưa có trong danh mục.
+- Toàn bộ giao diện hoạt động mượt mà ngay cả khi không có mạng (hiển thị trạng thái offline dựa vào thông tin thiết bị đã lưu).
+- Đã kiểm tra tự động 269/269 test trên máy tính, mã nguồn sạch hoàn toàn.
+
 ## 2026-10-27 — Backend core for knowledge domains, matching, and memory integration (KD-3)
 
 - Implemented backend module `knowledge`: domain entities, Vietnamese text normalizer (pure stdlib, handling diacritics and đ/Đ), and lexical overlap matcher combining n-grams containment and Jaccard similarity.
