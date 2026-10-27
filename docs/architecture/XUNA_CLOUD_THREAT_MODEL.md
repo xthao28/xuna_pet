@@ -1,6 +1,6 @@
 # XUNA Cloud threat model and data-flow inventory (CLD-01)
 
-Date: 2026-10-17. **Status: Approved (owner-delegated, 2026-10-17)** — the owner answered "bạn cứ quyết định theo ý bạn"; §4 decisions are approved under that delegation. Scope: Phase 1 text projection and Phase 2 backup per the [Cloud plan](XUNA_CLOUD_IMPLEMENTATION_PLAN.md). Voice (Phase 5) and direct MQTT (Phase 4) are listed only where they change the model.
+Date: 2026-10-17. **Status: Approved (owner-delegated, 2026-10-17)** — the owner answered "bạn cứ quyết định theo ý bạn"; §4 decisions are approved under that delegation. Scope: Phase 1 text projection and Phase 2 backup per the [Cloud plan](XUNA_CLOUD_IMPLEMENTATION_PLAN.md). Voice (Phase 5) is listed only where it changes the model. Device-direct transport (Stage 2, WebSocket over TLS per [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md), replacing the earlier MQTT wording) is covered by F10–F11 and T15–T19, added 2026-10-27 (DC-0, Proposed until the owner reads the contract).
 
 ## 1. Assets
 
@@ -37,6 +37,8 @@ Date: 2026-10-17. **Status: Approved (owner-delegated, 2026-10-17)** — the own
 | F7 | Provider → API → app | generated text, tool calls | Third party (untrusted) | — |
 | F8 | API → app → device (suggestions, Phase 3) | signed bounded suggestion | Internet then radio | Suggestions opt-in |
 | F9 | Backup upload/restore (Phase 2) | encrypted snapshot | Internet | Backup opt-in |
+| F10 | App → device (Wi-Fi setup, DC-2) | SSID, password, server host/port | Radio (unbonded BLE, write-only) | Local; setting up Wi-Fi is the opt-in (DC-D6) |
+| F11 | Device → API direct (WSS `/v1/devices/connect`, ADR-0010) | hello, session proof, ping, projection | Home Wi-Fi + Internet; TLS to a pinned CA | U1/U2 of the bound owner |
 
 ## 3. Threats (STRIDE) and mitigations
 
@@ -56,6 +58,11 @@ Date: 2026-10-17. **Status: Approved (owner-delegated, 2026-10-17)** — the own
 | T12 | DoS / cost exhaustion via chat | F6 | Per-owner rate and token budgets; provider timeout; local fallback (CLD-13) |
 | T13 | Cross-tenant access (IDOR) | API | Every query scoped by owner binding; tests for foreign `PetId` access (CLD-11) |
 | T14 | Malicious restore to another device | F9 | Explicit owner approval + device challenge; restore never creates a new `PetId` (Phase 2) |
+| T15 | **Rogue access point / MITM** on the board's Wi-Fi: someone intercepts the WSS connection to read projections or feed fake server frames | F11 | The firmware trusts only the pinned CA (one self-made CA in the LAN test setup, DC-D8; no public bundle) and checks the server name; certificate dates are not checked (no trusted clock), so pinning is the defence. The server sends nothing that changes device state (H2); unknown server messages are ignored. A leaked dev CA key means re-issuing and reflashing (Proposed, ADR-0010) |
+| T16 | **Stolen board** used to impersonate the pet | F11 | The private key never leaves NVS and cannot be read over BLE (only signatures are). The owner unbinds the pet in the app: the server refuses the board at its next connect (`not_bound`) and closes a live session. With USB access the key and Wi-Fi password can be read from NVS while flash encryption is off (production topic, residual) |
+| T17 | **Replayed session proof** | F11 | 32-byte server nonce per connection, single-use, expires after 60 s; proof purpose 3 (Session) cannot be reused as bind or projection proof and vice versa; the message binds nonce, `PetId`, purpose and the device public key (contract §4) |
+| T18 | **Wi-Fi password exposure** | F10, F11 | Write-only BLE characteristic (never readable or notified back); kept only in NVS namespace `xuna_net`; never logged on device or app, never sent to the cloud; "forget Wi-Fi" erases the namespace. Unbonded BLE means a nearby attacker could write *other* credentials (denial of service only, the life is unaffected); bonding before launch (T2) |
+| T19 | **Reconnect storm** against the server (many boards after an outage, or a bug loop) | F11 | Device: exponential backoff with jitter (2 s → 5 min), longer waits after `not_bound`/`consent_required`/`replaced`. Server: per-pet challenge limit, per-IP connection limit, frame size limits, idle timeout 3 × heartbeat, one session per pet (contract "Device connection") |
 
 ## 4. Decisions (owner-delegated approval 2026-10-17)
 
@@ -69,3 +76,4 @@ Date: 2026-10-17. **Status: Approved (owner-delegated, 2026-10-17)** — the own
 - Unbonded BLE (T2) and unsigned exports (T3) are acceptable only for the prototype.
 - Provider selection, data processing terms and region (T8) are open (D11a, CLD-13).
 - Legal, age/guardian and retention windows are launch-specific (Cloud plan §6).
+- Device-direct (ADR-0010, DC-0 2026-10-27): the LAN test setup uses a self-made CA whose private key lives on the dev machine (outside git); production needs a proper CA plan and key custody (D19). NVS holds the Wi-Fi password and device key unencrypted until flash encryption (T16, T18). The 2.4 GHz radio is shared by BLE and Wi-Fi; a busy network must never stall BLE or the life loop (E14 measures it).

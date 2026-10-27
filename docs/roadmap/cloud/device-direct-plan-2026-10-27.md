@@ -1,6 +1,6 @@
 # Device-direct cloud connection — plan (2026-10-27)
 
-Status: **decisions approved by the owner 2026-10-27; plan Proposed.** Nothing here is implemented. Each session starts only when the owner asks for it, and DC-2 onward start only after the E14 gate (DC-1) passes.
+Status: **decisions approved by the owner 2026-10-27; E14 thresholds confirmed as proposed the same day.** DC-0 written and DC-1 tools implemented 2026-10-27 (host-checked; E14 not run, no board available). The owner then asked to continue with the next sessions without waiting (2026-10-27): DC-2 onward are built and host-tested ahead of the gate, but nothing goes onto the board as a feature before E14 passes. If E14 fails, that work waits for the mitigation decision.
 
 Goal: the board connects to the XUNA backend by itself over Wi-Fi, with no phone in the loop, while its life stays offline-complete. This is Stage 2 of plan §22.3 and Cloud plan Phase 4, with the transport changed from MQTT to WebSocket (decision DC-D2).
 
@@ -54,14 +54,20 @@ Firmware facts checked 2026-10-27 in the pinned framework (`espressif32@6.5.0`):
 
 ## 4. Sessions
 
-### DC-0 — Contract and decision records (docs only)
+### DC-0 — Contract and decision records (docs only) — written 2026-10-27
+
+Done: [ADR-0010](../../decisions/ADR-0010-device-direct-websocket-transport.md), contract draft §2 "Device connection" and §4 purpose 3, threat model F10–F11 / T15–T19. Waiting for the owner to read the contract.
+
 
 - ADR-0010 "Device-direct transport over WebSocket" (supersedes the MQTT wording of §22.3 / Cloud Phase 4 for Stage 2; MQTT stays an option for later fleet needs).
 - Contract draft: the messages above, close codes (`unauthorized`, `not_bound`, `consent_required`, `rate_limited`, `unsupported_protocol`), size limits.
 - Threat model additions: rogue access point / MITM (pinned CA), stolen board (unbind revokes; the key cannot be read out over BLE), replayed proof (single-use nonce, 60 s), Wi-Fi password exposure (write-only characteristic, NVS only), reconnect storms against the server (backoff + per-pet rate limit).
 - No code. Acceptance: owner reads the contract.
 
-### DC-1 — E14: Wi-Fi + TLS + BLE coexistence on the board (gate)
+### DC-1 — E14: Wi-Fi + TLS + BLE coexistence on the board (gate) — tools implemented 2026-10-27, not run
+
+Run it with the [E14 runbook](E14-runbook.md). Firmware envs `xuna_e14_baseline` / `xuna_e14`, `tools/e14_report.py`; backend `scripts/make_dev_ca.py`, `scripts/e14_server.py`. Deviation: the firmware uses `esp_transport_ws` from its own core-0 task instead of `esp_websocket_client` (whose IDF 4.4 task is unpinned, see ADR-0010).
+
 
 - Firmware build flag `XUNA_E14` (off by default): the normal firmware plus a network task that joins Wi-Fi (credentials from a local, uncommitted build flag), opens WSS with the pinned dev CA to a small test endpoint, sends a 1 KB message every 5 s and echoes back.
 - Backend: `scripts/e14_server.py` (WSS echo with the dev certificate) and `scripts/make_dev_ca.py` (dev CA + server certificate for the machine's LAN name/IP; private keys stay out of git).
@@ -70,7 +76,7 @@ Firmware facts checked 2026-10-27 in the pinned framework (`espressif32@6.5.0`):
   - loop gap p50/p99/max, render mean/max, BLE command round-trip and failures;
   - TLS handshake time, reconnect behaviour under a server kill every 2 min and a router power-cycle;
   - resets/brownouts, and the board temperature by touch (no sensor).
-- Proposed thresholds (owner confirms before the run): minimum free **internal** heap ≥ 40 KB at all times; loop gap p99 ≤ 50 ms (§17.1); render max ≤ baseline + 20 %; zero BLE command failures; zero resets; every reconnect succeeds within 2 min after the server returns.
+- Thresholds (owner-confirmed 2026-10-27): minimum free **internal** heap ≥ 40 KB at all times; loop gap p99 ≤ 50 ms (§17.1); render max ≤ baseline + 20 %; zero BLE command failures; zero resets; every reconnect succeeds within 2 min after the server returns.
 - Output: `docs/roadmap/cloud/E14-results-<date>.md`. **Fail** → Stage 2 stays phone-gateway only, or a mitigation session (smaller TLS buffers, Wi-Fi only while idle) is proposed. **Pass** → DC-2.
 - Needs: owner flashes the board (verified NVS backup first), dev machine running the server, Windows firewall rule for the port.
 
@@ -127,7 +133,7 @@ DC-2 and DC-3 can run in parallel after the gate; DC-4 needs both.
 
 ## 6. Risks and open points
 
-- **Internal RAM for TLS** (mbedTLS internal allocation, plus Wi-Fi and BLE stacks): the main E14 question. Mitigations if tight: smaller TLS record buffers via the client config, keeping the subtitle and card buffers in PSRAM (already so), dropping BLE scan-response data.
+- **Internal RAM for TLS** (mbedTLS internal allocation, plus Wi-Fi and BLE stacks): the main E14 question. The bundled libraries fix the record buffers at 16 KB in each direction (`CONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN 16384`, no dynamic buffers), so client configuration cannot shrink them; only a custom SDK build can (checked 2026-10-27). Mitigations if tight: a custom SDK build, Wi-Fi only while idle, keeping the subtitle and card buffers in PSRAM (already so), dropping BLE scan-response data.
 - **LAN-only reach (DC-D8):** the board works only on the home network until public hosting is decided (D19). The dev machine's IP can change: the app writes the server host with the Wi-Fi settings, and the certificate must name it (or use a fixed DHCP lease).
 - **Radio coexistence:** BLE command latency may grow while Wi-Fi is busy; measured in E14.
 - **Power and heat:** Wi-Fi adds roughly 80–120 mA when active (datasheet range, not measured); modem sleep between heartbeats is the default.

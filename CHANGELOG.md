@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Chuẩn bị để board tự kết nối cloud (DC-0, DC-1)
+
+- **Hợp đồng và quyết định:** Ghi lại quyết định dùng WebSocket qua TLS thay cho MQTT (ADR-0010), cách board chứng minh danh tính mỗi lần kết nối, và các rủi ro bảo mật mới (WiFi giả, mất board, phát lại chữ ký, lộ mật khẩu WiFi, kết nối lại dồn dập).
+- **Bộ đo E14:** Có hai bản firmware thử: bản đo nền (chỉ ghi số đo) và bản bật WiFi + TLS gửi 1 KB mỗi 5 giây tới máy dev. Kèm script tạo chứng chỉ riêng cho mạng nhà, server echo có thể tự "tắt" mỗi 2 phút, công cụ chấm đạt/không đạt theo ngưỡng đã chốt, và hướng dẫn chạy từng bước. Firmware bình thường không đổi.
+- Firmware 359/359 bài kiểm thử PASS, backend 296/296 PASS. Chưa chạy trên board nên chưa có kết quả E14.
+
 ## 2026-10-27 — Board hiện chữ XUNA nói (phụ đề)
 
 - **Phụ đề trên board:** Câu XUNA nói hiện trong một bong bóng phía trên XUNA, pet vẫn nhìn thấy được. Khi XUNA nói thành tiếng, chữ đổi theo từng câu đúng lúc điện thoại đọc. Khi chỉ nhắn chữ, cả câu trả lời hiện ra rồi tự lật trang. Bong bóng tự ẩn sau vài giây.

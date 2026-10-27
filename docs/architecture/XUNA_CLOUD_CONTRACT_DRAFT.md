@@ -109,6 +109,59 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 `confirmed` only after the app reports the device commit (generation that contains it).
 
+### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); not implemented)
+
+The board connects by itself over Wi-Fi. One WebSocket over TLS per board, authenticated by the device key on every connect. In this slice data goes **up only**: the server never sends anything that changes device state (H2).
+
+```http
+GET /v1/devices/connect            Upgrade: websocket
+Sec-WebSocket-Protocol: xuna.device.v1
+(no owner token: the device proves itself inside the session)
+```
+
+Frames are UTF-8 JSON text, one message per frame, each with `"type"` and `"schemaVersion": 1`. Strict schemas: an unknown field or type from the device closes the session. Binary frames are refused.
+
+```text
+device → hello      { "type": "hello", "schemaVersion": 1, "petId": "<32 hex>",
+                      "firmware": "0.2.0-mvp", "capabilities": ["projection.v1"] }
+server → challenge  { "type": "challenge", "schemaVersion": 1, "nonce": "<base64 32 B>", "expiresIn": 60 }
+device → proof      { "type": "proof", "schemaVersion": 1, "generation": <u32>,
+                      "publicKey"?: "<base64 65 B>", "signature": "<base64 64 B r||s>" }
+server → ready      { "type": "ready", "schemaVersion": 1, "serverTime": "<RFC 3339 UTC>", "heartbeatS": 30 }
+device → ping       { "type": "ping", "schemaVersion": 1, "seq": <u32> }
+server → pong       { "type": "pong", "schemaVersion": 1, "seq": <same> }
+device → projection { "type": "projection", "schemaVersion": 1, "generation": <u32>,
+                      "export": { …xuna.export.v1 envelope… } }                       (DC-5)
+server → ack        { "type": "ack", "schemaVersion": 1, "ref": "projection", "generation": <u32>,
+                      "result": "stored" | "duplicate" | "stale" | "consent_required" | "invalid" }
+```
+
+Handshake rules:
+
+- `hello` within 10 s of the upgrade, `proof` before the challenge expires (60 s, single-use, from the same store as `POST /v1/devices/challenges`). Nothing but `ping` and `projection` is accepted after `ready`, and nothing but `hello` → `proof` before it.
+- The proof is the §4 device proof with **purpose 3 (Session)**: `nonce` from `challenge`, `petId` from `hello`, `generation` the device's current snapshot generation, payload = the device's 65-byte public key (same layout as bind). The server verifies against the key pinned at bind time. `publicKey` is optional; when present it must equal the pinned key.
+- Accepted only for a pet that is bound and not revoked, whose owner has `aggregateMetrics` (U1) or `experienceEvents` (U2) on. Unbinding the pet revokes the board at its next connect, and closes a live session.
+- One session per pet: a newer verified session closes the older one with `replaced`.
+- `generation` in `proof` is reported as status only, never trusted as a projection.
+- Projections on a Ready session count as device-attested by the session proof (TLS to the pinned server + key proof). They go through the existing projection rules (envelope hash, strict payload, `petId` equal to the session's, `ProjectionKey` ordering, tombstones, U1/U2). `stored`/`duplicate`/`stale` mirror `201`/`200`/`409 conflict_stale_generation`.
+
+Limits: frames ≤ 4 KiB, except `projection` ≤ 16 KiB. Challenges per pet ≤ 10 per 10 min, plus a per-IP connection rate limit. The server closes the session after 3 × `heartbeatS` without a frame from the device. The device sends `ping` every `heartbeatS` (minimum 10 s) and drops the connection after 2 missed `pong`s.
+
+Close codes (WebSocket code + reason string = stable code; no other detail):
+
+| Code | Reason | When | Device reaction |
+| --- | --- | --- | --- |
+| 1008 | `unauthorized` | bad or missing signature, key mismatch, expired or reused nonce, steps out of order | backoff (2 s → 5 min, jitter) |
+| 1008 | `not_bound` | unknown, unbound or revoked pet | retry no sooner than 30 min, or after the app writes network settings, or after reboot |
+| 1008 | `consent_required` | owner has neither U1 nor U2 | same as `not_bound` |
+| 1008 | `rate_limited` | challenge or connection limit hit | backoff at the 5 min maximum |
+| 1002 | `unsupported_protocol` | unknown `schemaVersion`, subprotocol or message type, malformed JSON, binary frame | backoff at maximum; logged as a firmware/server mismatch |
+| 1009 | `frame_too_large` | size limit exceeded | backoff |
+| 1001 | `idle_timeout` / `going_away` | no frame within 3 × heartbeat / server shutdown | normal backoff from 2 s |
+| 4000 | `replaced` | a newer session for this pet was verified | do not reconnect for 5 min (avoids two boards fighting) |
+
+The device ignores any server message type it does not know (additive server changes) and never acts on one. Audit events `DEVICE_CONNECTED` / `DEVICE_REJECTED` carry the close code only. Online status: `GET /v1/devices/{deviceId}/transport/status` (connected at, last seen, firmware).
+
 ### Backups and suggestions
 
 `/v1/backups` (Phase 2, encrypted manifests) and `/v1/suggestions` (Phase 3, signed bounded) are placeholders; no shapes proposed yet.
@@ -123,7 +176,7 @@ Device holds an **ECDSA P-256** key generated on first boot (private key never l
 
 ```text
 "xuna.proof.v1" 0x00 | nonce[32] | petId[16 raw] | purpose u8 | generation u32 LE | payloadSha256[32]
-purpose: 1 bind, 2 projection
+purpose: 1 bind, 2 projection, 3 session (device connection, payload = own 65-byte public key; DC-0 2026-10-27, not implemented)
 ```
 
 `deviceProof = { "challengeId", "publicKey": base64(65-byte uncompressed SEC1), "signature": base64(64-byte r||s over SHA-256(message)) }`. Challenges are single-use and expire after 5 minutes. The first successful bind pins the device key to the pet (TOFU); later proofs must use that key. The board refuses projection proofs until it can hash its own export.
