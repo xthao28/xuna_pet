@@ -1,6 +1,38 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Voice WebSocket Streaming (VOICE-01..): Full-duplex low-latency voice streaming via /v1/voice with real-time PCM16 upload, immediate Whisper STT, streaming TTS playback, barge-in interruption, and 100% safe HTTP POST fallback; 280 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**. Before that: **Mobile & Backend: Full bilingual support (Vietnamese / English), XUNA voice settings (Edge TTS preview & selection: Hoai My, Nam Minh, Aria, Guy), dynamic audio wave ripples on mic, and Whisper ASR locale alignment; 273 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Speech subtitles on the board (owner: bubble above XUNA, replies only, Vietnamese + English): firmware native 352/352 PASS, ESP32 build SUCCESS; mobile 295/295 PASS, analyze 0 issues; not run on board/phone**. Before that: **AI reply gestures and the PE-4c signals fix on the voice WebSocket**.
+
+## 2026-10-27 — Speech subtitles on the board
+
+- **User requirement:** "bây giờ tôi muốn board hiển thị chữ của xuna nói được không", then "xuna update thêm cả tiếng anh rồi đó, để ý nhé". Owner chose the **subtitle bubble** (pet stays visible) and **XUNA's replies only** (never the owner's words). Record: [speech subtitles](docs/roadmap/voice/speech-subtitles-2026-10-27.md); decision added to [AGENTS.md](AGENTS.md).
+- **Firmware (`firmware/`, Windows machine):**
+  - `xuna/visual/SpeechBubble.h` (pure C++11): `SpeechTextAssembler` (frames of `[1, id, index, count, UTF-8…]`, ≤ 600 bytes, in order, empty = clear, control bytes cleaned), `wrapText` (word wrap by pixel width, long words cut between code points), `SpeechBubble` (3 lines per page, ~60 ms/char clamped 2–8 s, last page +3 s, then hidden), `renderSpeechBubble` (rounded body fitted to the widest line, tail at XUNA).
+  - `BleManager`: write characteristic `7a6e0010`, 16-frame queue, capability byte 3 bit 5 (`0x3f`), handle budget comment 22 → 26 (of 32). Speech never reaches the adapter; the log line has result + byte count only.
+  - `DisplayManager`: bubble region x 90–317, y 2–70 in a PSRAM buffer allocated on first use; effects pause under it; cards cover it; backlight stays full while it shows. `main.cpp` hands each complete text to the display.
+  - Font: `generate_ui_font.py` gives `kFontValue` all Vietnamese letters + typographic punctuation (241 glyphs); title/label unchanged. Regenerated with the backend venv's Pillow 13.0.0: old bitmaps identical, two advances ±1 px vs the Mac run.
+  - Checks: `pio test -e native` **352/352 PASS** (new `test_speech_bubble` 9/9); `pio run -e xuna_t_display_s3` **SUCCESS**, RAM 59,208 B (18.1 %), Flash 3,918,961 B (59.8 %), core purity PASS. `native_asan` not run (no libasan on this Windows toolchain). Not uploaded to the board.
+- **Mobile (`mobile/`):**
+  - Device: `SpeechTextCodec` (chunks to the connection's MTU − 3, cuts > 600 bytes after a whole word + "…"), `DeviceBleDataSource.writeSpeechFrame`/`maxWriteLength`/`supportsSpeechText` (simulator: unsupported), `DeviceRepository.showSpeech` (texts queued, never interleaved; errors translated), `ShowSpeechTextUseCase`.
+  - Voice: `VoiceRepository.playbackStarts` (a sentence when it starts playing) and `WatchPlaybackStartsUseCase`.
+  - `HomeController._showOnBoard`: spoken sentences as they play; unspoken AI replies whole when finished (HTTP and WS); local `_say` replies at once; only when connected and advertised; BLE errors logged by kind only.
+  - Checks: `fvm flutter analyze` 0 issues; `fvm flutter test` **295/295 PASS** (twice); `pubspec.lock` unchanged. A new playback test first used a fixed 10 ms wait and failed under full-suite load; it now waits on the condition.
+- **Not run:** board upload and visual check, phone, iOS MTU, write timing with 20-byte payloads (a 600-byte text is 38 writes).
+- **Next:** owner flashes the board (verified NVS backup first, as usual) and checks readability, bubble placement and sync with the voice in both languages.
+
+## 2026-10-27 — Cloud AI ↔ device: WS signals fix and AI reply gestures
+
+- **User requirement:** "xuna đã kết hợp giao tiếp AI cloud với thực hiện hành động ở firmware chưa?" → found (b) a gap and (a) no AI-chosen device action; owner: "b trước, rồi làm a luôn". For (a) the owner chose **"chỉ cử chỉ biểu cảm"** over adding play/quiet (opcode 2) or keeping AI out entirely, because it conflicted with backend AGENTS §1.4.
+- **(b) PE-4c signals on the voice WebSocket:** since `d471d39` a voice turn over `/v1/voice` sent no conversation tags, so the device's feelings no longer heard spoken chat. `websocket.py` now adds `signals` to `reply.finished` (same classifier and history count as the HTTP turn); mobile `VoiceWsReplyFinished.signals` is parsed (unknown names skipped) and `HomeController` forwards them over BLE opcode 8 when connected.
+- **(a) AI reply gestures:**
+  - Backend: `conversation/domain/gestures.py` (`ReplyGesture` = the 4 Track A variants, `GestureTagFilter` removes `<g:name>` tags anywhere in the streamed text, also when split across deltas, and reports the first valid one). `chat_turn` filters every reply and emits `GestureChosen` before the text; the prompt offers the tags only when the body/context has `gestures: true`. HTTP SSE event `gesture {name}`, WS message `{type: gesture, name}`. The tag never reaches the bubble or TTS.
+  - Mobile: `CloudTurnContext.gestures` = connected and the board advertises Track A (capability byte 4 bits 4–7); `CloudReplyGesture` / `VoiceWsGesture` (unknown names skipped); `HomeController._playGesture` re-checks connection and support, plays at most one per reply through `PreviewVariantUseCase` (opcode 1 args 4–7, display only), and a BLE failure is only logged. Fixed on the way: `StreamCloudReplyUseCase` rebuilt the context and would have dropped the flag.
+  - Rules: [backend/AGENTS.md](backend/AGENTS.md) §1.4 now names reply gestures as the single exception; root [AGENTS.md](AGENTS.md) records the owner decision; [contract draft](docs/architecture/XUNA_CLOUD_CONTRACT_DRAFT.md) and [WS design](docs/roadmap/voice/voice-websocket-design-2026-10-23.md) list the new field/events.
+- **Validation (Windows machine):**
+  - Backend: `pytest` **290 passed** with `XUNA_TEST_DATABASE_URL` (PostgreSQL 16, WS/API tests included); `ruff check` PASS; `mypy` 0 errors in 161 files; `alembic upgrade head` OK (no migration). `ruff format --check` still reports 5 files **untouched in this session** (`language_detector.py`, `edge_tts_adapter.py`, `knowledge/application/suggest.py`, `knowledge/domain/clustering.py`, `tests/modules/cognition/test_speech_adapters.py`), so `scripts/check.sh` stops at its first step until they are formatted in their own change.
+  - Mobile: `fvm flutter analyze` 0 issues; `fvm flutter test` **285/285 PASS**; `pubspec.lock` unchanged. `dart format` also reformatted older lines in `home_controller.dart`.
+  - **Not run:** phone, board, real LLM. Whether the provider follows the tag instruction (placement, frequency) is unmeasured; a wrong or missing tag only means no gesture.
+- **Known gap kept:** `HomeController` imports `features/voice/data/.../voice_websocket_data_source.dart` directly (from `d471d39`), against mobile AGENTS §1; not fixed here.
+- **Next:** owner phone + board check that a gesture plays during a voice/text reply and that the reply text never shows `<g:`; then tune the prompt if the model over- or under-uses gestures.
 
 ## 2026-10-27 — Voice WebSocket Streaming (VOICE-01..): Low-Latency Streaming, Barge-in & Safe Fallback
 

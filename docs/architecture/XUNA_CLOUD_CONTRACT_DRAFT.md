@@ -73,10 +73,15 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
                                                                        playful|quiet|lively|unhurried|sensitive|carefree;
                                                                        mood calm|glad|joyful|low|sad|bored; sent only
                                                                        for a pet with an identity)
-→ SSE events: delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?, signals?}
+  "gestures"?: true }                                                 (2026-10-27: the connected board advertises
+                                                                       Track A previews, so the AI may pick one)
+→ SSE events: gesture {name} | delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?, signals?}
              (PE-4c, 2026-10-25: signals = 0–2 closed tags from the owner's text,
               praise|scold|affection|playful|curious_question|long_chat; never stored;
               the app forwards them to the device as BLE opcode 8)
+             (2026-10-27: gesture = at most one, before the text, only when the body asked with
+              "gestures": true; name look_around|yawn_stretch|bounce_play|greet_nuzzle; the
+              app plays it as a Track A preview, opcode 1 args 4-7, display only)
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
              | speech_unavailable {code: "voice_unavailable"|"provider_unavailable"} (speak only, once)

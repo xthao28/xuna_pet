@@ -48,11 +48,12 @@ Server → client
 | `hello.ok` | `sessionId`, `downlink {format: mp3\|wav\|opus, sampleRate}`, `limits` | Session ready |
 | `vad.start` / `vad.end` | — | Speech detected / speech ended (VAD mode) |
 | `stt.final` | `text`, `asrMs` | Final transcript. The client must answer with `turn.commit` |
+| `gesture` | `name` | Same as the SSE `gesture` (2026-10-27): at most one, before the text, only when `context.gestures` is true |
 | `reply.delta` | `text` | Same as the SSE `delta` |
 | `tts.start` | `seq`, `text` | Next binary frames belong to sentence `seq` |
 | *(binary)* | Audio of the current sentence | Sent in `seq` order (the `spoken_turn` pipeline) |
 | `tts.end` | `seq` | End of sentence `seq` |
-| `reply.finished` | `latencyMs`, `firstAudioMs`, `spoken`, `timing {speechEndToTranscriptMs, commitToFirstTextMs}` | Turn done. Only numbers, no content |
+| `reply.finished` | `latencyMs`, `firstAudioMs`, `spoken`, `timing {speechEndToTranscriptMs, commitToFirstTextMs}`, `signals` | Turn done. Numbers, plus the PE-4c tags (same as the SSE `finished`, added 2026-10-27). No content |
 | `speech_unavailable` / `error` | `code` | Same codes as HTTP (`consent_required`, `provider_unavailable`, `voice_unavailable`, `rate_limited`, …) |
 
 ## 5. Turn flow (phone, push-to-talk)

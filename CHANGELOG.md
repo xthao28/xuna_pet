@@ -2,6 +2,19 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Board hiện chữ XUNA nói (phụ đề)
+
+- **Phụ đề trên board:** Câu XUNA nói hiện trong một bong bóng phía trên XUNA, pet vẫn nhìn thấy được. Khi XUNA nói thành tiếng, chữ đổi theo từng câu đúng lúc điện thoại đọc. Khi chỉ nhắn chữ, cả câu trả lời hiện ra rồi tự lật trang. Bong bóng tự ẩn sau vài giây.
+- **Tiếng Việt và tiếng Anh:** Font trên board giờ có đủ mọi chữ tiếng Việt có dấu và các dấu câu hay gặp trong tiếng Anh.
+- **Riêng tư:** Chỉ câu của XUNA hiện lên board, câu của bạn thì không. Board chỉ giữ chữ trong bộ nhớ tạm để hiển thị, không lưu lại và không ảnh hưởng tới tính cách hay những gì XUNA đã học.
+- Cần nạp firmware mới cho board. App và firmware cũ vẫn chạy bình thường (không có phụ đề). Firmware 352/352 bài kiểm thử PASS, ứng dụng 295/295 PASS. Chưa thử trên board và điện thoại thật.
+
+## 2026-10-27 — XUNA làm cử chỉ trên thiết bị theo câu trả lời AI
+
+- **Cử chỉ biểu cảm theo lời nói:** Khi trò chuyện với AI cloud (gõ chữ hoặc nói), XUNA có thể kèm một cử chỉ trên màn hình thiết bị như ngó nghiêng, ngáp vươn vai, nhún nhảy hay chào dụi đầu. Mỗi câu trả lời có tối đa một cử chỉ. Cử chỉ chỉ là diễn: không làm thay đổi nhu cầu, tính cách hay những gì XUNA đã học. Tính năng này chỉ bật khi thiết bị đang kết nối và có hỗ trợ cử chỉ.
+- **Sửa lỗi:** Khi nói chuyện bằng giọng qua kết nối WebSocket mới, lời khen, lời âu yếm… lại được chuyển xuống thiết bị như khi nhắn tin.
+- Backend 290 bài kiểm thử PASS (có PostgreSQL), ứng dụng 285/285 PASS. Chưa thử trên điện thoại, trên board và với AI thật.
+
 ## 2026-10-27 — Tối ưu hóa đàm thoại giọng nói 2 chiều siêu tốc qua WebSocket (VOICE-01..)
 
 - **Trò chuyện 2 chiều thời gian thực (Zero Upload Delay):** Âm thanh từ microphone điện thoại được truyền liên tục lên máy chủ qua luồng WebSocket ngay khi bạn đang nói, giúp máy chủ Whisper xử lý nhận diện tức thì ngay khi bạn vừa dứt lời mà không cần phải chờ tải cả tệp âm thanh lên như trước.
