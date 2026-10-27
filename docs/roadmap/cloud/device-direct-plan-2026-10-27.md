@@ -114,7 +114,10 @@ Done behind `XUNA_NET`: pure `xuna/net/CloudSession.h` (hello/challenge/proof/re
 - Platform `NetManager` (FreeRTOS task on core 0): Wi-Fi events, `esp_websocket_client` with the pinned CA compiled in, queues to and from the main loop; signing with `DeviceKey` on the network task (sign time is already logged by the bind flow).
 - Acceptance: host tests for every transition and malformed server frames; board: connects at boot, survives router and server restarts, shows Ready in the app; DC-1 metrics re-checked with the real task.
 
-### DC-5 — Automatic projection backup
+### DC-5 — Automatic projection backup — implemented 2026-10-27 (host tests, ahead of the gate)
+
+Done: firmware `xuna/net/ExportWriter.h` builds the payload from the board's own BLE projection bytes, mapped like `DeviceExportMapper`; `test_export_writer` reproduces the Dart golden payload and hash `fede139d…` byte for byte. `CloudBackup` (life loop) writes the frame into a PSRAM slot on each ready session and after a newer generation, at most every 15 min; `NetManager` sends it and reports the acknowledged generation in `7a6e0012`. Backend: `projection` frames go through the existing `ingest_projection` (new `session_attested=True`), acks `stored`/`duplicate`/`stale`/`consent_required`/`invalid`. App: the Wi-Fi sheet shows "Board tự backup gần nhất: thế hệ N" from `7a6e0012` (no extra network call; the plan's "lúc …" time from `GET …/projections/latest` is not shown). Projections still need U1 (`aggregateMetrics`), as on the app path; U2 alone opens the session but answers `consent_required`.
+
 
 - Firmware builds the `xuna.export.v1` envelope itself (C++ writer), checked byte-for-byte against the Dart-produced golden fixture `backend/tests/fixtures/xuna_export_v1_golden.json` (producing side stays Dart; the fixture is regenerated from Dart if the format changes).
 - Sent on connect and after a checkpoint that raised the generation, at most once per 15 min; the server stores it through the existing projection use case (consent U1/U2, ordering by `(PetId, generation)`, duplicates from the app path are no-ops) and answers `ack`.

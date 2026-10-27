@@ -109,7 +109,7 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 `confirmed` only after the app reports the device commit (generation that contains it).
 
-### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 implemented 2026-10-27 without `projection`)
+### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 and `projection` DC-5 implemented 2026-10-27, host tests only)
 
 The board connects by itself over Wi-Fi. One WebSocket over TLS per board, authenticated by the device key on every connect. In this slice data goes **up only**: the server never sends anything that changes device state (H2).
 
@@ -144,6 +144,8 @@ Handshake rules:
 - One session per pet: a newer verified session closes the older one with `replaced`.
 - `generation` in `proof` is reported as status only, never trusted as a projection.
 - Projections on a Ready session count as device-attested by the session proof (TLS to the pinned server + key proof). They go through the existing projection rules (envelope hash, strict payload, `petId` equal to the session's, `ProjectionKey` ordering, tombstones, U1/U2). `stored`/`duplicate`/`stale` mirror `201`/`200`/`409 conflict_stale_generation`.
+
+A board-built export (DC-5) is the same `xuna.export.v1` payload the app builds from the same BLE projections (firmware `ExportWriter`, checked against the Dart golden hash). Two values differ by nature: `app.version` is `firmware/<version>`, and `exportedAtUtc` is the board's phone-synced UTC, or the literal `"unknown"` when the board has no trusted time (the board never guesses a time). Rejections are answered with an `ack` and keep the session open.
 
 Limits: frames ≤ 4 KiB, except `projection` ≤ 16 KiB. Challenges per pet ≤ 10 per 10 min, plus a per-IP connection rate limit. The server closes the session after 3 × `heartbeatS` without a frame from the device. The device sends `ping` every `heartbeatS` (minimum 10 s) and drops the connection after 2 missed `pong`s.
 

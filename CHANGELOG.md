@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Board tự backup lên cloud (DC-5, bản thử)
+
+- Trong bản firmware thử `xuna_net`, mỗi lần kết nối được máy chủ và sau khi XUNA lưu một bản mới (tối đa 15 phút một lần), board tự gửi bản sao lưu giống hệt bản ứng dụng tạo ra. Máy chủ chỉ lưu khi chủ đã bật quyền U1, và đánh dấu đây là bản do chính board gửi.
+- Trang WiFi trong ứng dụng hiện thế hệ của bản backup gần nhất mà board tự gửi.
+- Firmware 373/373, backend 329/329, ứng dụng 309/309 bài kiểm thử PASS. Chưa chạy trên board.
+
 ## 2026-10-27 — Board tự kết nối và xác thực với máy chủ (DC-4, bản thử)
 
 - Trong bản firmware thử `xuna_net`, khi đã có WiFi và XUNA đã nở, board tự mở kết nối bảo mật tới máy chủ (chỉ tin chứng chỉ của máy chủ nhà), ký chứng minh bằng khóa riêng của mình, rồi giữ nhịp tim. Mất mạng hay máy chủ tắt thì board tự thử lại theo khoảng chờ tăng dần, cuộc sống của XUNA vẫn bình thường.

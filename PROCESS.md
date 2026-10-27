@@ -1,6 +1,17 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-4 firmware cloud session behind `XUNA_NET` (native 370/370; host only)**. Before that: **DC-2 Wi-Fi setup over BLE (mobile 309/309)**, **DC-3 backend gateway (backend 324/324)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-5 automatic projection backup (firmware 373/373, backend 329/329, mobile 309/309; host only). DC-0…DC-5 done on the host; E14 gate and DC-6 need the board**.
+
+## 2026-10-27 — Device-direct DC-5: automatic projection backup (host only)
+
+- **User requirement:** continue the DC sessions without asking (owner 2026-10-27). Built ahead of the E14 gate; nothing flashed.
+- **Firmware (`firmware`, `XUNA_NET`):** pure `xuna/net/ExportWriter.h` (payload from the BLE life/memory/explanation/identity bytes with the Dart mapper's names and checks, compact JSON, SHA-256 envelope, projection frame, RFC 3339 ms time or `"unknown"`); `CloudSession` parses `ack`; `NetManager` sends one offered frame per ready session from a PSRAM slot and records the acknowledged generation in `7a6e0012`; `CloudBackup` on the life loop builds it on each new ready session and after a newer generation (≥ 15 min apart), logging `backup_built … build_us`.
+- **Backend (`backend`):** `/v1/devices/connect` accepts `projection` (≤ 16 KiB; other frames still ≤ 4 KiB, an oversize frame is `frame_too_large` even when malformed) and answers `ack`; `ingest_session_projection` reuses `memory.ingest_projection` with `session_attested=True` (stored projections are `deviceAttested`).
+- **Mobile (`mobile`):** Wi-Fi sheet row "Board tự backup gần nhất: thế hệ N" (vi/en).
+- **Validation (Windows):** firmware `test_export_writer` 3/3 (Dart golden payload and hash `fede139d…`, worst-case size fits, out-of-range bytes refused, civil-time vectors), `test_cloud_session` 6/6 with acks, native **373/373**; `xuna_net` builds with a local CA (RAM 82,704 B / Flash 4,398,305 B); default and baseline envs unchanged. Backend: WS projection tests (stored → duplicate → stale → invalid → stored, `deviceAttested` true via `GET …/projections/latest`; U2-only → `consent_required`; oversize ping → 1009), full pytest **329/329**, ruff 0, mypy 0. Mobile analyze 0, test **309/309**.
+- **Not run:** board, phone, real Wi-Fi/TLS, uvicorn WebSocket (library missing).
+- **Incident (fixed before reporting):** a directory-wide `dart format` during DC-2 reformatted 10 unrelated mobile files into the DC-2 commit; they were restored and the unpushed commit amended (mobile `619239d`, root `169214f`). Later runs format only the changed files.
+- **Next:** (1) owner: run E14 with the board ([runbook](docs/roadmap/cloud/E14-runbook.md)); (2) owner decision: add `websockets` (or `wsproto`) to the backend so uvicorn can serve the device and voice WebSockets; (3) owner decision: what "unbind pet" means for cloud data (needed for DC-6 "unbind → refused"); (4) after a pass: switch `XUNA_NET` on, then DC-6 board acceptance. Status-card line "WiFi/Cloud" still open.
 
 ## 2026-10-27 — Device-direct DC-4: firmware cloud session (host only)
 
