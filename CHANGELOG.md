@@ -2,7 +2,12 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
-## 2026-10-27 — Tự động gợi ý lĩnh vực và trích xuất kiến thức thông minh từ cuộc trò chuyện (KD-4)
+## 2026-10-27 — Hỗ trợ giọng nói và trò chuyện song ngữ Anh - Việt mượt mà
+
+- **Nói tiếng Anh tự nhiên qua micro:** Tính năng nhận diện giọng nói (Whisper) được chuyển sang cơ chế tự động nhận diện ngôn ngữ. Giờ đây bạn có thể nói tiếng Anh hoặc tiếng Việt vào micro điện thoại mà không bị ép dịch hay phiên âm sai sang tiếng Việt nữa.
+- **Phát âm chuẩn tiếng Anh bản ngữ:** Khi XUNA trả lời bằng tiếng Anh, hệ thống tự động phát hiện và chuyển sang giọng đọc tiếng Anh bản ngữ chuẩn Mỹ (`en-US-AriaNeural`), giúp phát âm rõ ràng, đúng trọng âm và ngữ điệu tự nhiên, không còn bị đọc bằng giọng tiếng Việt ngắc ngứ.
+- **Tính cách thú cưng song ngữ:** XUNA tự động trò chuyện bằng ngôn ngữ bạn dùng (nói tiếng Việt thì xưng "mình" gọi "bạn", nói tiếng Anh thì xưng "XUNA" hoặc "I" và gọi "you"), vẫn giữ trọn nét ấm áp, thông minh và tinh nghịch của một bé pixel pet.
+- Toàn bộ 231 bài kiểm thử tự động của backend đều đạt kết quả tốt, mã nguồn sạch hoàn toàn.
 
 - **Gợi ý chủ đề tự động:** Khi bạn chia sẻ các kiến thức chưa phân loại (từ 4 điều trở lên), hệ thống tự động gom nhóm và đề xuất tạo một lĩnh vực mới với tên gọi và mô tả tiếng Việt phù hợp, hoặc đề xuất thêm vào lĩnh vực bạn đã có nếu nội dung tương đồng để tránh trùng lặp.
 - **Trích xuất kiến thức khi trò chuyện:** Trong các cuộc trò chuyện hàng ngày với XUNA, hệ thống có thể tự nhận biết những câu nói mang tính kiến thức thực tế (loại bỏ câu hỏi, chào hỏi hay thông tin nhạy cảm), tự động tìm chủ đề phù hợp và đưa ra đề xuất để bạn xác nhận trước khi lưu.

@@ -1,6 +1,29 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: backend suggestion engine & benchmark KD-4 (clustering, duplicate prevention, 14-day expiration, embedding adapter OpenAICompatibleEmbedder, chat extraction Q3, Vietnamese 60-fact benchmark 88.33% accuracy, 100% noise rejection; 211 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**. Before that: **M06 knowledge domains: mobile UI & orchestration KD-5 (entities, mappers, remote data source, repository, 13 use cases, multi-step orchestration flows, Vietnamese locales sync, HomeKnowledgeCard with 3-dot levels, HomeKnowledgeManageSheet with 5 slots & preset chips, HomeTeachKnowledgeSheet with 280-char input & confirmation, HomeKnowledgeSuggestionBanner, journal tab integration; 269/269 mobile tests PASS, flutter analyze 0 issues)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Voice & conversation: bilingual Vietnamese / English support (pure stdlib language_detector, Edge TTS auto voice en-US-AriaNeural / vi-VN-HoaiMyNeural, Whisper ASR auto-detect language with XUNA_ASR_AUTO_DETECT=true, bilingual persona prompt; 231 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**. Before that: **M06 knowledge domains: backend suggestion engine & benchmark KD-4 (clustering, duplicate prevention, 14-day expiration, embedding adapter OpenAICompatibleEmbedder, chat extraction Q3, Vietnamese 60-fact benchmark 88.33% accuracy, 100% noise rejection; 211 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**.
+
+## 2026-10-27 — Voice & conversation: bilingual Vietnamese / English support (Backend)
+
+- **User requirement:** Bổ sung hỗ trợ tiếng Anh cho XUNA: khắc phục lỗi khi người dùng nói tiếng Anh vào mic nhận dạng sai (do Whisper bị ép cứng `language="vi"`), sửa lỗi phát âm méo mó/sai phát âm khi Cloud trả về tiếng Anh (do Edge TTS bị ép dùng giọng tiếng Việt `vi-VN-HoaiMyNeural` đọc chữ tiếng Anh), và nâng cấp prompt trò chuyện song ngữ tự nhiên.
+- **Backend Implementation:**
+  - **Language Detection (Pure stdlib):**
+    - `modules/cognition/domain/language_detector.py`: xây dựng `detect_text_language(text: str, default: Locale)` nhận diện chính xác tiếng Việt qua dấu thanh, từ vựng không dấu đặc trưng, hoặc nhận diện tiếng Anh qua từ vựng thông dụng phổ biến, 0 dependencies bên ngoài.
+  - **TTS Auto-Voice Selection:**
+    - `modules/cognition/infrastructure/edge_tts_adapter.py`: nâng cấp `EdgeSpeechSynthesizer.synthesize` tự động nhận diện ngôn ngữ của câu văn. Nếu câu trả lời là tiếng Anh -> tự động chuyển sang giọng tiếng Anh bản ngữ chuẩn Mỹ `en-US-AriaNeural`; nếu là tiếng Việt -> dùng giọng truyền cảm `vi-VN-HoaiMyNeural`. Ngay cả khi biến môi trường đặt giọng tiếng Việt, văn bản tiếng Anh vẫn được đọc bằng giọng tiếng Anh chuẩn xác, không bị nuốt âm hay phát âm ngọng.
+  - **ASR Whisper Multilingual Auto-Detect:**
+    - `modules/cognition/infrastructure/openai_transcription.py`: hỗ trợ `locale: Locale | None = None`. Khi không truyền `locale`, adapter không gửi trường `language` -> Whisper tự động kích hoạt **Auto-detect Language** (nhận diện cả tiếng Anh và tiếng Việt với độ chính xác cao).
+    - `core/config.py`: bổ sung cấu hình `asr_auto_detect: bool = True` (`XUNA_ASR_AUTO_DETECT`).
+    - `modules/conversation/api/routes.py`: endpoint `POST /v1/speech/transcriptions` tự động áp dụng `asr_auto_detect` để gán `locale = None` -> ứng dụng di động hiện tại trên điện thoại thật có thể nói tiếng Anh và được nhận diện chuẩn ngay lập tức mà không cần build lại app.
+  - **Bilingual Persona Prompt:**
+    - `modules/conversation/application/chat_turn.py`: cập nhật persona song ngữ. Khi người dùng nói tiếng Anh, XUNA tự động trò chuyện bằng tiếng Anh (xưng "XUNA" hoặc "I", gọi "you"), giữ trọn tính cách thông minh, ấm áp. Khi nói tiếng Việt, xưng "mình" gọi "bạn". `build_request` tự động phát hiện ngôn ngữ của câu hỏi để gắn `locale` tương ứng.
+- **Validation:**
+  - `tests/modules/cognition/test_language_detector.py`: 17/17 test cases PASS.
+  - `tests/modules/cognition/test_speech_adapters.py`: bổ sung 2 test cases kiểm tra ASR auto-detect và Edge TTS tự động chọn `en-US-AriaNeural` -> 12/12 PASS.
+  - `tests/modules/conversation/test_chat_turn.py`: bổ sung test case tự động phát hiện ngôn ngữ của câu hỏi -> 13/13 PASS.
+  - Toàn bộ backend test suite: **231 passed, 42 skipped (do không có DB PostgreSQL URL), 0 failed**.
+  - `ruff check .`: **All checks passed! (0 linter errors)**.
+  - `mypy src`: **Success: no issues found in 160 source files (0 type errors)**.
+  - `pytest tests/test_architecture.py`: **2 passed (100%)** bảo đảm ranh giới Clean Architecture DAG.
 
 ## 2026-10-27 — M06 knowledge domains: backend suggestion engine & benchmark KD-4 (Backend)
 
