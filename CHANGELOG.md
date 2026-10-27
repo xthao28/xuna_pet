@@ -2,6 +2,11 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Board tự kết nối và xác thực với máy chủ (DC-4, bản thử)
+
+- Trong bản firmware thử `xuna_net`, khi đã có WiFi và XUNA đã nở, board tự mở kết nối bảo mật tới máy chủ (chỉ tin chứng chỉ của máy chủ nhà), ký chứng minh bằng khóa riêng của mình, rồi giữ nhịp tim. Mất mạng hay máy chủ tắt thì board tự thử lại theo khoảng chờ tăng dần, cuộc sống của XUNA vẫn bình thường.
+- Firmware 370/370 bài kiểm thử PASS. Chưa chạy trên board.
+
 ## 2026-10-27 — Cài WiFi cho XUNA từ ứng dụng (DC-2, bản thử)
 
 - **Kết nối WiFi cho XUNA:** Tab Thiết bị có thêm nút mở trang cài WiFi: nhập tên mạng, mật khẩu và máy chủ, rồi gửi cho board qua Bluetooth. Trang hiện trạng thái WiFi do board báo về. Có nút "Quên WiFi" (phải xác nhận).

@@ -104,7 +104,10 @@ Done: `GET /v1/devices/connect` (transport module), `ProofPurpose.SESSION = 3`, 
 - Per-pet rate limit on challenges; message size limit; idle timeout at 3 × heartbeat.
 - Tests (PostgreSQL): handshake OK, wrong key, replayed nonce, expired nonce, unbound pet, consent off, oversize frame, heartbeat timeout, two connections for one pet (the newer wins).
 
-### DC-4 — Firmware cloud session
+### DC-4 — Firmware cloud session — implemented 2026-10-27 (host tests, ahead of the gate)
+
+Done behind `XUNA_NET`: pure `xuna/net/CloudSession.h` (hello/challenge/proof/ready/ping, flat-JSON reader, close-code mapping, backoff 2 s → 5 min with ±25 % jitter, 30 min after `not_bound`/`consent_required`, 5 min after `replaced`/`rate_limited`/protocol errors, dead link after two missed pongs), `xuna/base/Base64.h`, `ProofPurpose::Session = 3` (golden SHA-256 shared with the backend; BLE still refuses every purpose but Bind). `NetManager` runs the session on core 0 with the pinned CA (`include/E14DevCa.h` required, `#error` otherwise) and subprotocol `xuna.device.v1`. Deviation: the **life loop signs** the session proof on request (one signature per connection attempt), because `DeviceKey` holds one mbedTLS context and boosts the CPU clock globally; signing from core 0 would race the BLE bind proof. Board acceptance and the DC-1 metrics re-check need the board and a backend served with a WebSocket library (`websockets`/`wsproto`, not installed).
+
 
 - Pure core `xuna/net/CloudSession.h` (host-tested): states Off → WifiJoining → Connecting → Hello → Proving → Ready → Backoff; exponential backoff with jitter (2 s → 5 min); message encode/decode for the few fixed JSON frames; never touches life state.
 - `DeviceProof.h`: purpose 3 Session, same message layout as bind.

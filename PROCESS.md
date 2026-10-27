@@ -1,6 +1,14 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-2 Wi-Fi setup over BLE (firmware `XUNA_NET` off by default, native 364/364; mobile 309/309; host only)**. Before that: **DC-3 backend gateway (backend 324/324)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-4 firmware cloud session behind `XUNA_NET` (native 370/370; host only)**. Before that: **DC-2 Wi-Fi setup over BLE (mobile 309/309)**, **DC-3 backend gateway (backend 324/324)**.
+
+## 2026-10-27 — Device-direct DC-4: firmware cloud session (host only)
+
+- **User requirement:** continue the DC sessions without asking (owner 2026-10-27). Built ahead of the E14 gate, behind `XUNA_NET`; nothing flashed.
+- **Firmware (`firmware`):** pure `xuna/net/CloudSession.h` (hello → challenge → proof → ready → ping/pong; unknown server messages ignored; strict checks: `schemaVersion` 1, 32-byte nonce, heartbeat 10–600 s; close codes → `NetError`; backoff as in the contract) with a flat JSON reader, `xuna/base/Base64.h` (RFC 4648 vectors, exact-size decode), `ProofPurpose::Session = 3`. `NetManager` (core 0): `esp_transport_ws` + `esp_transport_ssl` with the pinned CA, path `/v1/devices/connect`, subprotocol `xuna.device.v1`, 75 s handshake guard, network projection reports cloud state and the last error; the life loop signs the session proof on request (`serviceSigning`, logs `cloud_proof ok sign_us`) and hands over the PetId once the pet has one (an Egg stays offline).
+- **Backend (`backend`):** session-purpose golden test (`448f0b90…1aa4`, same as firmware) and a test that the exact firmware frames pass the strict parser.
+- **Validation (Windows):** firmware `test_cloud_session` 6/6 (incl. BLE refusing purpose 3), native **370/370**; `xuna_net` builds with a local CA header (RAM 82,656 B / Flash 4,393,441 B) and stops with `#error` without it; default and baseline envs unchanged. Backend `test_device_session.py` 15/15, `test_device_proof.py` 4/4.
+- **Not run:** no board, no real TLS against mbedTLS, no uvicorn WebSocket (library missing). DC-1 metrics not re-checked with the real task.
 
 ## 2026-10-27 — Device-direct DC-2: Wi-Fi setup over BLE (firmware + mobile, host only)
 
