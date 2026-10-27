@@ -1918,7 +1918,7 @@ Combines the offline learning in §9–§10 with an optional online layer. Ratio
 ### 22.3 Transport
 
 - **Stage 1 — phone gateway.** BLE ↔ app ↔ HTTPS backend. No network stack in firmware. First choice for O1–O4.
-- **Stage 2 — device direct.** Wi-Fi + MQTT over TLS, for device-first use without a phone.
+- **Stage 2 — device direct.** Wi-Fi + MQTT over TLS, for device-first use without a phone. **Amended (owner 2026-10-27):** the first Stage 2 slice uses WebSocket over TLS to the backend instead of MQTT, still gated by E14 ([device-direct plan](../roadmap/cloud/device-direct-plan-2026-10-27.md)); the MQTT details below stay for reference.
   - Topics `xuna/v1/{deviceId}/up/events`, `up/state`, `down/cmd`, `down/suggest`; LWT on `status`.
   - QoS 1 with idempotent IDs for events, commands and suggestions; retained messages only for status.
   - Audio is not carried over MQTT (WebSocket/HTTP per VOICE work).

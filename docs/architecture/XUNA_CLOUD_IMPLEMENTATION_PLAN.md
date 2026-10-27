@@ -138,6 +138,9 @@ restores the prior local behavior.
 
 Only after E14 plus D19/D22. Add Wi-Fi + MQTT/TLS for bounded events,
 commands, status and suggestions; audio stays outside MQTT.
+Amended by the owner 2026-10-27: the first slice uses WebSocket/TLS to the
+backend (one TLS session, no broker) for connection, status and projection
+backup only; see the [device-direct plan](../roadmap/cloud/device-direct-plan-2026-10-27.md).
 
 Acceptance: measured BLE/Wi-Fi/TLS resource budget passes on the actual board;
 reconnect and QoS 1 duplicates are safe; revoked credentials stop access;

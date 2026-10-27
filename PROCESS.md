@@ -1,6 +1,15 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Speech subtitles on the board (owner: bubble above XUNA, replies only, Vietnamese + English): firmware native 352/352 PASS, ESP32 build SUCCESS; mobile 295/295 PASS, analyze 0 issues; not run on board/phone**. Before that: **AI reply gestures and the PE-4c signals fix on the voice WebSocket**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct cloud plan: owner decisions DC-D1…D8 recorded, sessions DC-0…DC-6 Proposed, nothing implemented**. Before that: **Speech subtitles on the board (firmware 352/352, mobile 295/295; committed and pushed; not run on board/phone)**.
+
+## 2026-10-27 — Device-direct cloud connection: decisions and plan
+
+- **User requirement:** "xuna có thể giao tiếp trực tiếp với cloud mà không cần thông qua app chưa?" → not yet (no network code in the firmware; `MqttTransport.h` is test-only; the backend broker is in-memory; no mic/speaker on the board). Then: "gửi cho tôi các quyết định cần thiết để bạn lên plan chi tiết".
+- **Owner decisions (all as recommended):** connection foundation first (no voice, no downlink commands); WebSocket/TLS to the backend instead of MQTT; Wi-Fi set up by the app over BLE; voice on the board as a separate later plan; device key challenge on every connection; the owner's existing consents; E14 first with thresholds; backend on the dev machine in the LAN with a pinned self-made CA.
+- **Plan:** [device-direct plan](docs/roadmap/cloud/device-direct-plan-2026-10-27.md), sessions DC-0 (contract, ADR-0010, threat model) → DC-1 E14 gate on the board → DC-2 Wi-Fi setup over BLE ∥ DC-3 backend gateway → DC-4 firmware cloud session → DC-5 automatic projection backup → DC-6 board acceptance.
+- Checked in the pinned framework: `esp_websocket_client`, `mqtt`, `mbedtls`, `wifi_provisioning` bundled; mbedTLS allocates in internal RAM (main E14 risk); certificate dates unchecked (TLS independent of the board clock); Wi-Fi/BLE coexistence enabled.
+- Docs: AGENTS decision entry; plan §22.3 and Cloud plan Phase 4 marked amended (WSS instead of MQTT for the first Stage 2 slice).
+- **Next:** owner confirms the E14 thresholds in plan §4 DC-1, then DC-0 + DC-1 when requested. Not committed.
 
 ## 2026-10-27 — Speech subtitles on the board
 
