@@ -1,8 +1,71 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: research and detailed plan (open, owner-named domains with XUNA suggestions; sessions KD-1 → KD-7; docs only)**. Before that: **M06 direction change: knowledge domains instead of visual growth stages; KD-0 removed the growth-stage code and art (249 mobile tests PASS, mobile `d221476`, firmware `1cc59dd`)**. Before that: **M06 review fix: Growth card shows only a device-reported stage, stage sprites redrawn as temporary art (252 mobile tests PASS, mobile `9a9c607`, firmware `d42ae88`)**. Before that: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: protocol, board & mobile integration KD-2 (Opcode 10 subOps 1..7, characteristic 7a6e000f, capability byte 3 bit 4, LifeCore commit-first, BleManager, golden fixture generator knowledge_v1.json, mobile entities/usecases/models/mappers/codec/simulator/tests; 343/343 firmware tests PASS, 258/258 mobile tests PASS, flutter analyze 0 issues)**. Before that: **M06 knowledge domains: device knowledge core KD-1 (KnowledgeProfile, KnowledgeCodec section 13, KnowledgeProjection 64 B, Life Lab scenario, 15/15 test_knowledge PASS, 340/340 native suite PASS, budget measured)**.
 
-## 2026-10-27 — M06 knowledge domains: research and detailed plan (Docs)
+## 2026-10-27 — M06 knowledge domains: protocol, board & mobile integration KD-2 (Firmware + Mobile)
+
+- **User requirement:** Hoàn thành session KD-2 của milestone M06 Knowledge Domains: wire Opcode 10, BLE characteristic `7a6e000f`, capability, events, NVS persistence, commit-first pipeline trong firmware, sinh fixture vàng `knowledge_v1.json`, và tích hợp toàn diện trên mobile companion app (entity, use cases, models, mappers, codec, BleDataSourceImpl, simulator, golden + unit tests).
+- **Firmware Implementation:**
+  - `firmware/lib/xuna_core/include/xuna/time/ClockModel.h`: thêm `uint16_t localDayIndex(uint64_t mono) const` tính số ngày kể từ 2020-01-01 khi đồng hồ tin cậy, 0 khi chưa tin cậy.
+  - `firmware/lib/xuna_core/include/xuna/event/EventTypes.h`: thêm các event `KnowledgeSlotChanged` (`0x63`), `KnowledgeEvidenceChanged` (`0x64`), `KnowledgeLevelChanged` (`0x65`).
+  - `firmware/lib/xuna_core/include/xuna/persist/SnapshotCodec.h`: giữ `kBudget = 1536` B theo quy chuẩn plan §7.5 (snapshot fresh + full knowledge chỉ 1264 B, nằm an toàn trong budget).
+  - `firmware/lib/xuna_core/include/xuna/life/LifeCore.h`:
+    - Tích hợp `KnowledgeProfile knowledge_`, getter `knowledge()`, `syncKnowledge()`.
+    - `restore()`: nạp section 13 knowledge từ NVS snapshot.
+    - `forget()`: reset toàn bộ knowledge profile.
+    - `handleKnowledge(subop, slot, slot2, factKey, now)`: thực hiện commit-first (§9.5) trước khi trả kết quả `KnowledgeCommandResult`.
+  - `firmware/lib/xuna_core/include/xuna/protocol/V1LifeCoreAdapter.h`:
+    - Dispatch opcode 10 (`kOpcodeKnowledge`) với sub-ops 1..7 (`OpenSlot`, `SetActive`, `SetResting`, `ClearSlot`, `AddEvidence`, `RemoveEvidence`, `MoveEvidence`).
+    - Nối `enhancedLearning_` với `knowledge`, `encodeKnowledge()` chiếu 64-byte payload.
+  - `firmware/include/BleManager.h`:
+    - Bật capability byte 3 bit 4 (`0x1f`).
+    - Khởi tạo characteristic `7a6e000f-8c44-4db6-9f61-2b7d5300a101` (PROPERTY_READ).
+    - Cập nhật và xuất bản knowledge projection định kỳ trong `update()`.
+  - `firmware/test/test_v1_adapter/test_main.cpp`: bổ sung 3 test cases `enhanced_knowledge_command_flow_and_persistence`, `baseline_rejects_knowledge_command`, và `knowledge_command_argument_validation`.
+  - `firmware/sim/knowledge_golden.cpp`: tool mô phỏng firmware sinh ra fixture vàng UTF-8 `mobile/test/fixtures/firmware/knowledge_v1.json` gồm 11 bước bao phủ mở slot, thêm fact, thêm trùng, di chuyển giữa 2 slot, chuyển resting/active, xóa fact, và xóa slot.
+- **Mobile Implementation:**
+  - Domain Entities: `knowledge_slot_state.dart`, `knowledge_level.dart`, `knowledge_reason.dart`, `knowledge_journal_entry.dart`, `knowledge_slot.dart`, `knowledge_profile.dart`.
+  - Domain Use Cases: `read_knowledge_profile_use_case.dart`, `open_knowledge_slot_use_case.dart`, `set_knowledge_slot_state_use_case.dart`, `clear_knowledge_slot_use_case.dart`, `add_knowledge_evidence_use_case.dart`, `remove_knowledge_evidence_use_case.dart`, `move_knowledge_evidence_use_case.dart`.
+  - Data Layer:
+    - `knowledge_profile_model.dart`: giải mã 64-byte projection, validate header/slots/journal.
+    - `knowledge_mapper.dart`: ánh xạ binary models sang domain entities.
+    - `device_protocol.dart`: thêm `opcodeKnowledge = 10`, `knowledgeSubOp*` (1..7), `capabilityKnowledge = 1 << 4`.
+    - `device_command_model.dart`: thêm các trường `slot`, `slot2`, `factKey` và named constructors.
+    - `protocol_codec.dart`: encode/decode 16-byte command, `supportsKnowledge` check.
+    - `device_ble_data_source_impl.dart`: quản lý characteristic 15 (`7a6e000f`), getter `supportsKnowledge`, phương thức `readKnowledge()`.
+    - `simulator_device_ble_data_source.dart`: mô phỏng đầy đủ 5 slots, tính level theo quy tắc $F=\{3, 10, 25\}, D=\{1, 3, 5\}$, journal seq & ring buffer, xử lý opcode 10 và `readKnowledge()`.
+    - `device_repository.dart` & `device_repository_impl.dart`: hoàn thiện interface và implementation cho toàn bộ các use cases knowledge.
+  - Tests:
+    - `mobile/test/features/device/data/model/knowledge_profile_model_test.dart`: 5 test cases kiểm tra giải mã, mapping và các trường hợp lỗi boundary/corrupt.
+    - `mobile/test/features/device/data/firmware_knowledge_golden_test.dart`: 4 test cases kiểm tra schema metadata, encode frame byte-identical, decode projection, và chạy chuỗi 11 lệnh golden trên simulator.
+- **Validation:**
+  - Firmware native tests: **343/343 test cases PASSED (100%)** qua toàn bộ 40 test suites.
+  - Mobile flutter tests: **258/258 test cases PASSED (100%)** qua toàn bộ repository test suites.
+  - Mobile static analysis: `fvm flutter analyze` **No issues found!** (0 errors, 0 warnings).
+- **Next steps:** KD-3 (Backend lõi: module `knowledge`, migration 0009, API, CandidateType.KNOWLEDGE, fact_key, lexical domain matching, retrieval).
+
+- **User requirement:** "làm session KD-1 — lõi Knowledge trên thiết bị của milestone M06" theo plan `knowledge-domains-plan-2026-10-27.md` (§0, §1, §3, §5.1, §5.2, §5.3, §9 KD-1, §12) và AGENTS.md.
+- **Implemented:**
+  - `firmware/lib/xuna_core/include/xuna/knowledge/KnowledgeProfile.h`: 5 slots, 32 fact keys per slot, states Empty/Active/Resting, typed `Result`, circular journal of 4 entries (`KnowledgeJournalEntry`), level derived from `F = {3, 10, 25}` and `D = {1, 3, 5}`. Idempotent `add` returns `Duplicate` without mutating state, untrusted day (`trustedDay = 0`) increments facts but not days, `remove` preserves days history, `move` transfers evidence atomically and journals both slots (reason 4). Pure C++11, zero dynamic allocation, no STL containers, no exceptions.
+  - `firmware/lib/xuna_core/include/xuna/knowledge/KnowledgeCodec.h`: snapshot section 13 codec (variable size 66 B min to 706 B max). Validates level matches computed level (or Corrupt), no duplicate keys in slot, `keyCount <= 32`, `state <= 2`, returns `TooNew` for `slotCount > 5` or `maxKeys > 32`.
+  - `firmware/lib/xuna_core/include/xuna/knowledge/KnowledgeProjection.h`: 64-byte read-only BLE projection for characteristic `7a6e000f`, matching plan §5.3 (version=1, size=64, clockTrusted flag bit 0, 5 slots x 8 B, 4 journal entries x 4 B newest first).
+  - `firmware/lib/xuna_core/include/xuna/persist/SnapshotCodec.h`: added `SectionId::Knowledge = 13` (optional, version 1), `SnapshotKnowledge` struct, wired into `LifeSnapshotV2`, `encodedSize`, `encode`, and `parseSection` (unreadable or newer section skipped gracefully without failing snapshot into ERROR_SAFE).
+  - `firmware/lib/xuna_core/include/xuna/event/EventTypes.h`: added comment `obsolete 2026-10-27, never reuse` for `0x60` and `0x61`.
+  - `firmware/lib/xuna_core/include/xuna/lab/LifeScenarios.h`: added `KnowledgeDualReport` and `LifeScenarios::knowledgeTwoHistories()` comparing steady teaching (4 days, 12 facts -> Level 2) vs cramming (1 day, 25 facts -> Level 1); journal entries explain level transitions.
+  - `firmware/test/test_knowledge/test_main.cpp`: 15 test cases covering level boundaries table, duplicate rejection, remove existing/missing, clear, move edge cases, add to empty/resting, trusted vs untrusted days, saturation at 255, capacity at 32 keys, journal ring buffer wrapping, codec round-trip and corruption sweeps, projection exact byte layout, snapshot integration with and without section 13, Life Lab scenario, and snapshot budget measurement.
+- **Validation:**
+  - `pio test -e native -f test_knowledge`: **15/15 PASS**.
+  - `pio test -e native -f test_personality_persist -f test_snapshot_v2 -f test_life_lab -f test_life_lab_scenarios`: **45/45 PASS**.
+  - `pio test -e native`: **340/340 PASS** across all 41 test suites.
+  - `tools/check_core_purity.py`: PASS on all builds.
+  - `pio test -e native_asan -f test_knowledge`: ERRORED at link stage on Windows host because MinGW/UCRT64 GCC toolchain lacks `libasan` and `libubsan` (`cannot find -lasan`, `cannot find -lubsan`).
+- **Snapshot Budget Measurement:**
+  - `KnowledgeCodec::kMaxSize = 706 B`.
+  - Fresh snapshot + full knowledge (706 B): **1264 B** (within `kBudget = 1536 B`).
+  - Worst-case theoretical snapshot (all optional sections simultaneously at max: personality 482 B + habit 152 B + stated 92 B + product learner 458 B + knowledge 706 B): **1906–2002 B**, which exceeds the current `kBudget = 1536 B` by **+370 B to +466 B**.
+  - Reported to owner for decision before KD-2: raise `kBudget` (e.g. to 2048 B, well within ESP32 NVS blob capability) vs fallback to `u16` keys (386 B max for section 13).
+- **Not run:** physical ESP32 board, mobile companion app.
+- **Next step:** KD-2 (Protocol + board: opcode 10, characteristic `7a6e000f`, capability bit, events, snapshot store wiring).
 
 - **User requirement:** "cái danh sách lĩnh vực này tôi nghĩ là không nên cố định đâu", then "về phần này tôi cần bạn research đàng hoàng, bạn tìm kiếm các repo liên quan trước đi, rồi cho tôi gợi ý/đề xuất", then "oke chọn A đi, tôi cần bạn lên kế hoạch cho phần này, nhớ gắn thêm repo tham khảo vì có thể tôi sẽ dùng model khác để code nữa, lên plan chi tiết nhé".
 - **Research:** [knowledge-domains-research-2026-10-27.md](docs/research/knowledge-domains-research-2026-10-27.md).

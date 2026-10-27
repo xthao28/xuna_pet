@@ -2,6 +2,21 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Knowledge commands connected to board storage and companion app (KD-2)
+
+- Firmware now supports Bluetooth Opcode 10 with 7 operations: open a subject slot, set active, set resting, clear, add a confirmed fact, remove a fact, and move a fact between slots.
+- Every knowledge change is committed to the device's persistent storage before acknowledging the command (commit-first rule). Knowledge profile reloads cleanly across reboots.
+- The device announces knowledge capability in its Bluetooth flags and broadcasts its 64-byte knowledge projection on characteristic `7a6e000f`.
+- The Flutter companion app now has complete entities, use cases, protocol codecs, repository methods, and simulator support for all knowledge operations.
+- Verified on computer with golden fixtures generated directly from firmware: 343/343 firmware tests pass, 258/258 Flutter tests pass, and code analysis is completely clean. Ready for backend integration (KD-3).
+
+## 2026-10-27 — XUNA's device core learns to remember knowledge by subject (KD-1)
+
+- The device core now has 5 slots to track what you teach XUNA about subjects you choose (such as cooking or English).
+- Each slot tracks confirmed facts and distinct teaching days. XUNA's level in a subject (from 0 to 3) is decided strictly by the device: higher levels require both enough facts (3, 10, 25) and enough different days of teaching (1, 3, 5), so cramming all facts in one sitting will not jump to high levels.
+- Removing a fact lowers the evidence count but preserves the history of days taught.
+- Memory and reboot persistence for knowledge (snapshot section 13) and a 64-byte Bluetooth projection are built and verified with tests on the computer. Not yet wired to the board hardware or phone app (KD-2).
+
 ## 2026-10-27 — XUNA will grow in what it knows, not in how it looks
 
 - XUNA no longer has growth stages after hatching. It keeps its look and all its animations.

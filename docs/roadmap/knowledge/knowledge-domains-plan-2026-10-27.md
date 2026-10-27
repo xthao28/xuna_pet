@@ -3,7 +3,9 @@
 > **Trạng thái:** hướng đi owner-approved 2026-10-27: phương án A, *lĩnh vực mở, chủ tự đặt, XUNA gợi ý thêm*. Mọi con số, ngưỡng, tên và layout byte có ký hiệu **[P]** là Proposed. Chúng chỉ thành chính thức khi owner chốt (§12) hoặc session tương ứng đo xong.
 > **Nghiên cứu nền:** [knowledge-domains-research-2026-10-27.md](../../research/knowledge-domains-research-2026-10-27.md). Repo tham khảo cho từng phần ở §11.
 > **KD-0** (dọn code giai đoạn trưởng thành cũ) đã xong: mobile `d221476`, firmware `1cc59dd`.
-> **Q1–Q7 đã chốt 2026-10-27** (§12). Khi §12 khác với ghi chú [P] hay "Qx" ở các mục khác, §12 là bản đúng. Session tiếp theo: **KD-1**.
+> **Q1–Q7 đã chốt 2026-10-27** (§12).
+> **KD-1** (lõi Knowledge trên thiết bị) đã xong: `KnowledgeProfile`, `KnowledgeCodec` (section 13), `KnowledgeProjection` (64 B), Life Lab dual-history scenario, 15/15 tests `test_knowledge` PASS, 340/340 native suite PASS.
+> **KD-2** (Protocol + board + mobile integration) đã xong: Opcode 10 (sub-ops 1..7), characteristic `7a6e000f`, capability byte 3 bit 4, events 0x63..0x65, ClockModel day index, SnapshotCodec section 13 (budget 1536 B duy trì an toàn), LifeCore + V1LifeCoreAdapter commit-first; golden generator tạo mobile fixture `knowledge_v1.json` (11 steps); mobile entities, use cases, models, mappers, codec, BleDataSourceImpl, Simulator; toàn bộ test 343/343 firmware native PASS, 258/258 mobile flutter test PASS, flutter analyze sạch 0 issues. Session tiếp theo: **KD-3** (Backend lõi).
 
 ## 0. Dành cho người (hoặc model) sẽ code
 
