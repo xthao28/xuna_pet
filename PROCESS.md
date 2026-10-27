@@ -1,8 +1,34 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Voice & conversation: bilingual Vietnamese / English support (pure stdlib language_detector, Edge TTS auto voice en-US-AriaNeural / vi-VN-HoaiMyNeural, Whisper ASR auto-detect language with XUNA_ASR_AUTO_DETECT=true, bilingual persona prompt; 231 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**. Before that: **M06 knowledge domains: backend suggestion engine & benchmark KD-4 (clustering, duplicate prevention, 14-day expiration, embedding adapter OpenAICompatibleEmbedder, chat extraction Q3, Vietnamese 60-fact benchmark 88.33% accuracy, 100% noise rejection; 211 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Mobile & Backend: Full bilingual support (Vietnamese / English), XUNA voice settings (Edge TTS preview & selection: Hoai My, Nam Minh, Aria, Guy), dynamic audio wave ripples on mic, and Whisper ASR locale alignment; 273 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**. Before that: **Voice & conversation: bilingual Vietnamese / English support (pure stdlib language_detector, Edge TTS auto voice en-US-AriaNeural / vi-VN-HoaiMyNeural, Whisper ASR auto-detect language with XUNA_ASR_AUTO_DETECT=true, bilingual persona prompt; 231 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**.
 
-## 2026-10-27 — Voice & conversation: bilingual Vietnamese / English support (Backend)
+## 2026-10-27 — Mobile & Backend: Full Bilingual Support, Voice Settings Sheet & Ripple Visualizer
+
+- **User requirement:** Hoàn thiện song ngữ (Vietnamese / English) toàn diện trên Mobile App: khắc phục lỗi mic nhận diện tiếng Anh không chính xác, bổ sung cài đặt chọn giọng đọc XUNA (Edge TTS) cho cả tiếng Việt và tiếng Anh kèm tính năng nghe thử trực tiếp, chuyển đổi ngôn ngữ ứng dụng 1:1, và thêm hiệu ứng sóng âm động quanh nút Micro khi đang lắng nghe.
+- **Mobile & Backend Implementation:**
+  - **i18n & Bilingual Interface:**
+    - Đồng bộ 100% 507 khóa ngôn ngữ giữa `assets/locales/vi_VN.json` và `assets/locales/en_US.json`.
+    - Sinh mã `lib/generated/locales.g.dart` với đầy đủ `LocaleKeys`, `Locales.vi_VN`, `Locales.en_US`.
+    - `core/presentation/app.dart`: Hỗ trợ `Locale('en', 'US')` và fallback `Locale('vi', 'VN')`.
+    - Bổ sung tùy chọn chuyển đổi ngôn ngữ ứng dụng ngay trong `HomeDeviceSettingsCard` và tự động lưu trạng thái vào `AppHive`.
+  - **Edge TTS Voice Selection & Preview:**
+    - `backend/`: Bổ sung endpoint `POST /v1/speech/synthesis` và tham số `voice: str | None` trong `TurnBody` và `SpeechSynthesizer.synthesize`.
+    - `mobile/`: Thêm `SynthesizeSpeechUseCase`, `CloudRemoteDataSource.postSynthesis`, `CloudRepository.synthesize`.
+    - Giao diện `HomeVoiceSettingsSheet`: Cho phép lựa chọn 4 giọng đọc chất lượng cao (Tiếng Việt: Hoài My, Nam Minh; Tiếng Anh: Aria, Guy) kèm nút Nghe thử (Preview) phát âm thanh trực tiếp từ Cloud.
+    - Truy cập nhanh Voice Settings từ thẻ Cài đặt thiết bị hoặc ngay trong menu dấu ba chấm của màn hình chat.
+  - **Whisper ASR Accurate English Recognition:**
+    - Cập nhật `CloudRepositoryImpl.transcribe`: Không còn gán cứng `'locale': 'vi'`, tự động truyền `locale: currentLocaleCode` (hoặc `en` / `vi`) tương ứng với ngôn ngữ người dùng đang thiết lập, giúp Whisper chuyển ngữ tiếng Anh cực kỳ chuẩn xác, không còn bị lỗi từ vựng hay ngữ pháp.
+  - **Micro Ripple Animation (Dynamic Visualizer):**
+    - `HomeChatComposer`: Thêm hiệu ứng sóng âm concentric ripples lan tỏa nhẹ nhàng khi `VoiceInputState.listening`, bọc trong kích thước chuẩn 72px để giữ trọn bố cục và visual feedback mượt mà.
+- **Validation:**
+  - `mobile/test/generated/locales_sync_test.dart`: 3/3 tests PASS (đồng bộ 100% 507 keys).
+  - `mobile/test/features/home/presentation/widgets/home_voice_settings_sheet_test.dart`: PASS 100%.
+  - `mobile/test/features/home/presentation/widgets/home_chat_composer_test.dart`: PASS 100% (cố định kích thước 72px).
+  - `mobile/test/features/home/presentation/home_page_test.dart`: PASS 5/5 tests.
+  - Toàn bộ mobile test suite: **273/273 tests PASS (100%)**.
+  - `fvm flutter analyze`: **No issues found! (0 errors, 0 warnings)**.
+  - Toàn bộ backend test suite: **231 passed, 42 skipped (0 failed)**; `ruff check .` 0 issues; `mypy src` 0 errors.
+
 
 - **User requirement:** Bổ sung hỗ trợ tiếng Anh cho XUNA: khắc phục lỗi khi người dùng nói tiếng Anh vào mic nhận dạng sai (do Whisper bị ép cứng `language="vi"`), sửa lỗi phát âm méo mó/sai phát âm khi Cloud trả về tiếng Anh (do Edge TTS bị ép dùng giọng tiếng Việt `vi-VN-HoaiMyNeural` đọc chữ tiếng Anh), và nâng cấp prompt trò chuyện song ngữ tự nhiên.
 - **Backend Implementation:**

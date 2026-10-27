@@ -2,7 +2,18 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
-## 2026-10-27 — Hỗ trợ giọng nói và trò chuyện song ngữ Anh - Việt mượt mà
+## 2026-10-27 — Giao diện song ngữ Anh - Việt, Cài đặt giọng đọc XUNA và Hiệu ứng Micro sống động
+
+- **Giao diện song ngữ 1:1 mượt mà:** Ứng dụng hỗ trợ chuyển đổi linh hoạt giữa Tiếng Việt và Tiếng Anh trong phần Cài đặt thiết bị với hơn 500 mục giao diện được dịch và đồng bộ chuẩn xác.
+- **Tùy chọn giọng đọc XUNA (Edge TTS):** Bạn có thể dễ dàng chọn giọng đọc cho XUNA trong Cài đặt hoặc ngay trong màn hình trò chuyện:
+  - Tiếng Việt: Giọng nữ ngọt ngào (Hoài My) hoặc giọng nam ấm áp (Nam Minh).
+  - Tiếng Anh: Giọng nữ trong trẻo chuẩn bản xứ (Aria) hoặc giọng nam tự nhiên (Guy).
+  - Tích hợp nút **Nghe thử (Preview)** trực tiếp để trải nghiệm ngay chất giọng trước khi chọn.
+- **Nói tiếng Anh chuẩn xác:** Sửa lỗi micro bị ép nhận diện tiếng Việt khi nói tiếng Anh. Ứng dụng tự động truyền ngôn ngữ phù hợp lên Cloud Whisper, giúp XUNA lắng nghe và hiểu đúng từng câu chữ tiếng Anh bạn nói.
+- **Hiệu ứng sóng âm Micro động:** Khi bạn nhấn giữ hoặc kích hoạt micro để nói, các vòng sóng âm dịu nhẹ sẽ lan tỏa quanh nút mic, mang lại cảm giác sống động và phản hồi trực quan tức thì.
+- Toàn bộ 273/273 bài kiểm thử tự động trên ứng dụng di động đều đạt kết quả tốt (100% PASS), mã nguồn sạch hoàn toàn.
+
+## 2026-10-27 — Hỗ trợ giọng nói và trò chuyện song ngữ Anh - Việt mượt mà (Backend)
 
 - **Nói tiếng Anh tự nhiên qua micro:** Tính năng nhận diện giọng nói (Whisper) được chuyển sang cơ chế tự động nhận diện ngôn ngữ. Giờ đây bạn có thể nói tiếng Anh hoặc tiếng Việt vào micro điện thoại mà không bị ép dịch hay phiên âm sai sang tiếng Việt nữa.
 - **Phát âm chuẩn tiếng Anh bản ngữ:** Khi XUNA trả lời bằng tiếng Anh, hệ thống tự động phát hiện và chuyển sang giọng đọc tiếng Anh bản ngữ chuẩn Mỹ (`en-US-AriaNeural`), giúp phát âm rõ ràng, đúng trọng âm và ngữ điệu tự nhiên, không còn bị đọc bằng giọng tiếng Việt ngắc ngứ.
