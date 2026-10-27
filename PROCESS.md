@@ -1,6 +1,13 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Device-direct DC-5 automatic projection backup (firmware 373/373, backend 329/329, mobile 309/309; host only). DC-0…DC-5 done on the host; E14 gate and DC-6 need the board**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Owner decisions after DC-5: websockets added, unbind (key revoked, data kept), E14 by hand, push (backend 332/332, mobile 311/311)**. Before that: **DC-0…DC-5 on the host**.
+
+## 2026-10-27 — Owner decisions after DC-5: WebSocket library, unbind, E14 commands, push
+
+- **Owner choices (all recommended):** add `websockets`; unbind = revoke the board key and keep cloud data; E14 BLE commands pressed by hand (runbook); push `dev`.
+- **Backend:** `websockets==13.1` pinned (BSD-3); `scripts/serve.py` runs uvicorn with the Selector loop on Windows (psycopg async fails on the Proactor loop) and optional dev TLS. A real TLS run on Windows (`serve.py --tls`, pinned-CA client) found and fixed a crash: a 32-hex PetId that is not UUIDv4 now closes 1002 `unsupported_protocol`. Unbind: `DELETE /v1/pets/{petId}/device` (204, idempotent, audit `pet.unbound`), pets keep listing with `deviceBound`, the board is refused `not_bound` at connect and at the next heartbeat, app-path proofs with a revoked key get `device_key_mismatch`, binding again restores the key (same or new) with data kept. pytest **332/332**, ruff/mypy clean; a directory-wide `ruff format` touched 4 old files and was reverted.
+- **Mobile:** `CloudPet.deviceBound` (absent = bound), `UnbindPetDeviceUseCase`, "Gỡ liên kết board" in the account card with confirmation; an unbound board counts as not bound until bound again. analyze 0, test **311/311**.
+- **Not run:** board, phone. **Next:** E14 on the board; then switch `XUNA_NET` on and DC-6.
 
 ## 2026-10-27 — Device-direct DC-5: automatic projection backup (host only)
 

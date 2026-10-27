@@ -22,10 +22,13 @@ POST /v1/pets            # bind a device-issued PetId to the owner
   "snapshotGeneration": 38,
   "deviceProof": { "challengeId": "<uuid>", "publicKey": "<b64 65B>", "signature": "<b64 64B>" } }
 → 201 created | 200 already bound by this owner with this device key
-  { "petId", "brainId", "deviceId", "origin", "lastGeneration", "boundAt" }
+  { "petId", "brainId", "deviceId", "origin", "lastGeneration", "boundAt", "deviceBound" }
 
 GET  /v1/pets            → 200 { "items": [ <pet as above> ] }
 GET  /v1/pets/{petId}    → 200 | 404
+DELETE /v1/pets/{petId}/device          # unbind the board (owner 2026-10-27): key revoked, data kept
+→ 204 (twice = no-op) | 404 another owner's pet
+
 ```
 
 ### Device credentials (CLD-11)
