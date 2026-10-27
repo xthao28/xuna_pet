@@ -29,7 +29,7 @@ Plan references:
 | M05b memory/journal/BLE v2 | Partly | D8, D9; E8 MTU; E9 bonding → D10; v2 payload layouts | S29–S38 |
 | M05c-B conversation + memory | Partly | D8, D10; V2 needs D11a → E12 → D11 | S40–S42 |
 | M05d cognitive gates | Algorithm yes | Thresholds are hypotheses until Life Lab data; order vs Evolution MVP (D15) | S42a, S43–S46 |
-| M06 / M07 | M06: direction approved 2026-10-27 (knowledge domains, no visual stages); M07 outline only | M06 sessions KD-0 → KD-5 in the [knowledge plan](knowledge/knowledge-domains-plan-2026-10-27.md), Q1–Q5 open; M07 broken down later (rolling-wave planning) | later |
+| M06 / M07 | M06: direction approved 2026-10-27 (knowledge domains, no visual stages); M07 outline only | M06 sessions KD-1 → KD-6 (KD-0 done) in the [knowledge plan](knowledge/knowledge-domains-plan-2026-10-27.md), open domains (owner option A), Q1–Q7 decided 2026-10-27; M07 broken down later (rolling-wave planning) | later |
 
 **Historical prerequisites observed on Windows (2026-10-12; recheck on the actual session machine):**
 

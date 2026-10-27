@@ -1,6 +1,28 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 direction change: knowledge domains instead of visual growth stages; KD-0 removed the growth-stage code and art (249 mobile tests PASS, mobile `d221476`, firmware `1cc59dd`)**. Before that: **M06 review fix: Growth card shows only a device-reported stage, stage sprites redrawn as temporary art (252 mobile tests PASS, mobile `9a9c607`, firmware `d42ae88`)**. Before that: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: research and detailed plan (open, owner-named domains with XUNA suggestions; sessions KD-1 → KD-7; docs only)**. Before that: **M06 direction change: knowledge domains instead of visual growth stages; KD-0 removed the growth-stage code and art (249 mobile tests PASS, mobile `d221476`, firmware `1cc59dd`)**. Before that: **M06 review fix: Growth card shows only a device-reported stage, stage sprites redrawn as temporary art (252 mobile tests PASS, mobile `9a9c607`, firmware `d42ae88`)**. Before that: **Digital Life M06: Growth & Evolution Stage Sprites (Option 1 Stage Progression: Egg -> Newborn -> Child -> Mature, AI pixel art generated & processed to 96x72, mobile HomeGrowthCard active journey, 248 mobile tests PASS, mobile `96b25d9`, firmware `c500bba`)**. Before that: **Voice: Real-time Voice over WebSocket (VOICE-WS WS-1 Backend & WS-2 Mobile, Xiaozhi-aligned streaming, 226 backend tests PASS, 248 mobile tests PASS, backend `9143ef9`, mobile `1301850`)**. Before that: **Cloud: Phase 4 Direct Device Transport (CLD-40, CLD-41, E14, Backend & Firmware C++11, backend `10a5f5b`, firmware `5befdce`)**.
+
+## 2026-10-27 — M06 knowledge domains: research and detailed plan (Docs)
+
+- **User requirement:** "cái danh sách lĩnh vực này tôi nghĩ là không nên cố định đâu", then "về phần này tôi cần bạn research đàng hoàng, bạn tìm kiếm các repo liên quan trước đi, rồi cho tôi gợi ý/đề xuất", then "oke chọn A đi, tôi cần bạn lên kế hoạch cho phần này, nhớ gắn thêm repo tham khảo vì có thể tôi sẽ dùng model khác để code nữa, lên plan chi tiết nhé".
+- **Research:** [knowledge-domains-research-2026-10-27.md](docs/research/knowledge-domains-research-2026-10-27.md).
+  - Surveyed about 15 companion and pet repos and 8 LLM memory libraries.
+  - No open-source project has a per-topic knowledge level.
+  - User-authored entries are the most trusted pattern (SillyTavern, KoboldAI).
+  - Fully emergent topics churn.
+  - BERTopic's zero-shot mode (named topics plus clustered leftovers) is the working hybrid.
+- **Owner decision (option A):** open, owner-named domains with descriptions; XUNA suggests a new domain (or "add to X") only when unsorted knowledge clusters; at most one pending suggestion; the owner confirms.
+- **Plan:** [knowledge-domains-plan-2026-10-27.md](docs/roadmap/knowledge/knowledge-domains-plan-2026-10-27.md) rewritten as a detailed implementation plan for any coding model. It covers decisions K-D1–K-D7, the honesty contract and concepts, and the [P] defaults: level from confirmed facts and trusted teaching days (3/10/25 facts and 1/3/5 days), 5 slots, 32 fact keys per slot. The rest:
+  - **Firmware:** `KnowledgeProfile`, snapshot section 13, 64 B projection on `7a6e000f`, 16 B opcode 10 (open/active/resting/clear/add/remove/move), capability byte 3 bit 4, events 0x63–0x65.
+  - **Backend:** module `knowledge`, migration 0009, API, `CandidateType.KNOWLEDGE`, `fact_key`. Algorithms: assignment, relation, suggestion and merge guard, summary, retrieval budget, optional chat extraction and embeddings.
+  - **Mobile:** layers, orchestration use cases with idempotent retry, UI.
+  - **Sessions KD-1 → KD-7** with files, tests and acceptance; risks; a reference-repo table per part; owner questions Q1–Q7.
+- **Design findings recorded in the plan:**
+  - BLE command frames are at most 16 B and `CommandCache` stores 16 B, so domain names stay in the cloud and the device keeps only slots, counters, keys, level and journal. This also avoids the board font gap.
+  - Today a fact "commit" writes nothing to the device (the app only attaches the current `snapshotGeneration`). Opcode 10 `add` closes that gap for knowledge (backend AGENTS §1.3).
+  - Memory routes declare no consent of their own; this is Q1.
+- **Owner answers (all recommended options, plan §12):** Q1 reuse U3 `conversation_text`; Q2 keep the defaults (5 slots, 3/10/25 facts, 1/3/5 days, suggest at 4 unsorted); Q3 LLM proposes knowledge from chat, at most 1 per turn, always confirmed, with an off switch (default on); Q4 lexical first, embedding adapter measured in KD-4 then owner decides (D11a); Q5 delete domain asks each time, default keeps knowledge as unsorted; Q6 no board display in phase 1; Q7 levels "Mới nghe qua / Biết chút ít / Biết khá / Biết nhiều".
+- **No code changed.** Next: KD-1 (`xuna_core` knowledge core, native tests, Life Lab).
 
 ## 2026-10-27 — M06 direction change: knowledge domains (Docs)
 
