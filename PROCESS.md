@@ -1,6 +1,36 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Mobile & Backend: Full bilingual support (Vietnamese / English), XUNA voice settings (Edge TTS preview & selection: Hoai My, Nam Minh, Aria, Guy), dynamic audio wave ripples on mic, and Whisper ASR locale alignment; 273 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**. Before that: **Voice & conversation: bilingual Vietnamese / English support (pure stdlib language_detector, Edge TTS auto voice en-US-AriaNeural / vi-VN-HoaiMyNeural, Whisper ASR auto-detect language with XUNA_ASR_AUTO_DETECT=true, bilingual persona prompt; 231 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Voice WebSocket Streaming (VOICE-01..): Full-duplex low-latency voice streaming via /v1/voice with real-time PCM16 upload, immediate Whisper STT, streaming TTS playback, barge-in interruption, and 100% safe HTTP POST fallback; 280 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**. Before that: **Mobile & Backend: Full bilingual support (Vietnamese / English), XUNA voice settings (Edge TTS preview & selection: Hoai My, Nam Minh, Aria, Guy), dynamic audio wave ripples on mic, and Whisper ASR locale alignment; 273 mobile tests PASS, analyze 0 issues, 231 backend tests PASS, ruff & mypy PASS**.
+
+## 2026-10-27 — Voice WebSocket Streaming (VOICE-01..): Low-Latency Streaming, Barge-in & Safe Fallback
+
+- **User requirement:** Tối ưu hóa đàm thoại 2 chiều qua WebSocket thay vì HTTP POST (VOICE-01..): Giảm triệt để độ trễ đàm thoại, stream audio hai chiều real-time, hỗ trợ ngắt lời XUNA (Barge-in), và giữ fallback HTTP an toàn.
+- **Full-Duplex Architecture & Implementation:**
+  - **Backend (`backend/`):**
+    - `src/xuna_backend/modules/conversation/application/voice_session.py`:
+      - Hỗ trợ tham số `voice: str | None = None` trong khởi tạo session và trong `stream_turn_reply(text, context, voice=...)` để truyền vào `spoken_turn`.
+    - `src/xuna_backend/modules/conversation/api/websocket.py`:
+      - Nhận `locale` và `voice` trong `hello` payload và inject vào `VoiceSession`.
+      - Nhận `voice` trong `turn.commit` payload để linh hoạt ghi đè giọng đọc theo từng lượt trò chuyện.
+      - Xử lý các gói tin điều khiển `listen.start`, binary PCM16 audio chunks, `listen.stop`, `turn.commit`, `abort` (cancel/barge-in).
+  - **Mobile Data & Domain Layer (`mobile/`):**
+    - `VoiceAudioDataSource` & `VoiceRepository`: Bổ sung `Future<Stream<Uint8List>> startStreaming()` sử dụng `AudioEncoder.pcm16bits` 16kHz Mono và `Future<void> stopStreaming()`.
+    - Thêm Use Cases: `StartStreamListeningUseCase`, `StopStreamListeningUseCase`, `ReadIdTokenUseCase`.
+    - `VoiceWebSocketDataSource`: Bổ sung tham số `locale` và `voice` vào `connect()` (gửi trong `hello`) và `sendTurnCommit()`.
+  - **Mobile Presentation & Controller Integration (`mobile/`):**
+    - `HomeController`:
+      - Quản lý vòng đời kết nối WebSocket (`_ensureVoiceWsConnected`, `_listenVoiceWsEvents`).
+      - `_startVoice()`: Stream binary PCM16 chunks trực tiếp lên socket trong khi người dùng nói (Zero upload wait time). Tự động kích hoạt cơ chế **Barge-in** (gửi `abort {reason: barge_in}` và dừng loa ngay khi người dùng nhấn mic trong lúc XUNA đang nói).
+      - `_finishVoice()`: Gửi `listen.stop`, nhận `VoiceWsSttFinal` từ server, kiểm tra intent cục bộ (chơi, dạy kiến thức, sở thích); nếu là hội thoại AI -> gửi `turn.commit` với đầy đủ turn context.
+      - Xử lý `VoiceWsReplyDelta` cập nhật text bubble real-time và `VoiceWsTtsAudio` đưa vào hàng đợi phát âm thanh mượt mà ngay khi câu đầu tiên được tổng hợp xong.
+      - `cancelVoice()`: Hủy stream mic và gửi `abort {reason: cancel}`.
+      - **100% Safe Fallback:** Tự động chuyển đổi mượt mà sang luồng HTTP POST truyền thống nếu kết nối WebSocket gặp sự cố hoặc offline.
+  - **Testing & Quality Assurance:**
+    - `test/features/home/presentation/controller/home_controller_test.dart`: Thêm test group `Voice WebSocket Streaming` bao phủ toàn bộ luồng stream, commit turn, streaming deltas, tts audio chunks, barge-in, cancel, và local intent override.
+    - Cập nhật mock `_Audio` trong `voice_repository_impl_test.dart`.
+- **Validation:**
+  - `mobile/`: Toàn bộ **280 tests PASS (100%)**, `fvm flutter analyze` **No issues found! (0 errors, 0 warnings)**.
+  - `backend/`: **231 pytest passed, 42 skipped (0 failed)**; `ruff check .` **All checks passed!**; `mypy src` **Success: 0 errors in 160 source files**.
 
 ## 2026-10-27 — Mobile & Backend: Full Bilingual Support, Voice Settings Sheet & Ripple Visualizer
 

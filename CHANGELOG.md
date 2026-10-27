@@ -2,6 +2,15 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
+## 2026-10-27 — Tối ưu hóa đàm thoại giọng nói 2 chiều siêu tốc qua WebSocket (VOICE-01..)
+
+- **Trò chuyện 2 chiều thời gian thực (Zero Upload Delay):** Âm thanh từ microphone điện thoại được truyền liên tục lên máy chủ qua luồng WebSocket ngay khi bạn đang nói, giúp máy chủ Whisper xử lý nhận diện tức thì ngay khi bạn vừa dứt lời mà không cần phải chờ tải cả tệp âm thanh lên như trước.
+- **Phát âm thanh câu trả lời ngay lập tức:** Khi XUNA vừa nghĩ xong câu trả lời đầu tiên, âm thanh giọng nói (TTS) được gửi về và phát ra loa điện thoại ngay lập tức qua WebSocket, giúp cuộc trò chuyện liền mạch và giảm triệt để độ trễ phản hồi.
+- **Tính năng ngắt lời tự nhiên (Barge-in):** Khi XUNA đang nói mà bạn muốn ngắt lời hoặc nói tiếp, chỉ cần bấm vào micro, hệ thống sẽ tự động dừng ngay âm thanh đang phát và lập tức chuyển sang chế độ lắng nghe bạn.
+- **Dự phòng an toàn 100% (Safe Fallback):** Hệ thống tự động chuyển đổi mượt mà sang luồng HTTP truyền thống nếu mạng không hỗ trợ WebSocket, đảm bảo cuộc trò chuyện với XUNA luôn luôn thông suốt.
+- **Bảo toàn nguyên tắc thú cưng (Invariant):** Khi nhận diện các lệnh điều khiển cục bộ (như chơi đùa) hoặc dạy kiến thức/sở thích mới, hệ thống tự động giữ lại để xác nhận trên ứng dụng, không gửi lên trí tuệ nhân tạo cloud để đảm bảo quyền riêng tư và trạng thái trung thực của XUNA.
+- Toàn bộ 280/280 bài kiểm thử trên ứng dụng di động và 231 bài kiểm thử trên backend đều đạt kết quả 100% PASS, mã nguồn sạch hoàn toàn.
+
 ## 2026-10-27 — Giao diện song ngữ Anh - Việt, Cài đặt giọng đọc XUNA và Hiệu ứng Micro sống động
 
 - **Giao diện song ngữ 1:1 mượt mà:** Ứng dụng hỗ trợ chuyển đổi linh hoạt giữa Tiếng Việt và Tiếng Anh trong phần Cài đặt thiết bị với hơn 500 mục giao diện được dịch và đồng bộ chuẩn xác.
