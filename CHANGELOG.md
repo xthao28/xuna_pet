@@ -2,7 +2,14 @@
 
 Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
 
-## 2026-10-27 — Dạy và theo dõi kiến thức của XUNA trực tiếp trên ứng dụng (KD-5)
+## 2026-10-27 — Tự động gợi ý lĩnh vực và trích xuất kiến thức thông minh từ cuộc trò chuyện (KD-4)
+
+- **Gợi ý chủ đề tự động:** Khi bạn chia sẻ các kiến thức chưa phân loại (từ 4 điều trở lên), hệ thống tự động gom nhóm và đề xuất tạo một lĩnh vực mới với tên gọi và mô tả tiếng Việt phù hợp, hoặc đề xuất thêm vào lĩnh vực bạn đã có nếu nội dung tương đồng để tránh trùng lặp.
+- **Trích xuất kiến thức khi trò chuyện:** Trong các cuộc trò chuyện hàng ngày với XUNA, hệ thống có thể tự nhận biết những câu nói mang tính kiến thức thực tế (loại bỏ câu hỏi, chào hỏi hay thông tin nhạy cảm), tự động tìm chủ đề phù hợp và đưa ra đề xuất để bạn xác nhận trước khi lưu.
+- **Tự động dọn dẹp:** Các gợi ý không được bạn quyết định sau 14 ngày sẽ tự động hết hạn để không làm phiền màn hình của bạn.
+- **Hỗ trợ công nghệ nhúng ngữ nghĩa (Embedding):** Bổ sung kết nối embedding tùy chọn theo chuẩn OpenAI để sẵn sàng hỗ trợ tìm kiếm và phân loại ngữ nghĩa sâu hơn khi cần.
+- **Đánh giá chuẩn xác trên dữ liệu tiếng Việt:** Đã xây dựng bộ kiểm thử chuẩn gồm 60 kiến thức tiếng Việt thuộc 6 chủ đề đời sống và 10 nội dung nhiễu. Thuật toán so khớp từ vựng đạt độ chính xác **88.33%** và loại bỏ nhiễu tuyệt đối **100%**.
+- Toàn bộ 211 bài kiểm thử tự động của backend đều đạt kết quả tốt, mã nguồn chuẩn chỉnh và không có lỗi kiểu dữ liệu.
 
 - Thêm thẻ "Lĩnh vực của XUNA" trên màn hình chính: hiển thị 5 ô lĩnh vực với cấp độ hiểu biết tương ứng qua các chấm tròn (từ Mới nghe qua đến Biết nhiều) và số kiến thức/số ngày đã học lấy trực tiếp từ thiết bị.
 - Màn hình quản lý lĩnh vực: tự tạo chủ đề mới (kèm gợi ý nhanh), đổi tên, cho chủ đề tạm nghỉ (giải phóng ô trên thiết bị) hoặc xoá khi không còn muốn XUNA nhớ.

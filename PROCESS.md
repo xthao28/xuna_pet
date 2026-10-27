@@ -1,6 +1,44 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: mobile UI & orchestration KD-5 (entities, mappers, remote data source, repository, 13 use cases, multi-step orchestration flows, Vietnamese locales sync, HomeKnowledgeCard with 3-dot levels, HomeKnowledgeManageSheet with 5 slots & preset chips, HomeTeachKnowledgeSheet with 280-char input & confirmation, HomeKnowledgeSuggestionBanner, journal tab integration; 269/269 mobile tests PASS, flutter analyze 0 issues)**. Before that: **M06 knowledge domains: backend core KD-3 (module knowledge, migration 0009, lexical matcher, domain lifecycle, suggestions, memory candidate integration, chat turn context; 196 pytest PASS, ruff check/format PASS, mypy PASS, clean architecture PASS)**.
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **M06 knowledge domains: backend suggestion engine & benchmark KD-4 (clustering, duplicate prevention, 14-day expiration, embedding adapter OpenAICompatibleEmbedder, chat extraction Q3, Vietnamese 60-fact benchmark 88.33% accuracy, 100% noise rejection; 211 pytest PASS, ruff check PASS, mypy PASS, clean architecture boundaries PASS)**. Before that: **M06 knowledge domains: mobile UI & orchestration KD-5 (entities, mappers, remote data source, repository, 13 use cases, multi-step orchestration flows, Vietnamese locales sync, HomeKnowledgeCard with 3-dot levels, HomeKnowledgeManageSheet with 5 slots & preset chips, HomeTeachKnowledgeSheet with 280-char input & confirmation, HomeKnowledgeSuggestionBanner, journal tab integration; 269/269 mobile tests PASS, flutter analyze 0 issues)**.
+
+## 2026-10-27 — M06 knowledge domains: backend suggestion engine & benchmark KD-4 (Backend)
+
+- **User requirement:** Hoàn thành session KD-4 của milestone M06 Knowledge Domains: suggestion engine, duplicate prevention, 14-day expiration, optional embedding adapter, trích xuất kiến thức hội thoại chat (Q3), và bộ đánh giá benchmark tiếng Việt (plan §6.3.4, §6.3.7, §9 KD-4, §12 Q3/Q4).
+- **Backend Implementation:**
+  - **Cognition Embedding Adapter:**
+    - `modules/cognition/domain/types.py`: thêm `Capability.EMBEDDING`, `EmbeddingRequest`, `EmbeddingResult`.
+    - `modules/cognition/application/ports.py`: định nghĩa protocol `Embedder`.
+    - `modules/cognition/infrastructure/openai_compatible.py`: triển khai `OpenAICompatibleEmbedder` hỗ trợ endpoint `/embeddings`, đăng ký `Capability.EMBEDDING` trong provider registry.
+    - `core/config.py`: bổ sung cấu hình `XUNA_EMBEDDING_*` (`embedding_provider`, `embedding_base_url`, `embedding_model`, `embedding_api_key`, `embedding_api_key_header`, `embedding_timeout_s`).
+    - `main.py`: cấu hình factory `embedder()` và inject vào `app.state.embedder`.
+  - **Domain Clustering & Suggestion Engine:**
+    - `modules/knowledge/domain/clustering.py`:
+      - `compute_pairwise_clean_similarity`: tính toán tương đồng n-gram tiếng Việt trên các từ vựng mang nghĩa (loại bỏ stopwords).
+      - `cluster_candidates_lexical`: thuật toán phân cụm đồ thị liên thông (connected components) trên các candidate chưa phân loại với ngưỡng `min_similarity = 0.02` và kích thước tối thiểu $\ge 4$ candidates.
+      - `check_cluster_duplicate`: phát hiện cụm có độ tương đồng $\ge 0.10$ với các domain hiện có để đề xuất `ADD_TO_DOMAIN` thay vì tạo trùng lặp.
+      - `derive_cluster_name_and_description`: sinh tự động tên chủ đề tiếng Việt ($\le 40$ ký tự) và mô tả ($\le 160$ ký tự) từ các bigram và từ khóa phổ biến nhất trong cụm.
+      - `is_suggestion_expired`: kiểm tra thời hạn gợi ý sau 14 ngày.
+    - `modules/knowledge/application/suggest.py`:
+      - `GenerateKnowledgeSuggestionUseCase`: tự động dọn dẹp các gợi ý quá 14 ngày thành `EXPIRED`, kiểm tra giới hạn 1 gợi ý `PENDING`, phân cụm các kiến thức chưa phân loại $\ge 4$ items, kiểm tra trùng lặp để sinh `ADD_TO_DOMAIN` hoặc `NEW_DOMAIN` (nếu tổng domain $< 5$).
+      - `ExpireKnowledgeSuggestionsUseCase`: dọn dẹp các gợi ý tồn đọng quá 14 ngày.
+    - `modules/knowledge/api/routes.py`: thêm endpoint `POST /v1/pets/{petId}/knowledge-suggestions/generate` (yêu cầu consent `CONVERSATION_TEXT`).
+  - **Chat Turn Knowledge Extraction (Q3):**
+    - `modules/conversation/domain/candidate_extractor.py`: xây dựng `extract_knowledge_candidate` lọc bỏ câu hỏi, câu chào, cảm thán chitchat, thông tin cá nhân/tên gọi, thông tin bảo mật/mật khẩu, chỉ trích xuất các câu thông tin kiến thức thực tế (factual knowledge).
+    - `modules/conversation/api/routes.py`: mở rộng `TurnBody` với cờ `extractKnowledge: bool = True` (mặc định bật theo Q3), tự động đối chiếu domain phù hợp qua lexical matcher (ngưỡng 0.20), phát hiện quan hệ `refines` (ngưỡng 0.60) so với fact cũ trong domain, tính deterministic `fact_key`, lưu candidate trạng thái `AWAITING_OWNER_CONFIRMATION` và trả về `candidate` trong sự kiện SSE `finished`.
+  - **Vietnamese Benchmark & Evaluation Suite:**
+    - `tests/fixtures/knowledge_vi.json`: bộ benchmark chuẩn gồm 60 kiến thức tiếng Việt thuộc 6 chủ đề (nấu ăn, lập trình, âm nhạc, thể thao, tiếng anh, làm vườn) kèm 10 câu nhiễu (chitchat, câu hỏi, cảm thán).
+    - `tests/modules/knowledge/test_evaluation.py`:
+      - **Lexical Top-1 Accuracy:** đạt **88.33%** (53/60 đúng tuyệt đối chỉ bằng unigrams + bigrams pure stdlib).
+      - **Coverage ở ngưỡng $\tau = 0.05$:** đạt **81.67%** (vượt chỉ tiêu $> 80\%$).
+      - **Noise Rejection Rate:** đạt **100%** (10/10 mục nhiễu bị loại bỏ hoàn toàn, 0 gợi ý sai).
+      - **Embedding Cosine Simulation:** đạt **88.33%** Top-1 Accuracy.
+- **Validation:**
+  - `pytest tests/`: **211 passed, 42 skipped (do không có DB PostgreSQL URL), 0 failed** qua toàn bộ backend test suite.
+  - `pytest tests/test_architecture.py`: **2 passed (100%)** bảo đảm ranh giới Clean Architecture DAG.
+  - `ruff check .`: **All checks passed! (0 linter errors)**.
+  - `mypy src`: **Success: no issues found in 159 source files (0 type errors)**.
+- **Next steps:** KD-6 (Nghiệm thu toàn diện M06 trên thiết bị thật và điện thoại thật: thử nghiệm 2 lịch sử dạy khác nhau, xác nhận hiển thị level, journal giải thích được, offline giữ mức, xóa giảm mức).
 
 ## 2026-10-27 — M06 knowledge domains: mobile UI & orchestration KD-5 (Mobile)
 
