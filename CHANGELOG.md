@@ -1,6 +1,13 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-26** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
+
+## 2026-10-27 — XUNA will grow in what it knows, not in how it looks
+
+- XUNA no longer has growth stages after hatching. It keeps its look and all its animations.
+- Instead, you will pick a few subjects (for example cooking or English), and XUNA will get to know them better the more you teach it and confirm. The plan is written; nothing of it is built yet.
+- In the app, "LỚN LÊN" became "LĨNH VỰC" (the room badge, the Journal filter and a new "LĨNH VỰC CỦA XUNA" card), all marked "SẮP CÓ". The stage pictures from yesterday were removed.
+- Only tested on the computer.
 
 ## 2026-10-26 — XUNA's growth journey waits for the board
 

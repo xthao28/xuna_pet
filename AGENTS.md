@@ -192,7 +192,7 @@ Only work on the requested milestone; do not build later milestones speculativel
 | **M03 — Pixel Pet & Animation** | Original character, basic reactions | Idle/happy/sleep/curious animations driven by input/state |
 | **M04 — Digital Life Foundation** | Time, state, event schema, behavior, persistence | Pet state survives reboot; deterministic event processing and tests |
 | **M05 — Memory + Learning + Conversation V1** | Learn from interaction, feedback and dialogue | Show a measured change in future behavior due to prior feedback; source-independent Conversation Foundation, initially tested with Flutter text/simulation; device voice separately gated |
-| **M06 — Growth & Evolution** | Experience-linked growth, appearance, Journal | Two histories produce explainable behavior/appearance differences |
+| **M06 — Growth & Knowledge** | Hatch, then knowledge in owner-chosen domains that deepens with owner-confirmed evidence, Journal. No visual growth stages (owner 2026-10-27, [plan](docs/roadmap/knowledge/knowledge-domains-plan-2026-10-27.md)) | Two histories produce explainable differences in what XUNA knows and how it talks and behaves |
 | **M07 — Physical Experience** | External sensors and meaningful environment events | Sensor readings translate to validated events affecting behavior and memory |
 | **Later** | Advanced voice, new displays, cloud, new hardware | Only after validation and explicit priority change |
 
