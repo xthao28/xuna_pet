@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Ngủ màn hình tiết kiệm pin và chỉnh độ sáng từ ứng dụng (Giai đoạn 2)
+
+- **Ngủ màn hình 3 tầng tiết kiệm pin:** Sau 30 giây không có tương tác, màn hình tự dịu xuống mức `4/16`; sau 2 phút yên tĩnh (khi bật chế độ ngủ màn hình và không mở thẻ hay bong bóng phụ đề), mạch tự tắt hẳn IC đèn nền (`0 mA`), đưa màn hình vào chế độ ngủ, tạm dừng vẽ khung hình và giãn vòng lặp để tiết kiệm pin tối đa trong khi XUNA vẫn sống ngầm bình thường.
+- **Đánh thức tức thì:** Bấm bất kỳ nút nào trên mạch hoặc kết nối/gửi lệnh từ ứng dụng đều đánh thức màn hình ngay lập tức (lần bấm đơn đầu tiên khi màn hình đang tắt chỉ dùng để bật sáng màn hình, tránh dạy nhầm phản ứng).
+- **Mở khoá chỉnh độ sáng và công tắc ngủ màn hình trên ứng dụng:** Trên tab Thiết bị, ô «Độ sáng màn hình» cho phép chạm chuyển giữa 3 mức `Vừa → Cao → Thấp` và mục «Đánh thức màn hình» cho phép bật/tắt chế độ tự ngủ màn hình; cài đặt được lưu bền vững trên cả điện thoại lẫn bộ nhớ NVS của mạch qua BLE Opcode 11.
+- Firmware 380/380 bài kiểm thử PASS, build `xuna_t_display_s3` thành công; ứng dụng 332/332 bài kiểm thử PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-29 — Hoàn tất kiểm thử tổng thể Knowledge Expert M06 và tối ưu cấu trúc ứng dụng (KX-6)
 
 - **Kiểm chứng toàn diện 6 tiêu chí Knowledge Expert (KX-6):** Xác nhận trọn vẹn luồng hoạt động từ thiết bị, ứng dụng đến máy chủ qua bộ kiểm thử tự động: so sánh câu trả lời giữa 2 lĩnh vực (`Lập trình nhúng` từ gói mẫu và lĩnh vực tự đặt), tách bạch lời nói ngắn (`<= 200` ký tự) đọc thành tiếng/hiện trên màn hình mạch với bản phân tích Markdown chi tiết trên ứng dụng, tăng mức độ ăn ý (`Mới quen` → `Ăn ý`) qua quy ước làm việc, việc đã giải quyết và tài liệu tham khảo U4, hạ mức và loại bỏ ngay khỏi bộ nhớ khi xoá bằng chứng, giữ nguyên mức trên mạch và tự chuyển về câu trả lời mẫu khi mất mạng, đồng thời tương thích ngược hoàn toàn với ứng dụng phiên bản cũ.

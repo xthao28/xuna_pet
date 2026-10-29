@@ -1,6 +1,26 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-6 M06 Knowledge Expert Host Acceptance & `HomeController` Service Refactor ([KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md); backend 402/402 pytest PASS; mobile `flutter analyze` 0 issues, `flutter test` 329/329 PASS)**. Before that: **KX-5 Owner Reference Documents (ADR-0011; backend 401/401, mobile 328/328)**, **KX-4 Working Conventions & Solved Cases (backend 393/393, mobile 325/325)**, **KX-3 Domain Packs & Working Brief (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **Power & Thermal Upgrade Phase 1 & Phase 2 — Screen Sleep/Doze & App Brightness/Wake Controls ([power-thermal-upgrade-plan-2026-10-28.md](docs/roadmap/power/power-thermal-upgrade-plan-2026-10-28.md); firmware 380/380 native tests PASS, `xuna_t_display_s3` build SUCCESS; mobile `flutter analyze` 0 issues, `flutter test` 332/332 PASS)**. Before that: **KX-6 M06 Knowledge Expert Host Acceptance & `HomeController` Service Refactor ([KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md); backend 402/402 pytest PASS; mobile 329/329 PASS)**, **KX-5 Owner Reference Documents (ADR-0011)**, **KX-4 Working Conventions & Solved Cases**, **KX-3 Domain Packs & Working Brief**, **KX-2 Mobile dual-output UI** and **KX-1 Backend Knowledge Expert**.
+
+## 2026-10-29 — Quản lý năng lượng, Giảm nhiệt & Ngủ màn hình tiết kiệm pin (Giai đoạn 1 & Giai đoạn 2)
+
+- **User requirement:** Triển khai kế hoạch [power-thermal-upgrade-plan-2026-10-28.md](docs/roadmap/power/power-thermal-upgrade-plan-2026-10-28.md) (Giai đoạn 1: sửa lỗi nhiệt đèn nền AW9364, giảm công suất phát BLE, hạ nhịp khung hình khi rảnh; Giai đoạn 2: ngủ màn hình 3 tầng `Active` → `Dim` → `Off`, đánh thức tức thì bằng nút bấm/BLE, chỉnh độ sáng & công tắc ngủ màn hình từ App).
+- **Firmware (`firmware/`):**
+  - **Giai đoạn 1:**
+    - `src/DisplayManager.cpp`: bật `kBacklightPin` (`HIGH` + chờ ổn định `35 µs` `t_on` theo datasheet AW9364) trước khi gọi `setBacklight()`; tăng độ rộng xung 1-wire từ `1 µs` lên `3 µs` kèm khoá ngắt ngắn (`noInterrupts()`/`interrupts()`) để tránh trượt bậc sáng.
+    - `include/BleManager.h`: đặt công suất phát BLE về `0 dBm` (`ESP_PWR_LVL_N0`) cho `DEFAULT`/`ADV`/`SCAN`.
+    - `lib/xuna_core/include/xuna/visual/Backlight.h`, `src/main.cpp`: thêm `PowerPacer` điều tiết nhịp khung hình từ `10 FPS` (`100 ms`) xuống `5 FPS` (`200 ms`) và chu kỳ `loop()` từ `10 ms` lên `25 ms` sau `20 s` không có tương tác ở trạng thái `Idle`/`Sleep`.
+  - **Giai đoạn 2:**
+    - `lib/xuna_core/include/xuna/visual/Backlight.h`: thêm `BrightnessPreset` (`Low = 6/16`, `Medium = 10/16`, `High = 14/16`), `ScreenPowerState` (`Active` 0–30 s, `Dim` 30–120 s ở mức `4/16`, `Off` sau 120 s khi `sleepEnabled == true` và không mở thẻ/phụ đề), và chu kỳ `loop()` `50 ms` khi màn hình tắt.
+    - `src/DisplayManager.cpp`, `include/DisplayManager.h`: khi chuyển sang `ScreenPowerState::Off`, kéo `kBacklightPin` xuống `LOW` (> 3 ms, `0 mA` trên AW9364), gửi `ST7789_SLPIN (0x10)` qua `lcd_.writecommand(0x10)` và bỏ qua toàn bộ việc vẽ sprite (`draws = 0`); khi thức dậy, gửi `ST7789_SLPOUT (0x11)`, chờ `5 ms`, bật lại AW9364 và bước mượt tới độ sáng đích.
+    - `lib/xuna_core/include/xuna/BleProtocol.h`, `lib/xuna_core/include/xuna/protocol/V1LifeCoreAdapter.h`, `include/BleManager.h`, `include/ScenePreference.h`, `src/main.cpp`: thêm BLE Opcode 11 (`DisplaySettings`, 8 byte: `arg = 0..2` độ sáng, `source = 0..1` ngủ màn hình, capability byte 3 bit 7 = `0x80`), lưu bền vững vào NVS namespace `xuna_ui` (`keys: br, slp`), đánh thức màn hình khi bấm nút vật lý (nuốt lần bấm đầu tiên khi màn hình đang tắt để không dạy nhầm phản ứng) hoặc khi có tương tác/phụ đề BLE.
+- **Mobile (`mobile/`):**
+  - Mở rộng `ScreenBrightness` (`low`, `medium`, `high`), `DevicePreferences`, `DevicePreferencesModel`, `DevicePreferencesMapper`, `DeviceProtocol`, `DeviceCommandModel.displaySettings`, `ProtocolCodec` (`encodeDisplaySettings`, `supportsDisplaySettings`), `DeviceBleDataSource`, `DeviceRepository`, `SetScreenBrightnessUseCase`, `SetScreenSleepUseCase`, `SyncDisplaySettingsUseCase`.
+  - Mở khoá 2 mục `SẮP CÓ` trên tab **Thiết bị** (`HomeDeviceTab` & `HomeDeviceSettingsCard`): ô **Độ sáng màn hình** xoay vòng `Vừa → Cao → Thấp` và công tắc **Đánh thức màn hình** (`home_settingWake` + `home_settingWakeNote`) lưu vào Hive và tự động đồng bộ qua BLE Opcode 11.
+- **Validation (Windows):**
+  - Firmware: `pio test -e native` **380/380 PASS** (46/46 suites, bao gồm `test_backlight` 20/20 và `test_v1_adapter` 15/15); `pio run -e xuna_t_display_s3` **PASS** (`xuna_core purity check: PASS`, RAM 18.1% / 59,240 B, Flash 59.8% / 3,922,065 B).
+  - Mobile: `fvm dart format` **PASS**, `fvm flutter analyze` **PASS** (`No issues found!`), `fvm flutter test --no-pub` **332/332 PASS** (bao gồm `locales_sync_test.dart`, `protocol_codec_test.dart`, `device_preferences_repository_impl_test.dart`, `home_page_test.dart`).
+- **Not run:** Chưa nạp lên mạch LILYGO T-Display-S3 vật lý để đo lại `chip_temp_c` và dòng tiêu thụ khi `ScreenOff`.
 
 ## 2026-10-29 — KX-6: Nghiệm thu M06 Knowledge Expert trên host & tách `HomeController` thành 5 Coordinator Services
 

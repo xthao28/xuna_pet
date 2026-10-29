@@ -1,8 +1,8 @@
 # XUNA — Kế hoạch Nâng cấp Quản lý Năng lượng, Giảm nhiệt & Ngủ Tiết kiệm Pin
 
 > **Ngày lập:** 2026-10-28
-> **Trạng thái:** Giai đoạn 1 Implemented (2026-10-29, host-tested 376/376 PASS, build `xuna_t_display_s3` SUCCESS; chờ nạp mạch đo kiểm nhiệt độ thực tế). Giai đoạn 2 Proposed.
-> **Phạm vi:** `firmware/` (`DisplayManager`, `Backlight.h`, `SceneEffects.h`, `InputManager`, `BleManager`, `main.cpp`) và `mobile/` (`HomeDeviceSettingsCard`, `HomeDeviceTab`, `HomeController`)
+> **Trạng thái:** Giai đoạn 1 & Giai đoạn 2 Implemented (2026-10-29, firmware host-tested 382/382 PASS, build `xuna_t_display_s3` SUCCESS; mobile `flutter analyze` 0 issues, `flutter test` PASS; chờ nạp mạch đo kiểm nhiệt độ thực tế).
+> **Phạm vi:** `firmware/` (`DisplayManager`, `Backlight.h`, `ScenePreference.h`, `BleProtocol.h`, `V1LifeCoreAdapter.h`, `BleManager.h`, `main.cpp`) và `mobile/` (`HomeDeviceSettingsCard`, `HomeDeviceTab`, `HomeDeviceService`, `HomeController`, `HomeBinding`, `ProtocolCodec`, `DevicePreferences`)
 
 ---
 
@@ -38,7 +38,7 @@ heap_free=220828 heap_min=218812 psram_heap_total=8386215 psram_free=8239487
 
 ---
 
-### Giai đoạn 1: Sửa lỗi nhiệt & Tối ưu tiêu thụ khi đang thức (Firmware)
+### Giai đoạn 1: Sửa lỗi nhiệt & Tối ưu tiêu thụ khi đang thức (Firmware — Implemented 2026-10-29)
 
 1. **Chuẩn hoá điều khiển xung đèn nền `AW9364` (`DisplayManager.cpp`):**
    - Trong `DisplayManager::begin()`: bật `digitalWrite(kBacklightPin, HIGH)` và chờ ổn định `delayMicroseconds(35)` (`t_on` theo datasheet AW9364) **trước** khi gọi `setBacklight()`, đồng bộ chính xác `backlightHw_ = BacklightDimmer::kMax` với trạng thái phần cứng.
@@ -51,20 +51,22 @@ heap_free=220828 heap_min=218812 psram_heap_total=8386215 psram_free=8239487
 
 ---
 
-### Giai đoạn 2: Chế độ Ngủ Màn Hình (Screen Sleep / Doze) & Điều khiển từ App (Firmware + Mobile)
+### Giai đoạn 2: Chế độ Ngủ Màn Hình (Screen Sleep / Doze) & Điều khiển từ App (Firmware + Mobile — Implemented 2026-10-29)
 
-1. **Máy trạng thái năng lượng màn hình 3 tầng (`Active` → `Dim` → `ScreenOff`):**
-   - **`Active` (0 – 30 giây từ lần tương tác cuối):** Độ sáng theo mức cài đặt của người dùng (mặc định `10/16` khi thức, `6/16` khi XUNA ngủ, `15/16` khi mở thẻ QR/Status).
+1. **Máy trạng thái năng lượng màn hình 3 tầng (`Active` → `Dim` → `Off`):**
+   - **`Active` (0 – 30 giây từ lần tương tác người dùng/BLE cuối, hoặc khi đang mở thẻ QR/Status/bong bóng phụ đề):** Độ sáng theo 3 mức cài đặt của người dùng (`BrightnessPreset::Low = 6/16`, `Medium = 10/16`, `High = 14/16` khi thức; `4/16` – `6/16` khi XUNA ngủ; `15/16` khi mở thẻ QR/Status).
    - **`Dim` (30 – 120 giây không tương tác):** Hạ mượt đèn nền xuống mức dịu (`4/16`).
-   - **`ScreenOff / Doze` (sau 120 giây không tương tác, khi bật chế độ tiết kiệm pin):**
+   - **`Off / Doze` (sau 120 giây không tương tác, khi bật chế độ ngủ màn hình):**
      - Kéo `kBacklightPin` xuống `LOW` (> 3 ms) để tắt hoàn toàn IC nguồn đèn nền AW9364 (`0 mA`).
      - Gửi lệnh `ST7789_SLPIN (0x10)` qua `lcd_.writecommand(0x10)` để đưa bộ điều khiển LCD vào chế độ ngủ.
-     - Bỏ qua toàn bộ việc vẽ sprite/cửa sổ (`draws = 0`) và giãn vòng lặp `loop()` lên `50 ms`.
+     - Bỏ qua toàn bộ việc vẽ sprite/cửa sổ (`draws = 0`) và giãn vòng lặp `loop()` lên `50 ms`. Các hành động tự phát ngầm của `LifeCore` không tự ý bật sáng lại màn hình.
 2. **Cơ chế Đánh thức (Wake Triggers):**
-   - **Nút bấm trên mạch (`GPIO0` / `GPIO14`):** Nếu màn hình đang ở `ScreenOff`, lần bấm đầu tiên sẽ gọi `lcd_.writecommand(0x11)` (`ST7789_SLPOUT`), chờ ổn định và bật lại đèn nền (đồng thời nuốt sự kiện bấm đó giống như khi đóng thẻ Status để không vô tình dạy nhầm phản ứng).
-   - **Tương tác từ App qua BLE:** Khi nhận lệnh đổi biểu cảm, xem động tác, gợi ý hành động, hoặc nhận bong bóng phụ đề (`7a6e0010`), màn hình tự động thức dậy để hiển thị.
-3. **Đồng bộ Cài đặt trên App (`mobile/`):**
-   - Mở khoá 2 mục đang gắn nhãn `SẮP CÓ` trên màn hình **Thiết bị** (`HomeDeviceTab` & `HomeDeviceSettingsCard`):
-     - **Độ sáng màn hình (`home_brightness` / `home_settingBrightness`):** Cho phép chọn mức độ sáng (Thấp / Vừa / Cao) và lưu bền vững.
-     - **Đánh thức màn hình / Ngủ tiết kiệm pin (`home_settingWake`):** Công tắc bật/tắt chế độ tự động tắt màn hình tiết kiệm pin và tự đánh thức khi mở App / tương tác.
-
+   - **Nút bấm trên mạch (`GPIO0` / `GPIO14`):** Nếu màn hình đang ở `Off`, lần bấm đầu tiên đánh thức LCD (`ST7789_SLPOUT 0x11`, chờ 5 ms, bật AW9364 >= 35 µs rồi bước tới mức sáng đích) và nuốt sự kiện bấm đơn đó để không vô tình dạy nhầm phản ứng (nhấn giữ cả 2 nút vẫn mở thẻ QR bình thường).
+   - **Tương tác từ App qua BLE:** Khi kết nối BLE, nhận lệnh từ App, hoặc nhận bong bóng phụ đề (`7a6e0010`), `pacer.touch(now)` tự động đánh thức màn hình ngay lập tức.
+3. **Giao thức BLE Opcode 11 (`DisplaySettings`) & Lưu bền vững NVS (`xuna_ui`):**
+   - Opcode 11 (`8 byte`): `arg` = `0..2` (`Low` / `Medium` / `High`), `source` = `0..1` (`screenSleepEnabled`), quảng bá qua capability byte 3 bit 7 (`0x80`).
+   - Lưu vào NVS namespace `xuna_ui` (`keys: br, slp`) thông qua `ScenePreference`.
+4. **Đồng bộ Cài đặt trên App (`mobile/`):**
+   - Mở khoá 2 mục trên màn hình **Thiết bị** (`HomeDeviceTab` & `HomeDeviceSettingsCard`):
+     - **Độ sáng màn hình (`home_brightness`):** Ô chọn trên `HomeDeviceTab` xoay vòng `Vừa → Cao → Thấp`, lưu vào `DevicePreferences` (Hive) và gửi BLE opcode 11 xuống mạch khi đang kết nối.
+     - **Đánh thức màn hình / Ngủ tiết kiệm pin (`home_settingWake`):** Công tắc trên `HomeDeviceSettingsCard` kèm mô tả `home_settingWakeNote`, lưu vào `DevicePreferences` và đồng bộ BLE opcode 11 ngay khi bật/tắt hoặc khi vừa kết nối mạch.
