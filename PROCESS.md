@@ -1,6 +1,35 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **Knowledge Expert plan approved (KX-1…KX-6, documentation only)**. Before that: **Thermal & Power Phase 1 in firmware (AW9364 pulse sync, BLE 0 dBm TX power, adaptive 5 FPS / 25 ms quiet pacing; native 376/376 PASS, build SUCCESS)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 pytest PASS, eval mode 40/40, domain 40/40)**. Before that: **Knowledge Expert plan approved (KX-1…KX-6, documentation only)**.
+
+## 2026-10-29 — KX-1: Backend expert mode, dual-output, routing & owner-context retrieval
+
+- **User requirement:** Thực hiện đúng session KX-1 của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) (chỉ backend, không đụng mobile hay firmware).
+- **Backend (`backend/`):**
+  - **Domain:**
+    - `modules/conversation/domain/turn_mode.py`: `RequestedMode`, `TurnMode`, `Channel`, `ModeReason`, `ModeDecision`, `LONG_TEXT_CHARS=280`, `decide_mode`, `looks_like_code`, `is_task_request` theo thứ tự ưu tiên §6.2.
+    - `modules/conversation/domain/reply_sections.py`: `MAX_SAY_CHARS=280`, `Section`, `ReplySectionFilter`, `fallback_say` tách luồng `<say>...</say>` và Markdown `detail`, an toàn qua ranh giới chunk và không cắt thẻ dở dang.
+    - `modules/conversation/domain/fact_format.py`: chuyển `_format_fact` thành `format_fact(content)` dùng chung.
+    - `modules/knowledge/domain/owner_context.py`: `DeviceSlotView`, `DomainBrief`, `DocSnippet`, `OwnerContext`.
+  - **Application:**
+    - `modules/knowledge/application/owner_context.py`: `BuildOwnerContextUseCase` chọn domain (`explicit_domain_id` hoặc lexical similarity `>= 0.20`, bỏ qua domain ở slot `resting`/`archived`), xếp hạng conventions/cases theo lexical + recency + kind weight, áp trần ký tự (`8 × 140`, `4 × 180`, unsorted `3`).
+    - `modules/conversation/application/chat_turn.py`: tách `PERSONA_CORE_VI`, `CHAT_STYLE_VI`, `EXPERT_STYLE_VI`, `SAFETY_VI`, giữ nguyên chuỗi `PERSONA_VI` và tạo `PERSONA_EXPERT_VI`; thêm `describe_owner_context`, `ReplyBudget`, `DetailDelta`, `TurnContext.owner` / `mode`, `chat_turn(sections=..., locale_vi=...)`; xoá `TurnContext.knowledge`.
+    - `modules/conversation/application/spoken_turn.py`: mở rộng `SpokenTurnEvent` nhận `DetailDelta` và truyền thẳng qua không đưa vào TTS.
+    - `modules/conversation/application/turn_preparation.py`: `PreparedTurn`, `prepare_turn` gom facts cá nhân, `BuildOwnerContextUseCase` (bọc `try/except` trả `OwnerContext()` khi lỗi) và `decide_mode`.
+    - `modules/conversation/application/voice_session.py`: `stream_turn_reply` nhận `mode`, `budget`, `generator`, bật `sections=(mode == TurnMode.EXPERT)`.
+  - **Config, Wiring & API:**
+    - `core/config.py`, `main.py`, `.env.example`, `docs/ops/internal-ai-over-vpn.md`: thêm `expert_model`, `expert_max_output_tokens`, `expert_timeout_seconds`, `chat_max_output_tokens`, `chat_timeout_seconds` và khởi tạo `app.state.expert_text_generator`.
+    - `modules/conversation/api/routes.py`: mở rộng `TurnRequest` (`mode`, `domainId`, `knowledge`, `text` ≤ 8000 khi có `mode="auto"|"expert"`, `history[].text` ≤ 2000), đóng DB session trước khi stream LLM, phát SSE `mode` (chỉ khi client gửi `mode`), `detail` trước `finished`, và bổ sung `mode`, `domainId`, `hasDetail` vào `finished`.
+    - `modules/conversation/api/websocket.py`: đọc `mode`, `context.knowledge`, `context.domainId`, gọi `prepare_turn` trước khi tạo task, phát `turn.mode`, `detail.delta` trước `reply.finished`, và bổ sung `mode`, `domainId`, `hasDetail` vào `reply.finished`.
+- **Validation (Windows, PostgreSQL 16 `postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test`):**
+  - `ruff format --check` trên 22 file KX-1: **PASS** (5 file cũ chưa format từ PROCESS 2026-10-27 được giữ nguyên không đụng).
+  - `ruff check src tests migrations scripts`: **PASS** (`All checks passed!`).
+  - `mypy` & `mypy --strict` trên `src` và toàn bộ test KX-1: **PASS** (`Success: no issues found`).
+  - `alembic upgrade head`: **PASS** (head `0010_device_session_status`).
+  - `pytest -q`: **385/385 PASS** (trong đó `test_architecture.py` 4/4 PASS). Chỉ sửa 1 test cũ (`test_build_request_includes_knowledge_facts_within_bounds` trong `test_chat_turn.py`) do chuyển từ `TurnContext.knowledge` sang `TurnContext.owner` theo §6.4.4 / §10.
+  - Eval `backend/tests/fixtures/turn_domain_vi.json` (40 mục): **mode đúng 40/40 (100.0% >= 90%), domain đúng 40/40 (100.0% >= 80%)**.
+- **Not run:** Chưa gọi AI provider thật (dùng generator giả trong pytest), chưa chạy trên điện thoại và board vật lý.
+- **Next:** KX-2 (Mobile dual-output UI và công tắc chế độ).
 
 ## 2026-10-29 — M06 Knowledge Expert: owner decisions and implementation plan (docs only)
 

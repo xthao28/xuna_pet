@@ -2,7 +2,7 @@
 
 > **Trạng thái:** owner-approved 2026-10-29. Owner chọn cả 6 khuyến nghị (§1, KX-D1..KX-D6). Các con số có ký hiệu **[P]** là mặc định đã duyệt: được chỉnh sau khi đo, nhưng phải báo owner.
 > **Thay cho một phần của** [knowledge-domains-plan-2026-10-27.md](knowledge-domains-plan-2026-10-27.md) (KD). Những gì plan này không nhắc tới thì KD vẫn giữ nguyên, đặc biệt là firmware (KD-1/KD-2), opcode 10, projection `7a6e000f`, luồng confirm → device commit, xoá có tombstone. Danh sách điểm bị thay ở §13.
-> **Session:** KX-1 → KX-6 (§10). Chưa session nào bắt đầu.
+> **Session:** KX-1 → KX-6 (§10). **KX-1 đã hoàn thành (2026-10-29, backend: 385/385 pytest PASS, eval `turn_domain_vi.json` mode 40/40 = 100%, domain 40/40 = 100%).** Tiếp theo: KX-2.
 > **Firmware: không sửa gì** trong toàn bộ plan này.
 
 ---

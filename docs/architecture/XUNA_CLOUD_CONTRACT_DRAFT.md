@@ -66,8 +66,14 @@ GET /v1/audit-events?limit=50 → { "items": [ { "eventId", "action", "subject",
 ```http
 POST /v1/conversations/{petId}/turns     Accept: text/event-stream
 { "schemaVersion": 1, "text": "…", "locale": "vi", "speak"?: false,
+  "mode"?: "auto"|"chat"|"expert",                                    (KX-1, 2026-10-29: omitted = legacy chat;
+                                                                       text ≤ 500 chars when omitted or "chat",
+                                                                       ≤ 8000 chars when "auto" or "expert")
+  "domainId"?: "<uuid>",                                              (KX-1: explicit active domain override)
   "clientTime"?: "2026-10-23T21:05:00+07:00",                       (turn context, 2026-10-23)
-  "history"?: [{ "role": "owner"|"xuna", "text": "…" }],            (≤ 12 lines, each ≤ 500 chars)
+  "history"?: [{ "role": "owner"|"xuna", "text": "…" }],            (≤ 12 lines, each ≤ 2000 chars)
+  "knowledge"?: [{ "slot": 0..4, "level": 0..3, "state": "active"|"resting"|"archived" }],
+                                                                      (KX-1: device knowledge slot view)
   "pet"?: { "activeSeconds", "learnedEvents", "current"?, "quietChoice"?, "playChoice"?,
             "personality"?, "mood"? } }
                                                                       (actions: idle|happy|curious)
@@ -78,13 +84,20 @@ POST /v1/conversations/{petId}/turns     Accept: text/event-stream
                                                                        for a pet with an identity)
   "gestures"?: true }                                                 (2026-10-27: the connected board advertises
                                                                        Track A previews, so the AI may pick one)
-→ SSE events: gesture {name} | delta {text} | toolCall {name, arguments} | finished {provider, model, latencyMs, spoken?, firstAudioMs?, signals?}
+→ SSE events: mode {mode: "chat"|"expert", domainId: "<uuid>"|null, reason}   (KX-1: only when request sent "mode")
+             | gesture {name} | delta {text} | detail {text} | toolCall {name, arguments}
+             | finished {provider, model, latencyMs, mode, domainId, hasDetail, spoken?, firstAudioMs?, signals?, candidate?}
              (PE-4c, 2026-10-25: signals = 0–2 closed tags from the owner's text,
               praise|scold|affection|playful|curious_question|long_chat; never stored;
               the app forwards them to the device as BLE opcode 8)
              (2026-10-27: gesture = at most one, before the text, only when the body asked with
               "gestures": true; name look_around|yawn_stretch|bounce_play|greet_nuzzle; the
               app plays it as a Track A preview, opcode 1 args 4-7, display only)
+             (KX-1, 2026-10-29: in expert mode the model streams `<say>…</say>` followed by
+              Markdown detail; `delta` carries only the spoken/board `<say>` summary and
+              `detail` carries the Markdown body before `finished`; TTS synthesises only `say`.
+              `/v1/voice` WebSocket mirrors this via `turn.commit.mode`, `turn.mode`, `detail.delta`,
+              and `mode`/`domainId`/`hasDetail` on `reply.finished`.)
              | error {code}
              | audio {seq, text, format: "mp3"|"wav", sampleRate, data: base64}   (speak only)
              | speech_unavailable {code: "voice_unavailable"|"provider_unavailable"} (speak only, once)

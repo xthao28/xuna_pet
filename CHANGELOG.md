@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Máy chủ hỗ trợ chế độ trả lời chuyên sâu (Knowledge Expert KX-1)
+
+- **Hai phần trả lời trong một lượt:** Khi bạn hỏi câu chuyên môn dài, kèm mã nguồn hoặc bật chế độ Chuyên sâu, máy chủ tách câu trả lời của XUNA thành hai phần: lời tóm tắt ngắn gọn để XUNA đọc thành tiếng và hiện trên màn hình thiết bị, kèm phần giải thích chi tiết (bố cục, các bước, mã nguồn) gửi riêng về ứng dụng.
+- **Chọn đúng lĩnh vực đang làm việc:** Máy chủ tự đối chiếu câu hỏi (cả nhắn chữ lẫn giọng nói) với các lĩnh vực và quy ước bạn đã xác nhận cho XUNA, đồng thời tự bỏ qua các lĩnh vực đang tạm nghỉ trên thiết bị.
+- **Tương thích hoàn toàn với ứng dụng hiện tại:** Các bản ứng dụng cũ chưa gửi chế độ trả lời vẫn nhận câu trả lời trò chuyện ngắn gọn như trước.
+- Backend 385/385 bài kiểm thử PASS, bộ đánh giá phân loại chế độ và lĩnh vực tiếng Việt đạt 40/40 (100%). Chưa thử với AI thật và trên điện thoại.
+
 ## 2026-10-29 — Giảm nhiệt và tối ưu hiệu năng cho board (Giai đoạn 1)
 
 - **Đèn nền chuẩn mức sáng:** Sửa thứ tự khởi tạo và khoá ngắt khi phát xung điều khiển IC đèn nền `AW9364` để màn hình hạ đúng về mức sáng cài đặt thay vì kẹt ở mức tối đa 100%.
