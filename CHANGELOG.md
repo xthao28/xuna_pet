@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Ứng dụng hiển thị câu trả lời chuyên sâu và công tắc chế độ (Knowledge Expert KX-2)
+
+- **Công tắc chế độ trả lời:** Thanh trò chuyện có thêm nút chuyển nhanh giữa ba chế độ Tự động, Chuyên sâu và Trò chuyện, đồng thời cho phép nhập câu hỏi dài tối đa 8.000 ký tự khi ở chế độ Tự động hoặc Chuyên sâu.
+- **Tách riêng lời nói trên mạch và chi tiết trên ứng dụng:** Khi XUNA trả lời chuyên sâu, màn hình thiết bị hiện phụ đề «Để mình xem kỹ nhé…» rồi chỉ hiện và đọc câu tóm tắt ngắn gọn; phần giải thích chi tiết (bố cục Markdown, các bước, mã nguồn) hiện trong thẻ xem trước ngay dưới tin nhắn kèm nút «Xem chi tiết» và «Sao chép».
+- **Gửi trạng thái ô lĩnh vực từ thiết bị:** Cả lượt nhắn chữ lẫn giọng nói đều gửi danh sách các ô lĩnh vực đang hoạt động hoặc tạm nghỉ trên thiết bị để máy chủ chọn đúng ngữ cảnh.
+- Ứng dụng 318/318 bài kiểm thử PASS, lutter analyze 0 lỗi. Chưa thử với AI thật và trên điện thoại.
+
 ## 2026-10-29 — Máy chủ hỗ trợ chế độ trả lời chuyên sâu (Knowledge Expert KX-1)
 
 - **Hai phần trả lời trong một lượt:** Khi bạn hỏi câu chuyên môn dài, kèm mã nguồn hoặc bật chế độ Chuyên sâu, máy chủ tách câu trả lời của XUNA thành hai phần: lời tóm tắt ngắn gọn để XUNA đọc thành tiếng và hiện trên màn hình thiết bị, kèm phần giải thích chi tiết (bố cục, các bước, mã nguồn) gửi riêng về ứng dụng.

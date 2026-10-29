@@ -1,6 +1,37 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 pytest PASS, eval mode 40/40, domain 40/40)**. Before that: **Knowledge Expert plan approved (KX-1…KX-6, documentation only)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-2 Mobile dual-output UI & reply mode switch (lutter analyze 0 issues, lutter test 318/318 PASS)**. Before that: **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 pytest PASS, eval mode 40/40, domain 40/40)**.
+
+## 2026-10-29 — KX-2: Mobile dual-output UI và công tắc chế độ
+
+- **User requirement:** Thực hiện toàn bộ session KX-2 của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) (chỉ mobile/, không đụng ackend/ hay irmware/). Owner duyệt dùng lutter_markdown_plus (^1.0.7 / 1.0.7) cho cổng KX-T5.
+- **Mobile (mobile/):**
+  - **Dependency:** Thêm lutter_markdown_plus: ^1.0.7 (1.0.7 + markdown 7.3.0) trong pubspec.yaml và pubspec.lock.
+  - **Domain:**
+    - lib/features/account/domain/entity/reply_mode.dart: ReplyMode { chat, expert } và RequestedReplyMode { auto, chat, expert }.
+    - lib/features/account/domain/entity/cloud_turn_context.dart: thêm CloudKnowledgeSlotView, knowledge, domainId, nâng maxLineChars = 2000 để giữ say\ndetail trong history cho lượt sau, cập nhật ounded().
+    - lib/features/account/domain/entity/cloud_reply_event.dart: thêm CloudReplyMode, CloudReplyDetail, CloudReplyFinished.
+    - lib/features/account/domain/repository/cloud_repository.dart, lib/features/account/domain/usecase/stream_cloud_reply_use_case.dart: truyền mode (RequestedReplyMode.auto mặc định), maxTextChars = 500, maxExpertTextChars = 8000, maxCharsForMode(mode).
+    - lib/features/voice/domain/repository/voice_turn_repository.dart, lib/features/voice/domain/usecase/commit_voice_turn_use_case.dart: trừu tượng hoá commitTurn cho đường WebSocket /v1/voice không phụ thuộc ccount/data/.
+  - **Data:**
+    - lib/features/account/data/repository/cloud_repository_impl.dart: gửi mode trong postTurn, bổ sung knowledge và domainId trong contextJson, giải mã SSE mode, detail, inished.
+    - lib/features/voice/data/data_source/voice_websocket_data_source.dart: thêm VoiceWsTurnMode, VoiceWsDetailDelta, mở rộng VoiceWsReplyFinished (mode, domainId, hasDetail) và sendTurnCommit(mode: ...).
+    - lib/features/voice/data/mapper/voice_turn_context_mapper.dart, lib/features/voice/data/repository/voice_turn_repository_impl.dart: tuần tự hoá CloudTurnContext sang JSON trên WebSocket đồng nhất với CloudRepositoryImpl.contextJson (kiểm tra bằng golden test 	est/fixtures/turn_context_v2.json).
+  - **Presentation, Controller & Locales:**
+    - ssets/locales/vi_VN.json, ssets/locales/en_US.json, lib/generated/locales.g.dart: thêm 7 khoá KX-2 (home_replyModeAuto, home_replyModeExpert, home_replyModeChat, home_expertOpenDetail, home_expertCopy, home_expertThinking, home_expertDetailTitle).
+    - lib/features/home/presentation/widgets/home_reply_detail_sheet.dart: bottom sheet hiển thị Markdown chi tiết bằng MarkdownBody (lutter_markdown_plus) kèm nút sao chép (Clipboard.setData) và đóng qua 
+av.back().
+    - lib/features/home/presentation/widgets/home_chat_bubble.dart, home_chat_composer.dart, home_chat_tab.dart, home_page.dart, home_binding.dart: thêm pill chuyển chế độ Tự động / Chuyên sâu / Trò chuyện (HomeChatComposer.modeKey), thẻ xem trước 3 dòng + nút Xem chi tiết (HomeChatBubble.openDetailKey) mở HomeReplyDetailSheet qua 
+av.bottomSheet.
+    - lib/features/home/presentation/controller/home_controller.dart: thêm 
+eplyMode, cycleReplyMode(), mở rộng HomeChatMessage (detail, domainId, expert), hiển thị phụ đề Để mình xem kỹ nhé… một lần khi vào lượt expert, chỉ gửi say tới TTS và board (_showOnBoard không bao giờ nhận detail), ghép say\ndetail (cắt theo maxLineChars = 2000) trong _turnContext().history, gửi knowledge slots khi đang kết nối thiết bị.
+- **Validation (Windows, Flutter 3.32.8 via FVM):**
+  - vm flutter pub get: **PASS**.
+  - vm dart format (chỉ trên các file KX-2): **PASS**.
+  - vm flutter analyze: **PASS** (No issues found!).
+  - vm flutter test: **318/318 PASS** (bao gồm golden test 	urn_context_v2.json, SSE/WS expert stream tests, controller board/history tests, và widget test cho mode chip + HomeReplyDetailSheet).
+- **Not run:** Chưa chạy với AI provider thật, chưa chạy trên điện thoại thật và board vật lý.
+- **Next:** KX-3 (Domain Packs + Working Brief + nâng cấp prompt theo lĩnh vực).
 
 ## 2026-10-29 — KX-1: Backend expert mode, dual-output, routing & owner-context retrieval
 

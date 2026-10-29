@@ -2,7 +2,7 @@
 
 > **Trạng thái:** owner-approved 2026-10-29. Owner chọn cả 6 khuyến nghị (§1, KX-D1..KX-D6). Các con số có ký hiệu **[P]** là mặc định đã duyệt: được chỉnh sau khi đo, nhưng phải báo owner.
 > **Thay cho một phần của** [knowledge-domains-plan-2026-10-27.md](knowledge-domains-plan-2026-10-27.md) (KD). Những gì plan này không nhắc tới thì KD vẫn giữ nguyên, đặc biệt là firmware (KD-1/KD-2), opcode 10, projection `7a6e000f`, luồng confirm → device commit, xoá có tombstone. Danh sách điểm bị thay ở §13.
-> **Session:** KX-1 → KX-6 (§10). **KX-1 đã hoàn thành (2026-10-29, backend: 385/385 pytest PASS, eval `turn_domain_vi.json` mode 40/40 = 100%, domain 40/40 = 100%).** Tiếp theo: KX-2.
+> **Session:** KX-1 → KX-6 (§10). **KX-1 đã hoàn thành (2026-10-29, backend: 385/385 pytest PASS, eval `turn_domain_vi.json` mode 40/40 = 100%, domain 40/40 = 100%). KX-2 đã hoàn thành (2026-10-29, mobile: `flutter analyze` 0 issues, `flutter test` 318/318 PASS).** Tiếp theo: KX-3.
 > **Firmware: không sửa gì** trong toàn bộ plan này.
 
 ---
@@ -62,7 +62,7 @@
 | KX-T2 | Không thêm `CandidateType` mới. Vẫn dùng `knowledge` và thêm `content.kind ∈ {convention, case, document}`. Mục cũ không có `kind` được coi là `convention` | [P] |
 | KX-T3 | Tài liệu (KX-5): lưu chunk + embedding trong **JSONB** và lọc từ vựng trước, rồi cosine trên ≤ 50 ứng viên. **Chưa dùng pgvector** (không thêm extension hay package). Chỉ viết ADR pgvector khi một pet vượt trần chunk | [P]. Điều chỉnh so với câu trả lời trước: tránh dependency mới mà vẫn đủ nhanh |
 | KX-T4 | Upload tài liệu dạng base64 trong JSON (giống `/v1/speech/transcriptions`), **không** dùng multipart (multipart cần `python-multipart`) | [P] |
-| KX-T5 | Dependency **cần owner duyệt trước session tương ứng**: mobile `flutter_markdown_plus` (KX-2), backend `pypdf` (KX-5, chỉ khi cần PDF), mobile `file_picker` (KX-5) | **Chưa duyệt.** Coder phải dừng và hỏi |
+| KX-T5 | Dependency **cần owner duyệt trước session tương ứng**: mobile `flutter_markdown_plus` (KX-2, **owner-approved 2026-10-29**: `flutter_markdown_plus: ^1.0.7` / `1.0.7`), backend `pypdf` (KX-5, chỉ khi cần PDF), mobile `file_picker` (KX-5) | `flutter_markdown_plus` đã duyệt; `pypdf` và `file_picker` chưa duyệt (dừng hỏi trước KX-5) |
 | KX-T6 | Consent cho tài liệu: lớp mới `owner_documents` (U4), theo đúng mẫu migration `0004_consent_voice` | [P] |
 
 ---
