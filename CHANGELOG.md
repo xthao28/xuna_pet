@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Hoàn tất kiểm thử tổng thể Knowledge Expert M06 và tối ưu cấu trúc ứng dụng (KX-6)
+
+- **Kiểm chứng toàn diện 6 tiêu chí Knowledge Expert (KX-6):** Xác nhận trọn vẹn luồng hoạt động từ thiết bị, ứng dụng đến máy chủ qua bộ kiểm thử tự động: so sánh câu trả lời giữa 2 lĩnh vực (`Lập trình nhúng` từ gói mẫu và lĩnh vực tự đặt), tách bạch lời nói ngắn (`<= 200` ký tự) đọc thành tiếng/hiện trên màn hình mạch với bản phân tích Markdown chi tiết trên ứng dụng, tăng mức độ ăn ý (`Mới quen` → `Ăn ý`) qua quy ước làm việc, việc đã giải quyết và tài liệu tham khảo U4, hạ mức và loại bỏ ngay khỏi bộ nhớ khi xoá bằng chứng, giữ nguyên mức trên mạch và tự chuyển về câu trả lời mẫu khi mất mạng, đồng thời tương thích ngược hoàn toàn với ứng dụng phiên bản cũ.
+- **Tách gọn bộ điều phối màn hình chính trên ứng dụng:** Tổ chức lại `HomeController` thành 5 dịch vụ chuyên biệt (Lĩnh vực & tri thức, Ứng viên ký ức, Tài khoản đám mây, Thiết bị Bluetooth, và Trò chuyện giọng nói) giúp mã nguồn gọn nhẹ, dễ bảo trì mà không thay đổi giao diện hay trải nghiệm.
+- Backend 402/402 bài kiểm thử PASS, ứng dụng 329/329 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Chờ đo độ trễ âm thanh thực tế và kiểm tra trực quan trên điện thoại + mạch thật.
+
 ## 2026-10-29 — Nạp tài liệu tham khảo riêng và quyền dữ liệu U4 (Knowledge Expert KX-5)
 
 - **Quyền dữ liệu U4 (Tài liệu của bạn):** Trong mục Quyền dữ liệu trên ứng dụng có thêm lựa chọn `U4 · Tài liệu của bạn` (mặc định tắt). Khi bật, bạn có thể nạp tài liệu văn bản hoặc Markdown riêng để XUNA tra cứu khi trả lời chuyên sâu.

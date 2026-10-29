@@ -1,6 +1,37 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-5 Owner Reference Documents, Consent U4, Heading-Aware Chunker & Expert Snippet Retrieval (ADR-0011; backend 401/401 pytest PASS, migration `0012`; mobile `flutter analyze` 0 issues, `flutter test` 328/328 PASS)**. Before that: **KX-4 Working Conventions & Solved Cases (backend 393/393, mobile 325/325)**, **KX-3 Domain Packs & Working Brief (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-6 M06 Knowledge Expert Host Acceptance & `HomeController` Service Refactor ([KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md); backend 402/402 pytest PASS; mobile `flutter analyze` 0 issues, `flutter test` 329/329 PASS)**. Before that: **KX-5 Owner Reference Documents (ADR-0011; backend 401/401, mobile 328/328)**, **KX-4 Working Conventions & Solved Cases (backend 393/393, mobile 325/325)**, **KX-3 Domain Packs & Working Brief (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+
+## 2026-10-29 — KX-6: Nghiệm thu M06 Knowledge Expert trên host & tách `HomeController` thành 5 Coordinator Services
+
+- **User requirement:**
+  1. Tách `HomeController` (`mobile/`) thành các service điều phối theo miền nghiệp vụ để giảm độ phình, kiểm tra lỗi và commit trước.
+  2. Thực hiện session **KX-6** (*Nghiệm thu M06 mới, thay KD-6*) của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) §10.
+- **`HomeController` Service Refactor (`mobile/`, committed as `c042a58` / root `a0c332a`):**
+  - Tách `HomeController` từ 1.981 dòng (40 dependencies) thành 5 coordinator services nằm tại `lib/features/home/presentation/service/`:
+    - `HomeKnowledgeService` (quản lý lĩnh vực, khung chuyên môn, dạy quy ước, lưu việc đã giải quyết, nạp/xoá tài liệu U4, gợi ý lĩnh vực).
+    - `HomeMemoryCandidateService` (ứng viên ký ức chờ xác nhận, xác nhận/từ chối/gắn lại lĩnh vực, sự kiện đã xác nhận).
+    - `HomeCloudAccountService` (đăng nhập/đăng xuất Firebase, quyền dữ liệu U1–U4, khôi phục sao lưu, đồng bộ hồ sơ thiết bị).
+    - `HomeDeviceService` (quét/kết nối BLE, đọc trạng thái/tính cách/kiến thức `7a6e000f`, nở trứng, điều chỉnh âm lượng/độ sáng, xuất dữ liệu).
+    - `HomeVoiceService` (phiên trò chuyện giọng nói qua WebSocket `/v1/voice`, ghi âm, phát TTS theo câu, gửi phụ đề và cử chỉ xuống board).
+  - Giữ nguyên toàn bộ API/reactive getters trên `HomeController` (dùng `HomeController.fromServices` cho `HomeBinding` và `factory HomeController` tương thích ngược cho toàn bộ test hiện có).
+- **KX-6 Acceptance & Bug Fix (`backend/`, `mobile/`, `docs/`):**
+  - **Biên bản nghiệm thu:** [KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md) ghi nhận đầy đủ bằng chứng cho cả 6 tiêu chí KX-6 (§10).
+  - **Backend (`backend/`):**
+    - Sửa lỗi phân giải chuỗi UUID qua HTTP JSON khi bật `ConfigDict(strict=True)`: thêm `strict=False` cho trường `domain_id: UUID | None` trong `TeachKnowledgeRequest`, `ProposeKnowledgeCaseRequest`, `UploadDocumentRequest` (`modules/knowledge/application/schemas.py`) và `CreateCandidateRequest`, `PatchCandidateRequest` (`modules/memory/application/schemas.py`).
+    - Thêm `tests/modules/knowledge/test_kx6_acceptance.py` (`test_kx6_full_acceptance_matrix`) kiểm thử tích hợp end-to-end cả 6 tiêu chí KX-6 trên PostgreSQL thật:
+      1. Hai domain (`embedded` từ pack + domain tự đặt `Bếp gia đình`) trả lời cùng câu hỏi chuyên môn với `say <= 200` ký tự và `detail` Markdown có cấu trúc.
+      2. Đường giọng nói (`/v1/voice`): TTS chỉ đọc `say`, `detail` tách riêng qua `detail_delta`, và `reply_finished` báo `mode="expert"`, `hasDetail=True`.
+      3. Tiến trình mức `0 → 2` (`Ăn ý`) qua quy ước (`convention`), tình huống đã giải quyết (`case`) và tài liệu U4 (`document`); ở mức 2, system prompt yêu cầu XUNA chủ động áp dụng quy ước mà không cần nhắc.
+      4. Khi thiết bị báo mức qua projection `7a6e000f`, backend chỉ đọc mức từ request và không tự tính/lưu mức.
+      5. Xoá case (`DELETE` / `action="delete"`): mục bị xoá tạo tombstone, biến mất khỏi `OwnerContext` prompt, và khi mức thiết bị giảm về `1` thì hướng dẫn chủ động mức `2` không còn xuất hiện.
+      6. Tương thích ngược: ứng dụng cũ (trước KX-2, không gửi `mode`) vẫn nhận phản hồi `chat` truyền thống (`<= 500` ký tự, không có thẻ `<say>`).
+  - **Mobile (`mobile/`):**
+    - Thêm `test/features/home/presentation/controller/kx6_acceptance_test.dart` kiểm thử end-to-end luồng mobile: tạo 2 domain (`embedded` pack + domain tự đặt), hỏi câu chuyên sâu (mạch chỉ nhận `say`, không bao giờ nhận Markdown `detail`), đề xuất và lưu việc đã giải quyết (`proposeSolvedCase` → `commitConfirmingKnowledge`), nạp tài liệu U4 (`uploadKnowledgeDocument`), mất kết nối mạng (`offline` vẫn giữ nguyên `knowledgeProfile` từ thiết bị và trả lời bằng mẫu cục bộ `home_replyUnknown`), và xoá domain giải phóng slot trên thiết bị.
+- **Validation (Windows):**
+  - Backend (`postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test`): `ruff format --check` trên các file đã sửa **PASS**, `ruff check src tests migrations scripts` **PASS**, `mypy --strict src tests/modules/knowledge/test_kx6_acceptance.py` **PASS** (178 files), `pytest -q` **402/402 PASS**.
+  - Mobile (Flutter 3.32.8 via FVM): `fvm dart format` **PASS**, `fvm flutter analyze` **PASS** (`No issues found!`), `fvm flutter test --no-pub` **329/329 PASS**.
+- **Not run:** Chưa đo p50 thời gian đến âm thanh đầu tiên với AI/TTS provider thật và chưa chạy nghiệm thu vật lý trực tiếp trên điện thoại + board LILYGO T-Display-S3.
 
 ## 2026-10-29 — KX-5: Tài liệu của chủ (Consent U4, chia đoạn theo tiêu đề, tìm đoạn và hiển thị trên app)
 

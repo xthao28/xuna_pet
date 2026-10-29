@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-18** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/milestones/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -492,3 +492,11 @@ Current: item 2 uploaded with initial smoke PASS, remaining board checks owner-s
 ## Git delivery checkpoint — 2026-10-16
 
 Owner requested all pending work committed: firmware `b0f4ded`, mobile `4976147`, then root docs and updated gitlinks. No push requested/performed. Implementation/board validation status remains unchanged; S26 is source/build only, while the board runs the preceding S13/S18 image.
+
+## M06 Knowledge Domains & Knowledge Expert checkpoint — 2026-10-29
+
+| ID | Status | Evidence / next step |
+| --- | --- | --- |
+| KD-0..KD-5 | Done on host — 2026-10-27..28 | Firmware `KnowledgeProfile` + BLE opcode 10 + projection `7a6e000f` (376/376 native PASS), backend `knowledge` module, mobile UI & orchestration; see [knowledge-domains-plan-2026-10-27.md](docs/roadmap/knowledge/knowledge-domains-plan-2026-10-27.md) |
+| KX-1..KX-5 | Done on host — 2026-10-29 | Dual-output `<say>` + Markdown `detail`, mode/domain router, Domain Packs + Working Brief (migration `0011`), Working Conventions + Solved Cases, Owner Reference Documents with U4 consent (ADR-0011, migration `0012`), `HomeController` 5-service refactor; see [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) |
+| KX-6 | Done on host — 2026-10-29; physical board + phone + live AI provider trial pending | [KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md): 6/6 KX-6 criteria verified on host (`backend` 402/402 pytest PASS, `mobile` 329/329 flutter test PASS, `flutter analyze` 0 issues) |
