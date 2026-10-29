@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Ghi nhớ quy ước làm việc, lưu việc đã giải quyết và đổi tên mức độ ăn ý (Knowledge Expert KX-4)
+
+- **Ghi nhớ quy ước và tình huống đã giải quyết:** Khi XUNA trả lời chuyên sâu và giúp bạn xử lý xong một việc, dưới câu trả lời có thêm nút «Đã giải quyết» để tóm tắt ngắn gọn vấn đề và cách giải (không lưu nguyên văn đoạn hội thoại). Bạn kiểm tra bản tóm tắt rồi bấm xác nhận để lưu vào XUNA như một kinh nghiệm làm việc chung.
+- **Đổi tên 4 mức độ đồng hành:** Các mức trong mỗi lĩnh vực được đặt tên theo độ hiểu ý giữa bạn và XUNA: `Mới quen` → `Bắt nhịp` → `Ăn ý` → `Đồng đội`, kèm nhãn phân biệt rõ `Quy ước`, `Việc đã giải quyết` và `Tài liệu`.
+- **Tiếp tục ghi nhớ khi ô trên mạch đã đầy 32 kinh nghiệm:** Khi một ô lĩnh vực trên mạch đã đạt đủ 32 kinh nghiệm (mức Đồng đội), ứng dụng hiện thông báo rõ ràng và vẫn lưu các quy ước, tình huống mới của bạn lên đám mây mà không gây lỗi ghi trên mạch.
+- Backend 393/393 bài kiểm thử PASS, ứng dụng 325/325 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Chưa thử với AI thật và trên điện thoại.
+
 ## 2026-10-29 — Bổ sung 7 lĩnh vực chuyên môn mẫu, khung làm việc và chọn lĩnh vực khi trò chuyện (Knowledge Expert KX-3)
 
 - **7 lĩnh vực chuyên môn mẫu (Domain Packs):** Khi tạo lĩnh vực mới, bạn có thể chọn nhanh một trong 7 gói chuyên môn biên tập sẵn (`Nhúng & phần cứng`, `Phần mềm & hệ thống`, `Tài chính & kế toán`, `Marketing & sản phẩm`, `Pháp luật (tham khảo)`, `Y sinh & sức khoẻ (tham khảo)`, `Ngôn ngữ & viết lách`) để điền sẵn tên, mô tả, khung chuyên môn và mức lưu ý an toàn.

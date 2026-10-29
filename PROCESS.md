@@ -1,6 +1,33 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-3 Domain Packs, Working Brief & Chat Domain Picker (backend 390/390 pytest PASS, migration `0011`; mobile `flutter analyze` 0 issues, `flutter test` 322/322 PASS)**. Before that: **KX-2 Mobile dual-output UI & reply mode switch (318/318 PASS)** and **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 PASS)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-4 Working Conventions, Solved Cases, Bond Level Labels & 32-Slot Cap Handling (backend 393/393 pytest PASS; mobile `flutter analyze` 0 issues, `flutter test` 325/325 PASS)**. Before that: **KX-3 Domain Packs, Working Brief & Chat Domain Picker (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+
+## 2026-10-29 — KX-4: Bằng chứng đồng hành (quy ước làm việc, việc đã giải quyết, đổi tên mức ăn ý, xử lý slot đầy 32)
+
+- **User requirement:** Thực hiện session KX-4 của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) (backend + mobile, không đụng `firmware/`).
+- **Backend (`backend/`):**
+  - **Domain:**
+    - `modules/conversation/domain/candidate_extractor.py`: đổi `extract_knowledge_candidate` thành `extract_convention_candidate` (giữ alias `extract_knowledge_candidate` cho `test_evaluation.py`), thêm bộ quy tắc ngữ cảnh làm việc `_CONVENTION_CONTEXT_PATTERNS` (§6.9: quy ước xưng hô, định dạng trả lời, đơn vị/kỹ thuật/công cụ) và gắn `content={"text": cleaned, "summary": cleaned, "kind": "convention"}`.
+  - **Application & API:**
+    - `modules/knowledge/application/schemas.py`, `use_cases.py`: thêm `ProposeKnowledgeCaseRequest` (`question <= 4000`, `answer <= 8000`, `domainId`), thêm trường `kind` vào `TeachKnowledgeResponse`, cập nhật `TeachKnowledgeUseCase` gắn `kind="convention"`.
+    - `modules/knowledge/application/cases.py`: `CASE_SUMMARY_SYSTEM_VI` (nguyên văn Phụ lục C) và `ProposeKnowledgeCaseUseCase` tóm tắt câu hỏi + câu trả lời thành 1–2 câu `<= 180` ký tự (`Vấn đề: ... Cách giải: ...`), lọc sạch thẻ `<say>`/`<g:...>`, tính `factKey = compute_fact_key("case:" + summary)`, khử trùng lặp candidate cùng `fact_key`, tự gán `proposed_domain_id` (`>= 0.20`), tạo `MemoryCandidate(candidate_type=KNOWLEDGE, content={"text": summary, "summary": summary, "kind": "case"})`; **không bao giờ lưu hay log nguyên văn `question`/`answer`**.
+    - `modules/knowledge/api/routes.py`, `modules/conversation/api/routes.py`: thêm `POST /v1/pets/{pet_id}/knowledge-cases` (kiểm tra quyền U3 `conversationText`, kiểm tra chủ sở hữu pet, trả `503 provider_unavailable` khi LLM lỗi) và cập nhật `routes.py` gọi `extract_convention_candidate`.
+  - **Tests:**
+    - `tests/modules/conversation/test_candidate_extractor.py`, `tests/modules/knowledge/test_cases.py`: kiểm thử trích xuất quy ước (`kind="convention"`), tóm tắt case (`kind="case"`), khử trùng lặp, kiểm tra consent U3 (`403`), pet chủ khác (`404`), lỗi provider (`503`), và quét toàn bộ bảng PostgreSQL xác nhận không lưu `question`/`answer` nguyên văn.
+- **Mobile (`mobile/`):**
+  - **Locales:** cập nhật 4 tên mức độ ăn ý (`Mới quen` / `Bắt nhịp` / `Ăn ý` / `Đồng đội`), đổi nút sang `GHI NHỚ BỐI CẢNH` (`@facts kinh nghiệm · @days ngày`), cập nhật câu chữ sheet ghi nhớ quy ước, và thêm 5 khoá mới (`home_knowledgeSolved`, `home_knowledgeSlotFullNote`, `home_knowledgeKindConvention`, `home_knowledgeKindCase`, `home_knowledgeKindDocument`) trong `vi_VN.json`, `en_US.json`, `locales.g.dart`.
+  - **Domain & Data:**
+    - `KnowledgeSlot.maxEvidence = 32` và `isFull`.
+    - `CommitKnowledgeUseCase`: đọc `KnowledgeProfile` trước khi gửi BLE; nếu `slot.factCount >= 32` thì bỏ qua `_device.addKnowledgeEvidence` (tránh lỗi `invalid_argument` từ firmware khi đầy 32 bằng chứng) nhưng vẫn đọc `snapshotGeneration` và commit candidate lên cloud (`confirmMemoryCandidate` + `commitMemoryCandidate`).
+    - `TeachKnowledgeResult`, `TeachKnowledgeResultMapper`, `ProposeKnowledgeCaseUseCase`, `CloudRemoteDataSource.postKnowledgeCase`, `CloudRepository.proposeKnowledgeCase`, `CloudRepositoryImpl.proposeKnowledgeCase`.
+  - **Presentation & Controller:**
+    - `HomeChatBubble`, `HomeChatTab`, `HomePage`, `HomeController`, `HomeBinding`: thêm nút phụ `Đã giải quyết` (`HomeChatBubble.solvedKey`) trên bong bóng trả lời `expert` khi lượt đó có `domainId` hoặc pet có ít nhất 1 lĩnh vực đang hoạt động; bấm nút sẽ gọi `proposeSolvedCase` rồi mở `HomeTeachKnowledgeSheet` ở trạng thái xác nhận (`initialResult`) để chủ kiểm tra và bấm lưu vào XUNA.
+    - `HomeTeachKnowledgeSheet`, `HomeKnowledgeManageSheet`, `HomeCandidateCard`: hiển thị nhãn `kind` (`Quy ước` / `Việc đã giải quyết` / `Tài liệu`), hiển thị chú thích `home_knowledgeSlotFullNote` khi ô đạt 32 kinh nghiệm, và thay 3 chuỗi quan hệ cứng trong `HomeCandidateCard` bằng `LocaleKeys`.
+- **Validation (Windows):**
+  - Backend (`postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test`): `ruff format --check` trên 8 file KX-4 **PASS**, `ruff check` **PASS**, `mypy --strict src` **PASS** (175 files), `pytest -q` **393/393 PASS**.
+  - Mobile (Flutter 3.32.8 via FVM): `fvm dart format --output=none --set-exit-if-changed` trên 22 file KX-4 **PASS**, `fvm flutter analyze` **PASS** (`No issues found!`), `fvm flutter test` **325/325 PASS**.
+- **Not run:** Chưa chạy với AI provider thật, chưa chạy trên điện thoại thật và board vật lý.
+- **Next:** KX-5 (Tài liệu tham khảo nhẹ: dán ghi chú / nạp file `.md`/`.txt`, chia đoạn có tiêu đề phân cấp, tìm đoạn theo BM25).
 
 ## 2026-10-29 — KX-3: Domain Packs, Working Brief và chọn lĩnh vực khi trò chuyện
 

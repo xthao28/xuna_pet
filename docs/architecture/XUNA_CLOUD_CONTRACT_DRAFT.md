@@ -143,6 +143,15 @@ PATCH /v1/knowledge-domains/{domainId}
 POST /v1/knowledge-domains/{domainId}/brief-drafts
 {}
 → 200 { "domainId", "expertBrief" }  (AI draft only; never saved until the owner sends PATCH action="set_brief")
+
+POST /v1/pets/{petId}/knowledge-teach
+{ "schemaVersion": 1, "domainId"?: "<uuid>", "text": "…" }
+→ 201 { "candidateId", "factKey": 0..65535, "text", "kind": "convention", "proposedDomainId"?, "relation": "new"|"refines"|"contradicts", "relatedCandidateId"? }
+
+POST /v1/pets/{petId}/knowledge-cases
+{ "schemaVersion": 1, "domainId"?: "<uuid>", "question": "…", "answer": "…" }
+→ 201 { "candidateId", "factKey": 0..65535, "text": "Vấn đề: … Cách giải: …", "kind": "case", "proposedDomainId"?, "relation": "new"|"refines"|"contradicts", "relatedCandidateId"? }
+  (Requires conversationText U3 consent; question and answer are used transiently to draft the <= 180-char case summary and are never stored or logged.)
 ```
 
 ### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 and `projection` DC-5 implemented 2026-10-27, host tests only)
