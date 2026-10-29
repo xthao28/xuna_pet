@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Nạp tài liệu tham khảo riêng và quyền dữ liệu U4 (Knowledge Expert KX-5)
+
+- **Quyền dữ liệu U4 (Tài liệu của bạn):** Trong mục Quyền dữ liệu trên ứng dụng có thêm lựa chọn `U4 · Tài liệu của bạn` (mặc định tắt). Khi bật, bạn có thể nạp tài liệu văn bản hoặc Markdown riêng để XUNA tra cứu khi trả lời chuyên sâu.
+- **Chia đoạn thông minh, không lưu tệp gốc:** Tài liệu bạn nạp được chia thành từng đoạn ngắn theo tiêu đề và giữ nguyên các khối mã nguồn để tìm kiếm chính xác; máy chủ không lưu tệp gốc của bạn. Khi bạn xoá một tài liệu, toàn bộ các đoạn đã chia cũng được xoá ngay kèm dấu xóa (tombstone).
+- **Quản lý tài liệu ngay trong lĩnh vực:** Trong bảng Quản lý lĩnh vực, mục «Tài liệu tham khảo» cho phép xem danh sách tài liệu đã nạp (kèm số đoạn), xoá tài liệu hoặc dán/nạp tài liệu mới và tạo ứng viên bằng chứng `Tài liệu` để bạn xác nhận lưu vào XUNA.
+- Backend 401/401 bài kiểm thử PASS (kèm migration `0012`), ứng dụng 328/328 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Chưa thử với AI thật và trên điện thoại.
+
 ## 2026-10-29 — Ghi nhớ quy ước làm việc, lưu việc đã giải quyết và đổi tên mức độ ăn ý (Knowledge Expert KX-4)
 
 - **Ghi nhớ quy ước và tình huống đã giải quyết:** Khi XUNA trả lời chuyên sâu và giúp bạn xử lý xong một việc, dưới câu trả lời có thêm nút «Đã giải quyết» để tóm tắt ngắn gọn vấn đề và cách giải (không lưu nguyên văn đoạn hội thoại). Bạn kiểm tra bản tóm tắt rồi bấm xác nhận để lưu vào XUNA như một kinh nghiệm làm việc chung.

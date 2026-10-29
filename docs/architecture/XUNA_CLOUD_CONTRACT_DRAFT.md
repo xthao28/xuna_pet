@@ -52,14 +52,15 @@ Server rules: verify envelope hash and strict payload (implemented in `exports` 
 
 ```http
 GET /v1/consents → { "aggregateMetrics", "experienceEvents", "conversationText", "conversationVoice",
-                     "version", "updatedAt" | null }
+                     "ownerDocuments", "version", "updatedAt" | null }
 PUT /v1/consents   { "schemaVersion": 1, "aggregateMetrics": false, "experienceEvents": false,
-                     "conversationText": false, "conversationVoice"?: false, "expectedVersion": 0 }
+                     "conversationText": false, "conversationVoice"?: false, "ownerDocuments"?: false,
+                     "expectedVersion": 0 }
 → 200 new state | 409 consent_version_conflict
 GET /v1/audit-events?limit=50 → { "items": [ { "eventId", "action", "subject", "metadata", "occurredAt" } ] }
 ```
 
-`conversationVoice` (U3V, added 2026-10-22, owner D16) is optional in `PUT`: omitted keeps the current value, so apps that predate voice never revoke it. Default all `false`, version 0 (U0). Each change appends a history row and an audit event; protected routes return `403 consent_required` (implemented 2026-10-17, CLD-12).
+`conversationVoice` (U3V, added 2026-10-22, owner D16) and `ownerDocuments` (U4, added 2026-10-29, [ADR-0011](../decisions/ADR-0011-owner-knowledge-documents.md)) are optional in `PUT`: omitted keeps the current value, so older apps never revoke them. Default all `false`, version 0 (U0). Each change appends a history row and an audit event; protected routes return `403 consent_required` (implemented 2026-10-17, CLD-12).
 
 ### Conversations (Phase 1, CLD-13)
 
@@ -152,6 +153,17 @@ POST /v1/pets/{petId}/knowledge-cases
 { "schemaVersion": 1, "domainId"?: "<uuid>", "question": "…", "answer": "…" }
 → 201 { "candidateId", "factKey": 0..65535, "text": "Vấn đề: … Cách giải: …", "kind": "case", "proposedDomainId"?, "relation": "new"|"refines"|"contradicts", "relatedCandidateId"? }
   (Requires conversationText U3 consent; question and answer are used transiently to draft the <= 180-char case summary and are never stored or logged.)
+
+POST /v1/pets/{petId}/knowledge-documents
+{ "schemaVersion": 1, "title": "…", "domainId"?: "<uuid>", "mediaType": "text/markdown"|"text/plain", "data": "<base64>" }
+→ 201/200 { "documentId", "petId", "domainId"?, "title", "mediaType", "byteSize", "sha256", "status": "ready", "chunkCount", "candidateId"?, "factKey"?, "createdAt", "updatedAt" }
+  (Requires ownerDocuments U4 consent, [ADR-0011](../decisions/ADR-0011-owner-knowledge-documents.md); raw file bytes are never stored, only heading-aware chunks in `knowledge_chunks`. Caps: <= 20 docs/pet, <= 2 MB/file, <= 400 chunks/doc, <= 2000 chunks/pet.)
+
+GET  /v1/pets/{petId}/knowledge-documents
+→ 200 { "items": [<document as above>] }
+
+DELETE /v1/knowledge-documents/{documentId}
+→ 204 (Cascades `knowledge_chunks` and records a `knowledge_document` tombstone.)
 ```
 
 ### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 and `projection` DC-5 implemented 2026-10-27, host tests only)

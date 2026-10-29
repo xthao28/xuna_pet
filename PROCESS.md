@@ -1,6 +1,31 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-4 Working Conventions, Solved Cases, Bond Level Labels & 32-Slot Cap Handling (backend 393/393 pytest PASS; mobile `flutter analyze` 0 issues, `flutter test` 325/325 PASS)**. Before that: **KX-3 Domain Packs, Working Brief & Chat Domain Picker (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-5 Owner Reference Documents, Consent U4, Heading-Aware Chunker & Expert Snippet Retrieval (ADR-0011; backend 401/401 pytest PASS, migration `0012`; mobile `flutter analyze` 0 issues, `flutter test` 328/328 PASS)**. Before that: **KX-4 Working Conventions & Solved Cases (backend 393/393, mobile 325/325)**, **KX-3 Domain Packs & Working Brief (backend 390/390, mobile 322/322)**, **KX-2 Mobile dual-output UI (318/318)** and **KX-1 Backend Knowledge Expert (385/385)**.
+
+## 2026-10-29 — KX-5: Tài liệu của chủ (Consent U4, chia đoạn theo tiêu đề, tìm đoạn và hiển thị trên app)
+
+- **User requirement:** Thực hiện session KX-5 của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) (gate doc ADR-0011 + backend + mobile, không đụng `firmware/`).
+- **Gate Doc ([ADR-0011](docs/decisions/ADR-0011-owner-knowledge-documents.md)):**
+  - Chốt quyền dữ liệu riêng **U4 `owner_documents` (`ownerDocuments`)**, mặc định tắt (`U0`); chỉ lưu metadata tài liệu và các đoạn văn bản đã chia (`knowledge_chunks`), **không bao giờ lưu nguyên tệp gốc (`data` bytes)**; giữ JSONB embedding (chưa bắt buộc `pgvector`), lọc sơ bộ top 50 theo điểm từ khoá rồi xếp hạng lại bằng cosine similarity; chỉ bơm tối đa 4 đoạn (`<= 3000` ký tự) vào prompt khi ở chế độ `expert` kèm vách ngăn chống prompt injection.
+- **Backend (`backend/`):**
+  - **Consent U4 & Migration `0012`:**
+    - `modules/consent/{domain/consent.py, application/use_cases.py, infrastructure/models.py, infrastructure/repository.py, api/routes.py}`: thêm `ConsentClass.OWNER_DOCUMENTS` (`ownerDocuments`) vào `ConsentState`, `GET/PUT /v1/consents` (optional trong `PUT` để tương thích ngược) và `RequireConsent`.
+    - `migrations/versions/0012_knowledge_documents.py`: thêm cột `owner_documents` vào `consent_records` và `consent_history`, tạo bảng `knowledge_documents` và `knowledge_chunks` (FK cascade khi xoá tài liệu).
+  - **Domain, Infrastructure & Application:**
+    - `modules/knowledge/domain/documents.py`: `DocumentMediaType` (`text/markdown`, `text/plain`), `DocumentStatus`, `KnowledgeDocument`, `KnowledgeChunk`, bộ chia đoạn `chunk_document_text` (giữ đường dẫn tiêu đề Markdown `#`/`##`/`###`, không cắt giữa khối code ```...```, tối đa `1200` ký tự/đoạn, gối `150` ký tự) và các trần bảo vệ (`<= 20` tài liệu/pet, `<= 2 MB`/tệp, `<= 400` đoạn/tài liệu, `<= 2000` đoạn/pet).
+    - `modules/knowledge/infrastructure/{models.py, repository.py}`, `application/{ports.py, schemas.py, documents.py}`: `UploadKnowledgeDocumentUseCase` (kiểm tra kích thước, UTF-8, khử trùng lặp theo `(pet_id, sha256)`, chia đoạn, nhúng ngữ nghĩa nếu có `TextEmbedder`, tạo `MemoryCandidate(kind="document", fact_key=compute_fact_key("doc:" + sha256))`), `ListKnowledgeDocumentsUseCase`, `DeleteKnowledgeDocumentUseCase` (xoá tài liệu + cascade chunks, đánh dấu candidate `DELETED` và ghi `Tombstone(item_type="knowledge_document")`).
+    - `modules/knowledge/application/owner_context.py`, `modules/conversation/application/chat_turn.py`: `BuildOwnerContextUseCase` truy xuất tối đa 4 đoạn (`<= 3000` ký tự) khớp câu hỏi cho miền đang chọn (hoặc không gắn miền), loại trừ các tài liệu có candidate bị chủ `REJECTED`/`DELETED`; `describe_owner_context` chỉ đưa `owner.snippets` vào system prompt khi `mode == TurnMode.EXPERT` (§6.10, §11 mục 14).
+    - `modules/knowledge/api/routes.py`: thêm `POST /v1/pets/{pet_id}/knowledge-documents` (bảo vệ bằng `RequireConsent(ConsentClass.OWNER_DOCUMENTS)`), `GET /v1/pets/{pet_id}/knowledge-documents`, `DELETE /v1/knowledge-documents/{document_id}` (`204 No Content`).
+  - **Tests:**
+    - `tests/modules/knowledge/test_documents.py`, `test_use_cases.py`, `tests/modules/consent/{test_consent_use_cases.py, test_consent_api.py}`, `tests/modules/conversation/test_chat_turn.py`: kiểm thử U4 consent (`403 consent_required` khi tắt), chia đoạn Markdown + giữ khối code, khử trùng lặp SHA-256, trần kích thước `413`, xoá tài liệu cascade chunks + tạo tombstone, chỉ bơm snippet ở chế độ `expert` (không bơm ở `chat`), loại trừ tài liệu có candidate bị `rejected`, và quét DB xác nhận không lưu chuỗi base64 nguyên tệp.
+- **Mobile (`mobile/`):**
+  - **Locales & Consent U4:** thêm `account_consentDocumentsTitle`, `account_consentDocumentsNote` và 6 khoá `home_knowledgeDocument*` trong `vi_VN.json`, `en_US.json`, `locales.g.dart`; mở rộng `ConsentSettings`, `ConsentModel`, `ConsentMapper`, `HomeConsentSheet` hiển thị công tắc U4.
+  - **Domain, Data & Presentation:** thêm `CloudKnowledgeDocument`, `CloudKnowledgeDocumentMapper`, `UploadKnowledgeDocumentUseCase`, `ReadKnowledgeDocumentsUseCase`, `DeleteKnowledgeDocumentUseCase`, cập nhật `CloudRemoteDataSource`, `CloudRepository`, `CloudRepositoryImpl`, `HomeController`, `HomeBinding`, `HomePage`, và bổ sung mục «TÀI LIỆU THAM KHẢO» trong `HomeKnowledgeManageSheet` (hiển thị danh sách tài liệu kèm số đoạn, xoá tài liệu, nạp tài liệu Markdown/văn bản mới).
+- **Validation (Windows):**
+  - Backend (`postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test`): `ruff format --check` trên 22 file KX-5 **PASS**, `ruff check` **PASS**, `mypy --strict src` **PASS** (177 files), `alembic upgrade head` **PASS** (`0012`), `pytest -q` **401/401 PASS**.
+  - Mobile (Flutter 3.32.8 via FVM): `fvm dart format` trên các file KX-5 **PASS**, `fvm flutter analyze` **PASS** (`No issues found!`), `fvm flutter test --no-pub` **328/328 PASS**.
+- **Not run:** Chưa chạy với AI provider thật, chưa chạy trên điện thoại thật và board vật lý.
+- **Next:** KX-6 (Hỏi làm rõ một câu cho câu hỏi mơ hồ & hoàn thiện kiểm thử tổng thể Knowledge Expert).
 
 ## 2026-10-29 — KX-4: Bằng chứng đồng hành (quy ước làm việc, việc đã giải quyết, đổi tên mức ăn ý, xử lý slot đầy 32)
 
