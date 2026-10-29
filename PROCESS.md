@@ -1,6 +1,39 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-2 Mobile dual-output UI & reply mode switch (lutter analyze 0 issues, lutter test 318/318 PASS)**. Before that: **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 pytest PASS, eval mode 40/40, domain 40/40)**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **KX-3 Domain Packs, Working Brief & Chat Domain Picker (backend 390/390 pytest PASS, migration `0011`; mobile `flutter analyze` 0 issues, `flutter test` 322/322 PASS)**. Before that: **KX-2 Mobile dual-output UI & reply mode switch (318/318 PASS)** and **KX-1 Backend Knowledge Expert dual-output, routing & owner-context retrieval (385/385 PASS)**.
+
+## 2026-10-29 — KX-3: Domain Packs, Working Brief và chọn lĩnh vực khi trò chuyện
+
+- **User requirement:** Tiếp tục thực hiện session KX-3 của [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) (backend + mobile, không đụng `firmware/`).
+- **Backend (`backend/`):**
+  - **Domain & Migration:**
+    - `modules/knowledge/domain/packs.py`: `SafetyTier` (`normal`, `caution_medical`, `caution_legal`, `caution_financial`), `DomainPack`, `PACKS` với 7 gói biên tập sẵn nguyên văn Phụ lục A (`embedded`, `software`, `finance`, `marketing`, `law`, `biomed`, `language`) và `get_pack()`.
+    - `modules/knowledge/domain/entities.py`: bổ sung `pack_id`, `expert_brief` (`<= 1600` ký tự), `safety_tier` trên `KnowledgeDomain`.
+    - `migrations/versions/0011_knowledge_expert_briefs.py`: migration `0011` (down_revision `0010`) thêm cột `pack_id`, `expert_brief`, `safety_tier` vào bảng `knowledge_domains`.
+    - `modules/knowledge/infrastructure/models.py`, `repository.py`: ánh xạ và lưu/cập nhật `pack_id`, `expert_brief`, `safety_tier`.
+  - **Application & API:**
+    - `modules/knowledge/application/schemas.py`, `use_cases.py`: mở rộng `CreateDomainRequest` (`packId`), `DomainResponse` (`packId`, `expertBrief`, `safetyTier`), `UpdateDomainRequest` (`action="set_brief" | "apply_pack"`, `expertBrief`, `packId`), `KnowledgePackResponse`, `DraftBriefRequest`, `DraftBriefResponse`.
+    - `modules/knowledge/application/brief_draft.py`: `BRIEF_DRAFT_SYSTEM_VI` (nguyên văn §6.5) và `DraftExpertBriefUseCase` tạo bản nháp khung chuyên môn từ domain + conventions/cases đã confirmed mà **không tự lưu vào DB**.
+    - `modules/knowledge/application/owner_context.py`: truyền `domain.expert_brief` và `domain.safety_tier` từ DB vào `DomainBrief`.
+    - `modules/knowledge/api/routes.py`: thêm `GET /v1/knowledge-packs`, `POST /v1/knowledge-domains/{domain_id}/brief-drafts`, kiểm tra quyền sở hữu domain trên `get_domain`/`update_domain`, truyền `pack_id`/`expert_brief`.
+  - **Eval & Tests:**
+    - `scripts/expert_eval_questions_vi.json` (35 câu hỏi tiếng Việt qua 7 pack) và `scripts/expert_eval.py` (chấm offline với provider thật khi cấu hình).
+    - `tests/modules/knowledge/test_entities.py`, `test_use_cases.py`, `test_brief_draft.py`: kiểm thử 7 pack, tạo domain với `packId`, `set_brief`/`apply_pack`, `brief-drafts` không tự ghi DB, và `build_request` đưa `expert_brief` + nhắc nhở an toàn vào system prompt.
+- **Mobile (`mobile/`):**
+  - **Locales:** thêm 4 khoá KX-3 (`home_knowledgePackPicker`, `home_knowledgeBriefLabel`, `home_knowledgeBriefDraft`, `home_knowledgeChatDomain`) trong `vi_VN.json`, `en_US.json`, `locales.g.dart`.
+  - **Domain & Data:**
+    - `CloudKnowledgePack`, `CloudKnowledgePackMapper`, mở rộng `CloudKnowledgeDomain` & `CloudKnowledgeDomainMapper` (`packId`, `expertBrief`, `safetyTier`).
+    - `CloudRemoteDataSource`, `CloudRepository`, `CloudRepositoryImpl`: `getKnowledgePacks`/`fetchKnowledgePacks`, `postBriefDraft`/`draftDomainBrief`, truyền `packId` khi tạo domain và `expertBrief`/`packId` khi cập nhật domain.
+    - `ReadKnowledgePacksUseCase`, `DraftExpertBriefUseCase`, cập nhật `CreateKnowledgeDomainUseCase`, `UpdateKnowledgeDomainUseCase`, `CreateDomainFlowUseCase`.
+  - **Presentation & Controller:**
+    - `HomeBinding`, `HomeController`: thêm `knowledgePacks`, `selectedChatDomainId`, `activeKnowledgeDomains`, `selectedChatDomain`, `cycleChatDomain()`, `fetchKnowledgePacks()`, `saveDomainBrief()`, `applyDomainPack()`, `draftDomainBrief()`, và truyền `domainId: selectedChatDomain?.domainId` vào `_turnContext()`.
+    - `HomeKnowledgeManageSheet`: hiển thị chip chọn lĩnh vực mẫu từ `packs` (có fallback offline 7 gói), khung sửa `expertBrief` (`<= 1600` ký tự) kèm nút «Nhờ AI viết nháp» (điền vào ô nhập để chủ xem/sửa trước khi bấm Xác nhận lưu), và chuyển hộp thoại xác nhận xoá sang `sl<AppNavigator>().dialog` đúng chuẩn kiến trúc (`mobile/AGENTS.md` §5.3).
+    - `HomeChatComposer`, `HomeChatTab`, `HomePage`: hiển thị pill `HomeChatComposer.domainKey` (`Lĩnh vực: Tự động` / tên lĩnh vực active) cạnh pill chế độ trả lời khi có ít nhất 1 domain đang `active`.
+- **Validation (Windows):**
+  - Backend (`postgresql+psycopg://xuna:xuna@localhost:5432/xuna_test`): `ruff format --check` trên 14 file KX-3 **PASS**, `ruff check` **PASS**, `mypy` **PASS** (174 files), `alembic upgrade head` **PASS** (`0011`), `pytest -q` **390/390 PASS**.
+  - Mobile (Flutter 3.32.8 via FVM): `fvm dart format` **PASS**, `fvm flutter analyze` **PASS** (`No issues found!`), `fvm flutter test` **322/322 PASS**.
+- **Not run:** Chưa chạy `backend/scripts/expert_eval.py` với AI provider thật, chưa chạy trên điện thoại thật và board vật lý.
+- **Next:** KX-4 (Bằng chứng trải nghiệm làm việc chung: quy ước & tình huống đã giải quyết).
 
 ## 2026-10-29 — KX-2: Mobile dual-output UI và công tắc chế độ
 

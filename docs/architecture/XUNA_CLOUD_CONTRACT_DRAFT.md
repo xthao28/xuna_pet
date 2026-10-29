@@ -125,6 +125,26 @@ PATCH /v1/memory-candidates/{id}         # owner confirm/reject
 
 `confirmed` only after the app reports the device commit (generation that contains it).
 
+### Knowledge domains, packs and working briefs (KD / KX-3, 2026-10-29)
+
+```http
+GET  /v1/knowledge-packs
+→ 200 { "items": [{ "packId", "name", "description", "safetyTier": "normal"|"high_stakes" }] }
+
+POST /v1/pets/{petId}/knowledge-domains
+{ "name": "…", "description"?: "…", "deviceSlot": 0..4, "packId"?: "embedded"|"software"|"finance"|"marketing"|"law"|"biomed"|"language" }
+→ 201 { "domainId", "petId", "name", "description", "deviceSlot", "status", "origin", "packId", "expertBrief", "safetyTier", "createdAt", "updatedAt" }
+
+PATCH /v1/knowledge-domains/{domainId}
+{ "action": "device_ack"|"rename"|"rest"|"activate"|"delete"|"set_brief"|"apply_pack",
+  "name"?, "description"?, "expertBrief"?, "packId"?, "generation"?, "keepKnowledge"?: true }
+→ 200 <domain as above>
+
+POST /v1/knowledge-domains/{domainId}/brief-drafts
+{}
+→ 200 { "domainId", "expertBrief" }  (AI draft only; never saved until the owner sends PATCH action="set_brief")
+```
+
 ### Device connection (Stage 2, DC-0 2026-10-27; [ADR-0010](../decisions/ADR-0010-device-direct-websocket-transport.md); backend DC-3 and `projection` DC-5 implemented 2026-10-27, host tests only)
 
 The board connects by itself over Wi-Fi. One WebSocket over TLS per board, authenticated by the device key on every connect. In this slice data goes **up only**: the server never sends anything that changes device state (H2).

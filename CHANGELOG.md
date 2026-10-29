@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Bổ sung 7 lĩnh vực chuyên môn mẫu, khung làm việc và chọn lĩnh vực khi trò chuyện (Knowledge Expert KX-3)
+
+- **7 lĩnh vực chuyên môn mẫu (Domain Packs):** Khi tạo lĩnh vực mới, bạn có thể chọn nhanh một trong 7 gói chuyên môn biên tập sẵn (`Nhúng & phần cứng`, `Phần mềm & hệ thống`, `Tài chính & kế toán`, `Marketing & sản phẩm`, `Pháp luật (tham khảo)`, `Y sinh & sức khoẻ (tham khảo)`, `Ngôn ngữ & viết lách`) để điền sẵn tên, mô tả, khung chuyên môn và mức lưu ý an toàn.
+- **Khung chuyên môn (Working Brief) và viết nháp bằng AI:** Mỗi lĩnh vực đang mở có thể xem/chỉnh sửa khung làm việc chuyên môn (tối đa 1.600 ký tự) hoặc bấm «Nhờ AI viết nháp» để AI gợi ý bản nháp từ quy ước và tình huống đã lưu; bản nháp chỉ lưu khi bạn kiểm tra và bấm xác nhận.
+- **Chọn lĩnh vực trực tiếp trên thanh trò chuyện:** Khi XUNA có ít nhất một lĩnh vực đang hoạt động, thanh trò chuyện hiện thêm nút «Lĩnh vực: Tự động» để bạn chạm chuyển nhanh sang lĩnh vực muốn hỏi chuyên sâu.
+- Backend 390/390 bài kiểm thử PASS (kèm migration `0011`), ứng dụng 322/322 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Chưa chạy đánh giá với AI thật và trên điện thoại.
+
 ## 2026-10-29 — Ứng dụng hiển thị câu trả lời chuyên sâu và công tắc chế độ (Knowledge Expert KX-2)
 
 - **Công tắc chế độ trả lời:** Thanh trò chuyện có thêm nút chuyển nhanh giữa ba chế độ Tự động, Chuyên sâu và Trò chuyện, đồng thời cho phép nhập câu hỏi dài tối đa 8.000 ký tự khi ở chế độ Tự động hoặc Chuyên sâu.
