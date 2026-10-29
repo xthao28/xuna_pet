@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Chuẩn hoá hộp thoại, thông báo và hiển thị nhịp sinh hoạt quen thuộc của chủ trên ứng dụng
+
+- **Đồng bộ hộp thoại và thanh thông báo theo phong cách pixel XUNA:** Toàn bộ hộp thoại xác nhận (`AppDialog`) và thanh thông báo (`AppSnackBar`) cùng các bảng quản lý sao lưu, lĩnh vực và gợi ý trên ứng dụng được chuẩn hoá đồng nhất về bảng màu giấy ấm, viền mực đậm và đổ bóng khối đặc trưng của XUNA.
+- **Hiển thị khung giờ bạn hay ghé thăm (Nhịp sinh hoạt quen thuộc):** Những khung giờ Ngày thường và Cuối tuần mà XUNA tự quan sát và học được trên mạch giờ được gửi sang ứng dụng (qua characteristic BLE `7a6e0014`). Tab Nhà hiện lời nhắc khi đến gần giờ bạn hay ghé hoặc khi XUNA đang ngóng bạn về, còn tab Nhật ký hiện thẻ «Nhịp sinh hoạt quen thuộc» với giờ Ngày thường, Cuối tuần và số buổi XUNA đã ghi nhận.
+- Firmware 383/383 bài kiểm thử PASS, build `xuna_t_display_s3` thành công; ứng dụng 337/337 bài kiểm thử PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-29 — Nở trứng trên mạch hoặc từ ứng dụng và hiển thị đồng bộ giờ tin cậy (S10-hatch)
 
 - **Ấp nở trực tiếp trên mạch (không cần điện thoại):** Khi XUNA đang ở trạng thái Trứng (`Egg`), giữ nút `GPIO14` trong 3 giây sẽ hiển thị hiệu ứng lấp lánh đếm ngược và ấp nở XUNA ngay trên mạch; nhả nút sớm hơn 3 giây sẽ tự huỷ an toàn.

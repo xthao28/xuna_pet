@@ -417,7 +417,8 @@ No board upload, mobile/backend work, commit or push in this checkpoint.
 | XUNA tokens, fonts, base widgets | Implemented; host tests pass | [Mobile UI record](docs/roadmap/ui/mobile-ui-design-system.md) |
 | Four-tab home on real data | Implemented; simulator-transport tests pass | Owner visual check on a real phone with the board |
 | Original images (`room`, `avatar`, `book`, `lv1–3`) | Pending | Export from Claude Design into `mobile/assets/images/` and swap stand-ins |
-| Base dialogs/snack bars restyle | Pending | Separate small session (mobile AGENTS §11) |
+| Base dialogs/snack bars restyle | Implemented; host tests pass (2026-10-29) | `AppDialog` + `AppSnackBar` in `shared/widgets/`, `AppNavigatorImpl` + `GetPageMixin` + `UtilWidget` + `AppColors` aligned to XUNA tokens |
+| Routine / Habit anticipation UI (`7a6e0014`) | Implemented; host tests pass (2026-10-29) | Firmware `RoutineCodec` + BLE `7a6e0014`; mobile `PetRoutine` + `HomeRoutineCard` on Home & Journal tabs |
 | Locked "SẮP CÓ" features | Deferred | Each needs its own approved session (M06, protocol, VOICE gates) |
 
 ## Commit checkpoint — 2026-10-14 (review fixes + mobile UI)
