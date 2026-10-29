@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
 
+## 2026-10-29 — Nở trứng trên mạch hoặc từ ứng dụng và hiển thị đồng bộ giờ tin cậy (S10-hatch)
+
+- **Ấp nở trực tiếp trên mạch (không cần điện thoại):** Khi XUNA đang ở trạng thái Trứng (`Egg`), giữ nút `GPIO14` trong 3 giây sẽ hiển thị hiệu ứng lấp lánh đếm ngược và ấp nở XUNA ngay trên mạch; nhả nút sớm hơn 3 giây sẽ tự huỷ an toàn.
+- **Ấp nở từ ứng dụng kèm đồng bộ giờ sinh (`bornAt`):** Khi kết nối với XUNA đang là Trứng, tab Nhà và tab Thiết bị hiện thẻ «XUNA đang là trứng» cùng nút «Ấp nở XUNA ngay». Ứng dụng tự động đồng bộ giờ điện thoại trước khi gửi lệnh nở (BLE Opcode 7); nếu chưa đồng bộ được giờ tin cậy, ứng dụng sẽ hỏi xác nhận trước khi nở với giờ sinh chưa xác định, và nếu đồng bộ được giờ ngay trong cùng lần khởi động đó thì mạch sẽ tự bổ sung lại giờ sinh chính xác cho XUNA.
+- **Hiển thị vòng đời và chất lượng đồng hồ tin cậy:** Bảng «Thông tin thiết bị» hiển thị thêm trạng thái Vòng đời (Trứng, Mới nở trên mạch / qua app / nâng cấp từ bản đầu), chất lượng Đồng hồ tin cậy (Đã đồng bộ 24h, Ước lượng từ lần đồng bộ trước, hoặc Chưa đồng bộ) và trạng thái Giờ nở (`bornAt`) qua characteristic BLE `Lifecycle V1` (`7a6e0013`).
+- Firmware 382/382 bài kiểm thử PASS, build `xuna_t_display_s3` thành công; ứng dụng 334/334 bài kiểm thử PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-29 — Ngủ màn hình tiết kiệm pin và chỉnh độ sáng từ ứng dụng (Giai đoạn 2)
 
 - **Ngủ màn hình 3 tầng tiết kiệm pin:** Sau 30 giây không có tương tác, màn hình tự dịu xuống mức `4/16`; sau 2 phút yên tĩnh (khi bật chế độ ngủ màn hình và không mở thẻ hay bong bóng phụ đề), mạch tự tắt hẳn IC đèn nền (`0 mA`), đưa màn hình vào chế độ ngủ, tạm dừng vẽ khung hình và giãn vòng lặp để tiết kiệm pin tối đa trong khi XUNA vẫn sống ngầm bình thường.
