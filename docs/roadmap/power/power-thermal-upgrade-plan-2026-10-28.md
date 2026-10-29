@@ -1,8 +1,8 @@
 # XUNA — Kế hoạch Nâng cấp Quản lý Năng lượng, Giảm nhiệt & Ngủ Tiết kiệm Pin
 
 > **Ngày lập:** 2026-10-28
-> **Trạng thái:** Proposed (đã lưu kế hoạch theo yêu cầu của Owner, chờ triển khai sau khi ổn định bản build Mobile/Cloud hiện tại)
-> **Phạm vi:** `firmware/` (`DisplayManager`, `BacklightDimmer`, `BleManager`, `main.cpp`) và `mobile/` (`HomeDeviceSettingsCard`, `HomeDeviceTab`, `HomeController`)
+> **Trạng thái:** Giai đoạn 1 Implemented (2026-10-29, host-tested 376/376 PASS, build `xuna_t_display_s3` SUCCESS; chờ nạp mạch đo kiểm nhiệt độ thực tế). Giai đoạn 2 Proposed.
+> **Phạm vi:** `firmware/` (`DisplayManager`, `Backlight.h`, `SceneEffects.h`, `InputManager`, `BleManager`, `main.cpp`) và `mobile/` (`HomeDeviceSettingsCard`, `HomeDeviceTab`, `HomeController`)
 
 ---
 

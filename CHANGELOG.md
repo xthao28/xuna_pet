@@ -1,6 +1,13 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
+
+## 2026-10-29 — Giảm nhiệt và tối ưu hiệu năng cho board (Giai đoạn 1)
+
+- **Đèn nền chuẩn mức sáng:** Sửa thứ tự khởi tạo và khoá ngắt khi phát xung điều khiển IC đèn nền `AW9364` để màn hình hạ đúng về mức sáng cài đặt thay vì kẹt ở mức tối đa 100%.
+- **Bluetooth mát hơn:** Hạ công suất phát sóng BLE xuống `0 dBm`, giãn chu kỳ kết nối về `20–40 ms`, và chỉ tính toán lại dữ liệu GATT khi có thay đổi hoặc có điện thoại đang kết nối.
+- **Tự giảm nhịp khi yên tĩnh:** Sau 20 giây không có tương tác ở trạng thái đứng yên hoặc ngủ, board tự giảm tốc độ khung hình xuống `5 FPS` và giãn chu kỳ vòng lặp lên `25 ms`; khi bấm nút hoặc có gói tin từ ứng dụng thì trở lại `10 FPS` / `10 ms` ngay lập tức.
+- Firmware 376/376 bài kiểm thử PASS, build `xuna_t_display_s3` thành công.
 
 ## 2026-10-27 — Board tự backup lên cloud (DC-5, bản thử)
 

@@ -1,6 +1,29 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-27** (Asia/Ho_Chi_Minh). Latest: **Owner decisions after DC-5: websockets added, unbind (key revoked, data kept), E14 by hand, push (backend 332/332, mobile 311/311)**. Before that: **DC-0…DC-5 on the host**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **Thermal & Power Phase 1 in firmware (AW9364 pulse sync, BLE 0 dBm TX power, adaptive 5 FPS / 25 ms quiet pacing; native 376/376 PASS, build SUCCESS)**. Before that: **Owner decisions after DC-5 & Knowledge Domain commit/delete fixes**.
+
+## 2026-10-29 — Firmware Thermal & Power Phase 1: AW9364 backlight sync, BLE 0 dBm TX power & adaptive idle pacing
+
+- **User requirement:** Triển khai Giai đoạn 1 Giảm nhiệt cho Firmware ([power-thermal-upgrade-plan-2026-10-28.md](docs/roadmap/power/power-thermal-upgrade-plan-2026-10-28.md)): tối ưu xung đèn nền AW9364, giảm BLE TX Power và áp dụng adaptive frame rate / loop pacing để hạ nhiệt độ mạch T-Display-S3.
+- **Firmware (`firmware/`):**
+  - **AW9364 1-wire backlight synchronization (`DisplayManager.cpp`):**
+    - Trong `DisplayManager::begin()`: bật `digitalWrite(kBacklightPin, HIGH)` và chờ ổn định `delayMicroseconds(35)` (`t_on >= 25 µs` theo datasheet AW9364) kèm đồng bộ `backlightHw_ = BacklightDimmer::kMax` **trước** khi gọi `update(now, PetState::Idle)`, khắc phục lỗi kéo `HIGH` sau `update()` khiến IC đèn nền khởi động lại ở mức 16/16 (100% dòng tối đa).
+    - Trong `DisplayManager::setBacklight()`: tăng độ rộng xung `LOW` / `HIGH` từ `1 µs` lên `3 µs` và bọc vòng phát xung trong `noInterrupts()` / `interrupts()` (~6–90 µs) để ngắt BLE/RTOS không làm giãn xung `LOW` quá 2.5 ms gây sập hoặc lệch bậc sáng.
+  - **BLE TX Power & Connection Interval (`BleManager.h`, `V1LifeCoreAdapter.h`):**
+    - Hạ công suất phát sóng BLE xuống `0 dBm` (`ESP_PWR_LVL_N0`) cho `ESP_BLE_PWR_TYPE_DEFAULT`, `ESP_BLE_PWR_TYPE_ADV`, `ESP_BLE_PWR_TYPE_SCAN` sau `BLEDevice::init("XUNA")` và cho connection handle khi kết nối (`onConnect`), giữ kết nối ổn định trong phạm vi phòng (5–10m) nhưng giảm nhiệt RF khi đồng bộ liên tục.
+    - Thiết lập preferred BLE connection interval `20–40 ms` (`0x10..0x20`, slave latency `0`, timeout `4 s`) qua `adv->setMinPreferred/setMaxPreferred` và `server->updateConnParams`, giảm 2.5–4× tần suất đánh thức radio RF so với mức mặc định `7.5–15 ms` của iOS/Android mà không tạo độ trễ đọc/ghi GATT.
+    - Tối ưu hóa mã hóa 7 BLE GATT projections (`lifeStatus_`, `memories_[0..1]`, `explanation_`, `personality_`, `knowledge_`, `identity_`): loại bỏ việc tính toán lại `LearnerV3Explainer::explain`, traits, mood và `memcmp` ở mọi vòng lặp (40–100 lần/giây) khi không có điện thoại kết nối; khi đang kết nối chỉ mã hóa khi có lệnh BLE, thay đổi phiên, thay đổi `generation`/`decisionId`/`canFeedback`, hoặc mỗi 1 giây theo `activeSeconds`.
+    - Thêm `BleManager::hadTraffic()` để đánh thức `PowerPacer` ngay từ gói/chunk BLE đầu tiên (ví dụ chunk đầu của bong bóng phụ đề 38 chunks), đảm bảo vòng lặp rút về `10 ms` ngay lập tức để xả hàng đợi BLE.
+  - **Adaptive Frame Rate, Loop Pacing & Row-Pointer Compositing (`Backlight.h`, `SceneEffects.h`, `DisplayManager.h/.cpp`, `InputManager.h/.cpp`, `main.cpp`):**
+    - Bổ sung `PowerPacer` (pure C++11 trong `xuna/visual/Backlight.h`): giữ nguyên tốc độ vẽ `10 FPS` (`~100 ms/frame`) và chu kỳ vòng lặp `10 ms` trong 20 giây đầu sau mọi tương tác (nút bấm, gói tin BLE, bong bóng phụ đề, hành động tự phát, động tác Track A) hoặc khi đang ở trạng thái `Happy` / `Curious`, hoặc khi `DisplayManager::visualBusy()` đang hoạt động.
+    - Sau `20 giây` yên tĩnh ở trạng thái `Idle` hoặc `Sleep`: tự động nhân đôi chu kỳ khung hình (`~200 ms/frame` = `5 FPS`, giữ nguyên pha khung hình hiện tại không bị giật), đồng bộ nhịp vẽ mưa cửa sổ (`Backdrop::Rain`) theo nhịp khung hình 5 FPS thay vì 70 ms/lần, và giãn chu kỳ ngủ của `loop()` lên `25 ms`.
+    - Tối ưu vòng lặp composite pixel trong `DisplayManager::update()`, `drawEffect()` và `drawSpeech()` theo con trỏ hàng (row pointers), loại bỏ ~37,800 phép nhân địa chỉ mỗi khung hình.
+    - `InputManager::anyRawPressed()` phát hiện ngay lập tức khi nút bấm vật lý vừa chạm mức `LOW` (trước cả khi hết 30 ms debounce) để đưa chu kỳ vòng lặp về `10 ms` tức thì, đảm bảo không bao giờ trễ thao tác bấm nhanh.
+    - Dòng log `power` bổ sung `frame_ms=%u loop_ms=%u` để theo dõi trực tiếp qua Serial.
+- **Validation (Windows):**
+  - `pio test -d firmware -e native`: **376/376 PASS** (45 suites, bao gồm 3 unit tests mới cho `PowerPacer` trong `test_backlight`).
+  - `pio run -d firmware -e xuna_t_display_s3`: **SUCCESS** (`xuna_core purity check: PASS`, RAM 18.1% / 59,216 B, Flash 59.8% / 3,919,653 B).
+- **Not run:** Chưa nạp lên mạch vật lý để đo lại `chip_temp_c` sau 15–20 phút hoạt động.
 
 ## 2026-10-27 — Owner decisions after DC-5: WebSocket library, unbind, E14 commands, push
 
