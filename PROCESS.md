@@ -1,6 +1,24 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **Thermal & Power Phase 1 in firmware (AW9364 pulse sync, BLE 0 dBm TX power, adaptive 5 FPS / 25 ms quiet pacing; native 376/376 PASS, build SUCCESS)**. Before that: **Owner decisions after DC-5 & Knowledge Domain commit/delete fixes**.
+Last updated: **2026-10-29** (Asia/Ho_Chi_Minh). Latest: **Knowledge Expert plan approved (KX-1…KX-6, documentation only)**. Before that: **Thermal & Power Phase 1 in firmware (AW9364 pulse sync, BLE 0 dBm TX power, adaptive 5 FPS / 25 ms quiet pacing; native 376/376 PASS, build SUCCESS)**.
+
+## 2026-10-29 — M06 Knowledge Expert: owner decisions and implementation plan (docs only)
+
+- **User requirement:** XUNA phải giỏi thật về chuyên ngành để giúp chủ làm việc, không bắt chủ gõ dạy từng câu kiến thức; vẫn giữ bản sắc thú cưng tiến hoá cùng chủ; voice và board ngắn gọn, app hiện câu trả lời chuyên sâu. Owner chọn cả 6 khuyến nghị và nhờ viết plan chi tiết để một model khác code.
+- **Findings in current code:**
+  - `chat_turn.py` persona giới hạn 1–5 câu, 400 token, 500 ký tự đầu vào và cấm lời khuyên y tế/pháp lý/tài chính.
+  - `conversation/api/routes.py` đưa vào prompt 5 knowledge đã xác nhận **đầu tiên**, không theo độ liên quan, domain hay slot đang nghỉ; phần đọc này còn nằm trong lớp `api`.
+  - Đường voice WS không có knowledge nào.
+  - Mobile không gửi `knowledge`, không đọc `finished.candidate`. `HomeController` tự dựng context WS (thiếu offset của `clientTime`, không giới hạn 12 dòng / 500 ký tự).
+- **Decisions (KX-D1…D6):** không fine-tune; Domain Pack + RAG tài liệu riêng + định tuyến model; level = độ ăn ý từ bằng chứng chủ xác nhận (quy ước, case, tài liệu); an toàn phân mức; dual-output `<say>` + detail trong một lần gọi; công tắc auto/expert/chat. Firmware và BLE không đổi. Recorded in AGENTS.md.
+- **Docs:**
+  - New [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md): wire contract, prompts word for word, algorithms, sessions, forbidden mistakes.
+  - KD plan marked as partly replaced; roadmap README updated.
+- **Pending owner approvals:**
+  - `flutter_markdown_plus`, needed before KX-2 (otherwise the plain-text fallback is used);
+  - `pypdf`, `file_picker` and ADR-0011 (owner documents, U4 consent), needed before KX-5.
+- **Not run:** no code changed; no checks needed.
+- **Next:** KX-1 (backend expert mode, dual-output, routing, owner-context retrieval).
 
 ## 2026-10-29 — Firmware Thermal & Power Phase 1: AW9364 backlight sync, BLE 0 dBm TX power & adaptive idle pacing
 

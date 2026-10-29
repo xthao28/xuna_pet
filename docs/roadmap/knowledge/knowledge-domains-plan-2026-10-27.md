@@ -1,5 +1,7 @@
 # XUNA Knowledge Domains — kế hoạch triển khai M06 (2026-10-27)
 
+> **Bị thay một phần (owner 2026-10-29):** ý nghĩa của mức, prompt trả lời, cách lấy kiến thức vào chat, trích kiến thức từ chat, tên mức và KD-6 nay theo [knowledge-expert-plan-2026-10-29.md](knowledge-expert-plan-2026-10-29.md) (§13 của plan đó liệt kê từng điểm). Firmware KD-1/KD-2 và luồng xác nhận → commit thiết bị giữ nguyên.
+
 > **Trạng thái:** hướng đi owner-approved 2026-10-27: phương án A, *lĩnh vực mở, chủ tự đặt, XUNA gợi ý thêm*. Mọi con số, ngưỡng, tên và layout byte có ký hiệu **[P]** là Proposed. Chúng chỉ thành chính thức khi owner chốt (§12) hoặc session tương ứng đo xong.
 > **Nghiên cứu nền:** [knowledge-domains-research-2026-10-27.md](../../research/knowledge-domains-research-2026-10-27.md). Repo tham khảo cho từng phần ở §11.
 > **KD-0** (dọn code giai đoạn trưởng thành cũ) đã xong: mobile `d221476`, firmware `1cc59dd`.
