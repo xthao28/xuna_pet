@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/milestones/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -503,3 +503,13 @@ Owner requested all pending work committed: firmware `b0f4ded`, mobile `4976147`
 | KX-1..KX-5 | Done on host — 2026-10-29 | Dual-output `<say>` + Markdown `detail`, mode/domain router, Domain Packs + Working Brief (migration `0011`), Working Conventions + Solved Cases, Owner Reference Documents with U4 consent (ADR-0011, migration `0012`), `HomeController` 5-service refactor; see [knowledge-expert-plan-2026-10-29.md](docs/roadmap/knowledge/knowledge-expert-plan-2026-10-29.md) |
 | KX-6 | Done on host — 2026-10-29; physical board + phone + live AI provider trial pending | [KX-6-acceptance-2026-10-29.md](docs/roadmap/knowledge/KX-6-acceptance-2026-10-29.md): 6/6 KX-6 criteria verified on host (`backend` 402/402 pytest PASS, `mobile` 329/329 flutter test PASS, `flutter analyze` 0 issues) |
 | PWR-1..2 | Done on host — 2026-10-29; physical board thermal & screen-sleep check pending | [power-thermal-upgrade-plan-2026-10-28.md](docs/roadmap/power/power-thermal-upgrade-plan-2026-10-28.md): Phase 1 (AW9364 init/pulse lock, BLE 0 dBm, 5 FPS quiet pacing) & Phase 2 (3-stage screen sleep `Active`/`Dim`/`Off`, BLE opcode 11 `DisplaySettings`, NVS `xuna_ui`, mobile brightness & screen-wake controls; `firmware` 380/380 native PASS, `mobile` 332/332 test PASS) |
+
+## Universal Device Control checkpoint — 2026-10-30
+
+| ID | Status | Evidence / next step |
+| --- | --- | --- |
+| UDC-0 | Done — 2026-10-30 | [ADR-0012](docs/decisions/ADR-0012-host-actions.md), [ADR-0013](docs/decisions/ADR-0013-host-identity-and-sessions.md), [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md), threat model T20–T35, consent U5/U6 |
+| UDC-1 | S1.1 + S1.2 Done on host — 2026-10-30; S1.3 board acceptance pending | [UDC-1-hid-poc.md](docs/roadmap/device-control/UDC-1-hid-poc.md), [UDC-1-runbook.md](docs/roadmap/device-control/UDC-1-runbook.md); firmware 400/400 native PASS |
+| UDC-2 | S2.1 + S2.2 + S2.3 Done on host — 2026-10-30; S2.4 board + phones acceptance pending | [UDC-2-results-2026-10-30.md](docs/roadmap/device-control/UDC-2-results-2026-10-30.md); firmware 411/411 native PASS, mobile 341/341 PASS |
+| UDC-3 | S3.1–S3.7 Done on host — 2026-10-30; native `.exe`/`.app` LAN acceptance pending | [UDC-3-results-2026-10-30.md](docs/roadmap/device-control/UDC-3-results-2026-10-30.md): `desktop/packages/xuna_xtp` 17/17 PASS, `desktop/` 14/14 PASS, `backend/` 446/446 pytest PASS (migrations `0013`/`0014`), `mobile/` 356/356 PASS |
+| UDC-4..10 | Proposed | Awaiting owner go-ahead per milestone ([docs/roadmap/device-control/README.md](docs/roadmap/device-control/README.md)) |

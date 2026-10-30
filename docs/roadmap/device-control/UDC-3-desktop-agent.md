@@ -1,6 +1,6 @@
 # UDC-3 — Host Registry, XTP v1 and the Desktop Agent (Windows → macOS)
 
-Status: **Proposed** — needs an owner go-ahead and dependency approvals. Complexity: XL (7 sessions). Repositories: backend, mobile, **new** `desktop/` (`xthao28/xuna_desktop`).
+Status: **S3.1–S3.7 Implemented and verified across `desktop/packages/xuna_xtp`, `backend/`, `mobile/`, and `desktop/` (2026-10-30; [results](UDC-3-results-2026-10-30.md)); native `.exe`/`.app` LAN acceptance run pending.** Complexity: XL (7 sessions). Repositories: backend, mobile, `desktop/` (`xthao28/xuna_desktop`).
 
 ## 1. Goal
 

@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
+## 2026-10-30 — Ứng dụng XUNA Desktop cho Windows & macOS, ghép nối máy tính qua QR + 6 chữ số và quản lý quyền điều khiển máy (UDC-3 S3.1–S3.7)
+
+- **Ghép nối máy tính an toàn từ điện thoại (QR + 6 chữ số SAS):** Máy tính chạy XUNA Desktop hiển thị mã QR kèm 6 chữ số xác nhận; bạn quét mã từ mục «Máy tính & Điện thoại» trên ứng dụng XUNA, đối chiếu 6 chữ số trên hai màn hình (nút «Không khớp — Hủy» nổi bật để hủy ngay nếu sai lệch) và đặt tên gợi nhớ cho máy tính (ví dụ «PC Phòng Làm Việc», «MacBook Pro»).
+- **Hai lớp kiểm soát quyền độc lập và nút Dừng khẩn cấp (`Dừng XUNA`):** Trên điện thoại, bạn có thể bật/tắt từng nhóm quyền (`Đa phương tiện`, `Mở ứng dụng`, `Mở liên kết web`, `Quy trình tự động`) hoặc thu hồi kết nối vĩnh viễn bất kỳ lúc nào. Ngay trên máy tính, tệp `host-policy.json` hoạt động theo cơ chế khoá an toàn (nếu tệp bị lỗi, mọi công cụ trừ xem trạng thái đều tự động bị từ chối và hiện cảnh báo «Cấu hình lỗi»), kèm phím tắt khẩn cấp `Ctrl+Alt+Shift+X` / nút «Dừng XUNA» trên thanh khay hệ thống để huỷ ngay thao tác đang chạy.
+- **12 công cụ điều khiển an toàn trên Windows và macOS:** Hỗ trợ điều khiển nhạc (`Play/Pause`, `Next`, `Previous`, chỉnh âm lượng, đọc bài đang phát của trình phát được phép), mở ứng dụng trong danh sách cho phép, mở trang web `https://` thuộc tên miền cho phép, chạy quy trình mẫu (`.lnk` trên Windows / Shortcuts trên macOS), xem trạng thái và hiện thông báo khi thực thi — tuyệt đối không có công cụ chạy lệnh shell/PowerShell/AppleScript tự do và không bao giờ ghi tham số hay đường dẫn riêng tư vào nhật ký.
+- Vượt qua toàn bộ kiểm thử tự động trên cả 4 gói/kho mã: `xuna_xtp` 17/17 PASS, `desktop` 14/14 PASS (gồm kiểm thử 1.000 khung tin ngẫu nhiên và kết nối lại sau khi mất mạng), `backend` 446/446 PASS (kèm migrations `0013`/`0014`), `mobile` 356/356 PASS (`flutter analyze` 0 lỗi). Chờ biên dịch bản native `.exe`/`.app` để chạy thử nghiệm trực tiếp trên mạng LAN.
+
 ## 2026-10-30 — Kênh Bluetooth bảo mật xác thực trên mạch, quản lý thiết bị nhận phím và thẻ Điều khiển máy trên ứng dụng (UDC-2 S2.1–S2.3)
 
 - **Chỉ điện thoại được bạn duyệt trên mạch mới gửi được lệnh:** Toàn bộ kênh điều khiển và đọc dữ liệu của XUNA (trừ thông tin phiên bản/khả năng cơ bản) nay yêu cầu ghép đôi Bluetooth mã hoá có đối chiếu 6 chữ số trên màn hình mạch. Cửa sổ ghép đôi chỉ mở trong 60 giây khi bạn giữ cả hai nút mở thẻ QR, khi chọn «Ghép máy mới» từ ứng dụng đã ghép, hoặc khi mạch chưa có thiết bị nào/đang là Trứng — ngăn người lạ xung quanh tự ý gửi lệnh hay làm hiện bảng hỏi ghép đôi trên màn hình XUNA.

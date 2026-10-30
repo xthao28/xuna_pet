@@ -6,7 +6,8 @@ Date: 2026-10-30. Owner decisions: [roadmap §3](../XUNA_UNIVERSAL_DEVICE_CONTRO
 
 - **UDC-0 is Done (2026-10-30).**
 - **UDC-1 (S1.1 + S1.2) and UDC-2 (S2.1 + S2.2 + S2.3) are Implemented and host-verified (2026-10-30); physical board/phone acceptance (S1.3 / S2.4) is pending.**
-- UDC-3…UDC-10 are planned in full here; each needs an owner go-ahead before work starts.
+- **UDC-3 (S3.1–S3.7) is Implemented and verified across `desktop/`, `backend/`, and `mobile/` (2026-10-30; [UDC-3-results-2026-10-30.md](UDC-3-results-2026-10-30.md)); native `.exe`/`.app` LAN acceptance is pending.**
+- UDC-4…UDC-10 are planned in full here; each needs an owner go-ahead before work starts.
 
 This folder is written so that **any coding agent or engineer** (including a model other than the one that wrote it) can execute a milestone without extra context. Every milestone file follows the same layout:
 
@@ -29,7 +30,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | [UDC-0-decision-records.md](UDC-0-decision-records.md) | ADRs, contracts, threat model, consent classes (docs only) | **Done 2026-10-30** |
 | [UDC-1-hid-poc.md](UDC-1-hid-poc.md) | "XUNA bấm Play": BLE HID media keys on the board | **S1.1 + S1.2 Done 2026-10-30; S1.3 board acceptance pending** |
 | [UDC-2-secure-channel.md](UDC-2-secure-channel.md) | Authenticated app ↔ board channel, HID management, media-key opcode | **S2.1 + S2.2 + S2.3 Done 2026-10-30; S2.4 board + phones acceptance pending** |
-| [UDC-3-desktop-agent.md](UDC-3-desktop-agent.md) | Host Registry, XTP v1, Desktop Agent (Windows → macOS) | Proposed |
+| [UDC-3-desktop-agent.md](UDC-3-desktop-agent.md) | Host Registry, XTP v1, Desktop Agent (Windows → macOS) | **S3.1–S3.7 Done 2026-10-30 ([results](UDC-3-results-2026-10-30.md)); native LAN run pending** |
 | [UDC-4-brain-tools.md](UDC-4-brain-tools.md) | Brain tool calling, orchestrator, approvals | Proposed |
 | [UDC-5-android.md](UDC-5-android.md) | Android Mobile Host Adapter | Proposed |
 | [UDC-6-ios.md](UDC-6-ios.md) | iOS adapter + AMS spike | Proposed |
