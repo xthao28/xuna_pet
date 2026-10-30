@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
+## 2026-10-30 — Điện thoại Android trở thành thiết bị nhận lệnh từ XUNA, tự đăng ký, chạy nền khi gắn mạch và bảng giải thích quyền rõ ràng (UDC-5 S5.1–S5.4)
+
+- **Điều khiển nhạc, âm lượng, mở ứng dụng và liên kết ngay trên điện thoại Android của bạn:** Ứng dụng XUNA trên Android nay có thể trực tiếp điều khiển phiên phát nhạc đang mở (Spotify, YouTube Music…), chỉnh âm lượng hệ thống, đọc thông tin bài hát đang phát, mở các ứng dụng trong danh sách bạn cho phép và mở liên kết `https://` an toàn ngay trong lượt trò chuyện mà không cần thêm ứng dụng phụ.
+- **Tự đăng ký điện thoại bằng 1 chạm và tuỳ chọn chạy nền khi kết nối với XUNA:** Trong mục «Máy tính & Điện thoại», thẻ «Điện thoại Android này» cho phép bạn đăng ký ngay chiếc điện thoại đang cầm làm một máy đích của XUNA (bảo vệ bằng khoá bảo mật phần cứng Android Keystore). Khi bật tuỳ chọn «Cho phép điều khiển khi chạy nền», điện thoại sẽ duy trì kết nối an toàn chỉ trong lúc đang nối Bluetooth với mạch XUNA và tự động dừng ngay khi ngắt kết nối mạch để tiết kiệm pin.
+- **Giải thích quyền minh bạch trước khi mở cài đặt hệ thống (chuẩn chính sách Google Play):** Trước khi xin quyền điều khiển phiên phát nhạc (`NotificationListenerService` chỉ dùng để tìm trình phát nhạc, tuyệt đối không đọc hay lưu nội dung tin nhắn/thông báo), quyền gắn kết thiết bị đồng hành (`CompanionDeviceManager`) hoặc quyền dịch vụ chạy nền (`connectedDevice`), ứng dụng luôn hiển thị bảng giải thích rõ mục đích bằng tiếng Việt/Anh để bạn chủ động quyết định. Bản phát hành chuẩn tuyệt đối không chứa quyền `QUERY_ALL_PACKAGES` hay `AccessibilityService`.
+- Vượt qua toàn bộ kiểm thử tự động: `backend` 457/457 bài kiểm thử PASS (`ruff` và `mypy` 0 lỗi), `mobile` 376/376 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Tài liệu khai báo Google Play Console được lập tại [UDC-5-play-declarations.md](docs/roadmap/device-control/UDC-5-play-declarations.md) và biên bản kiểm chứng tại [UDC-5-results-2026-10-30.md](docs/roadmap/device-control/UDC-5-results-2026-10-30.md).
+
 ## 2026-10-30 — Nhờ XUNA điều khiển máy tính bằng lời nói/tin nhắn, bảng xác nhận 60 giây và điều phối phím media qua mạch (UDC-4 S4.1–S4.6)
 
 - **Nhờ XUNA điều khiển nhạc, mở ứng dụng và chạy quy trình ngay trong cuộc trò chuyện:** Khi bạn bật công tắc «Cho phép XUNA điều khiển máy tính trong trò chuyện» trong cài đặt Thiết bị (mặc định tắt), bạn có thể nhắn hoặc nói những câu như «Tạm dừng nhạc trên Mac», «Mở VS Code trên PC» hay «Bấm Play qua Bluetooth của XUNA». Nếu có nhiều máy tính đang kết nối mà bạn chưa nói rõ máy nào, XUNA sẽ hỏi lại bạn thay vì tự đoán.

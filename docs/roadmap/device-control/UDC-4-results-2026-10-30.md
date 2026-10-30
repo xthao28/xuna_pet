@@ -57,3 +57,4 @@ XUNA_TEXT_MODEL=<model> \
 Pending physical-environment checks (tracked in `PROCESS.md` / `PLAN.md`):
 - Live LLM run of `scripts/tool_benchmark.py` to compare candidate models for D11a.
 - End-to-end LAN latency measurement (phone + PC Host Agent + LILYGO T-Display-S3 board) for R1 media actions (`p50 ≤ 1.5 s`).
+

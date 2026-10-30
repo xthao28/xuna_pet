@@ -1,6 +1,6 @@
 # UDC-5 — Android Mobile Host Adapter
 
-Status: **Proposed** — needs an owner go-ahead. Complexity: L (5 sessions; S5.5 optional). Repositories: mobile, backend (small).
+Status: **Implemented (S5.1–S5.4 Done 2026-10-30; S5.5 optional; physical Android device & Play Console acceptance pending)** — see [UDC-5-results-2026-10-30.md](UDC-5-results-2026-10-30.md) and [UDC-5-play-declarations.md](UDC-5-play-declarations.md). Complexity: L (5 sessions; S5.5 optional). Repositories: mobile, backend (small).
 
 ## 1. Goal
 
