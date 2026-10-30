@@ -1,6 +1,6 @@
 # UDC-2 — Authenticated board channel, HID management and the media-key opcode
 
-Status: **Proposed** — needs an owner go-ahead after UDC-1 results. Complexity: M–L (4 sessions). Repositories: firmware, mobile.
+Status: **S2.1 + S2.2 + S2.3 Done 2026-10-30 ([results](UDC-2-results-2026-10-30.md)); S2.4 board + phones acceptance pending**. Complexity: M–L (4 sessions). Repositories: firmware, mobile.
 
 ## 1. Goal
 

@@ -47,7 +47,7 @@ flowchart LR
   end
   Orch <-- "XTP over WSS, mutual proof" --> Agent
   App <-- "Firebase ID token" --> Orch
-  App <-- "BLE (to be authenticated)" --> HID
+  App <-- "BLE (LE SC numeric comparison, encrypted GATT)" --> HID
   HID -- "bonded HOGP" --> OS
 ```
 
@@ -95,7 +95,7 @@ sequenceDiagram
 |---|---|
 | Agent ↔ Backend | TLS (public CA in production; pinned dev CA in LAN tests, as DC-D8) + per-session challenge proof with the host key; heartbeat; per-host rate limits |
 | App ↔ Backend | Existing Firebase ID token; approvals carry `approvalId` bound to the args hash |
-| App ↔ Board | **Currently unauthenticated GATT writes.** Before keyboard HID or button-triggered workflows: require LE Secure Connections bonding with passkey shown on the board screen, encrypted characteristics for control opcodes, and app-level session binding to the bound owner (UDC-T9) |
+| App ↔ Board | **Implemented in UDC-2 (firmware + mobile, 2026-10-30; board trial pending):** LE Secure Connections bonding (`ESP_LE_AUTH_REQ_SC_MITM_BOND`, `ESP_IO_CAP_IO`) with 6-digit numeric comparison confirmed on the board screen via GPIO0 inside a 60 s pairing window (`PairingWindow`; prompts outside the window are immediately rejected); `ESP_GATT_PERM_READ_ENCRYPTED` / `ESP_GATT_PERM_WRITE_ENCRYPTED` on all custom characteristics and CCCDs except open-read `7a6e0002` capabilities; targeted GATT notifications (`esp_ble_gatts_send_indicate` to `appConnId` only); max 4 bonds in stable NVS slots (`7a6e0015`, no Bluetooth addresses exposed); opcode 12 rate limit (`<= 4` presses/s and `<= 30`/min); opcode 13 `arg=2` forget-all requires 10 s physical GPIO0 confirmation on the board (UDC-T9, UDC-T10) |
 | Board ↔ Host (HID) | LE Secure Connections with numeric comparison (board screen + button) or passkey display, never Just Works; bonding; **every** HID characteristic requires an encrypted link (HOGP §7.1 — one reviewed library leaves report characteristics readable unencrypted); one connected HID host at a time |
 | Later: App ↔ Agent on LAN | Mutual authentication with enrolled keys (no shared secrets), mDNS only for discovery, never trust the advertised name |
 

@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
+## 2026-10-30 — Kênh Bluetooth bảo mật xác thực trên mạch, quản lý thiết bị nhận phím và thẻ Điều khiển máy trên ứng dụng (UDC-2 S2.1–S2.3)
+
+- **Chỉ điện thoại được bạn duyệt trên mạch mới gửi được lệnh:** Toàn bộ kênh điều khiển và đọc dữ liệu của XUNA (trừ thông tin phiên bản/khả năng cơ bản) nay yêu cầu ghép đôi Bluetooth mã hoá có đối chiếu 6 chữ số trên màn hình mạch. Cửa sổ ghép đôi chỉ mở trong 60 giây khi bạn giữ cả hai nút mở thẻ QR, khi chọn «Ghép máy mới» từ ứng dụng đã ghép, hoặc khi mạch chưa có thiết bị nào/đang là Trứng — ngăn người lạ xung quanh tự ý gửi lệnh hay làm hiện bảng hỏi ghép đôi trên màn hình XUNA.
+- **Thẻ «Điều khiển máy (Remote)» ngay trên ứng dụng:** Trong tab Thiết bị, bạn có thể bấm trực tiếp các phím Phát/Tạm dừng, Bài trước, Bài tiếp, Giảm/Tăng âm lượng, Tắt tiếng từ điện thoại để XUNA phát phím sang máy tính đang kết nối (tối đa 4 lần/giây và 30 lần/phút, hoàn toàn không ảnh hưởng đến tâm trạng hay việc học của XUNA).
+- **Đặt tên và quản lý tối đa 4 thiết bị đã ghép:** Ứng dụng hiển thị danh sách các máy đã ghép đôi với XUNA (không lộ địa chỉ MAC Bluetooth), cho phép bạn đặt tên gợi nhớ cho từng máy (ví dụ «MacBook bàn làm việc»), quên từng máy, mở cửa sổ ghép máy mới 60 giây, hoặc chọn «Quên tất cả» kèm bước bấm nút trên (`GPIO0`) của XUNA trong 10 giây để xác nhận vật lý.
+- Tính năng BLE HID nay được bật sẵn trong bản firmware mặc định (`xuna_t_display_s3`). Firmware vượt qua 411/411 bài kiểm thử (`53/53` bộ test), cả 4 bản build biên dịch thành công; ứng dụng vượt qua 341/341 bài kiểm thử (`flutter analyze` 0 lỗi). Chờ nạp mạch để nghiệm thu thực tế cùng điện thoại và máy tính (S2.4).
+
 ## 2026-10-30 — Chế độ Remote điều khiển nhạc qua Bluetooth và xác nhận ghép đôi 6 chữ số trên mạch (UDC-1 S1.1 + S1.2)
 
 - **Biến XUNA thành điều khiển nhạc Bluetooth (BLE HID):** Trong bản firmware thử nghiệm `xuna_hid` và `xuna_hid_net`, mạch XUNA có thể ghép đôi Bluetooth an toàn với máy tính hoặc điện thoại (hiển thị 6 chữ số trên màn hình để bạn bấm `GPIO0` đồng ý hoặc `GPIO14` từ chối) trong khi vẫn giữ kết nối đồng thời với ứng dụng XUNA trên điện thoại.
