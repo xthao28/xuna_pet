@@ -2,6 +2,17 @@
 
 Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
+## 2026-10-30 — Chế độ Remote điều khiển nhạc qua Bluetooth và xác nhận ghép đôi 6 chữ số trên mạch (UDC-1 S1.1 + S1.2)
+
+- **Biến XUNA thành điều khiển nhạc Bluetooth (BLE HID):** Trong bản firmware thử nghiệm `xuna_hid` và `xuna_hid_net`, mạch XUNA có thể ghép đôi Bluetooth an toàn với máy tính hoặc điện thoại (hiển thị 6 chữ số trên màn hình để bạn bấm `GPIO0` đồng ý hoặc `GPIO14` từ chối) trong khi vẫn giữ kết nối đồng thời với ứng dụng XUNA trên điện thoại.
+- **Chế độ Remote trên mạch:** Khi đã kết nối với thiết bị nhận phím, giữ nút `GPIO14` chuyển XUNA vào chế độ `Remote > máy 1`: bấm `GPIO0` để Phát/Tạm dừng (`Play/Pause`), bấm `GPIO14` để Qua bài (`Next`), giữ `GPIO0` để Lùi bài (`Previous`), giữ cả hai nút để Dừng (`Đã dừng`), hoặc giữ `GPIO14` lần nữa để thoát và đổi cảnh cửa sổ. Mọi lần bấm trong chế độ Remote đều tách biệt hoàn toàn với việc dạy phản ứng cho XUNA và tự thoát sau 60 giây không bấm.
+- Firmware vượt qua 400/400 bài kiểm thử (`50/50` bộ test), cả 4 bản build (`xuna_t_display_s3`, `xuna_hid`, `xuna_hid_net`, `xuna_net`) biên dịch thành công; bản mặc định `xuna_t_display_s3` giữ nguyên dung lượng RAM (`59.288 B`) và Flash (`3.924.445 B`, `±0 B`). Chờ nạp mạch để đo thực tế trên 4 hệ điều hành (S1.3).
+
+## 2026-10-30 — Ghi lại quyết định điều khiển thiết bị (UDC-0: ADR-0012, ADR-0013 và hợp đồng giao thức)
+
+- Ghi nhận chính thức bộ quyết định và hợp đồng kỹ thuật cho tính năng điều khiển thiết bị: [ADR-0012](docs/decisions/ADR-0012-host-actions.md) (tách riêng thao tác trên máy tính/điện thoại qua bộ điều phối có xác nhận của bạn, và chỉ cho phép mạch bấm phím media sau khi bạn duyệt từng lần bấm), [ADR-0013](docs/decisions/ADR-0013-host-identity-and-sessions.md) (định danh máy tính/điện thoại `HostId`, ghép nối qua mã QR kèm 6 chữ số đối chiếu), hợp đồng giao thức [XTP v1](docs/architecture/XUNA_XTP_V1_CONTRACT.md), mô hình bảo mật `T20–T35`, hai quyền dữ liệu mới `U5 · Màn hình máy tính` / `U6 · Thông báo` (mặc định tắt, không lưu trên máy chủ) và bảng mã lệnh Bluetooth trên mạch.
+- Chỉ cập nhật tài liệu quy tắc, chưa thay đổi mã nguồn trên mạch, ứng dụng hay máy chủ.
+
 ## 2026-10-30 — Nghiên cứu để XUNA điều khiển máy tính và điện thoại (chỉ tài liệu)
 
 - Bộ 6 tài liệu nghiên cứu và đề xuất kiến trúc giúp XUNA sau này điều khiển máy Mac, PC Windows, điện thoại Android và iPhone trong giới hạn mỗi nền tảng cho phép: XUNA tự bấm phím media qua Bluetooth như một bàn phím, và một ứng dụng nhỏ trên máy tính nhận lệnh từ XUNA, luôn hỏi bạn trước những thao tác quan trọng. [Nghiên cứu](docs/research/XUNA_UNIVERSAL_DEVICE_CONTROL_RESEARCH.md).

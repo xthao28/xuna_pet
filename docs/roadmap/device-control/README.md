@@ -27,7 +27,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | File | Milestone | Status |
 |---|---|---|
 | [UDC-0-decision-records.md](UDC-0-decision-records.md) | ADRs, contracts, threat model, consent classes (docs only) | **Done 2026-10-30** |
-| [UDC-1-hid-poc.md](UDC-1-hid-poc.md) | "XUNA bấm Play": BLE HID media keys on the board | **Approved to start** |
+| [UDC-1-hid-poc.md](UDC-1-hid-poc.md) | "XUNA bấm Play": BLE HID media keys on the board | **S1.1 + S1.2 Done 2026-10-30; S1.3 board acceptance pending** |
 | [UDC-2-secure-channel.md](UDC-2-secure-channel.md) | Authenticated app ↔ board channel, HID management, media-key opcode | Proposed |
 | [UDC-3-desktop-agent.md](UDC-3-desktop-agent.md) | Host Registry, XTP v1, Desktop Agent (Windows → macOS) | Proposed |
 | [UDC-4-brain-tools.md](UDC-4-brain-tools.md) | Brain tool calling, orchestrator, approvals | Proposed |

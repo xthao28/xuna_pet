@@ -1,6 +1,6 @@
 # UDC-1 — "XUNA bấm Play": BLE HID media keys on the board
 
-Status: **Approved to start (owner 2026-10-30, UDC-D1).** Not started. Complexity: M (3 sessions). Needs the board, a Mac, a Windows 11 PC, an Android phone and an iPhone in S1.3.
+Status: **Approved to start (owner 2026-10-30, UDC-D1). S1.1 + S1.2 Done 2026-10-30 (400/400 native tests PASS; 4 firmware envs PASS; default build ±0 B); S1.3 board acceptance pending.** Complexity: M (3 sessions). Needs the board, a Mac, a Windows 11 PC, an Android phone and an iPhone in S1.3.
 
 ## 1. Goal
 
@@ -363,7 +363,17 @@ ESP-IDF `esp_hid_device` (CC0: descriptor/security), the Arduino BLE library (bu
 
 ## 12. Handoff
 
-- Results file.
+- **S1.2 implementation record (2026-10-30):**
+  - Added [`firmware/include/HidManager.h`](../../../firmware/include/HidManager.h) and `#if defined(XUNA_HID) && XUNA_HID` branches in [`firmware/include/BleManager.h`](../../../firmware/include/BleManager.h) and [`firmware/src/main.cpp`](../../../firmware/src/main.cpp), plus `[env:xuna_hid]` and `[env:xuna_hid_net]` in [`firmware/platformio.ini`](../../../firmware/platformio.ini), and S1.3 runbook [`docs/roadmap/device-control/UDC-1-runbook.md`](UDC-1-runbook.md).
+  - **Finding 1 (`BLEDevice.cpp` GATTS callback ordering, §5.2 item 5):** in Arduino-ESP32 2.0.14 (`BLEDevice.cpp` lines 122–128), `BLEDevice::gattServerEventHandler` invokes `m_pServer->handleGATTServerEvent` (which calls `BLECharacteristicCallbacks::onWrite`) **before** `m_customGattsHandler`. Therefore `WriteCallbacks`, `ProofCallbacks`, `SpeechCallbacks`, and `NetCallbacks` use the 2-argument `onWrite(BLECharacteristic*, esp_ble_gatts_cb_param_t*)` overload under `XUNA_HID` and call `hid_.onAppAccessFromCallback(param->write.conn_id, ...)` **before** reading `session_.load()`, while `customGattsHandler` also handles `ESP_GATTS_READ_EVT` / `ESP_GATTS_WRITE_EVT` (e.g. CCCD descriptor writes and read-only projections).
+  - **Finding 2 (`BLEHIDDevice::manufacturer` in Arduino-ESP32 2.0.14):** `BLEHIDDevice(BLEServer*)` leaves `m_manufacturerCharacteristic` uninitialized until the no-arg `manufacturer()` is called; `HidManager::begin` calls `hid_->manufacturer()->setValue("XUNA")`.
+  - **Finding 3 (`BLEAdvertising::start` 128-bit UUID expansion):** `BLEAdvertising::start()` converts all entries in `m_serviceUUIDs` to 128-bit (`2 × 16 = 32 B`), overflowing the 31-byte legacy advertising PDU. `HidManager::begin` uses `BLEAdvertisementData` directly to build the exact 29-byte payload (`flags` 3 B + 128-bit custom UUID 18 B + 16-bit `0x1812` UUID 4 B + appearance `0x03C0` 4 B = 29 B) with `"XUNA"` in the scan response.
+  - **Build sizes (PlatformIO `espressif32@6.5.0`, Arduino 2.0.14):**
+    - `xuna_t_display_s3`: RAM `18.1%` (`59,288 / 327,680 B`, **`±0 B`**), Flash `59.9%` (`3,924,445 / 6,553,600 B`, **`±0 B`**).
+    - `xuna_hid`: RAM `18.4%` (`60,376 / 327,680 B`, `+1,088 B`), Flash `60.1%` (`3,940,517 / 6,553,600 B`, `+16,072 B`).
+    - `xuna_net`: RAM `25.3%` (`82,800 / 327,680 B`), Flash `67.2%` (`4,403,705 / 6,553,600 B`).
+    - `xuna_hid_net`: RAM `25.6%` (`83,904 / 327,680 B`, `+1,104 B` vs `xuna_net`), Flash `67.4%` (`4,419,825 / 6,553,600 B`, `+16,120 B` vs `xuna_net`).
+- Results file (`UDC-1-results-<date>.md` when S1.3 board trials are run).
 - PROCESS.md.
 - CHANGELOG ("XUNA bấm Play được trên … máy").
 - Update the [capability matrix](../../research/XUNA_PLATFORM_CAPABILITY_MATRIX.md) §5 rows from † to measured.
