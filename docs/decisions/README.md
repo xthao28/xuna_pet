@@ -23,6 +23,7 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | [ADR-0008 Cloud Brain authority and identity](ADR-0008-cloud-brain-authority-and-identity.md) | Approved | 2026-10-16, owner-delegated architecture choice |
 | [ADR-0009 Cloud platform, sequencing and privacy](ADR-0009-cloud-platform-sequencing-and-privacy.md) | Approved architecture baseline; not Implemented | 2026-10-16 |
 | [ADR-0010 device-direct transport over WebSocket](ADR-0010-device-direct-websocket-transport.md) (replaces MQTT for Stage 2's first slice) | Approved; not Implemented; gated by E14 | 2026-10-27, owner DC-D1…D8 |
+| UDC track and decisions R1–R8, UDC-D1…D11 ([roadmap §3](../roadmap/XUNA_UNIVERSAL_DEVICE_CONTROL_ROADMAP.md#3-owner-decisions-2026-10-30)); ADR-0012/0013 reserved for UDC-0 | Approved (UDC-0/1 only); not Implemented | 2026-10-30, owner |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
 | D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
 | D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/sessions/S22-decision-packet-2026-10-15.md) |

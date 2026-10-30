@@ -14,4 +14,6 @@ Plans and session records, grouped by topic. The master session list is [XUNA_SE
 | [personality/](personality/) | [Personality plan](personality/personality-plan-2026-10-23.md) (PE-0 → PE-5), [PE-2 board shadow](personality/PE2-board-shadow-2026-10-24.md), [PE-3 persistence](personality/PE3-persistence-2026-10-24.md), [Track A variants](personality/trackA-variants-2026-10-24.md), [PE-4a leaning](personality/PE4a-leaning-2026-10-24.md) |
 | [knowledge/](knowledge/) | [Knowledge domains plan](knowledge/knowledge-domains-plan-2026-10-27.md) (M06, KD-1…KD-5 done), [Knowledge Expert plan](knowledge/knowledge-expert-plan-2026-10-29.md) (KX-1…KX-6, approved 2026-10-29, replaces part of KD) and [research](../research/knowledge-domains-research-2026-10-27.md) |
 
+Universal Device Control (UDC-0/1 Approved 2026-10-30, separate from M01–M07): [roadmap](XUNA_UNIVERSAL_DEVICE_CONTROL_ROADMAP.md), detailed per-milestone plan in [device-control/](device-control/README.md).
+
 New records go into the matching folder; add a folder only when a new topic has several records.

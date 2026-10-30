@@ -1,6 +1,11 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-29** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
+
+## 2026-10-30 — Nghiên cứu để XUNA điều khiển máy tính và điện thoại (chỉ tài liệu)
+
+- Bộ 6 tài liệu nghiên cứu và đề xuất kiến trúc giúp XUNA sau này điều khiển máy Mac, PC Windows, điện thoại Android và iPhone trong giới hạn mỗi nền tảng cho phép: XUNA tự bấm phím media qua Bluetooth như một bàn phím, và một ứng dụng nhỏ trên máy tính nhận lệnh từ XUNA, luôn hỏi bạn trước những thao tác quan trọng. [Nghiên cứu](docs/research/XUNA_UNIVERSAL_DEVICE_CONTROL_RESEARCH.md).
+- Chưa có gì thay đổi trên mạch, ứng dụng hay máy chủ; mọi đề xuất đang chờ chủ duyệt.
 
 ## 2026-10-29 — Chuẩn hoá hộp thoại, thông báo và hiển thị nhịp sinh hoạt quen thuộc của chủ trên ứng dụng
 
