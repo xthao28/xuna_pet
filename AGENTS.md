@@ -45,6 +45,7 @@ Root repository: `xthao28/xuna_pet` (project orchestration, product decisions, s
 | `firmware/` | `xthao28/xuna_firmware` | C/C++ firmware, display/input, local digital-life runtime, BLE, persistence, sensors |
 | `mobile/` | `xthao28/xuna_mobile` | Flutter companion app: pairing, status, conversation UI, Evolution Journal, device settings |
 | `backend/` | `xthao28/xuna_backend` | Optional future cloud services: AI provider gateway, ASR/LLM/TTS, account/backup/sync |
+| `desktop/` | `xthao28/xuna_desktop` | Flutter desktop tray agent (Windows/macOS) + pure-Dart `xuna_xtp` XTP v1 package |
 
 Naming rationale: use **firmware** rather than `esp32` so a future MCU/PCB upgrade does not require a repository rename. The path `mobile/` is more descriptive than `FE/` for this hardware-centered product.
 
@@ -65,7 +66,8 @@ xuna_pet/
 │   └── roadmap/              # Milestones and validation notes
 ├── firmware/                 # Git submodule: xuna_firmware
 ├── mobile/                   # Git submodule: xuna_mobile
-└── backend/                  # Git submodule: xuna_backend
+├── backend/                  # Git submodule: xuna_backend
+└── desktop/                  # Git submodule: xuna_desktop
 ```
 
 Create folders/documents when genuinely needed; do not manufacture a large empty skeleton.

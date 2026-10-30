@@ -7,3 +7,6 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/xthao28/xuna_backend.git
+[submodule "desktop"]
+	path = desktop
+	url = https://github.com/xthao28/xuna_desktop.git
