@@ -2,6 +2,13 @@
 
 Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
 
+## 2026-10-30 — Nhờ XUNA điều khiển máy tính bằng lời nói/tin nhắn, bảng xác nhận 60 giây và điều phối phím media qua mạch (UDC-4 S4.1–S4.6)
+
+- **Nhờ XUNA điều khiển nhạc, mở ứng dụng và chạy quy trình ngay trong cuộc trò chuyện:** Khi bạn bật công tắc «Cho phép XUNA điều khiển máy tính trong trò chuyện» trong cài đặt Thiết bị (mặc định tắt), bạn có thể nhắn hoặc nói những câu như «Tạm dừng nhạc trên Mac», «Mở VS Code trên PC» hay «Bấm Play qua Bluetooth của XUNA». Nếu có nhiều máy tính đang kết nối mà bạn chưa nói rõ máy nào, XUNA sẽ hỏi lại bạn thay vì tự đoán.
+- **Bảng xác nhận 60 giây và quyền dừng tức thì trên điện thoại:** Các thao tác chỉnh nhạc cơ bản (R1) được thực hiện nhanh kèm thẻ trạng thái ngay trong bong bóng chat; mọi thao tác mở ứng dụng, mở trang web (R2), chạy quy trình tự động (R3) hoặc bấm phím Bluetooth qua mạch XUNA đều hiển thị bảng hỏi «XUNA muốn thực hiện hành động» với tên máy đích, nhãn mức độ (`Cần xác nhận` / `Quan trọng`), đồng hồ đếm ngược 60 giây và hai nút «Đồng ý» / «Từ chối», cùng thanh «Dừng hành động» để huỷ ngay trong lượt.
+- **Biểu cảm của XUNA theo kết quả thao tác:** Khi thực hiện thành công trên máy tính hoặc qua mạch, XUNA nhún nhảy vui vẻ (`bounce_play`); khi thao tác bị từ chối quyền hoặc không thực hiện được, XUNA ngó nghiêng (`look_around`) — tất cả chỉ là cử chỉ biểu cảm, không làm thay đổi tâm trạng, tính cách hay việc học của XUNA.
+- Vượt qua toàn bộ kiểm thử tự động: `backend` 452/452 bài kiểm thử PASS (kèm migration `0015` và bộ benchmark 120 câu tiếng Việt/Anh đạt 100% độ chính xác trên bộ đánh giá chuẩn, 0 thao tác nhầm máy), `mobile` 364/364 bài kiểm thử PASS (`flutter analyze` 0 lỗi). Chờ chạy thử nghiệm với AI thật và đo độ trễ trên mạng LAN.
+
 ## 2026-10-30 — Ứng dụng XUNA Desktop cho Windows & macOS, ghép nối máy tính qua QR + 6 chữ số và quản lý quyền điều khiển máy (UDC-3 S3.1–S3.7)
 
 - **Ghép nối máy tính an toàn từ điện thoại (QR + 6 chữ số SAS):** Máy tính chạy XUNA Desktop hiển thị mã QR kèm 6 chữ số xác nhận; bạn quét mã từ mục «Máy tính & Điện thoại» trên ứng dụng XUNA, đối chiếu 6 chữ số trên hai màn hình (nút «Không khớp — Hủy» nổi bật để hủy ngay nếu sai lệch) và đặt tên gợi nhớ cho máy tính (ví dụ «PC Phòng Làm Việc», «MacBook Pro»).

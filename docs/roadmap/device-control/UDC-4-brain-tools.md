@@ -1,6 +1,6 @@
 # UDC-4 — Brain tool calling, orchestrator and approvals
 
-Status: **Proposed** — needs an owner go-ahead. Complexity: L (6 sessions). Repositories: backend, mobile.
+Status: **Implemented (S4.1–S4.6 Done 2026-10-30; [results](UDC-4-results-2026-10-30.md)); live LLM + LAN board/agent run pending.** Complexity: L (6 sessions). Repositories: backend, mobile.
 
 ## 1. Goal
 

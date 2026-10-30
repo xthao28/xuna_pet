@@ -93,3 +93,4 @@ Status: **S3.1–S3.7 Implemented and verified across `desktop/packages/xuna_xtp
 | **Resilience** (Sleep/wake & Wi-Fi off/on → reconnect ≤ 60 s; no duplicate execution of in-flight call) | **PASS** (`desktop_agent_core_test.dart` S3.7 hardening) | [ ] Sleep/wake laptop and toggle Wi-Fi during active session |
 | **E-stop** (Hotkey `Ctrl+Alt+Shift+X` → in-flight call cancelled, new calls `denied (stopped)` until re-enabled) | **PASS** (`desktop_agent_core_test.dart`) | [ ] Press `Ctrl+Alt+Shift+X`, verify toast/tray state, then click `"Bật lại XUNA"` |
 | **Logs** (Agent and backend logs contain no arguments, URLs, titles, or app paths) | **PASS** (`test_hosts_module.py` + `desktop_agent_core_test.dart` S3.7 grep test) | [ ] Inspect `audit-YYYY-MM-DD.jsonl` and backend stdout after tool runs |
+
