@@ -75,3 +75,4 @@ Before publishing to Google Play, the owner must replace the placeholder `applic
    - `Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS`,
    - `CompanionDeviceManager.associate(...)`, and
    - Enabling the `connectedDevice` Foreground Service toggle.
+
