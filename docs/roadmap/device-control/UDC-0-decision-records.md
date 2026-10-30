@@ -1,6 +1,6 @@
 # UDC-0 — Decision records and contracts (docs only)
 
-Status: **Approved to start (owner 2026-10-30, UDC-D1).** Not started. Complexity: S (2 sessions). No board, phone or code.
+Status: **Done 2026-10-30 (S0.1 + S0.2; owner approved 2026-10-30, UDC-D1; not Implemented in code).** Complexity: S (2 sessions). No board, phone or code.
 
 ## 1. Goal
 

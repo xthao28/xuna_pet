@@ -189,7 +189,9 @@ No Brain, no network, no app. This is the only path that works for all four plat
 
 For a resolved target and capability, the orchestrator prefers **agent** (has results and policy) over **HID** (blind). **UDC-D6 (owner 2026-10-30):** the model may route a **media key** to the board's HID link, but every single press needs owner confirmation; the route is orchestrator → app → authenticated BLE (UDC-2) → board, and the board re-validates the opcode. Keyboard text and pointer reports stay outside model reach.
 
-## 5. XUNA Tool Protocol (XTP) v1 — draft
+## 5. XUNA Tool Protocol (XTP) v1 — summary (normative contract: [XUNA_XTP_V1_CONTRACT.md](XUNA_XTP_V1_CONTRACT.md))
+
+> **Normative specification:** [XUNA_XTP_V1_CONTRACT.md](XUNA_XTP_V1_CONTRACT.md) defines the authoritative wire frames, handshake (`xuna/hello`, `xuna/challenge`, `xuna/proof`, `xuna/enrollPending`, `xuna/enrolled`, `xuna/ready`), MCP-shaped session methods (`tools/list`, `tools/call`, `notifications/cancelled`, `notifications/progress`, `notifications/tools/list_changed`, `xuna/stop`, `ping`), error/close codes, size limits (≤ 64 KiB frame, ≤ 16 KiB `structuredContent`), timeouts (10 s handshake, 10 s default call, 30 s heartbeat × 2), canonical JSON `argsSha256`, and MVP tool schemas. Fix changes in `XUNA_XTP_V1_CONTRACT.md` rather than duplicating them here.
 
 Envelope: **JSON-RPC 2.0** over WSS (agent → Brain, outbound), strict schemas, `xtp/1` negotiated in the handshake. Frame size limit and unknown-field rejection follow the device-gateway rules.
 

@@ -27,7 +27,7 @@ accepted local MVP or prematurely binding XUNA to a vendor.
   D19 and D22.
 - Consent starts at U0. Raw audio is not stored, conversation text is not
   retained by default, and confirmed facts remain correctable, exportable and
-  deletable.
+  deletable. Extended by U3V `conversation_voice` (D16, 2026-10-22), U4 `owner_documents` ([ADR-0011](ADR-0011-owner-knowledge-documents.md), 2026-10-29), and U5 `host_screen` / U6 `host_notifications` (R5, **Approved (owner 2026-10-30), not Implemented**; default off, never stored server-side; see [the Cloud plan](../architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md) §6).
 - Deliver in phases: text projection, backup/restore, evidence-gated online
   suggestions, evidence-gated direct transport, gated voice, then commercial
   readiness.

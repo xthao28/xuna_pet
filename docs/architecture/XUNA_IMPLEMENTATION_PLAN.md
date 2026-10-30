@@ -1443,7 +1443,36 @@ v1 (20-byte values, opcodes 1–4) stays working until the mobile app requires v
 - **v1-compatible additions:**
   - opcode 5 `TimeSync` (capability bit 4);
   - opcode 6 `StatedPreference` (capability bit 5, §11.6, M05c-A);
-  - opcode 7 `Hatch` (capability bit 6, Egg state only, §12, M04.2).
+  - opcode 7 `Hatch` (capability bit 6, Egg state only, §12, M04.2);
+  - opcode 8 `ConversationSignal` (capability byte 3 bit 2, PE-4c);
+  - opcode 9 `PersonalityControl` (capability byte 3 bit 3, PE-4a);
+  - opcode 10 `Knowledge` (capability byte 5 bit 0, KD-1);
+  - opcode 11 `DisplaySettings` (8 bytes: `arg = 0..2` brightness preset, `source = 0..1` screen sleep enabled; capability byte 3 bit 7 = `0x80`, Power & Thermal Phase 2).
+- **Universal Device Control (UDC) BLE protocol additions (Approved (owner 2026-10-30), not Implemented; [ID register](../roadmap/device-control/README.md#21-firmware-ble-custom-service-7a6e0001-8c44-4db6-9f61-2b7d5300a101)):**
+
+  | Item | Value / Wire layout | Milestone | Notes |
+  |---|---|---|---|
+  | **Opcode 12 `HidConsumer`** | 8 bytes `[1, 12, requestId u32 LE, arg, source]`. `arg`: Consumer usage index `1..7`. `source`: `1` = app button, `2` = brain-approved (UDC-D6, [ADR-0012](../decisions/ADR-0012-host-actions.md)) | UDC-2 | Results: `kOk` (0), `kInvalidArgument` (4, bad `arg`/`source`), `kNotReady` (7, no HID host connected or channel not authenticated), `kBusy` (5, rate limit ≤ 4/s, ≤ 30/min). Expression-only feedback; never creates a `LifeCoreEvent`. |
+  | **Opcode 13 `HidHosts`** | 8 bytes `[1, 13, requestId u32 LE, arg, source]`. `arg = 1`: forget slot (`source = 0..3`); `arg = 2`: forget all (board shows 10 s GPIO0 confirmation on screen); `arg = 3`: open pairing window 60 s; **`arg = 4`**: set Remote layout (`source = 0` Media, `1` Workflows; NVS `xuna_hid/layout`) | UDC-2 (`arg 1..3`) / UDC-9 (`arg 4`) | Results: `kOk` (0), `kInvalidArgument` (4), `kNotReady` (7), `kExpired` (8, forget-all unconfirmed). |
+  | **Characteristic `7a6e0015` (`HID Hosts V1`)** | Read + Notify, 16 bytes (`7a6e0015-8c44-4db6-9f61-2b7d5300a101`): `[0]=version(1), [1]=size(16), [2]=flags (bit0 hidEnabled, bit1 hostConnected, bit2 remoteActive, bit3 pairingWindowOpen, bit4 pairingPromptPending), [3]=connectedSlot (0..3 or 0xFF), [4]=bondCount (0..4), [5..12]=4 slots × 2B [slotFlags (bit0 used, bit1 connected, bit2 isAppPhone), lastSeenDays (0..254, 255=unknown)], [13..15]=reserved(0)` | UDC-2 | Bond list projection; no Bluetooth addresses ever leave the board. |
+  | **Status notification kind 3 (`remoteEvent`)** | On `7a6e0004` Status characteristic: notification kind `3` (`remoteEvent`), `arg = 1` (`stop`), `arg = 2` (`workflow slot 1`), `arg = 3` (`workflow slot 2`) | UDC-7 (`stop`) / UDC-9 (`workflows`) | Gated by capability byte 5 bit 6 (`0x40`); verify app status decoder tolerates unknown kinds first. |
+  | **Capability byte 5 bit 3 (`0x08`)** | HID consumer service present | UDC-1 (set only in `xuna_hid` env; default build in UDC-2) | Existing byte 5 bits 0–2 are `0x07` (bit 2 = `Routine V1` `7a6e0014`). |
+  | **Capability byte 5 bit 4 (`0x10`)** | Opcodes 12 + 13 + characteristic `7a6e0015` present | UDC-2 | |
+  | **Capability byte 5 bit 5 (`0x20`)** | Authenticated control channel (bonded app session, encrypted GATT writes/reads) | UDC-2 | |
+  | **Capability byte 5 bit 6 (`0x40`)** | Remote events: status notification kind 3 (`remoteEvent`) on `7a6e0004` | UDC-7 / UDC-9 | |
+  | **Capability byte 5 bit 7 (`0x80`)** | Apple Media Service (AMS) client present on the board | UDC-6 (spike env only) | |
+
+  **Consumer usage index → HID usage (HID Usage Page `0x0C`):**
+
+  | Index (`arg`) | Usage | HID Usage ID |
+  |---|---|---|
+  | `1` | Play/Pause | `0xCD` |
+  | `2` | Scan Next | `0xB5` |
+  | `3` | Scan Previous | `0xB6` |
+  | `4` | Volume Increment | `0xE9` |
+  | `5` | Volume Decrement | `0xEA` |
+  | `6` | Mute | `0xE2` |
+  | `7` | Stop | `0xB7` |
 - **New characteristics:**
 
   | UUID | Properties | Purpose |

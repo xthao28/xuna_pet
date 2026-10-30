@@ -23,7 +23,10 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | [ADR-0008 Cloud Brain authority and identity](ADR-0008-cloud-brain-authority-and-identity.md) | Approved | 2026-10-16, owner-delegated architecture choice |
 | [ADR-0009 Cloud platform, sequencing and privacy](ADR-0009-cloud-platform-sequencing-and-privacy.md) | Approved architecture baseline; not Implemented | 2026-10-16 |
 | [ADR-0010 device-direct transport over WebSocket](ADR-0010-device-direct-websocket-transport.md) (replaces MQTT for Stage 2's first slice) | Approved; not Implemented; gated by E14 | 2026-10-27, owner DC-D1…D8 |
-| UDC track and decisions R1–R8, UDC-D1…D11 ([roadmap §3](../roadmap/XUNA_UNIVERSAL_DEVICE_CONTROL_ROADMAP.md#3-owner-decisions-2026-10-30)); ADR-0012/0013 reserved for UDC-0 | Approved (UDC-0/1 only); not Implemented | 2026-10-30, owner |
+| [ADR-0011 owner knowledge documents](ADR-0011-owner-knowledge-documents.md) (consent U4, chunk storage & retrieval) | Approved; Implemented (KX-5) | 2026-10-29, owner-delegated KX-5 |
+| UDC track and decisions R1–R8, UDC-D1…D11 ([roadmap §3](../roadmap/XUNA_UNIVERSAL_DEVICE_CONTROL_ROADMAP.md#3-owner-decisions-2026-10-30)) | Approved (UDC-0/1 only); not Implemented | 2026-10-30, owner |
+| [ADR-0012 host actions and closed board actuation exceptions](ADR-0012-host-actions.md) (amends [backend/AGENTS.md](../../backend/AGENTS.md) §1.4) | Approved (owner 2026-10-30), not Implemented | 2026-10-30, owner R1 / UDC-D6 / UDC-D7 |
+| [ADR-0013 host identity (`HostId`) and host sessions](ADR-0013-host-identity-and-sessions.md) | Approved (owner 2026-10-30), not Implemented | 2026-10-30, owner R3 / R4 / UDC-D10 |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
 | D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
 | D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/sessions/S22-decision-packet-2026-10-15.md) |

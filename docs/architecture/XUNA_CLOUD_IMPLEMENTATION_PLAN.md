@@ -85,6 +85,19 @@ propagates by tombstone; stale replicas cannot resurrect deleted memory.
 - U0 (no upload) is the default.
 - U1 aggregate learning metrics, U2 typed experience events and U3 per-call
   conversation text are separate opt-ins.
+- Additional opt-in consent classes added by later approved milestones:
+
+| Class | Identifier (`ConsentClass`) | Scope | Server retention | Status |
+|---|---|---|---|---|
+| **U0** | — (all `false`, default) | Local-only life; no upload | None | Implemented (CLD-12) |
+| **U1** | `aggregate_metrics` (`aggregateMetrics`) | Aggregate learning metrics / snapshot summary | Latest projection per `(PetId, generation)` | Implemented (CLD-12 / CLD-14) |
+| **U2** | `experience_events` (`experienceEvents`) | Typed experience events / memories in projections | Latest projection per `(PetId, generation)` | Implemented (CLD-12 / CLD-14) |
+| **U3** | `conversation_text` (`conversationText`) | Per-call conversation text and turn context | Ephemeral (not retained after provider call by default) | Implemented (CLD-12 / CLD-13) |
+| **U3V** | `conversation_voice` (`conversationVoice`) | Per-call speech audio for transcription (D16) | Never stored (audio and transcript discarded immediately) | Implemented (2026-10-22) |
+| **U4** | `owner_documents` (`ownerDocuments`) | Owner reference documents split into text chunks ([ADR-0011](../decisions/ADR-0011-owner-knowledge-documents.md)) | Metadata + heading-aware chunks only (raw file bytes never stored); cascade delete + tombstone | Implemented (KX-5, 2026-10-29) |
+| **U5** | `host_screen` (`hostScreen`) | Desktop/host screen captures, UI trees and OCR text for computer-use sessions (UDC-8, R5) | **Never stored server-side**; transient per-step provider input only; password fields redacted | **Approved (owner 2026-10-30), not Implemented** |
+| **U6** | `host_notifications` (`hostNotifications`) | Phone/host notification content (UDC-5 / UDC-6 ANCS, R5) | **Never stored server-side**; transient per-turn input only | **Approved (owner 2026-10-30), not Implemented** |
+
 - Raw audio is not stored. Conversation text is not retained by default after
   the provider call. Confirmed facts remain until corrected or deleted.
 - Export and deletion are product requirements, not administrative tools.

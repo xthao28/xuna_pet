@@ -26,8 +26,8 @@ This folder is written so that **any coding agent or engineer** (including a mod
 
 | File | Milestone | Status |
 |---|---|---|
-| [UDC-0-decision-records.md](UDC-0-decision-records.md) | ADRs, contracts, threat model, consent classes (docs only) | **Approved to start** |
-| [UDC-1-hid-poc.md](UDC-1-hid-poc.md) | "XUNA bấm Play": BLE HID media keys on the board | **Approved to start** after UDC-0 S0.1 |
+| [UDC-0-decision-records.md](UDC-0-decision-records.md) | ADRs, contracts, threat model, consent classes (docs only) | **Done 2026-10-30** |
+| [UDC-1-hid-poc.md](UDC-1-hid-poc.md) | "XUNA bấm Play": BLE HID media keys on the board | **Approved to start** |
 | [UDC-2-secure-channel.md](UDC-2-secure-channel.md) | Authenticated app ↔ board channel, HID management, media-key opcode | Proposed |
 | [UDC-3-desktop-agent.md](UDC-3-desktop-agent.md) | Host Registry, XTP v1, Desktop Agent (Windows → macOS) | Proposed |
 | [UDC-4-brain-tools.md](UDC-4-brain-tools.md) | Brain tool calling, orchestrator, approvals | Proposed |
@@ -88,7 +88,14 @@ Background (read once): [research](../../research/XUNA_UNIVERSAL_DEVICE_CONTROL_
 
 ## 2. ID register
 
-Reserve IDs here before using them; never reuse an ID.
+Reserve IDs here before using them; never reuse an ID. Normative definitions live in:
+
+- Firmware BLE protocol: [XUNA_IMPLEMENTATION_PLAN.md §14.1](../../architecture/XUNA_IMPLEMENTATION_PLAN.md#141-compatibility)
+- Host actions & board actuation exceptions: [ADR-0012](../../decisions/ADR-0012-host-actions.md)
+- Host identity (`HostId`), proof domain & sessions: [ADR-0013](../../decisions/ADR-0013-host-identity-and-sessions.md)
+- XTP v1 wire contract & tool schemas: [XUNA_XTP_V1_CONTRACT.md](../../architecture/XUNA_XTP_V1_CONTRACT.md)
+- Consent classes U5/U6: [XUNA_CLOUD_IMPLEMENTATION_PLAN.md §6](../../architecture/XUNA_CLOUD_IMPLEMENTATION_PLAN.md#6-privacy-and-retention-baseline-d23) and [ADR-0009](../../decisions/ADR-0009-cloud-platform-sequencing-and-privacy.md)
+- Threat model T20–T35: [XUNA_CLOUD_THREAT_MODEL.md §3](../../architecture/XUNA_CLOUD_THREAT_MODEL.md#3-threats-stride-and-mitigations)
 
 ### 2.1 Firmware BLE (custom service `7a6e0001-8c44-4db6-9f61-2b7d5300a101`)
 
