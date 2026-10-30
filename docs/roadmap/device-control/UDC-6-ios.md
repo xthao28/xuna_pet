@@ -1,6 +1,6 @@
 # UDC-6 — iOS adapter and the AMS spike
 
-Status: **Proposed** — needs an owner go-ahead. Complexity: M (3 sessions). Repositories: mobile (Swift in `ios/Runner`), firmware (AMS spike), backend (none beyond UDC-4/5 routes).
+Status: **Implemented (S6.1–S6.3 Done 2026-10-30; [results](UDC-6-results-2026-10-30.md)); physical iPhone + board acceptance pending.** Complexity: M (3 sessions). Repositories: mobile (Swift in `ios/Runner` + Dart in `lib/features/hosts/`), firmware (AMS spike in `xuna_ams`), backend (`ToolPermissionState.UNSUPPORTED` filtering & rejection).
 
 ## 1. Goal
 
