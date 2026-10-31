@@ -73,21 +73,21 @@ Mục tiêu của kế hoạch này là xóa bỏ hoàn toàn ranh giới giữa
 
 ---
 
-### CỘT MỐC 2 (`SYM-2`): Autonomous Watchdogs, Executive Coach & Self-Evolving Workflows
+### CỘT MỐC 2 (`SYM-2`): Autonomous Watchdogs, Executive Coach & Self-Evolving Workflows — **HOÀN TẤT TRÊN HOST (2026-10-31, `0 B` Firmware Delta)**
 > **Mục tiêu:** Biến XUNA thành người canh gác tin cậy chạy ngầm (`Watchdogs`), trợ lý cuộc họp & gỡ rối khi bạn quá tải (`Executive Scaffolding`), và tự phát hiện thói quen lặp lại để đúc thành công cụ mới (`Workflow Miner`).
 
-#### `S2.1` — `desktop/packages/xuna_xtp` & `desktop/`: Background Watchdogs & Executive Coach Tools
+#### `S2.1` — `desktop/packages/xuna_xtp` & `desktop/`: Background Watchdogs & Executive Coach Tools (`22/22` & `27/27` PASS)
 - **Công cụ XTP mới (6 tools, nâng tổng số từ 44 → 50 tools):**
   1. `watchdog.watch_process_or_port`: Canh một tiến trình (theo tên/PID) hoặc một cổng mạng (`localhost:port`) cho đến khi hoàn tất hoặc bị sập; tự động thu thập 20 dòng log cuối nếu lỗi.
   2. `watchdog.watch_resource_threshold`: Canh ngưỡng tài nguyên hệ thống (RAM, đĩa trống, pin, hoặc dung lượng thư mục build) và phát sự kiện cảnh báo tức thì.
   3. `watchdog.list_and_clear`: Liệt kê và hủy các đội tuần tra đang chạy ngầm.
   4. `coach.decompose_overwhelm`: Nhận một mục tiêu lớn/rối rắm + trạng thái repo hiện tại → trả về **đúng 1 bước khởi động 5 phút (`Micro-Step`)** + danh sách các bước ẩn tiếp theo để giảm áp lực não bộ.
   5. `meeting.desk_whisper_digest`: Chuẩn bị bản nhắc bài siêu ngắn (`<= 120` ký tự) từ `Knowledge Expert` gửi thẳng lên màn hình mạch XUNA (`SpeechBubble`) trong lúc họp mà không hiện popup trên màn hình máy tính đang share.
-  6. `habit.propose_workflow`: Phân tích lịch sử chuỗi thao tác lặp lại của chủ trong `~/.xuna_desktop/action_history.json` để đề xuất đóng gói thành 1 Macro/Workflow 1 chạm.
+  6. `habit.propose_workflow`: Phân tích lịch sử chuỗi thao tác lặp lại của chủ để đề xuất đóng gói thành 1 Macro/Workflow 1 chạm (`<= R2`).
 
-#### `S2.2` — `backend/` & `mobile/`: Watchdog Alert Pipeline, Serendipity Postcard & Habit Approval UI
-- Khi một `Watchdog` trên `desktop/` kích hoạt (ví dụ lệnh build xong hoặc server lỗi), `AutoSymbioticService` đẩy sự kiện qua XTP → Backend tóm tắt nguyên nhân + gửi thông báo lên mạch XUNA (`SpeechBubble`) và điện thoại.
-- **Serendipity Engine ("Mảnh giấy nhớ của XUNA"):** Khi chủ vắng mặt, Backend liên kết 2 kiến thức trong `Knowledge Expert` để tạo một gợi ý thú vị đón chủ quay lại.
+#### `S2.2` & `S2.3` — `backend/` & `mobile/`: Watchdog Alert Pipeline, Serendipity Postcard & Habit Approval UI (`6/6` & `27/27` PASS)
+- **Backend (`S2.2`):** Bổ sung `SerendipityNote`, `HabitMacroProposal`, `SerendipityEngine`, `HabitWorkflowMiner` và 3 quy trình composite mới (`unstuck_coach` `R1`, `watch_and_alert` `R1`, `desk_whisper` `R1`).
+- **Mobile (`S2.3`):** Bổ sung `WatchdogAlertSummary`, `MicroStepCoachSummary`, `SerendipityNoteSummary`, `HabitMacroProposalSummary`, `BoardWorkflowSlotConfig.symbioticSentinelPresets` (`unstuck_coach`, `watch_and_alert`, `desk_whisper`) và các trạng thái tương ứng trong `HomeActionsService`.
 
 ---
 
