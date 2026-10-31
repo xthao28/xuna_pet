@@ -2,6 +2,20 @@
 
 Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
 
+## 2026-10-31 — Kết nối trực tiếp toàn diện Hệ sinh thái Cộng sinh (`SYM-LIVE` S-LIVE.1–S-LIVE.4), Hoàn thiện Voice WebSocket (`WS-3` VAD & Đánh thức máy tính từ xa) và Nghiệm thu `PE-4` trên Host (`mobile/`, `desktop/`, `backend/`, `firmware/`)
+
+- **Kết nối tương tác hai chiều, lưu trữ `AppHive` và dữ liệu mẫu Simulator cho Hệ sinh thái Cộng sinh (`SYM-LIVE` S-LIVE.1–S-LIVE.4):**
+  - **Trên `mobile/` (`S-LIVE.1` & `S-LIVE.4`):** Toàn bộ 5 nút hành động trên thẻ `HomeSymbioticLifeCard` (`Đóng băng tối nay`, `Khôi phục`, `Biến đổi`, `Dừng canh`, `Ghim Macro`) đã được nối trực tiếp vào `HomeController` và `HomeActionsService`, tự động lưu bền vững vào `AppHive` (`xuna_symbiotic_state_v1`) qua các lần mở lại ứng dụng và khởi tạo dữ liệu mẫu chân thực trong chế độ Simulator (`seedSimulatorSymbioticStateIfEmpty()`).
+  - **Trên `desktop/` (`S-LIVE.2`):** Chia sẻ chung `AutoSymbioticService` giữa bộ điều phối công cụ XTP và cửa sổ giao diện `DesktopAgentWindow`, đồng thời bổ sung 2 nút thao tác nhanh **«Đóng băng nhanh»** và **«Thêm ghi chú»** ngay trên tab `Cộng sinh`.
+  - **Trên `backend/` (`S-LIVE.3`):** Bổ sung 3 API REST chuẩn hóa (`POST /v1/symbiotic/dream-consolidate`, `POST /v1/symbiotic/unstuck-coach`, `POST /v1/symbiotic/social-encounters`).
+- **Hoàn thiện các mắt xích còn lại của Voice WebSocket (`VOICE-WS`):**
+  - Bổ sung bộ phát hiện tiếng nói `compute_pcm16_rms` trên máy chủ (`vad.start` / `vad.end` khi phiên thoại chọn `mode: "vad"`) mà không ảnh hưởng tới chế độ nhấn giữ (`push_to_talk`) mặc định.
+  - Bổ sung nhận diện sự kiện `host_wake_request`, `vad.start` và `vad.end` trên `mobile/` để tự động phát gói tín hiệu `Wake-on-LAN` đánh thức máy tính ngay trong phiên hội thoại giọng nói và tự động chốt lượt nói khi người dùng dừng nói.
+- **Đóng trọn bộ tiêu chí nghiệm thu `PE-4` trên Host (`firmware/` & `backend/`):**
+  - Bổ sung bài kiểm thử kịch bản spam khen/chê trong Life Lab (`shadow_chat_spam_shifts_affect_immediately_but_trait_requires_days`, `16/16` PASS), chứng minh gửi dồn dập 50 lời khen trong 1 ngày làm cảm xúc tức thời (`Affect.valence`) tăng ngay nhưng giới hạn `8 tag/ngày` và quy tắc `>= 4 buổi` ngăn chặn hoàn toàn việc trôi tính cách trong ngày đầu tiên.
+  - Bổ sung bài kiểm thử hoán đổi nhà cung cấp AI (`test_pe4_switching_ai_providers_produces_identical_personality_context`), chứng minh mọi adapter LLM đều nhận ngữ cảnh tính cách và tâm trạng (`PetSelf.temperament`, `PetSelf.mood`) giống hệt nhau.
+- **0 byte phát sinh trên ảnh nạp ESP32-S3 (`RAM 18.5%`, `Flash 60.3%`):** Vượt qua toàn bộ kiểm thử tự động: `firmware` `test_personality` 16/16 PASS (`xuna_core purity check: PASS`, build `xuna_t_display_s3` thành công), `backend` 13/13 PASS (`ruff` và `mypy` 0 lỗi trên 223 tệp), `desktop` 28/28 PASS (`flutter analyze` 0 lỗi), `mobile` 42/42 PASS (`actions_test.dart` 31/31 + `home_page_test.dart` 11/11, `flutter analyze` 0 lỗi).
+
 ## 2026-10-31 — Hoàn thiện giao diện trực quan Tiến hóa Cộng sinh (`SYM-UI` S-UI.1 & S-UI.2): Thẻ Trung tâm Cộng sinh `HomeSymbioticLifeCard` trên Điện thoại và Tab `Cộng sinh` trên XUNA Desktop (`mobile/`, `desktop/`)
 
 - **Thẻ Trung tâm Cộng sinh `HomeSymbioticLifeCard` trên `mobile/` (`S-UI.1`):** Hiển thị trực quan toàn bộ 4 mảnh ghép `SYM-1` → `SYM-4` theo ngôn ngữ thiết kế Pixel/Ink của XUNA:

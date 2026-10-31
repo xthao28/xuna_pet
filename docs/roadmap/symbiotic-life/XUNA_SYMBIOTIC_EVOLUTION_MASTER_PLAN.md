@@ -137,6 +137,29 @@ Mục tiêu của kế hoạch này là xóa bỏ hoàn toàn ranh giới giữa
 
 ---
 
+### CỘT MỐC KẾT NỐI TRỰC TIẾP (`SYM-LIVE` S-LIVE.1 → S-LIVE.4): Live End-to-End Symbiotic Wiring, Local Hive Persistence, Simulator Seeding & REST API (`/v1/symbiotic/*`) — **HOÀN TẤT TRÊN HOST (2026-10-31, `0 B` Firmware Delta)**
+> **Mục tiêu:** Biến toàn bộ các nút tương tác trên `HomeSymbioticLifeCard` (`mobile/`), tab `Cộng sinh` (`desktop/`) và dịch vụ cộng sinh (`backend/`) thành luồng hoạt động hai chiều thực sự, lưu bền vững qua các lần mở lại app và sẵn sàng trải nghiệm ngay trong Simulator Mode không cần mạch vật lý.
+
+#### `S-LIVE.1` & `S-LIVE.4` — `mobile/`: Interactive Action Wiring, `AppHive` Persistence & Simulator Mode Seeding (`home_actions_service.dart`, `home_controller.dart`, `home_page.dart`)
+- Nối đầy đủ 5 callback hành động trên `HomeSymbioticLifeCard`:
+  1. `freezeWorkspaceForTonight`: tạo ngay `WorkspaceCapsuleSummary` mới, đẩy gợi ý bước tiếp theo vào `pocketItems`, cập nhật giấc mơ `latestDreamVignette` + `symbioticRoomState` (`dream_bubble`) và lưu xuống `AppHive` (`xuna_symbiotic_state_v1`).
+  2. `restoreWorkspaceCapsule`: đưa gói ngữ cảnh lên đầu danh sách, cập nhật tóm tắt 15 giây đầu ngày vào `latestCoRegulationState`, chuyển vật phẩm phòng sang `focus_lamp` và lưu bền vững.
+  3. `transformPocketItem`: biến đổi trực tiếp mục trong túi đồ theo hành động gợi ý (`format_json`, `extract_urls`, `extract_todos`, `summarize`) và lưu bền vững.
+  4. `clearActiveWatchdogs`: xóa toàn bộ đội tuần tra đang chạy và hạ cảnh báo `watchdog_beacon` về `focus_lamp`.
+  5. `acceptHabitMacroProposal`: chuyển đề xuất quy trình từ thói quen thành `CustomWorkflowPreset` bền vững (`saveCustomWorkflow`) và gỡ đề xuất khỏi danh sách chờ.
+- Trong chế độ Simulator (`isSimulator == true`), `seedSimulatorSymbioticStateIfEmpty()` tự động khởi tạo dữ liệu mẫu chân thực để kiểm thử trực quan toàn bộ 4 khu vực trên thẻ Cộng sinh.
+
+#### `S-LIVE.2` — `desktop/`: Shared `AutoSymbioticService` Instance & Quick Actions (`main.dart`, `desktop_agent_controller.dart`, `desktop_agent_window.dart`)
+- Chia sẻ chung thực thể `dispatcher.symbioticService` giữa `HostToolDispatcher` và `DesktopAgentController` trong `desktop/lib/main.dart`, bổ sung 2 nút thao tác nhanh **«Đóng băng nhanh»** (`captureQuickWorkspaceCapsule`) và **«Thêm ghi chú»** (`pushQuickPocketSnippet`) ngay trên tab `Cộng sinh`.
+
+#### `S-LIVE.3` — `backend/`: `/v1/symbiotic/*` REST Endpoints (`routes.py`, `schemas.py`, `main.py`)
+- Bổ sung 3 endpoint chuẩn hóa:
+  - `POST /v1/symbiotic/dream-consolidate`: tổng hợp `DreamVignette` NREM/REM kèm đánh giá đồng cảm `CoRegulationState`.
+  - `POST /v1/symbiotic/unstuck-coach`: trả về bước khởi động 5 phút đầu tiên, 2 bước tiếp theo, mảnh giấy nhớ `SerendipityNote` và các đề xuất `HabitMacroProposal` từ lịch sử công cụ.
+  - `POST /v1/symbiotic/social-encounters`: ghi nhận cuộc gặp gỡ giữa hai cá thể XUNA và tạo `SocialPostcard` có chữ ký `SHA-256`.
+
+---
+
 ## 4. Thứ tự Thực thi Khuyến nghị & Cam kết Chất lượng
 
 1. **Triển khai `SYM-1` trước tiên** (vì `SYM-1` mang lại ngay **Time-Travel Workspace**, **Universal Pocket xuyên thiết bị**, **Sổ Mơ NREM/REM** và **Đồng cảm nhịp làm việc** với **0 Byte ảnh hưởng tới Firmware**).
