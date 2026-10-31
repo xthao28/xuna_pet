@@ -2,6 +2,12 @@
 
 Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
 
+## 2026-10-31 — Tiến hóa Cộng sinh giai đoạn 4 (SYM-4): Giao lưu xã hội giữa các mạch XUNA (XUNA-to-XUNA Social Ecology), Hoạt cảnh chào hỏi theo tính cách, Nhật ký Kết bạn và Bưu thiếp trao đổi chiêu trò (`SYM-4` S4.1–S4.3)
+
+- **Phát hiện và giao lưu tự động khi hai mạch XUNA đặt cạnh nhau (`SocialBeaconPacket` & `SocialEncounterEngine`, `S4.1`):** Sử dụng gói tin 8 byte siêu nhẹ hoàn toàn không chứa thông tin cá nhân của chủ (`U0`-safe: 4 byte đầu `PetId`, chiều tính cách nổi trội, sắc thái biểu sinh và chiêu trò yêu thích), khi hai chiếc mạch XUNA ở gần nhau trên bàn (`RSSI >= -65 dBm`), chúng tự động nhận diện nhau và biểu diễn hoạt cảnh chào hỏi theo sự cộng hưởng tính cách: *Xoay vòng bắt nhịp (`HarmoniousSpark`)* khi gặp bạn tò mò/tinh nghịch, *Dụi đầu ấm áp (`WarmNuzzle`)* khi gặp bạn hòa đồng, hoặc *Ngó nghiêng bẽn lẽn (`ShyPeek`)* khi gặp bạn nhạy cảm.
+- **Nhật ký Kết bạn (`SocialEncounterNote`) & Bưu thiếp Chiêu trò có chữ ký (`SocialPostcard`, `S4.2`–`S4.3`):** Mỗi cuộc gặp gỡ được `SocialEcologyService` ghi lại bằng giọng kể ngôi thứ nhất (*«mình – bạn»*) vào Sổ Tiến hóa & Kết bạn, kèm một tấm **Bưu thiếp Chiêu trò** (`spin_dance`, `curious_peek`, `cozy_nuzzle`...) có chữ ký toàn vẹn `SHA-256` để hai chú pet có thể học hỏi chiêu trò của nhau.
+- **Khép trọn lộ trình Tiến hóa Cộng sinh `SYM-1` → `SYM-4`:** Vượt qua toàn bộ kiểm thử tự động trên tất cả các kho mã: `firmware` `test_remote_mode` 9/9 PASS (`xuna_core purity check: PASS`, build `xuna_t_display_s3` thành công với `RAM 18.5%`, `Flash 60.3%`), `backend` `test_sym4_social_ecology.py` 2/2 PASS (`ruff` và `mypy` 0 lỗi trên 220 tệp), `mobile` 29/29 bài kiểm thử trong `actions_test.dart` PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-31 — Tiến hóa Cộng sinh giai đoạn 3 (SYM-3): Sắc thái Biểu sinh Cá thể (Epigenetic Phenotype), Vật phẩm Căn phòng Cộng sinh (Symbiotic Room Props) và Nhịp bấm 2 nút dạy Chiêu trò (2-Button Rhythm Tricks & `L-D3` Mastery) trên mạch ESP32-S3 (`SYM-3` S3.1–S3.3)
 
 - **Sắc thái Biểu sinh Cá thể (`EpigeneticPalette`, `S3.1`):** Mỗi cá thể XUNA nay mang một ánh sắc biểu sinh riêng biệt (`CyanMint`, `WarmCoral`, `GoldenAmber`, `CalmViolet`, `EmeraldGlow`) được kết tinh từ mã định danh `PetId` và chiều tính cách nổi trội nhất (`Temperament`), giữ nguyên đường viền sắc nét và đôi mắt long lanh mà không tốn thêm bộ nhớ khung hình.

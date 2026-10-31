@@ -109,12 +109,16 @@ Mục tiêu của kế hoạch này là xóa bỏ hoàn toàn ranh giới giữa
 
 ---
 
-### CỘT MỐC 4 (`SYM-4`): XUNA-to-XUNA Social Ecology
+### CỘT MỐC 4 (`SYM-4`): XUNA-to-XUNA Social Ecology — **HOÀN TẤT TRÊN HOST (2026-10-31)**
 > **Mục tiêu:** Khi hai chiếc mạch XUNA đặt cạnh nhau, chúng tự phát hiện nhau, giao lưu theo tính cách và ghi lại kỷ niệm vào `Evolution Journal`.
 
-#### `S4.1` — `firmware/` & `mobile/`: BLE Proximity Encounter & Signed Friendship Journal
-- Quảng bá và quét gói tin BLE Beacon nhẹ chứa `(shortPetId, dominantTrait, moodState)`.
-- Khi phát hiện một bạn XUNA khác ở gần (`RSSI > -65 dBm`), hai mạch tự động chạy hoạt cảnh chào hỏi theo tính cách và lưu bản ghi gặp gỡ vào `Evolution Journal`.
+#### `S4.1` — `firmware/`: BLE Proximity Encounter & Temperament-Driven Greeting (`xuna/social/SocialEcology.h`)
+- Mã hóa & giải mã gói tin 8 byte `SocialBeaconPacket` (`0x58`, `0x53`, `shortPetId[4]`, `dominantTrait`, `epigeneticTint`, `sharedTrick`, `moodCode`) hoàn toàn không chứa PII của chủ (`U0`-safe).
+- Khi phát hiện một bạn XUNA khác ở gần (`RSSI >= -65 dBm`, ngoài thời gian chờ 5 phút `kPeerCooldownMs = 300000 ms`), `SocialEncounterEngine` tự động kích hoạt hoạt cảnh chào hỏi theo tính cách (`HarmoniousSpark`, `WarmNuzzle`, `ShyPeek`) và lưu vào sổ gặp gỡ.
+
+#### `S4.2` & `S4.3` — `backend/` & `mobile/`: Signed Friendship Journal & Postcard Exchange
+- **Backend (`S4.2`):** Bổ sung `SocialEncounterNote`, `SocialPostcard` (kèm chữ ký `SHA-256` 64 ký tự hex) và `SocialEcologyService.record_encounter` tạo nhật ký gặp gỡ ngôi thứ nhất (*«mình – bạn»*) cùng bưu thiếp chiêu trò (`spin_dance`, `curious_peek`, `cozy_nuzzle`, `daily_standup`, `unstuck_coach`).
+- **Mobile (`S4.3`):** Bổ sung `SocialEncounterSummary`, `SocialPostcardSummary` và các trạng thái `socialEncounters` / `socialPostcards` trong `HomeActionsService`.
 
 ---
 
