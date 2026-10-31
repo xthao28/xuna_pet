@@ -2,6 +2,16 @@
 
 Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
 
+## 2026-10-31 — Hoàn thiện giao diện trực quan Tiến hóa Cộng sinh (`SYM-UI` S-UI.1 & S-UI.2): Thẻ Trung tâm Cộng sinh `HomeSymbioticLifeCard` trên Điện thoại và Tab `Cộng sinh` trên XUNA Desktop (`mobile/`, `desktop/`)
+
+- **Thẻ Trung tâm Cộng sinh `HomeSymbioticLifeCard` trên `mobile/` (`S-UI.1`):** Hiển thị trực quan toàn bộ 4 mảnh ghép `SYM-1` → `SYM-4` theo ngôn ngữ thiết kế Pixel/Ink của XUNA:
+  1. **Giấc mơ đêm qua & Đồng điệu cảm xúc:** Hiển thị câu chuyện mơ NREM/REM ngôi thứ nhất, câu hỏi chào buổi sáng kèm nút trả lời 1 chạm (`Kể tiếp`), huy hiệu đồng điệu cảm xúc (`CoRegulationStateSummary`) và **Mảnh giấy nhớ của XUNA (`SerendipityNoteSummary`)**.
+  2. **Hộp thời gian dự án & Túi đồ xuyên thiết bị:** Nút `Đóng băng tối nay`, danh sách dự án đã đóng băng kèm nút `Khôi phục` 1 chạm, và danh sách mục trong Túi đồ thông minh kèm nút `Biến đổi`.
+  3. **Trợ lực vi bước 5 phút, Đội tuần tra & Quy trình tự học:** Hiển thị bước khởi động 5 phút đầu tiên (`MicroStepCoachSummary`), danh sách cổng/tiến trình đang canh kèm nút `Dừng canh`, và đề xuất quy trình từ thói quen kèm nút `Ghim Macro`.
+  4. **Phòng cộng sinh, Nhịp nút & Kết bạn XUNA:** Hiển thị sắc thái biểu sinh cá thể & vật phẩm căn phòng (`SymbioticRoomStateSummary`), các chiêu trò nhịp 2 nút (`A-B-A`, `B-A-B`, `A-A-B` kèm huy hiệu thành thục `★`), cùng Nhật ký Kết bạn (`SocialEncounterSummary`) và Thiệp kỹ năng có chữ ký (`SocialPostcardSummary`).
+- **Tab `Cộng sinh` (`AgentWindowTab.symbiotic`) trên cửa sổ `DesktopAgentWindow` (`S-UI.2`):** Bổ sung tab **«Cộng sinh»** trên ứng dụng máy tính hiển thị trực tiếp **Hộp thời gian dự án**, **Túi đồ xuyên thiết bị**, **Đội tuần tra đang chạy** (kèm nút `Xóa tất cả`) và **Quy trình tự học từ thói quen**.
+- **0 byte phát sinh trên `firmware/`:** Vượt qua toàn bộ kiểm thử tự động: `mobile` 30/30 bài kiểm thử trong `actions_test.dart` PASS (`flutter analyze` 0 lỗi), `desktop` 28/28 bài kiểm thử PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-31 — Tiến hóa Cộng sinh giai đoạn 4 (SYM-4): Giao lưu xã hội giữa các mạch XUNA (XUNA-to-XUNA Social Ecology), Hoạt cảnh chào hỏi theo tính cách, Nhật ký Kết bạn và Bưu thiếp trao đổi chiêu trò (`SYM-4` S4.1–S4.3)
 
 - **Phát hiện và giao lưu tự động khi hai mạch XUNA đặt cạnh nhau (`SocialBeaconPacket` & `SocialEncounterEngine`, `S4.1`):** Sử dụng gói tin 8 byte siêu nhẹ hoàn toàn không chứa thông tin cá nhân của chủ (`U0`-safe: 4 byte đầu `PetId`, chiều tính cách nổi trội, sắc thái biểu sinh và chiêu trò yêu thích), khi hai chiếc mạch XUNA ở gần nhau trên bàn (`RSSI >= -65 dBm`), chúng tự động nhận diện nhau và biểu diễn hoạt cảnh chào hỏi theo sự cộng hưởng tính cách: *Xoay vòng bắt nhịp (`HarmoniousSpark`)* khi gặp bạn tò mò/tinh nghịch, *Dụi đầu ấm áp (`WarmNuzzle`)* khi gặp bạn hòa đồng, hoặc *Ngó nghiêng bẽn lẽn (`ShyPeek`)* khi gặp bạn nhạy cảm.

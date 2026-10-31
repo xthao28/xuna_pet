@@ -1,8 +1,8 @@
 # XUNA Symbiotic Evolution Master Plan (`SYM-1` → `SYM-4`)
 
 > **Date:** 2026-10-31
-> **Status:** `SYM-1` Implemented & Host-Verified (2026-10-31); `SYM-2` → `SYM-4` Proposed
-> **Scope:** Unifies **Track H (Embodied Human Augmentation — `H1`..`H6`)** and **Track L (Living Digital Organism — `Pillars 1`..`6`)** into a 4-Milestone execution roadmap across `desktop/`, `backend/`, `mobile/`, and `firmware/`.
+> **Status:** `SYM-1` → `SYM-4` & `SYM-UI` Implemented & Host-Verified (2026-10-31)
+> **Scope:** Unifies **Track H (Embodied Human Augmentation — `H1`..`H6`)** and **Track L (Living Digital Organism — `Pillars 1`..`6`)** into a 4-Milestone + Visual UI (`SYM-UI`) execution roadmap across `desktop/`, `backend/`, `mobile/`, and `firmware/`.
 > **Prerequisite:** `UDC-15` (Completed 2026-10-31, 38 XTP tools) and [XUNA_NEXT_FRONTIER_RESEARCH_2026-10-31.md](../../research/XUNA_NEXT_FRONTIER_RESEARCH_2026-10-31.md).
 
 ---
@@ -119,6 +119,21 @@ Mục tiêu của kế hoạch này là xóa bỏ hoàn toàn ranh giới giữa
 #### `S4.2` & `S4.3` — `backend/` & `mobile/`: Signed Friendship Journal & Postcard Exchange
 - **Backend (`S4.2`):** Bổ sung `SocialEncounterNote`, `SocialPostcard` (kèm chữ ký `SHA-256` 64 ký tự hex) và `SocialEcologyService.record_encounter` tạo nhật ký gặp gỡ ngôi thứ nhất (*«mình – bạn»*) cùng bưu thiếp chiêu trò (`spin_dance`, `curious_peek`, `cozy_nuzzle`, `daily_standup`, `unstuck_coach`).
 - **Mobile (`S4.3`):** Bổ sung `SocialEncounterSummary`, `SocialPostcardSummary` và các trạng thái `socialEncounters` / `socialPostcards` trong `HomeActionsService`.
+
+---
+
+### CỘT MỐC GIAO DIỆN (`SYM-UI`): Symbiotic Life Hub (`mobile/`) & Symbiotic Dashboard Tab (`desktop/`) — **HOÀN TẤT TRÊN HOST (2026-10-31, `0 B` Firmware Delta)**
+> **Mục tiêu:** Hiển thị trực quan toàn bộ hệ sinh thái cộng sinh `SYM-1` → `SYM-4` trên ứng dụng di động và cửa sổ máy tính với chuẩn thiết kế Pixel/Ink của XUNA.
+
+#### `S-UI.1` — `mobile/`: `HomeSymbioticLifeCard` (`home_symbiotic_life_card.dart`)
+- Hiển thị hợp nhất 4 khu vực trực quan:
+  1. **Giấc mơ đêm qua & Đồng điệu cảm xúc (`SYM-1` + `SYM-2`):** Thẻ `DreamVignetteSummary` kèm câu hỏi chào buổi sáng & nút trả lời 1 chạm (`Kể tiếp`), huy hiệu `CoRegulationStateSummary` và **Mảnh giấy nhớ của XUNA (`SerendipityNoteSummary`)**.
+  2. **Hộp thời gian dự án & Túi đồ xuyên thiết bị (`SYM-1`):** Nút `Đóng băng tối nay`, danh sách `WorkspaceCapsuleSummary` kèm nút `Khôi phục`, và danh sách `PocketItemSummary` kèm nút `Biến đổi`.
+  3. **Trợ lực vi bước 5 phút, Đội tuần tra & Quy trình tự học (`SYM-2`):** Bước khởi động 5 phút (`MicroStepCoachSummary`), danh sách cổng/tiến trình đang canh (`WatchdogAlertSummary`) kèm nút `Dừng canh`, và đề xuất macro thói quen (`HabitMacroProposalSummary`) kèm nút `Ghim Macro`.
+  4. **Phòng cộng sinh, Nhịp nút & Kết bạn XUNA (`SYM-3` + `SYM-4`):** Huy hiệu màu biểu sinh & vật phẩm phòng (`SymbioticRoomStateSummary`), các chiêu trò nhịp nút (`RhythmTrickSummary` kèm dấu `★` khi thành thục `L-D3`), cùng Nhật ký Kết bạn (`SocialEncounterSummary`) và Thiệp kỹ năng (`SocialPostcardSummary`).
+
+#### `S-UI.2` — `desktop/`: Tab `Cộng sinh` (`AgentWindowTab.symbiotic`) trên `DesktopAgentWindow`
+- Bổ sung tab **«Cộng sinh»** trên cửa sổ `DesktopAgentWindow` kết nối trực tiếp với `AutoSymbioticService` thông qua `DesktopAgentController.refreshSymbioticState()` và `clearAllWatchdogs()`, hiển thị trực tiếp **Hộp thời gian dự án**, **Túi đồ xuyên thiết bị**, **Đội tuần tra đang chạy** và **Quy trình tự học từ thói quen**.
 
 ---
 
