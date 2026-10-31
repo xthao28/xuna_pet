@@ -91,21 +91,21 @@ Mục tiêu của kế hoạch này là xóa bỏ hoàn toàn ranh giới giữa
 
 ---
 
-### CỘT MỐC 3 (`SYM-3`): Symbiotic Room, Epigenetic Phenotype & 2-Button Rhythm Tricks (`firmware/` + `mobile/`)
+### CỘT MỐC 3 (`SYM-3`): Symbiotic Room, Epigenetic Phenotype & 2-Button Rhythm Tricks (`firmware/` + `mobile/`) — **HOÀN TẤT TRÊN HOST (2026-10-31)**
 > **Mục tiêu:** Đột phá hoàn toàn phần nhìn và phần chạm vật lý trên mạch ESP32-S3 T-Display-S3 với ngân sách bộ nhớ siêu nhỏ (`< 2.5 KB` Flash, `< 256 B` RAM).
 
-#### `S3.1` — `firmware/`: Epigenetic Palette Tint & Symbiotic Room Micro-Overlays
-- Nâng cấp nhẹ [`DisplayManager.cpp`](../../../firmware/src/DisplayManager.cpp):
-  1. **Epigenetic Palette Modifier:** Dịch nhẹ sắc độ màu chủ đạo của XUNA dựa trên hạt giống `PetId` + chiều tính cách nổi trội nhất (`Temperament`) mà không cần nhân bản bộ khung hình gốc `scene::kFrames`.
-  2. **Symbiotic Room Props & Dream Bubbles:** Thêm các micro-icon `16×16` nén trong PROGMEM vẽ đè lên vùng `effect_buf_` hoặc góc phòng khi:
-     - Chủ đang `focus_session` / code sâu → hiện biểu tượng **Đèn bàn học / Đom đóm code**.
-     - XUNA đang ngủ ban đêm → hiện **Bong bóng giấc mơ (`Dream Bubble`)** thay vì chỉ chữ `Zzz`.
-     - Pin máy tính của chủ `< 20%` hoặc `Watchdog` báo hiệu → hiện biểu tượng **Cảnh báo năng lượng / Chuông báo**.
+#### `S3.1` — `firmware/`: Epigenetic Palette Tint & Symbiotic Room Micro-Overlays (`xuna/visual/SymbioticRoom.h` + `DisplayManager`)
+- Nâng cấp nhẹ [`DisplayManager.cpp`](../../../firmware/src/DisplayManager.cpp) và [`SymbioticRoom.h`](../../../firmware/lib/xuna_core/include/xuna/visual/SymbioticRoom.h):
+  1. **Epigenetic Palette Modifier (`EpigeneticPalette`):** Dịch nhẹ sắc độ màu chủ đạo của XUNA (`CyanMint`, `WarmCoral`, `GoldenAmber`, `CalmViolet`, `EmeraldGlow`) dựa trên hạt giống `PetId` + chiều tính cách nổi trội nhất (`Temperament`) mà vẫn giữ nguyên đường viền đen và ánh sáng mắt trắng, không nhân bản bộ khung hình gốc `scene::kFrames`.
+  2. **Symbiotic Room Props (`SymbioticRoomProps`):** Bổ sung các micro-prop `8×8` vẽ trực tiếp lên góc kính cửa sổ khi:
+     - Chủ đang `Playing` / `Observing` → hiện biểu tượng **Đèn bàn học (`FocusLamp`)**.
+     - XUNA đang ngủ (`PetState::Sleep`) → hiện **Bong bóng giấc mơ (`DreamBubble`)**.
+     - Đồng cảm vui vẻ (`PetState::Happy`) → hiện **Trái tim cộng sinh (`CoRegHeart`)**.
+     - Cảnh báo từ đội tuần tra (`WatchdogBeacon`).
 
-#### `S3.2` — `firmware/`: 2-Button Rhythm Gesture Decoder & `L-D3` Teachable Tricks
-- Mở rộng [`ButtonPad.h`](../../../firmware/lib/xuna_core/include/xuna/ButtonPad.h) và [`InputManager.h`](../../../firmware/include/InputManager.h):
-  - Giữ nguyên 100% hành vi bấm đơn/giữ hiện tại (`happy`, `idle`, `happyHold`, `idleHold`, `bothHold`).
-  - Thêm bộ nhận diện **Chuỗi nhịp bấm nhanh (`RhythmPattern`)** trong cửa sổ `900 ms` (ví dụ: `A-B-A`, `B-A-B`, `A-A-B`) để kích hoạt **Chiêu trò do chủ dạy (`L-D3` Teachable Tricks)** hoặc **Mini-game bắt nhịp 20 giây** khi nghỉ giải lao!
+#### `S3.2` & `S3.3` — `firmware/` & `mobile/`: 2-Button Rhythm Gesture Decoder, `L-D3` Teachable Tricks & Mobile Summaries
+- **Firmware (`S3.2`):** Bổ sung `RhythmTrickDecoder` nhận diện chuỗi nhịp bấm 3 bước (`A-B-A` → `SpinDance`, `B-A-B` → `CuriousPeek`, `A-A-B` → `CozyNuzzle`) trong cửa sổ `<= 1500 ms` mà không làm trễ thao tác bấm đơn, kết hợp `TrickMasteryTracker` (`L-D3` thành thục sau `>= 3` lần tập và tăng độ bền trí nhớ `stabilityDaysQ4`).
+- **Mobile (`S3.3`):** Bổ sung `SymbioticRoomStateSummary` và `RhythmTrickSummary` trong `board_workflow_slot.dart` và `HomeActionsService`.
 
 ---
 

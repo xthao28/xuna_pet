@@ -2,6 +2,17 @@
 
 Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
 
+## 2026-10-31 — Tiến hóa Cộng sinh giai đoạn 3 (SYM-3): Sắc thái Biểu sinh Cá thể (Epigenetic Phenotype), Vật phẩm Căn phòng Cộng sinh (Symbiotic Room Props) và Nhịp bấm 2 nút dạy Chiêu trò (2-Button Rhythm Tricks & `L-D3` Mastery) trên mạch ESP32-S3 (`SYM-3` S3.1–S3.3)
+
+- **Sắc thái Biểu sinh Cá thể (`EpigeneticPalette`, `S3.1`):** Mỗi cá thể XUNA nay mang một ánh sắc biểu sinh riêng biệt (`CyanMint`, `WarmCoral`, `GoldenAmber`, `CalmViolet`, `EmeraldGlow`) được kết tinh từ mã định danh `PetId` và chiều tính cách nổi trội nhất (`Temperament`), giữ nguyên đường viền sắc nét và đôi mắt long lanh mà không tốn thêm bộ nhớ khung hình.
+- **Vật phẩm Căn phòng Cộng sinh trên khung cửa sổ (`SymbioticRoomProps`, `S3.1`):** Khung cửa sổ bên cạnh XUNA tự động phản chiếu trạng thái đồng hành cùng bạn: hiện **Đèn bàn học (`FocusLamp`)** khi bạn đang làm việc/tập trung, **Bong bóng giấc mơ (`DreamBubble`)** khi XUNA ngủ đêm, **Trái tim cộng sinh (`CoRegHeart`)** khi vui vẻ và **Chuông cảnh báo (`WatchdogBeacon`)** khi đội tuần tra báo hiệu.
+- **Nhịp bấm 2 nút vật lý & Chiêu trò do chủ dạy (`RhythmTrickDecoder` & `TrickMasteryTracker`, `S3.2`–`S3.3`):** Giữ nguyên độ nhạy tức thì của từng lần bấm đơn trên 2 nút `GPIO0` (`A`) và `GPIO14` (`B`), bạn có thể gõ nhịp 3 bước trong vòng 1.5 giây để dạy và kích hoạt các chiêu trò đáng yêu:
+  - Nhịp **`A-B-A`** → *Vũ điệu xoay vòng (`SpinDance`)*
+  - Nhịp **`B-A-B`** → *Ngó nghiêng canh bàn làm việc (`CuriousPeek`)*
+  - Nhịp **`A-A-B`** → *Dụi đầu nạp năng lượng (`CozyNuzzle`)*
+  Sau 3 lần thực hành (`L-D3`), XUNA ghi nhận đã thuộc chiêu trò (`mastered = true`) với độ bền trí nhớ tăng dần theo mô hình FSRS-lite.
+- **Siêu nhẹ trên `firmware/` (`RAM 18.5%`, `Flash 60.3%`):** Vượt qua toàn bộ kiểm thử tự động: `firmware` `test_remote_mode` 8/8 PASS (`xuna_core purity check: PASS`, build `xuna_t_display_s3` thành công), `mobile` 28/28 bài kiểm thử trong `actions_test.dart` PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-10-31 — Tiến hóa Cộng sinh giai đoạn 2 (SYM-2): Đội tuần tra canh cổng/tiến trình chạy ngầm (Autonomous Watchdogs), Huấn luyện viên Gỡ bí 5 phút (Micro-Step Coach), Nhắc thầm không tiếng động trong cuộc họp (Desk Whisper), Mảnh giấy nhớ của XUNA (Serendipity Engine) và Tự học quy trình thói quen với 0 byte phát sinh trên mạch (`SYM-2` S2.1–S2.3)
 
 - **Đội tuần tra canh gác tiến trình, cổng dev và tài nguyên máy tính chạy ngầm (`watchdog.watch_process_or_port`, `watchdog.watch_resource_threshold`, `watchdog.list_and_clear`, `watch_and_alert`):** Bạn có thể dặn «Xuna ơi canh giúp mình cổng 8000 (hoặc lệnh build) nhé» (`watch_and_alert`, `R1`) để yên tâm đứng dậy pha cà phê. XUNA tự động theo dõi cổng mạng hoặc tiến trình cùng ngưỡng pin máy tính (`< 20%`) để báo hiệu ngay khi hoàn tất hoặc khi có sự cố.
