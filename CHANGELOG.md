@@ -1,6 +1,14 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
+
+## 2026-10-31 — Điều khiển nhiều thiết bị thông minh, quyền theo thời hạn, nút dừng khẩn cấp toàn hệ thống, chế độ LAN khi mất mạng và chữ ký bảo mật cho thao tác quan trọng (UDC-7 S7.1–S7.5)
+
+- **Chọn đúng thiết bị bạn muốn điều khiển và luôn hiển thị rõ tên máy đích (S7.2):** Khi bạn có nhiều máy tính và điện thoại kết nối cùng lúc (ví dụ MacBook, PC Windows, điện thoại Android), XUNA hiểu các cách gọi tự nhiên như «trên điện thoại», «trên máy tính», «trên Mac», nhớ máy vừa dùng trong 5 phút cho các câu nói tiếp theo («bài tiếp theo»), và luôn hỏi lại bạn nếu có nhiều máy cùng phù hợp thay vì tự đoán. Mọi bảng hỏi xác nhận, thẻ kết quả trong cuộc trò chuyện và bong bóng trên màn hình XUNA đều ghi rõ tên máy đích.
+- **Cấp quyền theo thời hạn (`1 giờ`, `Hôm nay`, `Không giới hạn`), tạm dừng 1 chạm và duyệt nhanh 15 phút trong cuộc trò chuyện (S7.1):** Trong trang chi tiết từng máy tính/điện thoại, bạn có thể đặt thời hạn tự động tắt cho từng nhóm quyền hoặc bấm «Tạm dừng tất cả quyền» bất cứ lúc nào. Khi XUNA xin phép mở ứng dụng hoặc trang web (`R2`), bạn có thể chọn «Chỉ lần này» (mặc định) hoặc «Trong cuộc trò chuyện này (15 phút)»; riêng các quy trình tự động quan trọng (`R3`) và phím Bluetooth từ mạch luôn hỏi bạn từng lần một.
+- **Dừng khẩn cấp tức thì từ mạch XUNA, điện thoại hoặc máy tính (S7.3):** Giữ đồng thời cả hai nút trên mạch XUNA khi đang ở chế độ Remote, bấm «Dừng hành động» trên ứng dụng điện thoại, hoặc bấm «Dừng XUNA» (`Ctrl+Alt+Shift+X`) trên thanh khay máy tính sẽ lập tức hủy mọi yêu cầu đang chờ duyệt, dừng thao tác đang chạy trên tất cả thiết bị và xóa quyền tạm 15 phút.
+- **Chế độ điều khiển nhạc qua mạng LAN nội bộ khi mất Internet và chữ ký số điện thoại cho thao tác R3 (S7.4 & S7.5):** Bạn có thể bật tùy chọn kết nối LAN nội bộ trên XUNA Desktop để điện thoại điều khiển nhạc (`Play/Pause`, `Next`, `Previous`, âm lượng) trực tiếp qua Wi-Fi nội bộ khi mất mạng (xác thực hai chiều bằng khóa bảo mật đã ghép đôi, khóa chặt chỉ cho phép điều khiển nhạc). Với các thao tác quan trọng mức `R3`, điện thoại của bạn ký xác nhận bằng khóa bảo mật riêng và máy tính đích tự kiểm tra chữ ký này trước khi thực thi.
+- Vượt qua toàn bộ kiểm thử tự động trên cả 5 gói/kho mã: `firmware` 417/417 bài kiểm thử PASS (`54/54` bộ test, build `xuna_t_display_s3` thành công), `backend` 462/462 bài kiểm thử PASS (kèm migration `0016` và bộ benchmark 50 tình huống đa thiết bị đạt `0` lần chạy nhầm máy), `xuna_xtp` 19/19 PASS, `desktop` 15/15 PASS, `mobile` 392/392 PASS (`flutter analyze` 0 lỗi). Biên bản kết quả được lập tại [UDC-7-results-2026-10-31.md](docs/roadmap/device-control/UDC-7-results-2026-10-31.md).
 
 ## 2026-10-30 — Phím tắt Siri / Action Button trên iPhone, điều khiển Apple Music & mở liên kết web, chế độ đặt bàn Guided Access và bản mạch thử nghiệm đọc tên bài hát iPhone (UDC-6 S6.1–S6.3)
 

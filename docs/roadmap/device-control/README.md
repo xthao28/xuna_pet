@@ -37,7 +37,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | [UDC-4-brain-tools.md](UDC-4-brain-tools.md) | Brain tool calling, orchestrator, approvals | **S4.1–S4.6 Done 2026-10-30 ([results](UDC-4-results-2026-10-30.md)); live LLM + LAN run pending** |
 | [UDC-5-android.md](UDC-5-android.md) | Android Mobile Host Adapter | **S5.1–S5.5 Done 2026-10-30 ([results](UDC-5-results-2026-10-30.md), [Play declarations](UDC-5-play-declarations.md)); physical Android run pending** |
 | [UDC-6-ios.md](UDC-6-ios.md) | iOS adapter + AMS spike | **S6.1–S6.3 Done 2026-10-30 ([results](UDC-6-results-2026-10-30.md)); physical iPhone + board run pending** |
-| [UDC-7-multihost.md](UDC-7-multihost.md) | Multi-host UX, grants, emergency stop, LAN offline mode | Proposed |
+| [UDC-7-multihost.md](UDC-7-multihost.md) | Multi-host UX, grants, emergency stop, LAN offline mode | **S7.1–S7.5 Done 2026-10-31 ([results](UDC-7-results-2026-10-31.md)); physical multi-host LAN + board run pending** |
 | [UDC-8-computer-use.md](UDC-8-computer-use.md) | Desktop computer use with Cua Driver | Proposed |
 | [UDC-9-10-workflows-learning.md](UDC-9-10-workflows-learning.md) | Cross-device workflows; learning and personalization | Proposed |
 

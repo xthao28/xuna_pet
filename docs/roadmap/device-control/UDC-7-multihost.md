@@ -1,6 +1,6 @@
 # UDC-7 — Multi-host targeting, permissions UX, emergency stop and LAN offline mode
 
-Status: **Proposed** — needs an owner go-ahead. Complexity: L (5 sessions). Repositories: backend, mobile, desktop, firmware (small).
+Status: **S7.1–S7.5 Implemented and verified across `backend/`, `mobile/`, `desktop/` and `firmware/` (2026-10-31; [UDC-7-results-2026-10-31.md](UDC-7-results-2026-10-31.md)); physical multi-host LAN + board acceptance is pending.** Complexity: L (5 sessions). Repositories: backend, mobile, desktop, firmware (small).
 
 ## 1. Goal
 
