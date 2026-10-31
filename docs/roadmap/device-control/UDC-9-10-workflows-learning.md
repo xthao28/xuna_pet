@@ -1,6 +1,6 @@
 # UDC-9 — Cross-device workflows · UDC-10 — Learning and personalization
 
-Status: **Proposed** — each needs its own owner go-ahead. Complexity: UDC-9 M (3 sessions), UDC-10 M (3 sessions). Repositories: backend, mobile, desktop, firmware (small).
+Status: **UDC-9 Implemented & Verified on Host (2026-10-31; [UDC-9-results-2026-10-31.md](UDC-9-results-2026-10-31.md), physical multi-host LAN + board button run pending) · UDC-10 Proposed** — each needs its own owner go-ahead. Complexity: UDC-9 M (3 sessions), UDC-10 M (3 sessions). Repositories: backend, mobile, desktop, firmware (small).
 
 ---
 
