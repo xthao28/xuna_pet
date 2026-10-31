@@ -10,7 +10,9 @@ Date: 2026-10-30. Owner decisions: [roadmap §3](../XUNA_UNIVERSAL_DEVICE_CONTRO
 - **UDC-4 (S4.1–S4.6) is Implemented and verified across `backend/` and `mobile/` (2026-10-30; [UDC-4-results-2026-10-30.md](UDC-4-results-2026-10-30.md)); live LLM + LAN acceptance is pending.**
 - **UDC-5 (S5.1–S5.5) is Implemented and verified across `mobile/` and `backend/` (2026-10-30; [UDC-5-results-2026-10-30.md](UDC-5-results-2026-10-30.md), [UDC-5-play-declarations.md](UDC-5-play-declarations.md)); physical Android device acceptance is pending.**
 - **UDC-6 (S6.1–S6.3) is Implemented and verified across `mobile/`, `backend/`, and `firmware/` (2026-10-30; [UDC-6-results-2026-10-30.md](UDC-6-results-2026-10-30.md)); physical iPhone + board acceptance is pending.**
-- UDC-7…UDC-10 are planned in full here; each needs an owner go-ahead before work starts.
+- **UDC-7 (S7.1–S7.5) is Implemented and verified across `firmware/`, `backend/`, `desktop/`, and `mobile/` (2026-10-31; [UDC-7-results-2026-10-31.md](UDC-7-results-2026-10-31.md)); physical multi-host LAN + board acceptance is pending.**
+- **UDC-8 (S8.1–S8.6) is Implemented and verified across `desktop/`, `backend/`, and `mobile/` (2026-10-31; [UDC-8-results-2026-10-31.md](UDC-8-results-2026-10-31.md)); native VM + live vision provider acceptance is pending.**
+- UDC-9…UDC-10 are planned in full here; each needs an owner go-ahead before work starts.
 
 This folder is written so that **any coding agent or engineer** (including a model other than the one that wrote it) can execute a milestone without extra context. Every milestone file follows the same layout:
 
@@ -38,7 +40,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | [UDC-5-android.md](UDC-5-android.md) | Android Mobile Host Adapter | **S5.1–S5.5 Done 2026-10-30 ([results](UDC-5-results-2026-10-30.md), [Play declarations](UDC-5-play-declarations.md)); physical Android run pending** |
 | [UDC-6-ios.md](UDC-6-ios.md) | iOS adapter + AMS spike | **S6.1–S6.3 Done 2026-10-30 ([results](UDC-6-results-2026-10-30.md)); physical iPhone + board run pending** |
 | [UDC-7-multihost.md](UDC-7-multihost.md) | Multi-host UX, grants, emergency stop, LAN offline mode | **S7.1–S7.5 Done 2026-10-31 ([results](UDC-7-results-2026-10-31.md)); physical multi-host LAN + board run pending** |
-| [UDC-8-computer-use.md](UDC-8-computer-use.md) | Desktop computer use with Cua Driver | Proposed |
+| [UDC-8-computer-use.md](UDC-8-computer-use.md) | Desktop computer use with Cua Driver | **S8.1–S8.6 Done 2026-10-31 ([results](UDC-8-results-2026-10-31.md)); native VM run pending** |
 | [UDC-9-10-workflows-learning.md](UDC-9-10-workflows-learning.md) | Cross-device workflows; learning and personalization | Proposed |
 
 Background (read once): [research](../../research/XUNA_UNIVERSAL_DEVICE_CONTROL_RESEARCH.md) · [architecture](../../architecture/XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) · [security](../../architecture/XUNA_DEVICE_CONTROL_SECURITY.md) · [capability matrix](../../research/XUNA_PLATFORM_CAPABILITY_MATRIX.md) · [open-source review](../../research/XUNA_DEVICE_CONTROL_OPEN_SOURCE_REVIEW.md).

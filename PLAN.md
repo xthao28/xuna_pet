@@ -1,6 +1,6 @@
 # XUNA — Work Plan
 
-Last updated: **2026-10-30** (Asia/Ho_Chi_Minh).
+Last updated: **2026-10-31** (Asia/Ho_Chi_Minh).
 
 Read [AGENTS.md](AGENTS.md) for canonical instructions and [PROCESS.md](PROCESS.md) for current context. This file owns the ordered task list and task status. [CHANGELOG.md](CHANGELOG.md) records work actually performed; [M01 validation record](docs/roadmap/milestones/M01-bring-up.md) owns detailed acceptance evidence.
 
@@ -514,4 +514,7 @@ Owner requested all pending work committed: firmware `b0f4ded`, mobile `4976147`
 | UDC-3 | S3.1–S3.7 Done on host — 2026-10-30; native `.exe`/`.app` LAN acceptance pending | [UDC-3-results-2026-10-30.md](docs/roadmap/device-control/UDC-3-results-2026-10-30.md): `desktop/packages/xuna_xtp` 17/17 PASS, `desktop/` 14/14 PASS, `backend/` 446/446 pytest PASS (migrations `0013`/`0014`), `mobile/` 356/356 PASS |
 | UDC-4 | S4.1–S4.6 Done on host — 2026-10-30; live LLM + LAN acceptance pending | [UDC-4-results-2026-10-30.md](docs/roadmap/device-control/UDC-4-results-2026-10-30.md): `backend/` 452/452 pytest PASS (migration `0015`, 120-item `tool_benchmark_vi.jsonl`), `mobile/` 364/364 PASS |
 | UDC-5 | S5.1–S5.5 Done on host — 2026-10-30; physical Android acceptance pending | [UDC-5-results-2026-10-30.md](docs/roadmap/device-control/UDC-5-results-2026-10-30.md), [UDC-5-play-declarations.md](docs/roadmap/device-control/UDC-5-play-declarations.md): `backend/` 457/457 pytest PASS (`POST /v1/hosts/self*`, `local_action_request`, Mode B `android` WS), `mobile/` 377/377 PASS (`xuna/android_host`, `XunaMediaListener`, `XunaHostForegroundService`, prominent disclosures, `play`/`dev` product flavours + `XunaAccessibilityService`) |
-| UDC-6..10 | Proposed | Awaiting owner go-ahead per milestone ([docs/roadmap/device-control/README.md](docs/roadmap/device-control/README.md)) |
+| UDC-6 | S6.1–S6.3 Done on host — 2026-10-30; physical iPhone + board acceptance pending | [UDC-6-results-2026-10-30.md](docs/roadmap/device-control/UDC-6-results-2026-10-30.md): `firmware/` 417/417 native PASS (`xuna_ams`), `backend/` 458/458 pytest PASS, `mobile/` 388/388 PASS |
+| UDC-7 | S7.1–S7.5 Done on host — 2026-10-31; physical multi-host LAN + board acceptance pending | [UDC-7-results-2026-10-31.md](docs/roadmap/device-control/UDC-7-results-2026-10-31.md): `firmware/` 417/417 native PASS, `backend/` 462/462 pytest PASS (migration `0016`, 50-item multi-host benchmark), `desktop/packages/xuna_xtp` 19/19 PASS, `desktop/` 15/15 PASS, `mobile/` 392/392 PASS |
+| UDC-8 | S8.1–S8.6 Done on host — 2026-10-31; native VM + live vision provider acceptance pending | [UDC-8-results-2026-10-31.md](docs/roadmap/device-control/UDC-8-results-2026-10-31.md): Cua Driver `0.38.0` (MIT, Capability Manifest v3), consent `U5`/`U6` (migration `0017`), `desktop/packages/xuna_xtp` 20/20 PASS, `desktop/` 20/20 PASS, `backend/` 469/469 pytest PASS (`10/10` Windows/macOS scripted tasks, `8/8` prompt-injection blocked), `mobile/` 395/395 PASS |
+| UDC-9..10 | Proposed | Awaiting owner go-ahead per milestone ([UDC-9-10-workflows-learning.md](docs/roadmap/device-control/UDC-9-10-workflows-learning.md)) |

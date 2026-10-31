@@ -1,6 +1,6 @@
 # UDC-8 — Desktop computer use (Windows first) with Cua Driver
 
-Status: **Proposed** — needs an owner go-ahead, consent U5 implemented, and a provider with vision + tool use chosen (D11a). Complexity: XL (6 sessions). Repositories: desktop, backend, mobile.
+Status: **Implemented & Verified across `desktop/`, `backend/`, and `mobile/` (2026-10-31; [UDC-8-results-2026-10-31.md](UDC-8-results-2026-10-31.md)); native Cua Driver binary VM acceptance is pending.** Complexity: XL (6 sessions). Repositories: desktop, backend, mobile.
 
 ## 1. Goal
 
