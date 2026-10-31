@@ -15,6 +15,7 @@ Date: 2026-10-30. Owner decisions: [roadmap §3](../XUNA_UNIVERSAL_DEVICE_CONTRO
 - **UDC-9 (S9.1–S9.3) is Implemented and verified across `firmware/`, `desktop/`, `backend/`, and `mobile/` (2026-10-31; [UDC-9-results-2026-10-31.md](UDC-9-results-2026-10-31.md)); physical multi-host LAN + board button acceptance is pending.**
 - **UDC-10 (S10.1–S10.3) is Implemented and verified across `backend/` and `mobile/` (2026-10-31; [UDC-10-results-2026-10-31.md](UDC-10-results-2026-10-31.md)); live multi-week phone/board routine trial is pending.**
 - **UDC-11 (S11.1–S11.3) is Implemented and verified across `desktop/` (`xuna_xtp` + agent), `backend/`, and `mobile/` (2026-10-31; [UDC-11-results-2026-10-31.md](UDC-11-results-2026-10-31.md)); live LAN wake & desktop coding-agent trial is pending.**
+- **UDC-12 (S12.1–S12.5) is Implemented and verified across `firmware/`, `desktop/` (`xuna_xtp` + agent), `backend/`, and `mobile/` (2026-10-31; [UDC-12-results-2026-10-31.md](UDC-12-results-2026-10-31.md)); live hardware/LAN trial is pending.**
 
 This folder is written so that **any coding agent or engineer** (including a model other than the one that wrote it) can execute a milestone without extra context. Every milestone file follows the same layout:
 
@@ -45,6 +46,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | [UDC-8-computer-use.md](UDC-8-computer-use.md) | Desktop computer use with Cua Driver | **S8.1–S8.6 Done 2026-10-31 ([results](UDC-8-results-2026-10-31.md)); native VM run pending** |
 | [UDC-9-10-workflows-learning.md](UDC-9-10-workflows-learning.md) | Cross-device workflows; learning and personalization | **UDC-9 (S9.1–S9.3) & UDC-10 (S10.1–S10.3) Done 2026-10-31 ([UDC-9 results](UDC-9-results-2026-10-31.md), [UDC-10 results](UDC-10-results-2026-10-31.md))** |
 | [UDC-11-dev-workspace-resume.md](UDC-11-dev-workspace-resume.md) | Zero-Config App/Project Discovery, Smart Host Wake & "Claude Code / Antigravity" Auto-Prompt Workflow (`resume_work`, `wrap_up_work`) | **S11.1–S11.3 Done 2026-10-31 ([results](UDC-11-results-2026-10-31.md)); live LAN wake & desktop coding-agent trial pending** |
+| [UDC-12-desk-copilot-ecosystem.md](UDC-12-desk-copilot-ecosystem.md) | Physical Board `R2` Approval, Bidirectional Task/Selection Bridge (`selection.read`, `host.lock_screen`, `workspace.watch_task`), Zero-Config MCP Bridge (`AutoMcpBridge`), Teachable Custom Workflows & Focus/Away Co-Pilot | **S12.1–S12.5 Done 2026-10-31 ([results](UDC-12-results-2026-10-31.md)); live hardware/LAN trial pending** |
 
 Background (read once): [research](../../research/XUNA_UNIVERSAL_DEVICE_CONTROL_RESEARCH.md) · [architecture](../../architecture/XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) · [security](../../architecture/XUNA_DEVICE_CONTROL_SECURITY.md) · [capability matrix](../../research/XUNA_PLATFORM_CAPABILITY_MATRIX.md) · [open-source review](../../research/XUNA_DEVICE_CONTROL_OPEN_SOURCE_REVIEW.md).
 
