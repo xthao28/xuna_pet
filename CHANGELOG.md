@@ -2,6 +2,22 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Chuẩn hóa Kiến trúc Hệ sinh thái Đa nền tảng (`ECO-S1`–`ECO-S4`): Phân tách mô-đun `AutoSymbioticService` (`symbiotic/*`), `HostToolDispatcher` (`handlers/*`), `xuna_xtp` (`schemas/*` & `policy/*`), Hợp nhất Nguồn Chân lý Ánh xạ Công cụ XTP & Gói Chia sẻ `packages/xuna_shared`, Nâng cấp Plugin Bản địa Windows/macOS/Linux & Quy trình CI/CD Đa nền tảng (`desktop/`, `mobile/`, `packages/xuna_shared/`, `.github/workflows/`)
+
+- **`ECO-S1` — Tái cấu trúc `AutoSymbioticService` (`4,139` dòng → Facade `~430` dòng + 10 tệp dưới `desktop/lib/features/discovery/symbiotic/`) và `HostToolDispatcher` (`2,922` dòng → `742` dòng + 5 tệp dưới `desktop/lib/features/tools/handlers/`):**
+  - `symbiotic/`: `symbiotic_models.dart`, `symbiotic_vitals_service.dart` (`UDC-15` S15.1–S15.4), `workspace_pocket_service.dart` (`SYM-1` S1.1), `watchdog_coach_service.dart` (`SYM-2` S2.1), `omniforge_service.dart` (`FORGE-1`/`FORGE-2`), `universal_pipeline_service.dart` (`UNIV-2`), `heartbeat_canvas_service.dart` (`CLAW-2`/`CLAW-3`), `skill_workshop_service.dart` (`CLAW-1`/`WORKSHOP-2`), `memory_aria_service.dart` (`MIND-2`), và `subagent_cron_service.dart` (`MIND-2`/`SWARM-2`).
+  - `handlers/`: `mvp_tool_handlers.dart` (`313` dòng), `workspace_copilot_handlers.dart` (`512` dòng), `tv_smarthome_handlers.dart` (`237` dòng), `symbiotic_tool_handlers.dart` (`498` dòng), và `forge_claw_tool_handlers.dart` (`667` dòng).
+- **`ECO-S2` — Hợp nhất Nguồn Chân lý Ánh xạ `ToolFamily`, Phân tách mô-đun `xuna_xtp` (`schemas/*` & `policy/*`) & Tích hợp Gói Pure-Dart dùng chung `packages/xuna_shared/`:**
+  - Bổ sung `resolveToolFamilyForName(String toolName)` trong `desktop/packages/xuna_xtp/lib/src/schemas/core_types.dart` và dùng chung tại `HostPolicyEvaluator.evaluateInvocation` (`policy.dart`), xóa bỏ logic phân nhánh trùng lặp (`xuna_xtp` 23/23 PASS).
+  - Tách `schemas.dart` (`4,500` dòng → barrel `6` dòng) thành 4 tệp dưới `lib/src/schemas/` (`core_types.dart`, `mvp_devops_catalog.dart`, `symbiotic_catalog.dart`, `forge_claw_catalog.dart`) và tách `policy.dart` (`3,465` dòng → `265` dòng) thành 5 tệp dưới `lib/src/policy/` (`policy_models.dart`, `url_domain_validator.dart`, `security_redaction.dart`, `forge_swarm_validators.dart`, `tool_arg_validators.dart`).
+  - Tạo gói `packages/xuna_shared/` (`SharedRiskTier`, `SharedHostPlatform`, `BleProtocolConstants` với UUID/opcodes/capability bits chuẩn v1, `dart test` 9/9 PASS) và tích hợp vào `mobile/pubspec.yaml`, `desktop/pubspec.yaml`, `device_protocol.dart`, `pending_action.dart` và `host.dart` (`mobile` 45/45 PASS).
+- **`ECO-S3` — Cải tiến Plugin Bản địa Windows/macOS & Khử trùng lặp `AutoWorkspaceIndexer`:**
+  - Nâng cấp `xuna_host_plugin.cpp` trên Windows: triển khai `ShowWindowsToast(title, body)` (WinRT `ToastNotificationManager` kèm fallback `Shell_NotifyIconW` `NIF_INFO` tray balloon an toàn), thay thế `std::thread(...).detach()` không giới hạn bằng hàng đợi worker giới hạn (`kMaxWorkerThreads = 4`, `kMaxPendingCalls = 64`) kèm RAII `ScopedComInitializer`.
+  - Đồng bộ `handleShowToast` trong `XunaHostPlugin.swift` (macOS) và khử nhánh trùng lặp trong `AutoWorkspaceIndexer._defaultAgentLauncher`.
+- **`ECO-S4` — Quy trình CI/CD Đa nền tảng & Khung Plugin Bản địa Linux GTK (`xuna/host`):**
+  - Tạo `.github/workflows/ecosystem-ci.yml` (root), `desktop/.github/workflows/ci.yml` và `mobile/.github/workflows/ci.yml`.
+  - Tạo `desktop/linux/runner/xuna_host_plugin.h`, `xuna_host_plugin.cc` và `README.md` định nghĩa khung 18 phương thức `FlMethodChannel` `"xuna/host"` trên Linux GTK.
+
 ## 2026-11-02 — Xưởng Kỹ Năng Sâu `ClawWorkshop` (`WORKSHOP-1`–`WORKSHOP-4`), Tâm thức Tự trị `ClawMind` (`MIND-1`–`MIND-4`) & Bầy Chuyên Gia Sub-Agent 0-Token (`SWARM-1`–`SWARM-4`) với 0 byte phát sinh trên mạch (`desktop/`, `backend/`, `mobile/`)
 
 - **`ClawWorkshop` (`WORKSHOP-1`–`WORKSHOP-4` — `skill.workshop_sync` `R1` & `skill.chain_and_test` `R2`):**

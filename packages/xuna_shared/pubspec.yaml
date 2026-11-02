@@ -1,0 +1,11 @@
+name: xuna_shared
+description: "Shared pure-Dart constants, risk tiers, host platforms, and BLE protocol v1 definitions across XUNA mobile and desktop."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.2
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.8
