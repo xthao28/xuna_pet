@@ -102,7 +102,7 @@ Status vocabulary:
     - `bornAt` is exact only when trusted time is available in the hatch boot session; otherwise it stays unknown and active lifetime is shown.
     - The existing MVP pet is kept and migrates as Newborn with `bornAt` unknown.
   - **D12:** `xuna_core` stays C++11.
-  - **D14:** mobile pins Flutter **3.32.8** via fvm (`mobile/.fvmrc`). Any SDK upgrade is a separate, validated session.
+  - **D14 (owner-approved update 2026-11-02):** mobile pins Flutter **3.47.9** via fvm (`mobile/.fvmrc`), replacing 3.32.8 after the iOS 26 Debug Dart VM RX/RW crash. Host build and analysis pass; physical-device startup validation remains pending. Future SDK upgrades remain separate, validated sessions.
   - **D17:** Conversation is split into two layers.
     - **Layer A** (text-first, developed and accepted with M05a, opcode 6 `StatedPreference`).
     - **Layer B** (personal facts and recall, after M05b).

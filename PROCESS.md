@@ -1,6 +1,19 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71): Windows `IUIAutomation` & macOS `AXUIElement` Semantic Control Tree (`[ref=ui_1]..[ref=ui_N]`), Direct `InvokePattern`/`AXPress` & `ValuePattern`/`AXValue` (`0B Screenshot`, `-92% Token`, `0 Mouse Hijack`) (`desktop/`, `backend/`, `mobile/`)**. Before that: **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
+Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **Flutter 3.47.9 upgrade for the iOS 26 Debug Dart VM RX/RW startup crash**. Before that: **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71)**, **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
+
+## 2026-11-02 — Flutter 3.47.9 and iOS 26 startup crash
+
+- The iPhone crash report showed Dart VM startup failing before `main()` with `Unable to flip between RX and RW memory protection on pages`. Flutter 3.32.8 / Dart 3.8.1 Debug on iOS 26 matches [flutter/flutter#170416](https://github.com/flutter/flutter/issues/170416); upstream guidance identifies Flutter 3.35+ as containing the needed fix.
+- Updated `mobile/.fvmrc` to Flutter 3.47.9 and resolved `pubspec.lock`. The SDK migration also added Swift Package Manager integration; iOS still warns that the existing custom Podfile retains CocoaPods integration and may need a separate manual migration.
+- Validation: `flutter analyze` PASS; iOS Debug and Release device builds PASS with code signing disabled. Full mobile tests: **412/415 PASS**; three existing `home_page_test.dart` layout-overflow failures also reproduce on Flutter 3.32.8. Physical-device launch was not run; the iOS 26 startup fix remains to be confirmed on-device.
+- The `UIScene` lifecycle message is a future compatibility warning, not the cause of this SIGABRT.
+
+## 2026-11-02 — Mobile submodule sync for app build
+
+- Fast-forwarded `mobile/dev` from `2e85506` to `e556ae3` (`origin/dev`; 29 commits). No merge conflict remains; `ios/Runner.xcodeproj/project.pbxproj` auto-merged.
+- Preserved the owner's pre-existing local iOS build edits: CocoaPods lockfile version `1.17.0` and generated Xcode project settings. `git -C mobile diff --check` passed; no build or tests run.
+- At sync time, the mobile worktree had only those two modified files. Root repo showed the changed `mobile` gitlink; neither repository was committed or pushed.
 
 ## 2026-11-02 — Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71 in `desktop/`, `backend/`, `mobile/`)
 

@@ -2,6 +2,13 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Nâng Flutter 3.47.9 để xử lý crash Debug trên iOS 26
+
+- Chẩn đoán crash xảy ra trong Dart VM trước `main()`: `Unable to flip between RX and RW memory protection on pages`, tương ứng [flutter/flutter#170416](https://github.com/flutter/flutter/issues/170416). Upstream cho biết thay đổi cần thiết có từ Flutter 3.35+.
+- Cập nhật pin FVM trong `mobile/.fvmrc` lên Flutter 3.47.9 và resolve lại `pubspec.lock`; cập nhật các API Flutter đã deprecated để giữ `flutter analyze` sạch.
+- Validation: analyze PASS; iOS Debug và Release build PASS (`--no-codesign`). Bộ test mobile đạt **412/415**; 3 lỗi overflow trong `home_page_test.dart` đã tái hiện bằng Flutter 3.32.8 nên không phải hồi quy của nâng cấp.
+- Flutter thêm Swift Package Manager integration nhưng cảnh báo Podfile tùy chỉnh vẫn dùng CocoaPods. Chưa chạy app trên iPhone thật; cần xác nhận crash đã hết trên iOS 26. Cảnh báo UIScene là việc tương thích tương lai, không phải nguyên nhân crash.
+
 ## 2026-11-02 — Điều khiển Ứng dụng Máy tính Bản địa Không Cần Chụp Màn hình (`UIA-1`–`UIA-4` / `ui.accessibility_tree`): `Windows IUIAutomation` & `macOS AXUIElement` Semantic Tree, `InvokePattern`/`AXPress` & `ValuePattern`/`AXValue` (`0B Screenshot`, `-92% Token`, `0 Chiếm Chuột`) (`desktop/`, `backend/`, `mobile/`)
 
 - **`UIA-1` — Công cụ XTP #71 `ui.accessibility_tree` (`ToolFamily.app`, `RiskTier.r1`) & Lá chắn Bảo mật Cửa sổ Nhạy cảm (`desktop/packages/xuna_xtp/`):**
