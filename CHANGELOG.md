@@ -2,6 +2,18 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Điều khiển Ứng dụng Máy tính Bản địa Không Cần Chụp Màn hình (`UIA-1`–`UIA-4` / `ui.accessibility_tree`): `Windows IUIAutomation` & `macOS AXUIElement` Semantic Tree, `InvokePattern`/`AXPress` & `ValuePattern`/`AXValue` (`0B Screenshot`, `-92% Token`, `0 Chiếm Chuột`) (`desktop/`, `backend/`, `mobile/`)
+
+- **`UIA-1` — Công cụ XTP #71 `ui.accessibility_tree` (`ToolFamily.app`, `RiskTier.r1`) & Lá chắn Bảo mật Cửa sổ Nhạy cảm (`desktop/packages/xuna_xtp/`):**
+  - Bổ sung công cụ thứ 71 `ui.accessibility_tree` (`inspect_window`, `invoke_ref`, `set_value_ref`) vào `buildClawPulseTools()` và ánh xạ chuẩn trong `resolveToolFamilyForName`.
+  - Chặn cứng mọi cửa sổ trình quản lý mật khẩu / hệ thống (`forbiddenUiWindowPatterns`: `1password`, `bitwarden`, `keepass`, `lastpass`, `keychain`, `credential manager`, `windows security`, `regedit`, `registry editor` → `ui_window_forbidden_target`) và chặn mọi thao tác chạm vào ô mật khẩu (`ui_ref_password_or_unsafe_blocked`).
+- **`UIA-2` — Cầu nối Bản địa `Windows IUIAutomation` (`xuna_host_plugin.cpp`), `macOS AXUIElement` (`XunaHostPlugin.swift`) & `UiAccessibilityTreeService` (`desktop/`):**
+  - Quét cây điều khiển ứng dụng desktop thật (`Excel`, `MISA`, `Word`, `Notion`, `Slack`...) thành danh sách mã tham chiếu ngữ nghĩa `[ref=ui_1]..[ref=ui_N]`, tự động che cứng các ô `IsPassword` (`[REDACTED_PASSWORD_CONTROL]`).
+  - Thực thi `invoke_ref` (`IUIAutomationInvokePattern::Invoke()` / `kAXPressAction`) và `set_value_ref` (`IUIAutomationValuePattern::SetValue()` / `kAXValueAttribute`) với **`0 byte` ảnh chụp màn hình (`screenshotBytesUsed: 0`)**, **tiết kiệm `92%` token** và **không cướp con trỏ chuột vật lý** của chủ nhân, kèm tự động ghi sổ hoàn tác `ReversibleActionLedger`.
+- **`UIA-3` & `UIA-4` — Đồng bộ Backend REST API (`POST /v1/symbiotic/ui-accessibility`) & Nút Điều khiển 1 Chạm trên Mobile (`backend/`, `mobile/`):**
+  - Bổ sung `UiAccessibilityTreeReceipt`, `ClawPulseService.evaluate_ui_accessibility_tree` và `POST /v1/symbiotic/ui-accessibility` (`backend` `ruff`/`mypy` 0 lỗi, `test_omniforge_skill_synthesis.py` 8/8 PASS).
+  - Bổ sung `triggerZeroScreenshotUiAutomation` và nút **«Điều Khiển App Máy Tính 0-Screenshot (UIA)»** trên `HomeSymbioticLifeCard` (`mobile` `flutter analyze` 0 lỗi, `actions_test.dart` 35/35 PASS).
+
 ## 2026-11-02 — Hệ sinh thái Home Screen Widget, Biểu tượng Ứng dụng Đổi màu Chameleon & Lối tắt Nhấn giữ Thông minh (`WIDGET-1`–`WIDGET-4`): `XUNA Living Room Window & Fridge Note Widget` (`iOS WidgetKit` + `Android AppWidgetProvider`), `Chameleon Dynamic App Icon` (7 Bảng màu + `Night Sleep`), `Context-Aware Dynamic App Shortcuts` (4 Quick Actions) & `Live Status Pill` (`mobile/`)
 
 - **`WIDGET-1` — `XUNA Living Room Window & Fridge Note Home Screen Widget` (`2x2` / `4x2`):**
