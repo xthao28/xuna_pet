@@ -1,6 +1,19 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **Flutter 3.47.9 upgrade for the iOS 26 Debug Dart VM RX/RW startup crash**. Before that: **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71)**, **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
+Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **macOS Desktop Agent XTP v1 Handshake, 71-Tool Manifest Validation & Hostname Alias Fix (`backend/`, `desktop/`, `mobile/`)**. Before that: **Flutter 3.47.9 upgrade for the iOS 26 Debug Dart VM RX/RW startup crash**, **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71)**, **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
+
+## 2026-11-02 — macOS Desktop Agent XTP v1 Handshake, 71-Tool Manifest Validation & Hostname Alias Fix (`backend/`, `desktop/`, `mobile/`)
+
+- **Board, Backend & macOS Desktop Agent runtime verification:**
+  - Backed up board NVS (`/tmp/xuna_nvs_backup_20261102.bin`, SHA-256 `6f4d74a8f9be5ade79e5c53a6a6e4d20d598aed2c2e95b14b56355fc5574f7f3`) and flashed `xuna_t_display_s3` (`fc52a9a`) to `/dev/cu.usbmodem14201`.
+  - Migrated `xuna_local` PostgreSQL to Alembic `0017 (head)`.
+- **Fixes across `backend/`, `desktop/`, `mobile/`:**
+  - `backend/src/xuna_backend/modules/hosts/domain/entities.py`: updated `validate_tool_name` to map `acoustic` → `ToolFamily.MEDIA` and `companion`, `ritual`, `ui.accessibility_tree` → `ToolFamily.APP` so the 71-tool `tools/list` manifest from Desktop Agent is accepted without `1002 unsupported_protocol`; updated `HostAlias` to allow `.`, `'`, `’` (`U+2019`).
+  - `desktop/`: passed `protocols: const <String>['xtp/1']` in `XtpSessionClient` default connector; fixed macOS P-256 key persistence/public-key extraction, `#available(macOS 10.15, *)` guard, non-blocking `handlePermissions`, and apostrophe normalization in `XunaHostPlugin.swift`; added POSIX in-process lock tracking to `SingleInstanceGuard`.
+  - `mobile/`: updated `ClaimHostUseCase._aliasPattern` and `HostEnrollController.onCodes` to accept/sanitize macOS hostnames containing curly apostrophes (`Xuan’s MacBook Pro`).
+- **Validation:**
+  - `backend/`: `ruff check` PASS, `mypy` PASS, `pytest -q -k "host or symbiotic"` **63 passed**.
+  - `desktop/`: `fvm flutter analyze` PASS (0 issues), `fvm flutter test` **28/28 PASS**; live macOS session connected (`session.ready`, 71 tools in `host_manifests`).
 
 ## 2026-11-02 — Flutter 3.47.9 and iOS 26 startup crash
 

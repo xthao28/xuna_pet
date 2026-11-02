@@ -2,6 +2,18 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Sửa lỗi Kết nối XTP v1 trên macOS, Ánh xạ 71 Công cụ (`FRONTIER-1..4` & `UIA-1`) và Ký tự Tên Máy Mac khi Ghép nối (`backend/`, `desktop/`, `mobile/`)
+
+- **`backend/` (`src/xuna_backend/modules/hosts/domain/entities.py`):**
+  - Cập nhật `validate_tool_name` đồng bộ 100% với `resolveToolFamilyForName` (`xuna_xtp`), ánh xạ `acoustic` → `ToolFamily.MEDIA` và `companion`, `ritual`, `ui.accessibility_tree` → `ToolFamily.APP`, khắc phục lỗi đóng kết nối `1002 unsupported_protocol` khi Desktop Agent gửi manifest 71 công cụ (`tools/list`).
+  - Cho phép dấu `.`, `'`, `’` (`U+2019`) trong `HostAlias` để hỗ trợ tên máy mặc định của macOS (`Xuan’s MacBook Pro`).
+- **`desktop/` (`XunaHostPlugin.swift`, `xtp_session_client.dart`, `single_instance_guard.dart`, `main.dart`):**
+  - Bổ sung subprotocol `protocols: const <String>['xtp/1']` mặc định trong `XtpSessionClient`.
+  - Sửa khóa P-256 trên macOS (`XunaHostPlugin.swift`) tránh lỗi `SecKeyCopyPublicKey` trả về `nil` trên CSSM Keychain cũ, tương thích `NSWorkspace.OpenConfiguration` với `#available(macOS 10.15, *)`, tránh treo main thread trong `handlePermissions` và chuẩn hóa dấu nháy cong trong `handleHostInfo`.
+  - Bổ sung kiểm tra khóa trong cùng tiến trình (`_activeInProcessLocks`) cho `SingleInstanceGuard` trên POSIX/macOS (`28/28` test `desktop` PASS).
+- **`mobile/` (`claim_host_use_case.dart`, `host_enroll_controller.dart`):**
+  - Mở rộng `_aliasPattern` hỗ trợ dấu `'`, `’` và tự động làm sạch ký tự đặc biệt trong hostname khi quét mã QR ghép nối máy tính.
+
 ## 2026-11-02 — Nâng Flutter 3.47.9 để xử lý crash Debug trên iOS 26
 
 - Chẩn đoán crash xảy ra trong Dart VM trước `main()`: `Unable to flip between RX and RW memory protection on pages`, tương ứng [flutter/flutter#170416](https://github.com/flutter/flutter/issues/170416). Upstream cho biết thay đổi cần thiết có từ Flutter 3.35+.
