@@ -2,6 +2,32 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Hệ sinh thái Home Screen Widget, Biểu tượng Ứng dụng Đổi màu Chameleon & Lối tắt Nhấn giữ Thông minh (`WIDGET-1`–`WIDGET-4`): `XUNA Living Room Window & Fridge Note Widget` (`iOS WidgetKit` + `Android AppWidgetProvider`), `Chameleon Dynamic App Icon` (7 Bảng màu + `Night Sleep`), `Context-Aware Dynamic App Shortcuts` (4 Quick Actions) & `Live Status Pill` (`mobile/`)
+
+- **`WIDGET-1` — `XUNA Living Room Window & Fridge Note Home Screen Widget` (`2x2` / `4x2`):**
+  - Đồng bộ trạng thái phòng XUNA (`petName`, `expressionLabel`, `themeId`, `themeLabel`, `accentHex`, `roomActivityVi`, `fridgeNoteVi`, `progressPercent`, `updatedAtIso`) từ Flutter qua kênh bản địa `xuna/android_host` (`SharedPreferences` + `XunaHomeWidgetProvider.kt` + `xuna_home_widget.xml` + `xuna_home_widget_info.xml`) và `xuna/ios_bridge` (`XunaWidgetSnapshotStore` + `UserDefaults` / App Group `group.com.xuna.mobile` + `WidgetCenter.shared.reloadAllTimelines()`).
+  - Hỗ trợ 2 nút tương tác trực tiếp ngay trên Widget màn hình chính Android (`👋 Nựng` `ACTION_WIDGET_PET` & `🧊 Đóng băng` `ACTION_WIDGET_FREEZE`) không cần mở sâu vào ứng dụng.
+- **`WIDGET-2` — `Chameleon Dynamic App Icon` (Đồng bộ Biểu tượng Ứng dụng trong App Library / App Drawer theo 7 Color Themes + Chế độ Ngủ đêm):**
+  - Tự động hoặc chủ động chuyển đổi biến thể biểu tượng ứng dụng (`theme_01_green_edition` .. `theme_07_berry_candy` và `night_sleep`) qua `UIApplication.shared.setAlternateIconName` trên iOS và `setAlternateAppIcon` trên Android.
+- **`WIDGET-3` — `Context-Aware Dynamic App Shortcuts` (Menu 4 Lối tắt Nhấn giữ Biểu tượng Ứng dụng):**
+  - Đăng ký 4 lối tắt ngữ cảnh động qua `UIApplication.shared.shortcutItems` (`UIApplicationShortcutItem` trên iOS) và `ShortcutManager` (`ShortcutInfo` trên Android): `shortcut_pet_vocal` (`👋 Nựng & Nghe XUNA`), `shortcut_pocket_clip` (`📥 Bỏ vào Túi XUNA`), `shortcut_mindful_478` (`🧘 Hít thở 4-7-8`), và `shortcut_emergency_stop` (`🛑 Dừng khẩn cấp`).
+- **`WIDGET-4` — `Live Status Pill / Ongoing Activity` & Giao diện Studio trên `HomeSymbioticLifeCard`:**
+  - Hiển thị tiến độ phiên đồng hành Pomodoro 25 phút / Sub-Agent Swarm trên thanh trạng thái (`NotificationManager` ongoing progress notification trên Android & `LiveStatusPill` snapshot trên iOS), kèm bảng điều khiển & xem trước trực tiếp trên `HomeSymbioticLifeCard` (`mobile` `flutter analyze` 0 lỗi, `actions_test.dart` 35/35 PASS).
+
+## 2026-11-02 — Nâng cấp Thế hệ Mới `XUNA Frontier 2026` (`FRONTIER-1`–`FRONTIER-4`): `Living Overlay & Feed-to-Process Drop-Zone` (`companion.overlay_and_drop`), `Bio-Acoustic Procedural Vocalizer & Prosody Empathy` (`acoustic.vocalize_and_sense`), `ChronoGraph Bi-Temporal Knowledge Graph & Memory Constellation` (`memory.temporal_graph`) và `Embodied Mindful Rituals, StandBy OLED Dock & Neighbor Playdate` (`ritual.mindful_and_playdate`) với 0 byte phát sinh trên mạch (`desktop/`, `backend/`, `mobile/`)
+
+- **`FRONTIER-1` — `XUNA Living Overlay & Feed-to-Process Drop-Zone` (`companion.overlay_and_drop` `R1`, `ToolFamily.app`):**
+  - Đưa XUNA hiện diện sống động trên mép màn hình Windows hoặc sát tai thỏ (`mac_notch`, `top_right`, `bottom_right`, `floating_dock`) trên macOS, kèm cổng nhận dữ liệu kéo-thả trực tiếp vào miệng XUNA (`feed_drop_item` → hiệu ứng `munch_sparkle`).
+  - Tự động chặn đuôi tệp thực thi nguy hiểm (`drop_item_forbidden_extension`), lọc sạch thông tin nhạy cảm (`redactSensitiveSelectionText`), đẩy vào `Universal Pocket` và định tuyến sang `omniforge_invoice_pipeline`, `universal_pocket_code` hoặc `xuna_beam_transfer`.
+- **`FRONTIER-2` — `XUNA Bio-Acoustic Vocalizer & Prosody Empathy` (`acoustic.vocalize_and_sense` `R1`, `ToolFamily.media`):**
+  - Bộ tổng hợp âm thanh sinh học phi ngôn từ thuần toán học (`16-bit mono RIFF WAV @ 16 kHz`, đường cong tần số $F_0(t)$, `vibrato` và hài âm bậc 2 điều biến theo 7 `Theme`) cho 6 biểu cảm: `happy_chirp`, `curious_trill`, `sleepy_coo`, `purr_nuzzle`, `eureka_chime`, `empathy_sigh` (0 byte file âm thanh tĩnh, 0 đồng chi phí TTS).
+  - Bộ cảm nhận giọng điệu ẩn danh (`sense_prosody` từ `speechRateWpm`, `rmsEnergyDb`, `pauseRatioPercent` không lưu âm thanh thô theo chuẩn `U3V`) nhận diện trạng thái `tired_low_energy`, `stressed_rushed`, `excited_focused`, `warm_relaxed` để điều chỉnh phản hồi đồng cảm.
+- **`FRONTIER-3` — `XUNA ChronoGraph: Bi-Temporal Knowledge Graph & Constellation` (`memory.temporal_graph` `R1`, `ToolFamily.app`):**
+  - Lưu trữ các cạnh tri thức hai chiều thời gian `(subject, predicate, object, validFromIso, validUntilIso, status: active | historical, supersededByEdgeId)`: khi chủ nhân chuyển trọng tâm công việc hoặc thói quen, hệ thống tự động đóng mốc `validUntilIso` của cạnh cũ (`historical`) và nối sang cạnh mới (`active`), đồng thời dựng **Bản đồ Chòm sao Ký ức (`constellation_graph`)** trực tiếp lên `Live Canvas A2UI`.
+- **`FRONTIER-4` — `Embodied Mindful Rituals, StandBy OLED Dock & Neighbor Playdate` (`ritual.mindful_and_playdate` `R1`, `ToolFamily.app`):**
+  - Tích hợp nghi thức hít thở `4-7-8` (`start_breathing_478`), phiên tập trung cộng sinh nở kỷ vật phòng (`start_symbiotic_pomodoro`), chế độ đồng hồ để bàn `StandBy OLED Dock` (`toggle_standby_dock`) và cho XUNA sang thăm phòng bạn thân 15 phút (`send_neighbor_playdate`).
+- **0 byte phát sinh trên ảnh nạp ESP32-S3:** Vượt qua toàn bộ kiểm thử tự động trên cả 4 gói/kho mã: `xuna_xtp` 23/23 PASS (nâng tổng số công cụ trong manifest từ `66` lên **`70` công cụ**), `desktop` 28/28 PASS (`flutter analyze` 0 lỗi), `backend` `ruff`/`mypy` 0 lỗi + `test_omniforge_skill_synthesis.py` 7/7 PASS (`POST /v1/symbiotic/frontier-2026`), `mobile` 34/34 bài kiểm thử trong `actions_test.dart` PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-11-02 — Chuẩn hóa Kiến trúc Hệ sinh thái Đa nền tảng (`ECO-S1`–`ECO-S4`): Phân tách mô-đun `AutoSymbioticService` (`symbiotic/*`), `HostToolDispatcher` (`handlers/*`), `xuna_xtp` (`schemas/*` & `policy/*`), Hợp nhất Nguồn Chân lý Ánh xạ Công cụ XTP & Gói Chia sẻ `packages/xuna_shared`, Nâng cấp Plugin Bản địa Windows/macOS/Linux & Quy trình CI/CD Đa nền tảng (`desktop/`, `mobile/`, `packages/xuna_shared/`, `.github/workflows/`)
 
 - **`ECO-S1` — Tái cấu trúc `AutoSymbioticService` (`4,139` dòng → Facade `~430` dòng + 10 tệp dưới `desktop/lib/features/discovery/symbiotic/`) và `HostToolDispatcher` (`2,922` dòng → `742` dòng + 5 tệp dưới `desktop/lib/features/tools/handlers/`):**
