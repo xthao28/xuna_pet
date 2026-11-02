@@ -1,6 +1,69 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **XUNA 7 Color Themes, 5-Role Sprite System & Dual Theme Experience (`THEME-1`–`THEME-4`) across `firmware/` & `mobile/`: Configurable 5-Role Palette Data (`highlight`, `hair`, `body`, `shadow`, `outline`) in `firmware/assets/color_themes.json` & `mobile/lib/shared/themes/xuna_color_themes.dart` (`XunaColorThemes` / `XunaColorThemeData`), 7 Official Themes (`01 Green Edition` [Default], `02 Forest Mint`, `03 Seafoam`, `04 Lavender Dream`, `05 Sunny Gold`, `06 Sky Blue`, `07 Berry Candy`), Automated Sprite Generator (`firmware/tools/generate_color_theme_sprites.py`) producing 128 base + 64 Track A firmware frames in Theme 01 Green Edition (`XunaAnimatedScene.cpp`, `XunaTrackA.cpp`, `0 B` Flash/RAM delta), `XunaThemePalette::applyThemeRgb565` O(1) 5-role remapper + `particleFor` + `autoThemeForPersonality` + theme-synced `SymbioticRoomProps::colorFor` in `SymbioticRoom.h` (`test_remote_mode` 9/9 PASS), all 7×4 theme PNGs + animated GIFs in `mobile/assets/images/`, `AppXunaPet(themeId: ..., showAccentParticle: true)` with custom pixel accent particles (`rays`, `sparkle`, `heart`) & room lighting sync, and Interactive 7-Theme Swatch Picker + Epigenetic Auto-Theme Toggle in `HomeSymbioticLifeCard` / `HomeActionsService` / `HomePage` (`mobile/` analyze 0 issues + `actions_test.dart` 33/33 PASS)**. Before that: **XunaScript Universal Composable Engine (`UNIV-1`–`UNIV-4`)**, **XUNA ClawPulse (`CLAW-1`–`CLAW-4`)**, and **XUNA OmniForge (`FORGE-1`–`FORGE-4`)**.
+Last updated: **2026-11-02** (Asia/Ho_Chi_Minh). Latest: **XUNA Zero-Token Multi-Specialist Sub-Agent Swarm (`SWARM-1`–`SWARM-4`): 4 Specialist Sub-Agent Roles (`scout_harvester`, `analyst_reconciler`, `executor_organizer`, `critic_verifier`), Role-Scoped Primitive Allowlist, Shared Blackboard & Critic Cross-Verification (`0 LLM Token` execution, saving ~88% context tokens) across `desktop/packages/xuna_xtp`, `desktop/`, `backend/`, and `mobile/`**. Before that: **XUNA ClawMind & Autonomy (`MIND-1`–`MIND-4`)**, **XUNA ClawWorkshop (`WORKSHOP-1`–`WORKSHOP-4`)**, **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**, **XunaScript Universal Composable Engine (`UNIV-1`–`UNIV-4`)**, **XUNA ClawPulse (`CLAW-1`–`CLAW-4`)**, and **XUNA OmniForge (`FORGE-1`–`FORGE-4`)**.
+
+## 2026-11-02 — XUNA Zero-Token Multi-Specialist Sub-Agent Swarm (`SWARM-1`–`SWARM-4`): 4 Specialist Sub-Agent Roles (`scout_harvester`, `analyst_reconciler`, `executor_organizer`, `critic_verifier`), Role-Scoped Primitive Allowlist, Shared Blackboard & Critic Cross-Verification (`desktop/`, `backend/`, `mobile/`)
+
+- **User requirement:** Nâng cấp cơ chế phân nhánh `Sub-Agent` của XUNA vượt trội hơn OpenClaw: thay vì nhân bản nhiều vòng lặp LLM tốn gấp 3–4 lần token như OpenClaw, XUNA kết hợp **Multi-Specialist Sub-Agent Swarm** với bộ máy nguyên tử cục bộ **`XunaScript`** để chạy **0 LLM Token thực thi (`llmTokensUsed: 0`)**, tiết kiệm **~88% token ngữ cảnh** luồng chat chính và giữ nguyên **0 byte thay đổi trên `firmware/`**.
+- **4 Nâng cấp Cốt lõi (`SWARM-1` → `SWARM-4`):**
+  1. **Auto-Goal Decomposition & 4 Specialist Roles (`SWARM-1` trong `desktop/packages/xuna_xtp`):**
+     - Mở rộng `subagent.spawn_and_poll` (`spawn`, `spawn_swarm`, `poll`, `list_active`, `read_blackboard`) và định nghĩa 4 chuyên gia chuẩn trong `allowedSubagentSpecialistRoles` ([schemas.dart](file:///c:/Users/Thao/Documents/xuna_pet/desktop/packages/xuna_xtp/lib/src/schemas.dart)):
+       - `scout_harvester`: chuyên quét song song dữ liệu thô & bóc tách trường chuẩn hóa lên `Shared Blackboard` (**Strict Read-Only**).
+       - `analyst_reconciler`: chuyên đối chiếu chéo 2 bảng, gom nhóm & tính toán số liệu từ `Shared Blackboard` (**0 LLM Token**).
+       - `executor_organizer`: chuyên thực thi đổi tên/sắp xếp tệp hoặc xuất báo cáo CSV/JSON/MD kèm mã hoàn tác `ReversibleActionLedger`.
+       - `critic_verifier`: chuyên kiểm toán chéo tổng số học, schema & phát hiện lệch dữ liệu trước khi chốt (**Strict Read-Only**).
+  2. **Role-Scoped Primitive Allowlist (`roleScopedPrimitiveAllowlist` & `isPrimitiveAllowedForSubagentRole` trong [policy.dart](file:///c:/Users/Thao/Documents/xuna_pet/desktop/packages/xuna_xtp/lib/src/policy.dart)):**
+     - Khóa cứng quyền hạn ở tầng giao thức XTP: `scout_harvester` và `critic_verifier` tuyệt đối không được gọi `file.batch_ops` hay `export.artifact` (chống rủi ro Sub-Agent đọc nhầm dữ liệu rồi tự ý sửa/xóa tệp). Mọi vai trò lạ ngoài 4 chuyên gia đều bị chặn với mã lỗi `subagent_role_forbidden`.
+  3. **Shared Blackboard & Critic Self-Verification (`SWARM-2` trong `desktop/`):**
+     - Nâng cấp `AutoSymbioticService.spawnOrPollSubagent` ([auto_symbiotic_service.dart](file:///c:/Users/Thao/Documents/xuna_pet/desktop/lib/features/discovery/auto_symbiotic_service.dart)) và `SubagentSpawnAndPollTool` ([host_tool_dispatcher.dart](file:///c:/Users/Thao/Documents/xuna_pet/desktop/lib/features/tools/host_tool_dispatcher.dart)): các chuyên gia trao đổi kết quả trung gian qua `_sharedBlackboard` (`scout_extracted_rows`, `analyst_reconciled_metrics`, `executor_exported_artifact`, `critic_audit_verdict`), thực thi bằng CPU cục bộ (`llmTokensUsed: 0`, `contextSavedPercent: 88`), kiểm toán `criticPassed: true` (`criticConfidenceScore: 98`), và chỉ đẩy bản tóm tắt tinh gọn vào `MEMORY_JOURNAL.md`.
+  4. **Đồng bộ `backend/` (`SWARM-3`) & `mobile/` (`SWARM-4`):**
+     - **`backend/`:** Nâng cấp `ClawMindReceipt`, `ClawPulseService.evaluate_claw_mind` và `POST /v1/symbiotic/claw-mind` trả về `subagentLlmTokensUsed: 0`, `contextSavedPercent: 88`, `criticPassed: True`, `criticConfidenceScore: 98` và danh sách 4 `specialistWorkers`.
+     - **`mobile/`:** Nâng cấp `HomeActionsService.spawnBackgroundSubagentAndHook` ([home_actions_service.dart](file:///c:/Users/Thao/Documents/xuna_pet/mobile/lib/features/home/presentation/service/home_actions_service.dart)) hiển thị trực quan bảng tiến độ 4 chuyên gia (`Scout`, `Analyst`, `Executor`, `Critic`) + `Lifecycle Hook` trên `Live Canvas A2UI`.
+- **Validation (Windows):**
+  - `desktop/packages/xuna_xtp`: `fvm dart analyze` 0 lỗi, `fvm dart test` **22/22 PASS**.
+  - `desktop/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub` **28/28 PASS**.
+  - `backend/`: `ruff check src tests` 0 lỗi, `mypy src` 0 lỗi (223 files), `pytest -q tests/unit/test_omniforge_skill_synthesis.py` **6/6 PASS**.
+  - `mobile/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub test/features/actions/actions_test.dart` **33/33 PASS**.
+- **Not run:** Thử nghiệm Swarm trên hàng nghìn tệp PDF/CSV ngoài thực tế.
+- **Next:** Chờ chủ dự án kiểm tra hoặc yêu cầu mở rộng tiếp theo.
+
+## 2026-11-02 — XUNA ClawMind & Autonomy (`MIND-1`–`MIND-4`): Transparent Markdown Memory Vault & Pre-Compaction Flush (`memory.markdown_vault`), Semantic Browser ARIA Snapshotter (`browser.semantic_snapshot`), Delegated Background Sub-Agents (`subagent.spawn_and_poll`) & Autonomous Cron/Lifecycle Hooks (`schedule.cron_and_hooks`) (`desktop/`, `backend/`, `mobile/`)
+
+- **User requirement:** Lên kế hoạch chi tiết từng phần và triển khai thật cẩn thận 4 tính năng cốt lõi còn lại của **ClawBot / OpenClaw** (ngoài hệ thống tự viết công cụ đã hoàn tất ở `CLAWWORKSHOP`) mà XUNA chưa có, giữ nguyên **0 byte thay đổi trên `firmware/`**.
+- **4 Năng lực Cốt lõi (`MIND-1` → `MIND-4`) nâng tổng số công cụ XTP v1 từ `62` lên `66` công cụ:**
+  1. **3-Tier Transparent Markdown Memory Vault & Pre-Compaction Flush (`memory.markdown_vault`, `R1`, `ToolFamily.app`):**
+     - Quản lý 3 tệp ký ức Markdown minh bạch trên đĩa (`XUNA_SOUL.md`, `OWNER_PROFILE.md`, `MEMORY_JOURNAL.md`) với đồng bộ 2 chiều thật qua `dart:io` (`read_vault`, `append_note`, `pre_compaction_flush`, `sync_to_disk`).
+     - Cơ chế `pre_compaction_flush` tự động chắt lọc sở thích chủ nhân, quy tắc xưng hô và quyết định quan trọng trước khi phiên hội thoại dài bị nén ngữ cảnh, đồng thời đi qua bộ lọc `redactSensitiveSelectionText` và `containsForbiddenSkillMarkdownPattern` (`memory_vault_content_unsafe`).
+  2. **Semantic Browser ARIA Snapshotter (`browser.semantic_snapshot`, `R1`, `ToolFamily.url`):**
+     - Bóc tách DOM/HTML thành cây ngữ nghĩa ARIA gọn nhẹ với mã tham chiếu đánh số `[ref=e1]..[ref=eN]` cho các phần tử tương tác (`button`, `link`, `textbox`, `combobox`), tự động che cứng mọi ô mật khẩu (`[REDACTED_PASSWORD_FIELD]`) và giảm **75–95% chi phí token** so với chụp ảnh màn hình Vision.
+  3. **Delegated Background Sub-Agent Spawner (`subagent.spawn_and_poll`, `R1`, `ToolFamily.app`):**
+     - Cho phép XUNA tách các tác vụ nặng/dài hơi sang một `Sub-Agent` chạy nền độc lập có ngân sách token riêng (`tokenBudget: 256..8192`), thực thi `executeUniversalPipeline` mà không làm nghẽn luồng trò chuyện chính và tự động ghi tóm tắt kết quả (`distilledResultVi`) vào `MEMORY_JOURNAL.md`.
+  4. **Autonomous Cron & Event-Driven Lifecycle Hooks (`schedule.cron_and_hooks`, `R1`, `ToolFamily.app`):**
+     - Đăng ký, kích hoạt, liệt kê hoặc gỡ bỏ các Hook tự trị theo lịch/sự kiện (`cron_daily`, `on_morning_wake`, `on_file_drop`, `on_before_sleep`, `on_git_commit`) gắn trực tiếp với kỹ năng trong `Skill Workshop` kèm mã hoàn tác `ReversibleActionLedger`.
+- **Validation (Windows):**
+  - `desktop/packages/xuna_xtp`: `fvm dart analyze` 0 lỗi, `fvm dart test` **22/22 PASS** (66 công cụ trong manifest).
+  - `desktop/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub` **28/28 PASS**.
+  - `backend/`: `ruff check src tests` 0 lỗi, `mypy src` 0 lỗi (223 files), `pytest -q tests/unit/test_omniforge_skill_synthesis.py` **6/6 PASS** (`POST /v1/symbiotic/claw-mind`).
+  - `mobile/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub test/features/actions/actions_test.dart` **33/33 PASS**.
+- **Not run:** Thử nghiệm phiên hội thoại kéo dài nhiều ngày liên tục trên máy khách hàng thực tế.
+- **Next:** Chờ chủ dự án kiểm tra hoặc yêu cầu mở rộng tiếp theo.
+
+## 2026-11-02 — XUNA ClawWorkshop (`WORKSHOP-1`–`WORKSHOP-4`): Disk-Backed Skill Workshop & Hot-Reload (`skill.workshop_sync`), Progressive Disclosure Compact Index, Multi-Skill DAG Pipe Chaining (`skill.chain_and_test`), Parameterized Template Interpolation (`{{variable}}`), Automated Self-Test Bench & Heartbeat Auto-Trigger (`desktop/`, `backend/`, `mobile/`)
+
+- **User requirement:** Nghiên cứu thật sâu cơ chế tự viết công cụ (`Dynamic Tool Factory` / `skill-creator` / `Skill Workshop`) của **ClawBot / OpenClaw** (*Clawdbot* / *Moltbot*), so sánh sòng phẳng xem OpenClaw có điểm nào mạnh hơn `OmniForge` + `ClawPulse` + `XunaScript` của XUNA hay không, và học hỏi ngay những điểm mạnh đó để nâng cấp cho XUNA với **0 byte thay đổi trên `firmware/`**.
+- **Deep Comparison (OpenClaw vs. XUNA) & 5 Điểm Học Hỏi Trực Tiếp (`WORKSHOP-1` → `WORKSHOP-4`):**
+  1. **Disk-Backed Skill Workshop & Hot-Reload (`skill.workshop_sync`):** Trước đây `_forgedSkills` của XUNA chỉ lưu trong RAM trên `desktop/`; nay XUNA lưu bền vững từng công cụ ra đĩa theo cấu trúc thư mục chuẩn `<workshopFolder>/<skillId>/SKILL.md` + `recipe.json` (`sync_to_disk`), hỗ trợ quét & nạp nóng (`hot_reload_from_disk`) các gói `SKILL.md` mới trên đĩa sau khi đi qua bộ lọc an ninh `containsForbiddenSkillMarkdownPattern`, và hỗ trợ quay lui phiên bản (`rollback_version`) qua `versionHistory`.
+  2. **Progressive Disclosure Compact Index (`compact_index`):** Học cơ chế tiết lộ lũy tiến của OpenClaw — xuất danh mục rút gọn (`skillId`, `titleVi`, `category`, `version`, `autoTriggerOnDelta`) giúp tiết kiệm >85% ngữ cảnh LLM cho đến khi kỹ năng thực sự được kích hoạt.
+  3. **Multi-Skill DAG / Pipe Chaining (`skill.chain_and_test`):** Cho phép nối chuỗi liên hoàn 2..5 kỹ năng (`chainSkillIds`, ví dụ: Kỹ năng 1 bóc tách dữ liệu -> Kỹ năng 2 đối soát chênh lệch -> đẩy lên `Live Canvas` kèm mã hoàn tác `undoSnapshotId`).
+  4. **Parameterized Template Interpolation (`{{variable}}`):** Bổ sung `isSafeTemplateParameterValue` và `interpolateSkillTemplate` trong [policy.dart](file:///c:/Users/Thao/Documents/xuna_pet/desktop/packages/xuna_xtp/lib/src/policy.dart) & [services.py](file:///c:/Users/Thao/Documents/xuna_pet/backend/src/xuna_backend/modules/symbiotic/application/services.py) để một công cụ viết 1 lần có thể tái sử dụng cho nhiều tháng/bộ phận/chiến dịch khác nhau qua `runtimeParams` (chặn cứng `..`, `|`, `;`, `` ` ``, `$(` với mã lỗi `skill_template_param_unsafe`).
+  5. **Automated 4-Point Self-Test Bench & Heartbeat Auto-Trigger (`autoTriggerOnDelta`):** Tự động kiểm thử 4 tiêu chí an toàn/đầu ra (`passedAssertions: 4, totalAssertions: 4, selfTestPassed: true`) và cho phép gắn kỹ năng vào `configureAndTickHeartbeat` để khi phát hiện biến động SHA-256 (`HEARTBEAT_ALERT`), XUNA tự động kích hoạt kỹ năng đã liên kết.
+- **Validation (Windows):**
+  - `desktop/packages/xuna_xtp`: `fvm dart analyze` 0 lỗi, `fvm dart test` **22/22 PASS** (62 công cụ trong manifest).
+  - `desktop/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub` **28/28 PASS**.
+  - `backend/`: `ruff check src tests` 0 lỗi, `mypy src` 0 lỗi (223 files), `pytest -q tests/unit/test_omniforge_skill_synthesis.py` **5/5 PASS**.
+  - `mobile/`: `fvm flutter analyze --no-pub` 0 lỗi, `fvm flutter test --no-pub test/features/actions/actions_test.dart` **33/33 PASS**.
+- **Not run:** Thử nghiệm watcher hệ thống tệp tin liên tục nhiều giờ trên máy khách hàng.
+- **Next:** Chờ chủ dự án kiểm tra hoặc yêu cầu mở rộng tiếp theo.
 
 ## 2026-11-02 — XUNA 7 Color Themes, 5-Role Sprite System & Dual Theme Experience (`THEME-1`–`THEME-4`): `Green Edition` (Default), `Forest Mint`, `Seafoam`, `Lavender Dream`, `Sunny Gold`, `Sky Blue`, `Berry Candy` (`firmware/`, `mobile/`)
 

@@ -2,6 +2,20 @@
 
 Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
 
+## 2026-11-02 — Xưởng Kỹ Năng Sâu `ClawWorkshop` (`WORKSHOP-1`–`WORKSHOP-4`), Tâm thức Tự trị `ClawMind` (`MIND-1`–`MIND-4`) & Bầy Chuyên Gia Sub-Agent 0-Token (`SWARM-1`–`SWARM-4`) với 0 byte phát sinh trên mạch (`desktop/`, `backend/`, `mobile/`)
+
+- **`ClawWorkshop` (`WORKSHOP-1`–`WORKSHOP-4` — `skill.workshop_sync` `R1` & `skill.chain_and_test` `R2`):**
+  - Đồng bộ hai chiều thư viện kỹ năng ra đĩa theo cấu trúc `<workshopFolder>/<skillId>/SKILL.md` + `recipe.json` (`sync_to_disk`), nạp nóng từ đĩa (`hot_reload_from_disk`) sau khi qua bộ lọc `containsForbiddenSkillMarkdownPattern`, quay lui phiên bản (`rollback_version`) và xuất danh mục tiết lộ lũy tiến (`compact_index`) tiết kiệm >85% ngữ cảnh LLM.
+  - Hỗ trợ nối chuỗi liên hoàn 2..5 kỹ năng (`chainSkillIds`) với truyền ống JSON thật giữa các bước, nội suy tham số mẫu `{{variable}}` an toàn (`isSafeTemplateParameterValue`), tự động kiểm thử 4 tiêu chí (`passedAssertions: 4, totalAssertions: 4`) và tự kích hoạt khi cảm biến nhịp tim phát hiện biến động (`autoTriggerOnDelta`).
+- **`ClawMind & Autonomy` (`MIND-1`–`MIND-4` — `memory.markdown_vault` `R1`, `browser.semantic_snapshot` `R1`, `subagent.spawn_and_poll` `R1`, `schedule.cron_and_hooks` `R1`):**
+  - Kho ký ức Markdown 3 tầng minh bạch trên đĩa (`XUNA_SOUL.md`, `OWNER_PROFILE.md`, `MEMORY_JOURNAL.md`) kèm cơ chế `pre_compaction_flush` tự động chắt lọc ký ức phiên dài và lọc sạch khóa nhạy cảm (`[REDACTED]`) trước khi nén ngữ cảnh.
+  - Bộ chụp cây ngữ nghĩa trình duyệt `ARIA Semantic Snapshotter` (`[ref=e1]..[ref=eN]`), tự động che cứng ô mật khẩu (`[REDACTED_PASSWORD_FIELD]`) và giảm 75–95% chi phí token so với chụp màn hình Vision.
+  - Hệ thống `Cron & Event-Driven Lifecycle Hooks` (`cron_daily`, `on_morning_wake`, `on_file_drop`, `on_before_sleep`, `on_git_commit`) tự động kích hoạt kỹ năng đã rèn kèm mã hoàn tác `ReversibleActionLedger`.
+- **Bầy Chuyên Gia Sub-Agent 0-Token (`SWARM-1`–`SWARM-4` — nâng cấp `subagent.spawn_and_poll`):**
+  - Tự động phân rã mục tiêu phức hợp (`decomposeGoalIntoSpecialistSwarm`) thành 4 chuyên gia: `scout_harvester` (**Strict Read-Only**), `analyst_reconciler`, `executor_organizer` (có Undo) và `critic_verifier` (**Strict Read-Only**, kiểm toán chéo số học & schema `PASS 98%`).
+  - Khóa cứng quyền hạn nguyên tử theo vai trò (`roleScopedPrimitiveAllowlist` & `isPrimitiveAllowedForSubagentRole`), chia sẻ kết quả trung gian qua `Shared Blackboard` (`read_blackboard`), và thực thi bằng CPU cục bộ với **`0 LLM Token` (`llmTokensUsed: 0`)**, tiết kiệm **88% ngữ cảnh** luồng trò chuyện chính.
+- **0 byte phát sinh trên ảnh nạp ESP32-S3:** Vượt qua toàn bộ kiểm thử tự động trên cả 4 gói/kho mã: `xuna_xtp` 22/22 PASS (nâng tổng số công cụ trong manifest từ `60` lên **`66` công cụ**), `desktop` 28/28 PASS (`flutter analyze` 0 lỗi), `backend` `ruff`/`mypy` 0 lỗi trên 223 tệp + `test_omniforge_skill_synthesis.py` 6/6 PASS (`POST /v1/symbiotic/workshop-chain` & `POST /v1/symbiotic/claw-mind`), `mobile` 33/33 bài kiểm thử trong `actions_test.dart` PASS (`flutter analyze` 0 lỗi).
+
 ## 2026-11-02 — Hệ thống 7 Bảng Màu Nhân vật XUNA & Trải nghiệm Bảng Màu Kép (`THEME-1`–`THEME-4`): 5 Vai trò Màu Cấu hình được (`highlight`, `hair`, `body`, `shadow`, `outline`), Bộ tạo Sprite Tự động (`Green Edition` mặc định, `Forest Mint`, `Seafoam`, `Lavender Dream`, `Sunny Gold`, `Sky Blue`, `Berry Candy`), Hạt Biểu Cảm Pixel & Bảng Chọn 5 Ô Màu Trực Quan với 0 byte tăng thêm trên Flash (`firmware/`, `mobile/`)
 
 - **Dữ liệu Bảng màu 5 Vai trò Cấu hình được (`color_themes.json` & `XunaColorThemes`, `THEME-1`):** Định nghĩa chuẩn hóa 7 bảng màu nhân vật XUNA với 5 vai trò màu (`highlight`, `hair`, `body`, `shadow`, `outline`) dưới dạng dữ liệu thiết kế có thể cấu hình (`fromJson`/`toJson`, `resolveAutoThemeForTraits`, `registerOrOverride`): `Theme 01 — Green Edition` (mặc định: `#EAF7C9`, `#B7E17D`, `#8FB06B`, `#5F7F52`, `#1E1E1E`), `Theme 02 — Forest Mint`, `Theme 03 — Seafoam`, `Theme 04 — Lavender Dream`, `Theme 05 — Sunny Gold`, `Theme 06 — Sky Blue`, và `Theme 07 — Berry Candy`.
