@@ -1,6 +1,20 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-02** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-03** (Asia/Ho_Chi_Minh).
+
+## 2026-11-03 — Thiết kế lại Home Screen Widget (`Neo-Brutalist Pixel Room Window`) & Đồng bộ Bảng màu XUNA (`THEME-1`–`THEME-4`) Toàn Hệ sinh thái (`mobile/`, `firmware/`, `desktop/`, `backend/`)
+
+- **`mobile/` — Thiết kế lại Widget ngoài màn hình chính (`iOS WidgetKit` + `Android AppWidgetProvider` + `Widget Studio`):**
+  - Mở rộng `XunaHomeWidgetPayload` ([xuna_launcher_widget_bridge.dart](file:///c:/Users/Thao/Documents/xuna_pet/mobile/lib/features/home/presentation/service/xuna_launcher_widget_bridge.dart)) truyền trọn bộ 5 vai trò màu (`highlightHex`, `hairHex`, `bodyHex`, `shadowHex`, `outlineHex`), hạt trang trí `accentParticle` và trạng thái `isAutoTheme`.
+  - **iOS (`XunaWidget.swift`, `XunaIosHostPlugin.swift`):** Vẽ khung cửa sổ phòng Pixel-Art `12x12` (`XunaPixelRoomSpriteView`) tô màu trực tiếp theo 5 vai trò màu của XUNA, dải 5 ô màu bảng màu (`XunaPaletteSwatchStrip`), thẻ giấy nhớ tủ lạnh (`Fridge Note`) và thanh tiến độ đồng bộ màu cho cả kích thước `2x2` (`.systemSmall`) và `4x2` (`.systemMedium`).
+  - **Android (`XunaHomeWidgetProvider.kt`, `xuna_home_widget.xml`, `bg_xuna_widget_*.xml`):** Kết xuất `Bitmap` sắc nét (`Bitmap.createBitmap` không làm mờ pixel) cho cửa sổ phòng XUNA `12x12` + dải 5 ô màu mẫu + thanh tiến độ Neo-Brutalist + 2 nút tương tác nhanh (`👋 Nựng` & `🧊 Đóng băng`).
+  - **In-App Studio & Màn Cộng sinh (`home_widget_config_sheet.dart`, `home_symbiotic_life_card.dart`, `app_tag.dart`):** Nâng cấp bản xem trước Widget với nhân vật `AppXunaPet` thực tế, hạt trang trí, dải 5 ô màu; thiết kế lại mục đầu tiên (`GIẤC MƠ & ĐỒNG ĐIỆU`) và khóa `maxLines: 1, overflow: TextOverflow.ellipsis` cho toàn bộ nhãn `status` để triệt tiêu lỗi tràn UI trên màn hình nhỏ.
+- **`firmware/` & `mobile/` — Đồng bộ màu sắc qua BLE `Opcode 11` (`DisplaySettings`) xuống mạch ESP32-S3 (`0 byte` thay đổi `LifeSnapshotV2`):**
+  - Mã hóa `colorThemeCode` (`0 = Auto`, `1..7 = Theme 01..07`) vào nibble cao của byte `b[7]` (`((colorThemeCode + 1) << 4)`) trong `BleProtocol.h`, `V1LifeCoreAdapter.h` và `protocol_codec.dart`.
+  - Lưu bền vững vào NVS `xuna_ui` (`ScenePreference::loadColorTheme` / `saveColorTheme`) và áp dụng bảng màu RGB565 trực tiếp lên sprite XUNA (`XunaThemePalette::applyThemeRgb565`) cùng đồ vật trong phòng (`SymbioticRoomProps::colorFor`) trên màn hình ST7789.
+- **`desktop/` & `backend/` — Đồng bộ Bảng màu lên Desktop Tray Agent, `ChronoGraph` & Symbiotic API:**
+  - Cập nhật `AgentHeaderBar`, `SymbioticTabView`, `AutoSymbioticService`, `Frontier2026Service` (`ChronoGraph` tự động ghi nhận cạnh `bảng_màu_yêu_thích`) và `POST /v1/symbiotic/frontier-2026` (`themeId` / `activeColorThemeId`).
+- **Kiểm thử:** `firmware` native tests **28/28 PASS**; `backend` `ruff` + `pytest` **6/6 PASS**; `desktop` `flutter analyze` 0 lỗi + `desktop_agent_core_test.dart` **19/19 PASS**; `mobile` `flutter analyze` 0 lỗi + `protocol_codec_test.dart` / `home_page_test.dart` **26/26 PASS** + `actions_test.dart` **35/35 PASS**.
 
 ## 2026-11-02 — Sửa lỗi Kết nối XTP v1 trên macOS, Ánh xạ 71 Công cụ (`FRONTIER-1..4` & `UIA-1`) và Ký tự Tên Máy Mac khi Ghép nối (`backend/`, `desktop/`, `mobile/`)
 
