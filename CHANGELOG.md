@@ -1,6 +1,16 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-03** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-04** (Asia/Ho_Chi_Minh).
+
+## 2026-11-04 — Sửa lỗi Mở Ứng dụng Electron trên macOS (`ELECTRON_RUN_AS_NODE`), Kiểm kê Ứng dụng (`app.list_allowed`) & Thực thi Thật Công cụ OmniForge trên Ổ cứng (`desktop/`, `backend/`)
+
+- **`desktop/` (`XunaHostPlugin.swift`, `auto_app_scanner.dart`, `auto_workspace_indexer.dart`, `mvp_tool_handlers.dart`, `desktop_agent_controller.dart`, `forge_claw_tool_handlers.dart`, `symbiotic_tab_view.dart`):**
+  - Loại bỏ các biến môi trường `ELECTRON_RUN_AS_NODE`, `VSCODE_*`, `ANTIGRAVITY_*`, `AGY_*` trong tiến trình macOS host và cấu hình `NSWorkspace.OpenConfiguration` để mở `Visual Studio Code` / `Antigravity` không bị thoát ngầm; ưu tiên `antigravity_ide` và hỗ trợ mở thẳng `System Settings → Privacy & Security`.
+  - Bổ sung `totalCount` và `appNames` vào `app.list_allowed`.
+  - Nâng cấp OmniForge (`forgeQuickInvoiceTool`, `runForgedSkillFromUi`, `openForgedSkillOutputFolderFromUi`, `ForgeSynthesizeSkillTool`, `ForgeRunSkillTool`) quét tệp thật trong `~/Downloads`, `~/Documents`, `~/Desktop`, tạo thư mục thật tại `~/Documents/XUNA_Workspace/<targetFolder>`, ghi tệp `BangKe_TongHop.csv` (UTF-8 BOM), `BaoCao_KetQua.md`, `SKILL.md`, `recipe.json`, kích hoạt mở App/URL liên quan và mở Finder hiển thị tệp kết quả (`/usr/bin/open -R`).
+- **`backend/` (`catalog.py`, `orchestrator.py`):**
+  - Đưa `forge.synthesize_skill`, `forge.run_skill`, `forge.list_and_manage` vào nhóm ưu tiên trong `_PRIORITY_ORDER`, nâng `MAX_CATALOG_TOOLS = 20`, bổ sung hướng dẫn `app__list_allowed` trong system prompt và tăng giới hạn chuỗi tóm tắt kết quả công cụ lên `360` ký tự.
+- **Kiểm thử:** `backend` `pytest tests/modules/actions/` **77/77 PASS** + `ruff check` PASS; `desktop` `fvm flutter test` **28/28 PASS**.
 
 ## 2026-11-03 — Thiết kế lại Home Screen Widget (`Neo-Brutalist Pixel Room Window`) & Đồng bộ Bảng màu XUNA (`THEME-1`–`THEME-4`) Toàn Hệ sinh thái (`mobile/`, `firmware/`, `desktop/`, `backend/`)
 
