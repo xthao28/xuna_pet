@@ -1,6 +1,29 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-04** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-05** (Asia/Ho_Chi_Minh).
+
+## 2026-11-05 — Agent điều khiển máy theo mô hình OpenClaw: Tool Search, vòng lặp nhiều bước, không đoán ref UI (`backend/`, `desktop/`)
+
+Tham khảo thiết kế OpenClaw (MIT, clone vào scratchpad để đọc; không chép code): một danh mục công cụ cố định cộng `tool_search`/`tool_describe`/`dispatch_action`, vòng lặp agent chạy tới khi xong, ref UI phải lấy từ snapshot.
+
+- **`backend/` — danh mục công cụ và công cụ gián tiếp:**
+  - Bỏ xếp hạng tool theo từ khóa trong câu nói (`_NAMESPACE_INTENT_KEYWORDS`, `query=`) vì chọn sai và có thể loại `ui.accessibility_tree` khỏi danh mục. Danh mục giờ xác định, sắp theo `_PRIORITY_ORDER` (công cụ lõi trước: `app.launch`, `app.list_allowed`, `ui.accessibility_tree`, `url.open`, media...).
+  - Mới `actions/application/tool_discovery.py`: khi tool vượt 20 chỗ, phần dư được truy cập qua `tool_search` (danh bạ tên trong mô tả), `tool_describe` (chữ ký tham số gọn) và `tool_invoke` (`argumentsJson`). `tool_invoke` đi lại đúng pipeline của orchestrator (schema, target, grant, phê duyệt, audit). Catalog và meta-tool dùng chung `collect_eligible_host_tools` nên không vượt quyền/consent.
+  - `chat_turn`: `MAX_TOOL_ROUNDS` 3 → 12 (vẫn giới hạn bởi `TURN_BUDGET_SECONDS = 90`); `_ToolLoopGuard` chặn lời gọi giống hệt đã thất bại 2 lần cùng kết quả và không chạy lại toggle `media.play_pause` đã thành công trong lượt; chuyển code model cũng nhận `tool_invoke(name=forge.*)`.
+  - Sửa lỗi: orchestrator bỏ qua `xuna/errorCode` của host từ xa nên `stale_ref` không tới model; nay được đưa vào `output.errorCode`.
+  - `encode_tool_payload`: gợi ý khôi phục thành trường `hint` cạnh `output` (không nằm trong dữ liệu host); `MAX_TOOL_OUTPUT_BYTES` 2048 → 6144, `compactUiTree` tới 3600 ký tự và tự thu nhỏ theo byte thay vì rơi về `{"truncated":true}`.
+  - Prompt: thêm nguyên tắc làm tới khi xong / không lặp lời gọi lỗi, module hướng dẫn công cụ gián tiếp khi có `tool_search`.
+- **`desktop/`:**
+  - `validateAndResolveRefKey`: thiếu `refId` cho hành động nhắm phần tử (`invoke_ref`, `set_value_ref`, các kiểu click, `browser_*`) → lỗi `missing_ref` kèm tối đa 6 ref hợp lệ (chỉ ô nhập được cho `set_value_ref`, bỏ ô mật khẩu), thay cho việc tự chọn nút/ô đầu tiên (thường là nút đóng cửa sổ hoặc `AXStaticText`).
+  - `HostToolDispatcher`: lỗi `XunaHostChannelException` trả kèm `errorCode`/`message` trong `structuredContent`.
+  - `detectRichOpenClawUiAction`: double/right click không còn rơi về phần tử đầu tiên khi không có mục tiêu khớp.
+  - **Tool giả lập không còn báo thành công (fail closed):** `tv.control` (trừ `power_wake`), `tv.launch_app`, `tv.cast_media` trả `unsupported`/`tv_bridge_not_configured` khi chưa có transport thật; `power_wake` không có MAC trả `wol_unavailable`; `smarthome.control` trả `smarthome_bridge_not_configured` khi chưa có bridge (trước đây chỉ sửa trạng thái trong bộ nhớ); `browser.semantic_snapshot` không có `rawHtml` trả `raw_html_required` (trước đây phân tích trang hóa đơn mẫu); chụp màn hình computer-use không có driver trả `screen_capture_unavailable` (trước đây ảnh rỗng).
+  - **`ui.accessibility_tree` không còn bịa cây UI** khi lệnh native lỗi hoặc không có phần tử: trả lỗi thật (`ui_tree_unavailable` hoặc mã lỗi native). Service vẫn giữ cây mẫu cho màn demo nội bộ của desktop, chỉ đường XTP bị chặn.
+- **Bỏ hai chỗ cố định trong vòng lặp agent (`backend/`, `desktop/`, `mobile/`):**
+  - Mới: khóa tùy chọn `xuna/policy.idempotent` (additive; host cũ không gửi vẫn hợp lệ) ở backend `ToolDescriptor`, desktop `ToolPolicyMeta` và manifest Android/iOS. `media.play_pause` khai báo `idempotent: false` trên desktop, Android, iOS. Orchestrator thêm `repeatSafe: false` vào kết quả thành công; `_ToolLoopGuard` chỉ đọc cờ này (không còn tên tool trong `chat_turn`). Host chưa khai báo: fallback tương thích `_LEGACY_UNDECLARED_TOGGLES` trong orchestrator, khai báo của host luôn thắng.
+  - Thứ tự danh mục theo thói quen của chủ: `tool_usage_counts` đếm `host.tool_invoked` thành công trong 300 sự kiện audit gần nhất (metadata không có nội dung); tool hay dùng được đưa lên trực tiếp, kể cả tool trước đó chỉ gọi qua `tool_invoke`. `_PRIORITY_ORDER` chỉ còn là mặc định khi chưa có dữ liệu; lỗi đọc audit không làm hỏng lượt.
+- **Bộ đánh giá tổng quát `backend/scripts/eval_host_control.py`:** sinh nhiệm vụ theo năng lực (clipboard, mở app, gõ vào app [`--allow-typing`], đọc URL trình duyệt, từ chối khi chưa có bridge nhà thông minh) từ chính danh sách app của host, ưu tiên app không có đường tắt AppleEvents; kiểm chứng độc lập qua `POST /v1/hosts/{id}/tools:invoke` (`XUNA_DEV_HOST_TOOLS=1`); chỉ số chính là **false success**; báo cáo tách app có/không có đường tắt; `--plan-only` để xem trước nhiệm vụ. Loại trừ mặc định app nhạy cảm (terminal, trình quản lý mật khẩu, cài đặt hệ thống, XUNA).
+- **Kiểm thử (Windows):** `backend` `ruff check` + `mypy` PASS, `pytest` **577 passed / 74 skipped** (lần đo cuối, gồm test `idempotent`/usage/bộ đánh giá); trước đó `pytest` **550 passed / 74 skipped** (không có `XUNA_TEST_DATABASE_URL`); mới `tests/modules/actions/test_tool_discovery.py` 38 test. `desktop` (Flutter 3.32.8 theo `.fvmrc`) `flutter analyze` file đã sửa 0 lỗi, `flutter test` **40/40 PASS** gồm `test/ui_ref_resolution_test.dart` mới và test fail-closed TV/smart home, cây UI, semantic snapshot. Chưa thử với model thật và máy Mac thật.
 
 ## 2026-11-04 — Sửa lỗi Mở Ứng dụng Electron trên macOS (`ELECTRON_RUN_AS_NODE`), Kiểm kê Ứng dụng (`app.list_allowed`) & Thực thi Thật Công cụ OmniForge trên Ổ cứng (`desktop/`, `backend/`)
 

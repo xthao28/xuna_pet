@@ -358,6 +358,18 @@ Before implementing a feature:
 
 Avoid: invented hardware benchmarks, unverified BOM/prices, fake AI learning claims, unnecessary cloud dependency, oversized frameworks, exposing secrets, overpromising an autonomous general intelligence, and rewriting roadmap without approval.
 
+**Honest-code rules (owner-approved 2026-11-05, all repositories, all coding agents):** follow [docs/architecture/XUNA_HONEST_CODE_RULES.md](docs/architecture/XUNA_HONEST_CODE_RULES.md). In short:
+- H1: report `ok` only for real effects; fail closed otherwise.
+- H2: no fabricated data on production or tool paths.
+- H3: never guess targets.
+- H4: errors travel end to end.
+- H5: no app names or phrase tables in generic agent layers; producers declare capabilities.
+- H6: names and docs match behaviour.
+- H7: tests must be able to fail.
+- H8: report what was and was not run.
+
+Run its review checklist before reporting.
+
 ## 11. Immediate M01 acceptance criteria
 
 With the existing **LILYGO T-Display-S3**, via **VS Code + PlatformIO**:
