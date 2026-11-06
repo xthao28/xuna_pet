@@ -16,7 +16,14 @@ Chủ yêu cầu bỏ các tính năng vô nghĩa của Cộng sinh; chọn "b�
   - `mobile/`: bỏ preset `meeting_ready` và `desk_whisper`.
   - Kiểm chứng: `xuna_xtp` analyze 0 lỗi, 29/29; desktop analyze 0 lỗi, `flutter test` 43/43; backend `ruff check` sạch, `mypy` 0 lỗi, `pytest` 577 passed / 74 skipped (cùng số như trước), `ruff format --check` vẫn 42 file có sẵn từ trước, không thêm; mobile analyze 0 lỗi, `actions_test` vẫn đúng 1 ca đỏ có sẵn.
   - Còn để ý: `workflows.py` (cùng khối tạo workflow thói quen) còn ánh xạ cụm từ → bước với `entityId: "light.living_room"` cố định cho "bật/tắt đèn", vi phạm H5 — chưa sửa.
-- **Chưa làm, đợt 2b/2c (chờ chủ):** swarm/cron "zero-token", Frontier 2026 + heartbeat canvas + ChronoGraph. Mỗi mục xuyên 3–4 repo (schema XTP, validator, handler, catalog backend, tool_names, action_summary, board slot mobile, fixture/test) và đổi hợp đồng manifest nên cần làm riêng từng cái kèm test.
+- **Đợt 2b — bỏ swarm/cron "zero-token" (chủ yêu cầu làm tiếp):** gỡ `subagent.spawn_and_poll` và `schedule.cron_and_hooks`.
+  - Lý do: dịch vụ chỉ mô phỏng. Có sẵn một lifecycle hook cài cứng (`hook-morning-digest-1`), "tiết kiệm 88 % ngữ cảnh", "Critic PASS 98 %", số token dùng đều là hằng số; không có worker thật nào chạy.
+  - `desktop/`: xoá `subagent_cron_service.dart`, 2 handler, 2 descriptor + validator, các hằng `allowedSubagent*`, `roleScopedPrimitiveAllowlist`, `allowedScheduleHookActions`, `allowedLifecycleEvents`, và `isPrimitiveAllowedForSubagentRole`/`decomposeGoalIntoSpecialistSwarm`. Manifest 68 → 66 công cụ.
+  - `backend/`: gỡ catalog/`action_summary`, **xoá endpoint `POST /v1/symbiotic/claw-mind`** cùng schema, `ClawMindReceipt` và `evaluate_claw_mind` — endpoint này trả toàn số cố định ("token_reduction 86 %", "Critic PASS 98 %", "chắt lọc 5 mục") và không client nào gọi. Giữ tolerance tiền tố `subagent`/`schedule` trong `hosts/domain/entities.py` cho host cũ.
+  - `mobile/`: xoá `spawnBackgroundSubagentAndHook` (dựng bảng canvas với kết quả bịa) và đoạn test; bỏ chữ "& Swarm" ở phụ đề Live Pill.
+  - Kiểm chứng: `xuna_xtp` analyze 0 lỗi, 29/29; desktop analyze 0 lỗi, `flutter test` 43/43; backend `ruff check` sạch, `mypy` 0 lỗi, `pytest` 577 passed / 74 skipped; mobile analyze 0 lỗi, `actions_test` vẫn 1 ca đỏ có sẵn.
+  - Phát hiện thêm (thuộc đợt 2c, chưa sửa): mobile `flushPreCompactionMemoryVault` và `captureSemanticAriaSnapshot` dựng bảng canvas với số cố định ("Tiết kiệm 86 % Token", "3 phần tử") không từ dữ liệu thật; backend còn các endpoint receipt cùng kiểu (`frontier-2026`, `claw-pulse`, `workshop-chain`, `dream-consolidate`, `social-encounters`, `forge-skill`, `unstuck-coach`, `ui-accessibility`) cần rà từng cái.
+- **Chưa làm, đợt 2c (chờ chủ):** Frontier 2026 + heartbeat canvas + ChronoGraph và các canvas/receipt dựng số cố định nói trên. Mỗi mục xuyên 3–4 repo (schema XTP, validator, handler, catalog backend, tool_names, action_summary, board slot mobile, fixture/test) và đổi hợp đồng manifest nên cần làm riêng từng cái kèm test.
 
 ## 2026-11-06 — macOS: đọc được giao diện app Electron/CEF (`desktop/`)
 
