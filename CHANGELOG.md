@@ -2,6 +2,16 @@
 
 Last updated: **2026-11-05** (Asia/Ho_Chi_Minh).
 
+## 2026-11-06 — Cộng sinh: bỏ dữ liệu bịa, đợt 1 (`desktop/`, `mobile/`)
+
+Chủ yêu cầu bỏ các tính năng vô nghĩa của Cộng sinh; chọn "bỏ nhóm bịa/giả trước" và không đụng firmware. Đợt 1 làm phần tự chứa nhất; các mục còn lại ghi ở cuối.
+
+- **`mobile/`:** xoá `seedSimulatorSymbioticStateIfEmpty` (HomeActionsService + HomeController): nó bơm giấc mơ, capsule, watchdog, bưu thiếp, mười tám mục bịa kể cả 38 hóa đơn và tổng 47,5 triệu đồng. Test SYM-LIVE nay khẳng định service mới rỗng rồi tự cấp dữ liệu thử.
+- **`system.vitals` (desktop `xuna_xtp`, handler, UI; mobile model):** trước đây mặc định pin 85 %, RAM 52 %, ổ 120 GB, `thermalState: nominal` (không hề đo nhiệt) và khi thiếu số liệu thì điền 100/50/100. Nay chỉ trả những gì đo được: `batteryPercent`/`isCharging`/`memoryUsedPercent`/`diskFreeGb` là tùy chọn (máy bàn không có pin → không có khoá pin), bỏ `thermalState`, `healthStatus` = `unknown` nếu không đo được gì; không đo được gì → lỗi `unsupported`/`vitals_unavailable`. `watchdog.watch_resource_threshold` với chỉ số không đo được → `metric_unavailable` (trước đó dùng số bịa nên test cũ "triggered" chỉ đúng nhờ pin giả 85 %). Mobile `SystemVitalsSummary` không còn mặc định 100/0/`nominal`/`healthy`.
+- **`dev.ports`:** bỏ đoán tên tiến trình từ số cổng (3000→`next-dev`, 8000→`uvicorn`…); trả `unknown` vì chưa dò chủ cổng.
+- **Kiểm chứng:** `xuna_xtp` analyze 0 lỗi, test 29/29; desktop analyze 0 lỗi, `flutter test` 43/43 (thêm 3 test fail-closed); mobile analyze 0 lỗi, `actions_test` 34 ca với 1 ca `HomeRemoteControlCard` đỏ từ trước (đã xác nhận cùng kết quả khi stash thay đổi). Chưa chạy backend pytest (máy này thiếu pytest trong Python mặc định).
+- **Chưa làm, đợt 2 (chờ chủ):** `meeting.status`/`meeting.control`/`meeting.desk_whisper_digest` (phát hiện "đang họp" chỉ bằng việc có tiến trình Zoom/Discord chạy), swarm/cron "zero-token", Frontier 2026 + heartbeat canvas + ChronoGraph. Mỗi mục xuyên 3–4 repo (schema XTP, validator, handler, catalog backend, tool_names, action_summary, board slot mobile, fixture/test) và đổi hợp đồng manifest nên cần làm riêng từng cái kèm test.
+
 ## 2026-11-06 — macOS: đọc được giao diện app Electron/CEF (`desktop/`)
 
 Triệu chứng chủ báo: mở app/project/tìm nhạc được, nhưng không bấm phát bài đã tìm, không prompt vào app kiểu Cursor/Claude/Codex. Nguyên nhân tìm thấy khi đọc `XunaHostPlugin+UiTreeScanner.swift`: không bao giờ bật accessibility cho app web-based nên cây UI rỗng/nông, ô nhập không nhãn bị bỏ, và giới hạn duyệt (500 node, sâu 8) quá nhỏ cho cây web.
