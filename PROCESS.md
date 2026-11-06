@@ -2,6 +2,37 @@
 
 Last updated: **2026-11-05** (Asia/Ho_Chi_Minh). Latest: **OpenClaw-style host control: Tool Search meta tools, 12-round agent loop with loop guard, no guessed UI refs (`backend/`, `desktop/`)**. Before that: **macOS Desktop App Launch Environment Sanitization, Full App Discovery (`app.list_allowed`) & Real On-Disk OmniForge Tool Execution (`desktop/`, `backend/`)**. Before that: **Home Screen Widget Neo-Brutalist Pixel Room Redesign & End-to-End 7 Color Themes Ecosystem Sync (`mobile/`, `firmware/`, `desktop/`, `backend/`)**, **macOS Desktop Agent XTP v1 Handshake, 71-Tool Manifest Validation & Hostname Alias Fix (`backend/`, `desktop/`, `mobile/`)**, **Flutter 3.47.9 upgrade for the iOS 26 Debug Dart VM RX/RW startup crash**, **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71)**, **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
 
+## 2026-11-06 — UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)
+
+- **Làm gì:** nút "Luôn cho phép việc này (7 ngày)" trong hộp duyệt R2 (chỉ khi backend đề nghị), mục DUYỆT TRƯỚC trên trang hosts, bảng `host_standing_approvals` (migration `0018`), route `/v1/actions/standing-approvals`. Chi tiết: [CHANGELOG 2026-11-06](CHANGELOG.md), [UDC-16 §7](docs/roadmap/device-control/UDC-16-permission-hub.md), [ADR-0014](docs/decisions/ADR-0014-standing-approvals-and-phone-sessions.md).
+- **Chưa kiểm chứng:** chưa chạy trên máy/luồng duyệt thật. Danh sách test: [checklist mục 4b](docs/roadmap/device-control/UDC-16-device-test-checklist.md). **Phạm vi thật hẹp:** chỉ `app.launch` trên chính điện thoại Android đủ điều kiện (desktop công bố `id` kiểu `pattern`, không phải `enum`). **Làm trước khi test:** chạy migration `0018` và khởi động lại backend.
+- **Lỗi có từ trước, không phải của đợt này:** `backend/tests/modules/consent/test_consent_api.py` (thiếu `hostNotifications`/`hostScreen` trong kết quả mong đợi). Cần chủ quyết định có sửa test không.
+- **Việc kế tiếp:** S16.4 (phiên điều khiển điện thoại) chờ số lần hỏi đếm trên máy thật; migration `0018` phải chạy trên DB thật trước khi dùng.
+- Chưa commit: `mobile/` và `backend/` là repo độc lập, commit từng repo rồi cập nhật gitlink ở repo cha.
+
+## 2026-11-06 — UDC-16 S16.1 + S16.2: cấp trước quyền hệ thống, gói quyền một chạm (`mobile/`)
+
+- **Làm gì:** thẻ "Quyền & kết nối" + luồng "Cấp trước các quyền cần thiết" (kiểm tra lại khi app resume); gói quyền một chạm trên sheet host, gồm gói `ui` R3 cho bản dev (trước đó app chặn mọi R3 nên tool `ui.*` Android không bao giờ được cấp). Chi tiết: [CHANGELOG 2026-11-06](CHANGELOG.md), [UDC-16 §7](docs/roadmap/device-control/UDC-16-permission-hub.md).
+- **Việc kế tiếp cho chủ:** chạy [danh sách test trên thiết bị](docs/roadmap/device-control/UDC-16-device-test-checklist.md) (điện thoại Android thật, bản dev). Đặc biệt: backend nhận grant `ui` R3, `ui.observe`/`ui.act` thật, và **đếm số lần hỏi duyệt** để quyết định S16.4.
+- **ADR:** [ADR-0014](docs/decisions/ADR-0014-standing-approvals-and-phone-sessions.md) đã viết (duyệt trước R2 + phiên điều khiển điện thoại). S16.3 làm được ngay; S16.4 chờ số lần hỏi đếm trên máy thật.
+- **Chưa làm:** code S16.3/S16.4; chip "Mở Quyền & kết nối" trong chat.
+- Chưa commit.
+
+## 2026-11-06 — Điều khiển Android observe → act → verify + kế hoạch UDC-16 (`mobile/`, `backend/`, `docs/`)
+
+- **Làm gì:** thêm `ui.observe` / `ui.act` / `ui.wait_for` cho bản dev Android (`XunaUiObserver.kt`, executor Dart, manifest, câu duyệt và prompt ở backend); bỏ toạ độ vuốt mặc định; lệnh `ui*` chạy tuần tự trên luồng nền. Chi tiết: [CHANGELOG 2026-11-06](CHANGELOG.md).
+- **Kế hoạch:** [UDC-16](docs/roadmap/device-control/UDC-16-permission-hub.md) về trang cấp quyền trước, gói quyền, duyệt trước R2 và phiên điều khiển điện thoại. S16.1–S16.2 không cần quyết định; S16.3–S16.4 cần chủ quyết định D1/D2 và sửa ADR-0012.
+- **Chưa kiểm chứng:** logic Kotlin mới chỉ biên dịch, chưa chạy trên máy bật Accessibility. Làm ngay: cài APK dev, bật dịch vụ Accessibility, thử `ui.observe` rồi `ui.act` trên một app thường.
+- Chưa commit. `mobile/` và `backend/` là repo độc lập: commit ở từng repo trước, rồi cập nhật gitlink ở repo cha.
+
+## 2026-11-06 — Widget màn hình chính: giao diện phẳng, nút ghim, ghi chú/tiến độ "chưa đặt" (`mobile/`)
+
+- **Làm gì:** widget Android/iOS bỏ gradient sang thẻ giấy + viền mực; thêm nút "Ghim widget ra màn hình chính" trong sheet cấu hình; ghi chú và tiến độ có thể chưa đặt thay vì số/câu bịa; sửa build dev (`XunaDevAccessibilityBridge`); debug build tắt Impeller. Chi tiết: [CHANGELOG 2026-11-06](CHANGELOG.md).
+- **Việc kế tiếp cho chủ:** thêm widget trên máy có launcher hỗ trợ (Pixel/máy thật) và xem hình dạng thật; biên dịch Swift trên Mac (`XunaWidget.swift`, `XunaIosHostPlugin.swift` chưa build).
+- **Bẫy:** build Android bằng Flutter 3.32.8 (`C:/Users/Thao/fvm/versions/3.32.8/bin/flutter.bat`), không dùng `fvm flutter` (đổi `local.properties`, thêm migrator vào `gradle.properties`).
+- **Di trú:** tiến độ widget lưu từ bản cũ bị bỏ một lần (`widgetPayloadSchema: 2`).
+- Chưa commit (chờ chủ yêu cầu). `mobile/` là repo độc lập: commit ở đó trước, rồi cập nhật gitlink ở repo cha.
+
 ## 2026-11-05 — OpenClaw-style host control, giai đoạn 1–2 (`backend/`, `desktop/`)
 
 - **Yêu cầu của chủ:** XUNA điều khiển thiết bị trong hệ sinh thái đa năng như Clawdbot/OpenClaw; chọn hướng "áp dụng thiết kế OpenClaw vào code XUNA" (không chạy OpenClaw làm bộ não). OpenClaw được clone vào scratchpad để đọc thiết kế (`docs/concepts/agent-loop.md`, `docs/tools/tool-search.md`, `docs/nodes/computer-use.md`, `src/agents/tools/nodes-tool.ts`); không chép code.

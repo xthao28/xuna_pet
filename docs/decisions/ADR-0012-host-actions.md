@@ -1,6 +1,6 @@
 # ADR-0012 — Host actions and closed board actuation exceptions
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30), not Implemented.** Amends [backend/AGENTS.md](../../backend/AGENTS.md) §1.4 and extends [ADR-0008](ADR-0008-cloud-brain-authority-and-identity.md).
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30), not Implemented.** Decision 1's `owner approval (R2+)` step is amended by [ADR-0014](ADR-0014-standing-approvals-and-phone-sessions.md) (standing approvals for exactly-constrained R2 calls; phone control sessions). Amends [backend/AGENTS.md](../../backend/AGENTS.md) §1.4 and extends [ADR-0008](ADR-0008-cloud-brain-authority-and-identity.md).
 
 ## Context
 

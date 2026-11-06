@@ -57,7 +57,7 @@ flowchart LR
 |---|---|---|
 | **R0** observe-meta | `host.status`, `media.now_playing` (title only if U6/U5 not needed) | Granted with the host; no approval |
 | **R1** reversible, low impact | Play/pause, next, volume, show a local notification, focus an allowlisted app | Grant per family; no per-action approval; rate-limited |
-| **R2** visible effect, recoverable | Launch allowlisted app, open https URL on allowlisted domain, run a workflow marked R2, screen capture/UI inspect (also needs U5) | Grant + **approval per action** by default; owner may allow "approve for this conversation (≤ 15 min)" |
+| **R2** visible effect, recoverable | Launch allowlisted app, open https URL on allowlisted domain, run a workflow marked R2, screen capture/UI inspect (also needs U5) | Grant + **approval per action** by default; owner may allow "approve for this conversation (≤ 15 min)"; or, for exactly-constrained calls only, a phone-signed standing approval ([ADR-0014](../decisions/ADR-0014-standing-approvals-and-phone-sessions.md)) |
 | **R3** consequential | Typing text, clicking in another app, file open/reveal, workflows marked R3, any step in a computer-use session that sends, buys, deletes, posts or submits | Grant + **approval per action, never batched**; approval shows host, app, exact text/target |
 | **R4** forbidden | Shell/script execution, credential or 2FA entry, password managers, security/privacy settings, installing software, elevated/admin actions, disabling protections, banking/payment confirmation | Not implementable; the tool does not exist |
 

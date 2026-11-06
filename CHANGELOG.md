@@ -1,6 +1,75 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-05** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-06** (Asia/Ho_Chi_Minh).
+
+## 2026-11-06 — UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)
+
+- **Làm gì:** XUNA hỏi một việc R2 (ví dụ mở một ứng dụng) thì hộp duyệt có nút **"Luôn cho phép việc này (7 ngày)"**. Bấm thì việc chạy lần này, và 7 ngày tới đúng việc đó (cùng máy, cùng tham số) chạy mà không hỏi. Trang Máy tính của bạn có mục **DUYỆT TRƯỚC** để xem hạn, số lần dùng và thu hồi.
+- **An toàn:** chỉ R2; công cụ không đọc màn hình; không thuộc nhóm `ui`/`cu`/`input`/`screen`; mọi tham số chuỗi phải thuộc một `enum` đóng trong schema của chính công cụ, nên việc dùng chữ tự do (`url.open`, `media.play_search`) **không** được duyệt trước. Mỗi mục do khoá điện thoại ký (`xuna.preapproval.v1`), backend kiểm bằng bộ kiểm P-256 thật và từ chối nếu thiếu bộ kiểm. Dừng khẩn cấp hoặc "Tạm khoá" làm mục vô hiệu vì quyền bị khoá trước khi tới bước duyệt. Gỡ ứng dụng khỏi danh sách cho phép thì mục không còn khớp. Audit không lộ nội dung.
+- **Backend:** bảng `host_standing_approvals` (migration `0018`), 3 route `/v1/actions/standing-approvals`, kiểm tra trong bộ điều phối, sự kiện chờ duyệt kèm gợi ý `standing` chỉ khi đủ điều kiện.
+- **Kiểm chứng:** backend `ruff check` và `mypy` sạch; `pytest` có PostgreSQL cục bộ: 685 qua, **1 lỗi có từ trước** (`tests/modules/consent/test_consent_api.py`: phản hồi `/v1/consents` đã có thêm `hostNotifications` và `hostScreen` từ UDC-8 mà test chưa cập nhật, không liên quan thay đổi này); migration `0018` chạy được lên và vòng upgrade/downgrade trong bộ test qua. Mobile `flutter analyze` sạch, `flutter test` 490/490 (có vector vàng so khớp từng byte với backend).
+- **Lưu ý diff:** lúc chạy `ruff format` trên thư mục `actions` của backend, 5 file cũ (`code_synthesizer.py`, `computer_use.py`, `target_resolver.py`, `brokers.py`, `repository.py`) bị định dạng lại (11 dòng thêm, 34 dòng bớt, chỉ định dạng). Mình không hoàn lại được vì lệnh `git checkout` bị chặn; bạn có thể `git checkout --` 5 file đó nếu không muốn giữ.
+- **Phạm vi thật (đọc kỹ):** hiện chỉ việc `app.launch` **trên chính điện thoại Android** đủ điều kiện, vì manifest Android đưa danh sách ứng dụng cho phép thành `enum`. Agent desktop công bố `app.launch` với `id` là chuỗi có `pattern` (không phải `enum`) nên PC chưa được duyệt trước; `url.open`, `media.play_search` và `ui.*` cũng không. Nên đợt này **giảm số lần hỏi rất ít**; muốn giảm nhiều cần phiên điều khiển (S16.4) hoặc cho desktop công bố `enum`.
+- **Kiểm chứng thêm:** có 2 test PostgreSQL thật cho kho SQL (`consume_match` dùng `FOR UPDATE`: 6 truy cập đồng thời chỉ 1 cái thắng lần dùng cuối; lọc hạn, số lần dùng, thu hồi, tách theo chủ). Mobile 490+ test qua.
+- **Chưa đạt hết ADR-0014 D1:** chưa có bộ giới hạn tần suất riêng (chỉ có trần số lời gọi mỗi lượt), chỉ backend kiểm chữ ký chứ agent chưa kiểm; hạn và số lần dùng cố định ở app (7 ngày, không giới hạn lần) dù API hỗ trợ cả hai. Hộp duyệt đã hiện đúng tool và tham số sẽ ký.
+- **Phải làm trước khi test tối nay:** chạy migration `0018` trên DB thật rồi khởi động lại backend.
+- **Chưa chạy:** chưa thử trên điện thoại hay luồng duyệt thật; iOS chưa thử; chưa commit. Chi tiết và danh sách test: [UDC-16](docs/roadmap/device-control/UDC-16-permission-hub.md), [checklist mục 4b](docs/roadmap/device-control/UDC-16-device-test-checklist.md).
+
+## 2026-11-06 — ADR-0014: duyệt trước và phiên điều khiển điện thoại (`docs/`)
+
+- **Làm gì:** viết [ADR-0014](docs/decisions/ADR-0014-standing-approvals-and-phone-sessions.md) sửa bước "chủ duyệt R2+" của ADR-0012 theo hai quyết định chủ đã giao cho khuyến nghị:
+  - **D1, duyệt trước:** chỉ R2, không đọc nội dung, mọi tham số cố định đúng giá trị (không văn bản tự do, không ký tự đại diện); mặc định 7 ngày, tối đa 30; **tạo bằng chữ ký khoá điện thoại** để backend bị chiếm cũng không tự tạo được; "Tạm khoá" và E-Stop vô hiệu hoá; có kiểm toán không lộ nội dung.
+  - **D2, phiên điều khiển điện thoại (chỉ bản dev):** một lần duyệt R3 có ký cho mục tiêu + danh sách app + ngân sách bước/phút + heartbeat. Trong phiên, thao tác điều hướng thường không hỏi lại; `set_text` và mọi thao tác phía "gửi/xoá/mua/thanh toán/đăng/xác nhận" hoặc **không phân loại được** vẫn hỏi từng lần. Việc phân loại nằm ở adapter Android, mặc định chặt (không rõ = R3).
+- **Điều kiện:** D1 có thể làm ngay (S16.3). D2 (S16.4) chờ số lần hỏi đếm được trên máy thật (checklist mục 5).
+- **Đã sửa kèm:** README roadmap thiết bị §1.7, đầu ADR-0012, danh sách ADR, UDC-16. Chưa viết code backend/mobile cho hai phần này. Chưa commit.
+
+## 2026-11-06 — UDC-16 S16.2: gói quyền một chạm + mở đường cấp quyền `ui` R3 (`mobile/`)
+
+- **Làm gì:** sheet chi tiết host có mục "Gói quyền một chạm": **Nghe nhạc** (media R1), **Trợ lý cơ bản** (media R1 + ứng dụng R2 + liên kết R2, 1 ngày), **Điều khiển giao diện (Dev)** (nhóm `ui` mức R3, 1 giờ; chỉ hiện cho điện thoại này ở bản có Trợ năng, không bao giờ ở bản `play`). Bấm gói hiện hộp xác nhận liệt kê đúng những gì sẽ đổi và câu "R2 trở lên vẫn hỏi duyệt"; gói đã bật sẵn thì báo vậy và không gửi gì.
+- **Lỗi phát hiện và sửa:** app chặn mọi quyền R3 và sheet chỉ có 4 nhóm quyền, nên các tool `ui.*` của Android (R3, nhóm `ui`) **không bao giờ được cấp để model thấy**. `SetHostGrantsUseCase` nay cho phép R3 riêng cho nhóm `ui`; nhóm khác vẫn tối đa R2. Cấp quyền chỉ làm tool đủ điều kiện, mỗi lệnh R3 vẫn cần duyệt riêng. Backend vốn nhận R3, nhưng đường này chưa chạy đầu cuối.
+- **Kiểm chứng:** `flutter analyze` sạch; `flutter test` 469/469 (11 test mới: kế hoạch gói, quy tắc R3 chỉ cho `ui`, luồng xác nhận, ẩn/hiện gói theo bản build, nút trên sheet).
+- **Danh sách việc cần test tối nay:** [UDC-16-device-test-checklist.md](docs/roadmap/device-control/UDC-16-device-test-checklist.md).
+- **Chưa chạy:** chưa thử trên điện thoại thật; chưa kiểm backend nhận grant `ui` R3 đầu cuối; chưa commit.
+
+## 2026-11-06 — UDC-16 S16.1: cấp trước quyền hệ thống Android, kiểm tra lại khi quay về app (`mobile/`)
+
+- **Làm gì:** trên trang "Máy tính của bạn", sau khi điện thoại đã đăng ký làm host, có thẻ "Quyền & kết nối" liệt kê quyền còn thiếu của bản đang chạy (truy cập thông báo, liên kết thiết bị đồng hành, Trợ năng chỉ ở bản dev) và nút "Cấp trước các quyền cần thiết". Nút đi lần lượt từng quyền: hiện lời giải thích, mở màn hình hệ thống, kiểm tra lại khi bạn quay về rồi sang quyền kế tiếp. Nếu quay về mà chưa cấp thì dừng và nói rõ quyền nào còn thiếu; huỷ lời giải thích thì kết thúc luồng.
+- **Sửa kèm:** app giờ kiểm tra lại trạng thái thật mỗi khi quay về từ màn hình cài đặt, nên trạng thái quyền không còn hiển thị cũ. Lời giải thích quyền Trợ năng được cập nhật cho khớp `ui.observe`/`ui.act`.
+- **Kiểm chứng:** `flutter analyze` sạch; `flutter test` 458/458 (13 test mới: luật lập thứ tự quyền, luồng cấp trước, quay về không cấp, huỷ, resume ngoài luồng, thẻ giao diện).
+- **Chưa làm / chưa chạy:** chưa chạy trên điện thoại thật nên chưa thấy hành vi thật của các màn hình hệ thống khi quay về; chưa có chip "Mở Quyền & kết nối" trong khung chat khi tool trả `permission_denied`; chưa có trang hub riêng. D1/D2 (duyệt trước R2, phiên điều khiển) chủ đã giao cho khuyến nghị nhưng chưa viết bản sửa ADR-0012 nên S16.3/S16.4 chưa bắt đầu. Chưa commit.
+
+## 2026-11-06 — Điều khiển Android: quan sát → hành động → xác minh (`ui.observe`/`ui.act`/`ui.wait_for`) + kế hoạch UDC-16 (`mobile/`, `backend/`, `docs/`)
+
+- **Làm gì (bản dev của Android):**
+  - `ui.observe` trả `snapshotId` và `ref` cho từng phần tử trên màn hình; ô mật khẩu/OTP bị che và không có `ref` nên không thể nhắm tới.
+  - `ui.act` chỉ nhận `ref` của snapshot hiện hành (activate, long_press, set_text, scroll, swipe trong vùng của phần tử, hoặc back/home/recents/notifications). Snapshot cũ, app đổi hoặc phần tử không còn khớp thì bị từ chối (`target_stale`, `package_changed`), không tự đoán lại theo chữ.
+  - Sau mỗi hành động app đọc lại màn hình: chỉ báo `ok` khi màn hình thật sự đổi; nếu hệ thống nhận lệnh mà màn hình không đổi thì trả `failed/no_visible_change` kèm màn hình mới. `set_text` đọc lại giá trị trong ô.
+  - `ui.wait_for` chờ có hạn (≤ 15 s) cho chữ hiện ra hoặc app vào foreground, hết giờ trả `timeout`.
+  - Toạ độ vuốt chỉ lấy từ khung của phần tử trong snapshot. `ui.swipe_drag` cũ không còn tự điền toạ độ mặc định (cả phía Dart lẫn Kotlin) mà trả `invalid_args`.
+  - Mọi lệnh `ui*` chạy tuần tự trên một luồng nền: trước đây chờ kết quả cử chỉ ngay trên luồng chính nên có thể treo và báo sai.
+- **Câu duyệt nêu đúng phần tử:** `activate`, `long_press`, `set_text` bắt buộc kèm `label` (chữ nhìn thấy của phần tử). Điện thoại kiểm tra phần tử (hoặc con ngay bên dưới) thật sự mang nhãn đó, không thì từ chối `target_mismatch`; nút bị vô hiệu bị từ chối. Câu duyệt hiện "Chạm vào 'Gửi'" hoặc "Nhập 'nhạc chill' vào 'Tìm kiếm'" thay vì "e3". Cửa sổ chờ xác minh sau hành động ~1,35 s.
+- **Backend:** thêm tên tool vào thứ tự ưu tiên của catalog, câu duyệt (vi/en, có test) và mô-đun prompt Observe→Act→Verify cho Android. Tool vẫn đến từ manifest của host, backend không có danh sách cứng.
+- **Số lần hỏi chủ KHÔNG giảm đợt này, mà tăng:** `ui.act` là R3 (duyệt từng hành động, ADR-0012) và `ui.observe`/`ui.wait_for` là R2, nên một việc 5 bước có thể hỏi khoảng 6 lần. Chỉ phiên điều khiển (UDC-16 phần D, cần chủ quyết định D2) mới gộp thành một lần duyệt. Bản `play` không có và không quảng cáo các tool này.
+- **Chưa kiểm:** kích thước kết quả (tối đa 150 phần tử, mặc định 60) so với giới hạn khung host 128 KB và việc cắt bớt trước khi tới LLM chưa được thử đầu cuối; `/v1/actions/{id}/result` không thấy giới hạn riêng nhưng chưa thử.
+- **Tham khảo:** mẫu observe/act/`snapshotId` của OpenClaw (MIT), viết lại theo mẫu chứ không sao chép mã.
+- **Kế hoạch quyền:** [UDC-16](docs/roadmap/device-control/UDC-16-permission-hub.md) (chưa code): trang "Quyền & kết nối" để cấp trước quyền hệ thống, gói quyền một chạm, duyệt trước cho hành động R2 có tham số cố định, và phiên điều khiển điện thoại (một lần duyệt cho cả chuỗi). Hai phần sau đổi một quy tắc bảo mật nên cần chủ quyết định D1/D2.
+- **Kiểm chứng:** `flutter analyze` sạch; `flutter test` 445/445 (8 test mới cho observe/act/wait/nhãn); Kotlin hai flavor `play` và `dev` biên dịch được (`BUILD SUCCESSFUL`, không có lỗi `e:`); backend `ruff check` + `mypy` sạch, `pytest` 577 qua / 74 bỏ qua (cần DB).
+- **Chưa chạy:** chưa thử trên máy hay emulator có bật Accessibility (logic `XunaUiObserver.kt` chỉ được biên dịch, chưa có test Kotlin); chưa build/cài APK dev; backend `ruff format --check` báo 41 file test cũ chưa format (có trước, không đụng tới); chưa commit.
+
+## 2026-11-06 — Widget màn hình chính: giao diện phẳng, nút ghim, bỏ ghi chú/tiến độ bịa (`mobile/`)
+
+Chủ báo widget ngoài app "xấu, khó nhìn vì nền gradient"; sau đó yêu cầu thêm nút ghim widget và thiết kế lại nút đó, rồi sửa các giá trị bịa còn sót.
+
+- **Giao diện (Android + iOS):** bỏ gradient. Thẻ nền giấy `#FBF7EC`, viền mực `#151515`, bóng cứng lệch 4dp (chỉ Android; WidgetKit cắt bóng ở mép), nút lime/hồng viền mực, chữ mực. Phòng của XUNA dùng màu nền theo theme, thanh tiến độ ô đầy viền mực. Phần xem trước trong sheet cấu hình cũng chuyển sang `AppInkCard` phẳng, dùng token.
+- **Nút "Ghim widget ra màn hình chính"** (sheet Thiết bị → Cấu hình Widget): kênh native `pinHomeWidget` gọi `AppWidgetManager.requestPinAppWidget`. `requested` chỉ nghĩa là launcher đã nhận yêu cầu và hiện hộp xác nhận; launcher không hỗ trợ → `unsupported` (app hiện hướng dẫn thêm từ menu Widgets); lỗi → `failed`; iOS/test → `unsupported`. Chuỗi mới trong `home_widgetPin*` (vi/en).
+- **Bỏ giá trị bịa:** ghi chú tủ lạnh và tiến độ nay có thể "chưa đặt" (`null`). Bỏ câu mặc định "Nhớ uống nước và hít thở 4-7-8…" (shortcut 4-7-8 đã gỡ từ trước), bỏ tiến độ mặc định 88 %/100 %, bỏ `updatedAtIso` giả của trạng thái khởi tạo, bỏ tiến độ cố định 80/25/100 mà shortcut Nựng/Pocket, mục tiêu 5 phút và "ngủ ngon" từng ghi. Widget chưa có ghi chú hiện "Chưa có ghi chú", chưa có tiến độ thì ẩn thanh. Giữ nguồn thật: tiến độ từ phiên focus đang chạy, ghi chú từ serendipity/bưu thiếp. Sheet chỉ gửi tiến độ khi người dùng kéo thanh trượt.
+- **Di trú một lần:** payload widget lưu có `widgetPayloadSchema: 2`. Dữ liệu cũ (không có dấu) bị bỏ `progressPercent` một lần vì bản cũ luôn ghi một giá trị (100 gieo sẵn hoặc giá trị thanh trượt gửi mỗi lần lưu) — không phân biệt được với lựa chọn thật. Câu mặc định cũ trong Hive/SharedPreferences/snapshot iOS được coi là rỗng. Hệ quả: ai từng chọn tiến độ thật ở bản cũ phải chọn lại. Native `remove()` khoá khi `null` để giá trị cũ không nằm lại.
+- **Sửa build dev:** `XunaDevAccessibilityBridge` gọi các hàm `execute*` đã bị xoá sau refactor `6394e07`; viết lại trên `clickNodeByText`, `inspectUiTree`, `inputTextIntoFocusedOrEditableField`, `scrollActiveContainer`, thêm `XunaAccessibilityGestureExecutor.swipeBetween`. Trả `status: ok` chỉ khi service báo hiệu ứng xảy ra.
+- **Debug build tắt Impeller** (`src/debug/AndroidManifest.xml`): Impeller/Vulkan trên emulator LDPlayer làm app kẹt ở màn splash native (không có lỗi Dart). Release giữ mặc định. Muốn bật lại trong debug: xoá khối `EnableImpeller`.
+- **Bẫy môi trường:** `fvm flutter` (3.47.9) ghi đè `android/local.properties` và thêm hai dòng migrator vào `android/gradle.properties`, trong khi Gradle 8.11.1 của dự án chỉ chạy với Flutter 3.32.8 (SDK IDE đặt trong `.vscode/settings.json`). Build bằng `C:/Users/Thao/fvm/versions/3.32.8/bin/flutter.bat`. Đã hoàn tác dòng migrator.
+- **Kiểm chứng:** `analyze lib test` 0 lỗi; toàn bộ `flutter test` 436/436 qua (chạy lại sau lần sửa cuối); build APK debug cả `play` và `dev` OK; cài lên LDPlayer, mở sheet, thấy nút mới, bản xem trước phẳng, "Chưa có ghi chú"; bấm ghim ra đúng thông báo "launcher không hỗ trợ".
+- **Chưa kiểm chứng:** hộp xác nhận ghim thật và hình dạng widget thật trên launcher có menu Widgets (LDPlayer không có; emulator `Pixel_8` đã thử bật nhưng không lên trong `adb`); **Swift** (`XunaWidget.swift`, `XunaIosHostPlugin.swift`) đã sửa nhưng chưa biên dịch; chưa chạy trên máy iOS.
+- **Đã xử lý tiếp:** ô ghi chú để trống giờ xoá ghi chú đã lưu (null vẫn giữ nguyên; có test); bỏ nút chat "Hít thở 4-7-8"; `uiSwipeDrag` thiếu toạ độ thì trả `failed/invalid_arguments` thay vì vuốt `300/600/300/250` (H3). `flutter analyze` sạch, `flutter test` 437/437, Kotlin hai flavor biên dịch được. Chưa commit.
 
 ## 2026-11-06 — Cộng sinh: bỏ dữ liệu bịa, đợt 1 (`desktop/`, `mobile/`)
 

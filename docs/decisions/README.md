@@ -27,6 +27,7 @@ Created 2026-10-12 for the documentation direction update; S02 documentation del
 | UDC track and decisions R1–R8, UDC-D1…D11 ([roadmap §3](../roadmap/XUNA_UNIVERSAL_DEVICE_CONTROL_ROADMAP.md#3-owner-decisions-2026-10-30)) | Approved (UDC-0/1 only); not Implemented | 2026-10-30, owner |
 | [ADR-0012 host actions and closed board actuation exceptions](ADR-0012-host-actions.md) (amends [backend/AGENTS.md](../../backend/AGENTS.md) §1.4) | Approved (owner 2026-10-30), not Implemented | 2026-10-30, owner R1 / UDC-D6 / UDC-D7 |
 | [ADR-0013 host identity (`HostId`) and host sessions](ADR-0013-host-identity-and-sessions.md) | Approved (owner 2026-10-30), not Implemented | 2026-10-30, owner R3 / R4 / UDC-D10 |
+| [ADR-0014 standing approvals and phone control sessions](ADR-0014-standing-approvals-and-phone-sessions.md) (amends [ADR-0012](ADR-0012-host-actions.md) decision 1) | Approved (owner delegation 2026-11-06); D1 Implemented (host-verified, not run on a device); D2 not Implemented, gated on device prompt count | 2026-11-06, owner UDC-16 D1/D2 |
 | D5 learnable actions (idle, happy, curious) and GPIO0 `button_greeting` context | Approved; day parts per S10 | 2026-10-15, AGENTS §3 |
 | D3 feedback window 120 s; direct input invalidates the pending reaction | Approved | 2026-10-15, AGENTS §3 |
 | D4 exploration = E10 UCB, labelled in "Why?" · D6 implicit feedback off · Layer A vi-first, "mình – bạn", follow-up for missing context, S22 phrase table | Approved | 2026-10-15, AGENTS §3, [S22 packet](../roadmap/sessions/S22-decision-packet-2026-10-15.md) |

@@ -53,6 +53,7 @@ This folder is written so that **any coding agent or engineer** (including a mod
 | [UDC-13-ambient-copilot-beam.md](UDC-13-ambient-copilot-beam.md) | Seamless Ambient Co-Pilot: Instant Active-Window Context (`window.active_context`), Semantic Browser Snapshot (`browser.read_page`), XUNA Beam Peer-to-Peer LAN Transfer (`beam.transfer`), Atomic Batch Steps (`workflow.batch_steps`) & Reversible Action Undo (`action.undo`) | **S13.1–S13.5 Done 2026-10-31 ([results](UDC-13-results-2026-10-31.md)); live LAN Peer-to-Peer Beam & desktop Accessibility trial pending** |
 | [UDC-14-smart-tv-home-bridge.md](UDC-14-smart-tv-home-bridge.md) | Zero-Config Smart TV LAN Bridge (`tv.list_devices`, `tv.control`, `tv.launch_app`, `tv.cast_media`), Cross-Screen Cast (`cast_to_tv`) & Smart Home Room Scenes (`smarthome.list_entities`, `smarthome.control`, `cinema_mode`, `goodnight_mode`) | **S14.1–S14.5 Done 2026-10-31 ([results](UDC-14-results-2026-10-31.md)); live LAN Smart TV & Home Assistant hardware trial pending** |
 | [UDC-15-symbiotic-copilot.md](UDC-15-symbiotic-copilot.md) | Live Symbiotic Co-Pilot: Write-to-Clipboard Bridge (`clipboard.write`), Meeting & Mic Controller (`meeting.status`, `meeting.control`, `meeting_ready`), Localhost Dev-Port Doctor & Cross-Device LAN Preview (`dev.ports`, `preview_on_phone`), System Vitals (`system.vitals`) & Morning Standup Workflow (`daily_standup`) | **S15.1–S15.5 Done 2026-10-31 ([results](UDC-15-results-2026-10-31.md)); live desktop/phone symbiotic workflow trial pending** |
+| [UDC-16-permission-hub.md](UDC-16-permission-hub.md) | Permission Hub ("Quyền & kết nối"), grant profiles, standing approvals for exactly-constrained R2 actions, Android phone control sessions (reuses UDC-8 sessions) | **S16.1, S16.2 and S16.3 (D1) implemented and host-verified 2026-11-06, none run on a device; S16.4 (phone sessions, D2) not started and gated on the device prompt count; [ADR-0014](../../decisions/ADR-0014-standing-approvals-and-phone-sessions.md)** |
 
 Background (read once): [research](../../research/XUNA_UNIVERSAL_DEVICE_CONTROL_RESEARCH.md) · [architecture](../../architecture/XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) · [security](../../architecture/XUNA_DEVICE_CONTROL_SECURITY.md) · [capability matrix](../../research/XUNA_PLATFORM_CAPABILITY_MATRIX.md) · [open-source review](../../research/XUNA_DEVICE_CONTROL_OPEN_SOURCE_REVIEW.md).
 
@@ -82,7 +83,7 @@ Background (read once): [research](../../research/XUNA_UNIVERSAL_DEVICE_CONTROL_
    - nothing runs elevated, and no `uiAccess`;
    - no Accessibility in the Play build;
    - the model never sends keyboard text or pointer reports to the board;
-   - every R2+ action needs an owner approval bound to its arguments;
+   - every R2+ action needs an owner approval bound to its arguments (per action, per conversation scope, or, only for exactly-constrained R2 calls and phone control sessions, one given in advance as defined in [ADR-0014](../../decisions/ADR-0014-standing-approvals-and-phone-sessions.md));
    - logs are content-free.
 8. **Device authority:** host actions never change the board's needs, drives, personality, learning or snapshot (UDC-D7). Board feedback is expression only: the Track A preview and subtitles.
 9. **Backward compatibility:**
@@ -150,12 +151,12 @@ Reserve IDs here before using them; never reuse an ID. Normative definitions liv
 |---|---|---|
 | ADRs | **ADR-0012** host actions as a model-tool class (amends backend AGENTS §1.4) · **ADR-0013** host identity (`HostId`) and host sessions | UDC-0 |
 | Modules | `hosts` (registry, enrollment, sessions, grants) · `actions` (orchestrator, approvals) | UDC-3 / UDC-4 |
-| Migrations | next free numbers after `0012_knowledge_documents.py`: `0013_hosts`, `0014_host_grants`, `0015_action_approvals` (renumber if others land first) | UDC-3 / UDC-4 |
+| Migrations | next free numbers after `0012_knowledge_documents.py`: `0013_hosts`, `0014_host_grants`, `0015_action_approvals` (renumber if others land first) · `0018_standing_approvals` (UDC-16 S16.3, ADR-0014) | UDC-3 / UDC-4 |
 | Consent classes | `host_screen` (U5), `host_notifications` (U6) added to `ConsentClass` | UDC-0 records; code in UDC-5/UDC-8 |
-| Audit actions | `host.enrolled`, `host.enroll_rejected`, `host.revoked`, `host.connected`, `host.rejected`, `host.grant_changed`, `host.tool_invoked`, `host.tool_denied`, `host.approval_granted`, `host.approval_rejected`, `host.stopped`, `board.hid_requested` | UDC-3 / UDC-4 / UDC-7 |
+| Audit actions | `host.enrolled`, `host.enroll_rejected`, `host.revoked`, `host.connected`, `host.rejected`, `host.grant_changed`, `host.tool_invoked`, `host.tool_denied`, `host.approval_granted`, `host.approval_rejected`, `host.preapproval_created`, `host.preapproval_used`, `host.preapproval_revoked` (UDC-16 S16.3), `host.stopped`, `board.hid_requested` | UDC-3 / UDC-4 / UDC-7 |
 | Proof purpose | Host proof uses its own domain `b"xuna.host.proof.v1\x00"` (not `ProofPurpose`, which is device-only) | UDC-3 |
-| Routes | `GET /v1/hosts/connect` (WebSocket) · `POST /v1/hosts` (claim enrollment) · `POST /v1/hosts/{hostId}/confirm` · `GET /v1/hosts` · `DELETE /v1/hosts/{hostId}` · `PUT /v1/hosts/{hostId}/grants` (UDC-3) · `POST /v1/actions/approvals/{approvalId}` · `POST /v1/actions/{invocationId}/result` (UDC-4) · `POST /v1/hosts/self/challenge` · `POST /v1/hosts/self` (UDC-5) · `POST /v1/actions/stop` (UDC-7) · `POST /v1/actions/sessions/{id}/heartbeat` (UDC-8) · `POST /v1/actions/workflow-trigger` (UDC-9) | UDC-3…UDC-9 |
-| Turn events | `action_pending`, `board_hid_request`, `action_result` (UDC-4) · `local_action_request` (UDC-5) · `progress` for computer-use sessions (UDC-8) | UDC-4…UDC-8 |
+| Routes | `GET /v1/hosts/connect` (WebSocket) · `POST /v1/hosts` (claim enrollment) · `POST /v1/hosts/{hostId}/confirm` · `GET /v1/hosts` · `DELETE /v1/hosts/{hostId}` · `PUT /v1/hosts/{hostId}/grants` (UDC-3) · `POST /v1/actions/approvals/{approvalId}` · `POST /v1/actions/{invocationId}/result` (UDC-4) · `POST /v1/hosts/self/challenge` · `POST /v1/hosts/self` (UDC-5) · `POST /v1/actions/stop` (UDC-7) · `POST /v1/actions/sessions/{id}/heartbeat` (UDC-8) · `POST /v1/actions/workflow-trigger` (UDC-9) · `POST` / `GET` / `DELETE /v1/actions/standing-approvals[/{id}]` (UDC-16 S16.3) | UDC-3…UDC-9 |
+| Turn events | `action_pending` (optional `standing: {tool, arguments}` only when the call can be pre-approved, UDC-16 S16.3), `board_hid_request`, `action_result` (UDC-4) · `local_action_request` (UDC-5) · `progress` for computer-use sessions (UDC-8) | UDC-4…UDC-8 |
 | Turn capability flag | `TurnBody.clientCapabilities: ["host_actions_v1", "board_hid_v1"]`; tools are offered only when present | UDC-4 |
 
 ### 2.3 Desktop / XTP
