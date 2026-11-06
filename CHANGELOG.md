@@ -2,6 +2,17 @@
 
 Last updated: **2026-11-06** (Asia/Ho_Chi_Minh).
 
+## 2026-11-06 — Gia cố điều khiển UI trên máy tính: bỏ đoán mục tiêu và dữ liệu bịa (`desktop/`)
+
+- **Làm gì:** rà soát điều khiển desktop (có tham khảo OpenClaw) và vá các chỗ XUNA có thể làm việc sai mà vẫn báo thành công. Không có tính năng mới.
+- **Quan trọng nhất:** `ui.accessibility_tree` trước đây cho phép bấm, gõ chữ, đóng cửa sổ mà **không cần bạn duyệt**. Giờ tool này chỉ còn **đọc** (`inspect_window`). Muốn bấm hay gõ, XUNA phải dùng phiên điều khiển máy tính (`input.*`) mà bạn đã duyệt trên điện thoại.
+- **Hết đoán mục tiêu:** bấm theo toạ độ không còn rơi vào "nút đầu tiên" (có thể là nút đóng cửa sổ); thiếu mục tiêu thì báo lỗi.
+- **Hết số liệu bịa:** `lockScreen`/`displayWake` không tự báo "xong" khi máy không trả lời; quyền hệ thống đọc lỗi thì báo "chưa biết" thay vì "đã cấp"; công cụ tự rèn (OmniForge) chỉ báo số tệp đo được trên đĩa, không còn "34 CV, điểm 92/100" dựng sẵn; bỏ con số "tiết kiệm 92% token" không đo được; bỏ 4 control giả.
+- **Sửa lệch:** quét UI tối đa 60 phần tử (bằng giới hạn thật của bước bấm; trước đó 80 nên 20 phần tử được đưa ra mà không bấm được).
+- **Kiểm chứng:** `flutter analyze` 0 lỗi, `flutter test` 49 qua, `xuna_xtp` 29 qua. **Chưa chạy** trên Windows/macOS thật, chưa thử phiên điều khiển có duyệt từ điện thoại.
+- **Còn lại:** macOS còn ép "đã cấp quyền Trợ năng" (cần Mac để sửa); Windows còn gõ nhầm vào ô nhập đầu tiên khi mất đích và ref chỉ là số thứ tự (cần máy Windows). [kết quả chi tiết](docs/roadmap/device-control/desktop-control-hardening-results-2026-11-06.md).
+- **Commit:** `desktop/` `2d8e690`, `7709f5b`, `2327bca`, `248f402`, `f038e43`.
+
 ## 2026-11-06 — UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)
 
 - **Làm gì:** XUNA hỏi một việc R2 (ví dụ mở một ứng dụng) thì hộp duyệt có nút **"Luôn cho phép việc này (7 ngày)"**. Bấm thì việc chạy lần này, và 7 ngày tới đúng việc đó (cùng máy, cùng tham số) chạy mà không hỏi. Trang Máy tính của bạn có mục **DUYỆT TRƯỚC** để xem hạn, số lần dùng và thu hồi.

@@ -2,13 +2,21 @@
 
 Last updated: **2026-11-05** (Asia/Ho_Chi_Minh). Latest: **OpenClaw-style host control: Tool Search meta tools, 12-round agent loop with loop guard, no guessed UI refs (`backend/`, `desktop/`)**. Before that: **macOS Desktop App Launch Environment Sanitization, Full App Discovery (`app.list_allowed`) & Real On-Disk OmniForge Tool Execution (`desktop/`, `backend/`)**. Before that: **Home Screen Widget Neo-Brutalist Pixel Room Redesign & End-to-End 7 Color Themes Ecosystem Sync (`mobile/`, `firmware/`, `desktop/`, `backend/`)**, **macOS Desktop Agent XTP v1 Handshake, 71-Tool Manifest Validation & Hostname Alias Fix (`backend/`, `desktop/`, `mobile/`)**, **Flutter 3.47.9 upgrade for the iOS 26 Debug Dart VM RX/RW startup crash**, **Zero-Screenshot Native OS UI Automation (`UIA-1`–`UIA-4` / `ui.accessibility_tree`, Tool #71)**, **XUNA Home Screen Widget, Chameleon Dynamic App Icon & Quick Shortcuts Studio (`WIDGET-1`–`WIDGET-4`)**, **XUNA Next-Gen Frontier 2026 (`FRONTIER-1`–`FRONTIER-4`)**, **Multi-Platform Ecosystem Architecture Hardening (`ECO-S1`–`ECO-S4`)**, and **XUNA 7 Color Themes (`THEME-1`–`THEME-4`)**.
 
+## 2026-11-06 — Gia cố điều khiển UI desktop: chỉ đọc, hết đoán mục tiêu và dữ liệu bịa (`desktop/`)
+
+- **Làm gì:** `ui.accessibility_tree` chỉ còn `inspect_window` (trước đó mọi action cùng R1 nên chạy không cần duyệt); provider computer-use bỏ `ui_1` và đoán `ui_N`; `lockScreen`/`displayWake`, permission, `forge.synthesize_skill`, `UiAccessibilityTreeService` không còn thành công giả hay dữ liệu dựng sẵn; cap inspect 60 khớp cap invoke. Chi tiết, commit và quyết định: [kết quả chi tiết](docs/roadmap/device-control/desktop-control-hardening-results-2026-11-06.md).
+- **Quyết định:** thu hẹp tool về chỉ đọc thay vì nâng rủi ro theo action, vì backend xin duyệt từ `descriptor.risk` trong manifest chứ không từ `effectiveRisk` của host. Không tạo milestone UDC mới (chưa đăng ký ID).
+- **Chưa kiểm chứng:** analyze 0 lỗi, `flutter test` 49 qua, `xuna_xtp` 29 qua. **Chưa chạy** native Windows/macOS/Linux và phiên computer-use thật có duyệt từ điện thoại.
+- **Việc kế tiếp:** chạy bản này trên Windows thật; snapshot ref ổn định (UIA RuntimeId) cần máy Windows; macOS Swift `|| true` ở accessibility cần Mac. Xem mục 5–6 trong file kết quả.
+- Đã commit trong `desktop/`: `2d8e690`, `7709f5b`, `2327bca`, `248f402`, `f038e43`; con trỏ ở repo cha bump riêng.
+
 ## 2026-11-06 — UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)
 
 - **Làm gì:** nút "Luôn cho phép việc này (7 ngày)" trong hộp duyệt R2 (chỉ khi backend đề nghị), mục DUYỆT TRƯỚC trên trang hosts, bảng `host_standing_approvals` (migration `0018`), route `/v1/actions/standing-approvals`. Chi tiết: [CHANGELOG 2026-11-06](CHANGELOG.md), [UDC-16 §7](docs/roadmap/device-control/UDC-16-permission-hub.md), [ADR-0014](docs/decisions/ADR-0014-standing-approvals-and-phone-sessions.md).
 - **Chưa kiểm chứng:** chưa chạy trên máy/luồng duyệt thật. Danh sách test: [checklist mục 4b](docs/roadmap/device-control/UDC-16-device-test-checklist.md). **Phạm vi thật hẹp:** chỉ `app.launch` trên chính điện thoại Android đủ điều kiện (desktop công bố `id` kiểu `pattern`, không phải `enum`). **Làm trước khi test:** chạy migration `0018` và khởi động lại backend.
 - **Lỗi có từ trước, không phải của đợt này:** `backend/tests/modules/consent/test_consent_api.py` (thiếu `hostNotifications`/`hostScreen` trong kết quả mong đợi). Cần chủ quyết định có sửa test không.
 - **Việc kế tiếp:** S16.4 (phiên điều khiển điện thoại) chờ số lần hỏi đếm trên máy thật; migration `0018` phải chạy trên DB thật trước khi dùng.
-- Chưa commit: `mobile/` và `backend/` là repo độc lập, commit từng repo rồi cập nhật gitlink ở repo cha.
+- Đã commit (2026-11-06): `backend/` `04e73f6`, `mobile/` `5428d41`, tài liệu repo cha `8a1104d`, gitlink `0a4d275`.
 
 ## 2026-11-06 — UDC-16 S16.1 + S16.2: cấp trước quyền hệ thống, gói quyền một chạm (`mobile/`)
 
