@@ -1,6 +1,21 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-06** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-11** (Asia/Ho_Chi_Minh).
+
+## 2026-11-11 — Mở thông điều khiển máy tính cá nhân đầu-cuối (`desktop/`, `mobile/`, `backend/`)
+
+- **Vấn đề:** Sau đợt gia cố 2026-11-06 thu hẹp `ui.accessibility_tree` về chỉ đọc, XUNA trên máy tính gần như chỉ mở được ứng dụng (`app.launch`) vì 6 chốt chặn nối tiếp nhau: `host-policy.json` mặc định tắt `cu`/`ui`/`input`, `cu.session_start` bắt khai tay `allowedApps` + `urlDomains`, cửa sổ macOS lệch tên ứng dụng tiếng Việt so với slug tiếng Anh, ứng dụng điện thoại ẩn công tắc quyền `cu`/`ui`/`input` và chặn mức `R3` cho `cu`/`input`, danh mục công cụ Backend xếp `cu.*`/`ui.inspect`/`input.*` ngoài top 20 trực tiếp, và `Orchestrator` hỏi duyệt từng bước `R2` thay vì gom theo phiên `cu`.
+- **Thay đổi trên `desktop/` & `xuna_xtp`:**
+  - `HostPolicyStore` bật mặc định `cu`, `screen`, `ui`, `input` và tự di trú bổ sung các family desktop còn thiếu trên file `host-policy.json` cũ mà vẫn tôn trọng mọi family chủ đã tắt tay (`block`).
+  - Cho phép `cu.session_start` dùng danh sách ứng dụng quét tự động (`allowZeroConfigAppDiscovery`) và mở mọi tên miền `https://` công khai hợp lệ cho `url.open` / `cu.session_start` (vẫn chặn cứng `http://`, `localhost`, `.local`, IP literal, `userinfo`; mỗi lần gọi vẫn qua duyệt trên điện thoại; `workflow.batch_steps` giữ nguyên kiểm tra `urlDomains`).
+  - `AutoAppScanner` đọc `CFBundleIdentifier` của `.app` trên macOS (cả plist XML và binary) và `ComputerUseSessionManager` đối chiếu cửa sổ theo cả slug lẫn Bundle ID để không trượt khi hệ điều hành hiển thị tên tiếng Việt; `screen.capture` báo `not_determined` trung thực khi chưa có driver chụp ngoài.
+- **Thay đổi trên `mobile/`:**
+  - Hiển thị công tắc nhóm quyền `cu`, `ui`, `input` trên chi tiết máy tính (`macos`/`windows`), cho phép cấp trần `R3` cho `{ui, cu, input}`, và thêm gói quyền một chạm **"Điều khiển máy tính"** (`media` R1, `window` R2, `app` R2, `url` R2, `cu` R3, `ui` R2, `input` R3 trong 1 ngày).
+- **Thay đổi trên `backend/`:**
+  - Đưa `cu.session_start`, `ui.inspect`, `input.click`, `input.type_text`, `input.key`, `input.scroll`, `cu.session_end`, `window.active_context` vào nhóm ưu tiên đầu `_PRIORITY_ORDER`; bổ sung câu duyệt VI/EN, gợi ý `state_driven_hint` và giữ tới 64 `nodes` UI trong giới hạn 6 KiB.
+  - Nối kiểm tra Consent `U5` (`host_screen`) thật vào cả danh mục công cụ lẫn `Orchestrator` trên SSE và Voice WebSocket.
+  - Nối `InMemoryComputerUseSessionStore` vào `Orchestrator`: khi chủ đã ký duyệt `R3` mở phiên `cu.session_start`, các bước điều hướng `R2` (`ui.inspect`, `input.click` thường, `input.key` thường, `input.scroll`) chạy mượt trong phiên không hỏi lặp lại; riêng `input.type_text`, nút hệ trọng (`Xóa`/`Gửi`/`Thanh toán`... kể cả tra ngược từ `cached_nodes`) và `Enter` trong biểu mẫu vẫn bắt buộc ký duyệt `R3` từng lần, còn ô mật khẩu bị chặn cứng ngay trước khi hỏi duyệt.
+- **Kiểm chứng:** `xuna_xtp` 30/30 PASS; `desktop` analyze sạch + 51/51 test PASS; `mobile` analyze sạch + `test/features/hosts/` 76/76 PASS (chạy trên Flutter 3.32.8 `--no-pub` do máy Mac chạy macOS 12.6, giữ nguyên `.fvmrc` 3.47.9 và `pubspec.lock`); `backend` `ruff check` + `mypy --strict src` sạch + `pytest` 614 passed / 76 skipped. **Chưa chạy** phiên điều khiển thật đầu-cuối với LLM thật và ký duyệt trực tiếp trên điện thoại; chưa commit.
 
 ## 2026-11-06 — Gia cố điều khiển UI trên máy tính: bỏ đoán mục tiêu và dữ liệu bịa (`desktop/`)
 
