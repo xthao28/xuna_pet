@@ -1,6 +1,6 @@
 # XUNA Tool Protocol (XTP) v1 — Normative Wire Contract
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10), not Implemented.**
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10), not Implemented.** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend and verified by unit tests only. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4); both are ordinary `tools/call` traffic, specified in [UDC-8 §4.2](../roadmap/device-control/UDC-8-computer-use.md), with no new frame.
 Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
 
 ---
@@ -434,6 +434,77 @@ Allowed `reason` values: `"owner_app" | "owner_host" | "owner_board" | "revoked"
   "result": {}
 }
 ```
+
+#### 4.2.8 `xuna/preflight` (Backend → Agent, Request)
+
+Added 2026-11-12 by [ADR-0015](../decisions/ADR-0015-commit-gated-control-and-trusted-scopes.md) and [UDC-17](../roadmap/device-control/UDC-17-smart-control-plan.md) S17.1. Before asking the owner to approve an `input.click`, `input.type_text` or `input.key` call on a desktop host (`windows`, `macos`), the backend asks the host which risk the host would enforce for that exact call. The host executes nothing and changes no state: it does not mint a snapshot, count a step, record the action for duplicate detection or end the session.
+
+The method is in the `xuna/` namespace because MCP has no equivalent. It is a separate method, not a flag on `tools/call`, so a host that does not know it cannot execute the call by mistake.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 18,
+  "method": "xuna/preflight",
+  "params": {
+    "name": "input.click",
+    "arguments": { "elementId": "@s00000001:e2", "elementName": "Mở" }
+  }
+}
+```
+
+`params` has exactly `name` and `arguments`, the same values the following `tools/call` will carry.
+
+**Response.** `result` has exactly one key, `preflight`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 18,
+  "result": {
+    "preflight": {
+      "status": "ok",
+      "effectiveRisk": "R3",
+      "reasonCode": "consequential_target",
+      "element": { "role": "button", "name": "Gửi báo cáo" }
+    }
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 19,
+  "result": {
+    "preflight": { "status": "denied", "errorCode": "password_field_forbidden" }
+  }
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `status` | Required. An `xuna/status` value (§5.1). `ok` means the call would be allowed at `effectiveRisk` once approved. Anything else means the host would refuse it. |
+| `effectiveRisk` | Required when `status` is `ok`, absent otherwise. `R0`–`R3`. |
+| `reasonCode` | Optional, `^[a-z0-9_.-]{1,64}$`. Desktop values: `policy`, `navigation_target`, `consequential_target`, `unclassified_target`, `draft_text`, `draft_budget_exceeded`, `activation_key`, `search_submit`, `text_space`, `navigation_key`, `scroll`. |
+| `errorCode` | Required when `status` is not `ok`, absent otherwise. The same code the `tools/call` would return, for example `cu_session_required`, `stale_ref`, `ambiguous_target`, `password_field_forbidden`, `target_outside_allowlist`, `stopped`. |
+| `element` | Optional, only with `ok`. Exactly `{role, name}`: `role` matches `^[a-z0-9_.-]{1,64}$`; `name` is the live label of the target, 1–80 characters, no control characters. Never sent for a password field. |
+
+**Host rules (Desktop Agent).**
+1. Evaluate the local policy without an approval. `approval_required` means "allowed at this risk once approved"; any other refusal is returned as a refusal.
+2. For `input.*`, read the live window and resolve the target in the same way as the real call, then classify the step with the same function the real call uses (`classifyInputStepRisk` in `xuna_xtp`). Typing is R2 only as a draft (ADR-0015 D1): the live target is an editable `textfield`, `searchfield`, `searchbox` or `textarea` that is not a password field (a Windows UIA `Document` is not one), the text has no line break (`\n`, `\r`), it is not sent as real keystrokes (`headed: true`), and it fits in the session's draft budget (2,000 characters, spent only by unsigned typing at execution, never by preflight); otherwise R3. While unsigned draft text has been typed since the last signed click or key, a click on an element with no name is R3. Bare Enter or Return is R2 only when the element holding focus is a `searchfield`, and bare Space only when it is one of the draft roles (ADR-0015 D2); with any modifier, or when focus is not known exactly, they are R3. Focus is read again at execution. A click whose target is not found in the live tree is R3. A click is R3 when either the live label or the model-declared `elementName` reads as a commit. The policy evaluator gives `input.type_text` and `input.key` only an R2 floor from the arguments; the classifier is the gate.
+3. When the live window cannot be read, answer `ok` with `R3` (`unclassified_target`).
+4. At execution, accept any attached approval that is bound to the arguments, unexpired, scoped `once` and phone-signed, even when the risk derived from the arguments alone is lower. A step raised to R3 by the live screen can then run once the owner has signed it.
+
+**Backend rules.**
+1. The effective risk is the highest of the descriptor risk, the host's `effectiveRisk` and the risk implied by the arguments (a consequential `elementName`). Activation keys are not raised by the backend on this path, since only the host sees focus (ADR-0015 D2); hosts without preflight keep the legacy rule (Enter, Return, Space are R3). The backend never lowers a risk the host reported.
+6. Text typed in a session since the last commit (signed or not, including calls that timed out) is kept in memory with the session (at most 5 entries; lost if the backend restarts) and appended to the summary of the next R3 `input.click` / `input.key` card, so the owner sees what a Send or Enter will commit (ADR-0015 D1). The list is cleared when that commit runs, when the session ends and on E-Stop. It is never logged or audited.
+2. If the host refuses, the backend returns the refusal to the model with its `errorCode` and does not ask the owner. A refusal code that means the host has no session (`cu_session_required`, budget codes, `stopped`) also ends the backend's copy of the session.
+3. The approval card shows `element.name`. The approval stays bound to the call's real arguments. The label is screen content: it is never logged or audited.
+4. If the host answers JSON-RPC `-32601` (method not found), it predates preflight and the backend's previous estimate applies. Any other failure is R3 with no label: a timeout (2 s), an offline host, a JSON-RPC error or a result that fails the rules above.
+5. Hosts that are not `windows` or `macos`, and the in-process self-host path, are not asked.
+
+The LAN offline server (UDC-7 S7.4) answers `-32601`: it executes only `media.*`.
 
 ---
 

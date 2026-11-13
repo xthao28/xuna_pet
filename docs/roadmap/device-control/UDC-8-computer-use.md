@@ -62,14 +62,19 @@ It works by observing the UI and acting, under:
 
 | Tool | Input | Output | Risk |
 |---|---|---|---|
-| `cu.session_start` | `{goal ≤ 200, apps: [allowlisted ids], domains: [allowlisted], maxSteps ≤ 20, maxMinutes ≤ 10}` | `{sessionId}` | R3 (always approved, phone-signed) |
+| `cu.session_start` | `{goal ≤ 200, apps: [allowlisted ids], domains: [allowlisted], maxSteps ≤ 40, maxMinutes ≤ 20}` | `{sessionId}` | R3 (always approved, phone-signed) |
 | `screen.capture` | `{scope: "active_window" \| "screen", maxEdge: 1280}` | Image (JPEG q70) **sent only to the provider, never stored or logged** | R2 (inside an approved session: no per-call approval) |
-| `ui.inspect` | `{scope: "active_window", maxNodes ≤ 300}` | Compact tree `[{id, role, name ≤ 60, enabled, bounds}]`; **password fields → `name: "•••"` and `value` omitted** | R2 (inside a session) |
-| `input.click` | `{elementId}` preferred, or `{x, y}` | `{effect: "changed" \| "no_change"}` (verified by re-inspect) | R2 inside the allowlisted app; **R3** if the element's name matches the send/submit/delete/buy/pay/post lexicon (vi + en) |
+| `ui.inspect` | `{scope: "active_window", maxNodes ≤ 300, skeleton?, interactiveOnly?, rootElementId?, collapseWebWrappers?}` | Compact tree `[{id, ref: "@s<snapshot>:e<N>", role, name ≤ 60, enabled, bounds}]`; **password fields → `name: "•••"` and `value` omitted**. Mints a new snapshot: earlier `@` refs become `stale_ref` | R2 (inside a session) |
+| `ui.find` (UDC-17 S17.4) | `{query? (1–80), role? ([A-Za-z_]{1,32}), maxResults? (1–10, default 5)}`, at least one of `query`/`role` | `{appId, windowTitle, snapshotId, searchedNodes, total, truncated, matches: [same node shape as ui.inspect]}`. Case-insensitive substring on the **name only** (never `value`); a password field is found only by role and is redacted; ranked exact > prefix > substring, controls before text, available before hidden/disabled. Never picks one. Matches join the current snapshot (one is minted if none exists), so earlier refs stay valid | R2 (inside a session) |
+| `input.click` | `{elementId}` preferred, or `{x, y}` | `{effect: "changed" \| "no_change", changes?}` (verified by re-inspect); `changes` below | R2 inside the allowlisted app; **R3** if the element's name matches the send/submit/delete/buy/pay/post lexicon (vi + en) |
 | `input.type_text` | `{elementId, text ≤ 200}` | `{effect}` | **R3, always** (shows the exact text and the target field name) |
 | `input.key` | `{combo ∈ allowlist: Enter, Tab, Esc, Ctrl+S/⌘S, Ctrl+F/⌘F, arrows, PageUp/Down}` | `{effect}` | R2; `Enter` → **R3** when the focused element is in a form |
 | `input.scroll` | `{elementId?, direction, amount ≤ 10}` | `{effect}` | R2 |
 | `cu.session_end` | `{sessionId, outcome}` | `{}` | R0 |
+
+**`changes` in every `input.*` result (UDC-17 S17.4, once a snapshot exists):** `{snapshotId, added: [nodes with new refs: ref, id, role, name, enabled, visible, editable, isPassword, modal only], removed: [refs], changed: [{ref, enabled, visible}], truncated}`, each list at most 15. A registered ref is kept only when the host can show it is the same element after the action: the same native id; or a non-empty role+name unique before and after (the raw id is re-bound when native ordinals shift); or the same position when the window's structure did not change at all. Anything else is `removed` and fails with `stale_ref`, never reaching another element. When another window outside the session is in front after the action, `changes` is `{snapshotId, windowOutsideSession: true}` and no element or surface of it is returned.
+
+**Approval cards for `cu.session_start` / `cu.session_extend` (backend, UDC-17 S17.3 and S17.5 follow-up):** the phone-signed card lists every app and every domain in full, plus budgets and the computer; only the goal is shortened (60 characters, with "…"). A scope the 240-character card cannot show, or any item over 60 characters, is denied before the owner is asked: `{errorCode: "extend_scope_too_long"}` or `{errorCode: "start_scope_too_long"}`, the latter with `templatePinned: true` on a template rerun (the model is told not to retry). Every `cu_session` event (SSE, voice WebSocket, `GET /v1/actions/cu-session`) carries `rerunFitsCard`: whether a rerun of that scope would fit its start card with a 60-character goal in both VI and EN; the phone does not save a template when it is `false`. Details: [UDC-17 §15–§16](UDC-17-smart-control-plan.md).
 
 **Hard refusals (agent, before the driver):**
 
@@ -106,9 +111,9 @@ sequenceDiagram
 
 **Budgets and stops:**
 
-- `maxSteps` (≤ 20) and `maxMinutes` (≤ 10).
+- `maxSteps` (≤ 40) and `maxMinutes` (≤ 20); raised from 20 / 10 by [ADR-0015](../../decisions/ADR-0015-commit-gated-control-and-trusted-scopes.md) E1 on 2026-11-12.
 - Three consecutive `no_change` effects → stop with "không tiến triển".
-- Duplicate-action detection: the same action on the same element twice → stop.
+- Duplicate-action detection: the same action on the same element twice → stop. Since UDC-17 S17.4 (2026-11-13, owner-approved) the host stops only when the earlier identical action returned `no_change`; a repeat after a visible change (next page, a "+" stepper) runs, because refs now survive actions.
 - **Dead-man switch:** the app sends `POST /v1/actions/sessions/{id}/heartbeat` every 5 s. Missing 3 → stop. The agent also stops if the backend heartbeat is lost.
 
 **Privacy:**

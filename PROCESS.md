@@ -1,6 +1,221 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-11-11** (Asia/Ho_Chi_Minh). Latest: **Mở thông toàn bộ luồng điều khiển máy tính cá nhân đầu-cuối (`cu.*` / `ui.inspect` / `input.*` / `url.open` HTTPS công khai / Consent `U5` thật) (`desktop/`, `mobile/`, `backend/`)**. Before that: **Gia cố điều khiển UI desktop: chỉ đọc, hết đoán mục tiêu và dữ liệu bịa (`desktop/`)**, **UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)**, **OpenClaw-style host control: Tool Search meta tools, 12-round agent loop with loop guard, no guessed UI refs (`backend/`, `desktop/`)**.
+Last updated: **2026-11-13** (Asia/Ho_Chi_Minh). Latest: **Hướng dẫn dựng môi trường test điều khiển máy tính (Mac + Android) và sửa phần chuẩn bị của checklist UDC-16 (docs); commit toàn bộ UDC-17**. Before that: **UDC-17 S17.5 bổ sung: không lưu mẫu không chạy lại được (`rerunFitsCard`); vùng dưới khung chat cuộn được, nút duyệt không bị đẩy khỏi màn hình (`backend/`, `mobile/`, docs)**. Before that: **UDC-17 S17.5 bổ sung: thẻ duyệt mở phiên hiện đủ mọi app và tên miền, không vừa thì từ chối trước khi hỏi; hộp duyệt trên điện thoại hết cắt sau 4 dòng (`backend/`, `mobile/`, docs)**. Before that: **UDC-17 S17.5 bổ sung: lượt chạy lại mẫu báo trước phạm vi cho XUNA (`backend/`)**. Before that: **UDC-17 S17.5: gợi ý "Luôn cho phép" và mẫu chạy lại lưu trên điện thoại, backend ghim phạm vi mở phiên (`backend/`, `mobile/`, docs)**. Before that: **UDC-17 S17.4 phần Dart/backend: `ui.find`, `changes` sau mỗi thao tác, giữ `ref` khi thứ tự native xô lệch (`desktop/`, `backend/`, docs)**. Before that: **UDC-17 S17.6: kho phiên bền, heartbeat thật, `url.open` chặn địa chỉ nội bộ, đo số lần hỏi**. Before that: **UDC-17 S17.3: thẻ phiên trực tiếp trên điện thoại, nút Dừng phiên, `cu.session_extend`, nút dẫn tới chỗ bật quyền (`mobile/`, `backend/`, `desktop/`, docs)**. Before that: **UDC-17 S17.2: gõ nháp trong phiên không cần ký; thẻ chốt hiện chữ đã gõ; `Enter`/`Space` theo ngữ cảnh mới có phần Dart (`desktop/`, `backend/`, docs)**. Before that: **UDC-17 S17.1: máy tính tự quyết mức rủi ro của thao tác `input.*` qua `xuna/preflight`; hộp duyệt hiện nhãn thật (`desktop/`, `backend/`, docs)**. Before that: **Chủ duyệt gói quyền "Rộng tay" (ADR-0015, UDC-17); E1 phiên 40 bước / 20 phút và E2 quyền 30 ngày đã làm (`desktop/`, `backend/`, `mobile/`)**. Before that: **Sửa sau review đợt mở thông điều khiển máy tính: `Enter`/`Space` luôn R3, đọc Bundle ID thật, di trú policy đúng phạm vi (`desktop/`, `backend/`, `mobile/`)**. Before that: **Mở thông toàn bộ luồng điều khiển máy tính cá nhân đầu-cuối (`cu.*` / `ui.inspect` / `input.*` / `url.open` HTTPS công khai / Consent `U5` thật) (`desktop/`, `mobile/`, `backend/`)**. Before that: **Gia cố điều khiển UI desktop: chỉ đọc, hết đoán mục tiêu và dữ liệu bịa (`desktop/`)**, **UDC-16 S16.3: duyệt trước cho việc R2 có tham số cố định (`backend/`, `mobile/`)**, **OpenClaw-style host control: Tool Search meta tools, 12-round agent loop with loop guard, no guessed UI refs (`backend/`, `desktop/`)**.
+
+## 2026-11-13 — Chuẩn bị để chủ test điều khiển máy tính trên máy thật (docs)
+
+- **Yêu cầu của chủ (2026-11-13):** hỏi "bao giờ thì tôi có thể test được các chức năng", rồi chọn khuyến nghị: sửa checklist, viết trang dựng môi trường test trên Mac, commit một bản cố định để test.
+- **Đã làm:**
+  - Viết [UDC-17-test-setup.md](docs/roadmap/device-control/UDC-17-test-setup.md): Mac chạy backend và app máy tính, điện thoại Android build trên Windows.
+  - Sửa UDC-16 §0: migration phải tới `0019`; build APK bằng 3.32.8 kèm `XUNA_API_BASE_URL` và `google-services.json`.
+- **Đã kiểm trên máy Windows:**
+  - `flutter build apk --flavor dev --debug` bằng **3.32.8** thành công; `pubspec.lock` và các file được track không đổi.
+  - Bằng **3.47.9** thì build hỏng (AGP 9 "new DSL") và tự thêm hai dòng vào `android/gradle.properties`; đã khôi phục.
+  - Máy Windows không có `google-services.json`, nên APK vừa build không đăng nhập được, và chưa cài lên emulator.
+- **Phát hiện:**
+  - **iPhone chưa build được:** Mac đang chạy macOS 12.6, mà Flutter 3.47.9 (cần cho iOS 26) đòi macOS 14 trở lên.
+  - Máy Windows không có Visual Studio C++, nên không build được app máy tính cho Windows.
+  - App máy tính chưa từng được build thành app macOS.
+  - App điện thoại có hai bản Flutter lệch nhau: test chạy bằng 3.47.9, APK build bằng 3.32.8.
+  - README backend tự mâu thuẫn: bảng ghi "Windows chưa thử uvicorn cho điện thoại", nhưng có mục `scripts/serve.py` cho Windows ngày 2026-10-27.
+- **Chưa chạy:** mọi bước trên Mac; điện thoại thật; model thật.
+- **Commit (chủ đồng ý 2026-11-13):** toàn bộ UDC-17 tới thời điểm này. backend `39e9b05`, desktop `26debd4`, mobile `3748105`; repo gốc ghim ba bản này kèm tài liệu. Các mục "Chưa commit" phía dưới (S17.1–S17.6) nằm trong các commit này.
+
+## 2026-11-13 — UDC-17 S17.5 bổ sung: chặn lưu mẫu quá lớn, vùng dưới khung chat cuộn được (`backend/`, `mobile/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** "xử lý đi" (cho hai lựa chọn ở báo cáo trước; tôi làm theo hai khuyến nghị 1a và 2a).
+- **Đã làm:** xem [UDC-17 §16](docs/roadmap/device-control/UDC-17-smart-control-plan.md).
+  - `backend/`:
+    - `ActionSummary.rerun_scope_fits_card` (mục tiêu dài nhất, cả VI và EN).
+    - `ComputerUseSessionEvent.rerun_fits_card`; payload `rerunFitsCard`.
+  - `mobile/`:
+    - `ComputerUseProgress.rerunFitsCard`/`rerunnable`, mapper.
+    - `CuTemplateExceptionKind.scopeTooLarge`, kiểm trong `SaveCuTemplateUseCase`.
+    - Thẻ mời lưu hiện câu giải thích thay cho ô nhập; khoá locale `actions_cuTemplateTooLarge` (vi/en, sửa tay cả `locales.g.dart`).
+    - `HomeChatTab` chuyển sang `CustomMultiChildLayout` với vùng dưới cuộn được; phần trang trí ẩn khi có thẻ duyệt hoặc tab thấp hơn 560 px.
+- **Validation (máy Windows):**
+  - Backend: ruff, mypy sạch; PostgreSQL **811 passed**.
+  - Mobile: analyze sạch, **525/525**, lock không đổi.
+  - Kiểm 8 đột biến, đều bị bắt (một test phải siết lại mới bắt được; chi tiết ở §16).
+  - Chỉ format các file đã sửa; tập file đã sửa khớp với trước, cộng 2 file test mới.
+- **Quyết định của chủ (2026-11-13, phương án a: "a"):** giữ việc ẩn tiêu đề và hình XUNA khi có thẻ duyệt hoặc khi tab thấp hơn 560 px. Trên hầu hết điện thoại, phần này ẩn mỗi lần bàn phím mở. Ngưỡng 560 px do tôi chọn.
+- **Chưa kiểm chứng:** điện thoại thật (checklist UDC-16 §4k), cỡ chữ lớn, bàn phím thật.
+- **Chưa commit.**
+
+## 2026-11-13 — UDC-17 S17.5 bổ sung: thẻ mở phiên hiện đủ phạm vi (`backend/`, `mobile/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** chọn phương án a. Thẻ duyệt R3 của `cu.session_start` phải hiện đủ mọi app và mọi tên miền; không vừa 240 ký tự thì từ chối trước khi hỏi, như `cu.session_extend`; giữ tiền tố "Chạy lại mẫu '…':".
+- **Đã làm:** xem [UDC-17 §15](docs/roadmap/device-control/UDC-17-smart-control-plan.md).
+  - `backend/`:
+    - `action_summary.py`: `_session_start_text` (dùng chung cho thẻ và việc kiểm), `start_scope_fits_card`, `_extend_text`; hằng số đổi tên thành `MAX_SCOPE_ITEM_DISPLAY_CHARS`.
+    - `orchestrator.py`: từ chối `start_scope_too_long` (thêm `templatePinned` khi là lượt chạy lại mẫu), gộp chung với kiểm `extend`.
+    - `prompts.py`: gợi ý cho cả hai trường hợp.
+    - Test mới: `tests/unit/test_udc17_start_card.py`.
+  - `mobile/`: hộp duyệt bỏ `maxLines: 4` (trước đây thẻ dài bị cắt kèm "…", cả thẻ `extend` của S17.3); thêm test widget.
+- **Validation (máy Windows):**
+  - Backend: ruff, mypy sạch; PostgreSQL **808 passed**. Kiểm 6 đột biến, đều bị bắt.
+  - Mobile: analyze sạch, **521/521**, lock không đổi. Kiểm 3 đột biến, đều bị bắt.
+  - Chỉ format đúng các file đã sửa; `git diff --stat` khớp mong đợi (backend thêm 1 file test mới, mobile không thêm file).
+- **Rủi ro bố cục (đo bằng test tạm, đã xoá):** tab chat vốn đã tràn trên màn thấp, kể cả với thẻ ngắn. Thẻ không cắt cao hơn, nên khi bàn phím mở hoặc cỡ chữ lớn, nút Đồng ý/Từ chối có thể bị đẩy khỏi màn hình. Chi tiết và số đo ở UDC-17 §15. **Đã xử lý** (mục phía trên, UDC-17 §16).
+- **Mẫu có phạm vi quá lớn:** không chạy lại được; backend báo rõ và LLM không thử lại vòng vòng. **Đã xử lý:** app không cho lưu mẫu như vậy (mục phía trên, UDC-17 §16).
+- **Ghi nhận:** `flutter pub get` gọi tường minh nâng `characters`/`intl` trong `pubspec.lock` dù SDK đúng 3.47.9. Đã khôi phục lock về HEAD và chạy lại test với lock gốc; chưa tìm nguyên nhân.
+- **Chưa kiểm chứng:** điện thoại và máy tính thật (checklist UDC-16 §4k), model thật.
+- **Chưa commit.**
+
+## 2026-11-13 — UDC-17 S17.5 bổ sung: báo trước phạm vi mẫu cho XUNA (`backend/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** "cứ làm theo ý b".
+- **Đã làm:**
+  - Lượt chạy lại có thêm một dòng system prompt nêu phạm vi mẫu, chỉ cho lượt đó và chỉ khi có công cụ. Code: `CuTemplatePin.prompt_note`, tham số `turn_note` của `build_request`, tra tên máy theo `hostId` của đúng chủ trong `conversation/api/routes.py`.
+  - Mục đích: lần mở phiên đầu khớp luôn, không bị từ chối một lần. Việc kiểm khớp giữ nguyên.
+- **Validation (máy Windows):** ruff và mypy sạch; thêm `tests/modules/actions/test_cu_template_turn.py` (3 test). Bỏ việc truyền dòng này thì test báo đỏ. Toàn bộ backend với PostgreSQL **797 passed**.
+- **Triển khai:** chỉ backend; không đổi app hay hợp đồng.
+- **Chưa kiểm chứng:** model thật có làm theo dòng này ngay lần đầu không.
+- **Chưa commit.**
+
+## 2026-11-13 — UDC-17 S17.5 phần 2: mẫu chạy lại (`backend/`, `mobile/`, docs)
+
+- **Quyết định của chủ (2026-11-13):** lưu mẫu **trên điện thoại** (chọn từ danh sách; tôi khuyến nghị cách này). Ngoại lệ với quy tắc "app không lưu chữ hội thoại" đã ghi vào `mobile/AGENTS.md` §4.4/§6.4.
+- **Quyết định tự chốt:**
+  - Không dùng lại kho workflow UDC-12 (chỉ trong RAM, cấm R3, chạy được từ nút board).
+  - Chỉ mời lưu khi XUNA báo `completed`. Tối đa 20 mẫu mỗi tài khoản.
+  - Không ghim chữ mục tiêu; tên mẫu chỉ hiện trên thẻ duyệt khi thẻ còn vừa 240 ký tự.
+  - Chạy lại đi đường SSE, không đi WebSocket giọng nói.
+- **Đã làm:** xem [UDC-17 §14 phần 2](docs/roadmap/device-control/UDC-17-smart-control-plan.md).
+- **Validation (máy Windows):**
+  - Backend: ruff và mypy sạch; thêm `test_udc17_cu_template.py` (26 test). Tắt việc kiểm khớp thì 7 test đỏ. Thêm test chứng minh backend thật sự gửi sự kiện `ended` + `completed` mà app dựa vào để mời lưu. Toàn bộ với PostgreSQL: **793 passed** (trước khi thêm test này).
+  - Mobile: analyze sạch, 520/520, `pubspec.lock` không đổi.
+- **Thứ tự triển khai: backend phải lên trước app** (`TurnBody` chặn trường lạ; app mới với backend cũ thì nút "Chạy lại" bị từ chối cả lượt).
+- **Chi phí đã biết (đã xử lý ở mục bổ sung phía trên):** trước bổ sung, LLM chỉ nhận chữ mục tiêu nên lần mở phiên đầu thường bị từ chối một lần.
+- **Phát hiện khi làm:** thẻ duyệt `cu.session_start` không hiện tên miền và chỉ hiện 4 app đầu, nên chủ ký phạm vi không thấy đủ. **Đã sửa 2026-11-13** (mục "thẻ mở phiên hiện đủ phạm vi" ở trên).
+- **Lỗi tự gây ra, đã khắc phục:**
+  - `dart format lib/features/actions` chạm 2 file không liên quan; đã khôi phục.
+  - `ruff format` định dạng lại `tests/unit/test_udc7_multihost.py`; đã khôi phục và chỉ thêm phương thức giả.
+- **Chưa kiểm chứng:** điện thoại và máy thật (checklist §4j), model thật.
+- **Chưa commit.**
+
+## 2026-11-13 — UDC-17 S17.5 phần 1: gợi ý duyệt trước (`backend/`, `mobile/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** "oke làm tiếp đi" (tiếp S17.5).
+- **Đã làm:** đếm số lần đúng một việc R2 đủ điều kiện duyệt trước đã được duyệt trong 30 ngày; từ 3 lần trở lên, thẻ duyệt hiện câu gợi ý và làm nổi nút "Luôn cho phép". Chi tiết ở [UDC-17 §14](docs/roadmap/device-control/UDC-17-smart-control-plan.md).
+  - `backend/`: `count_approved` (port, SQL, RAM, wrapper phiên-ngắn trong `routes.py`, fake trong `test_udc7_multihost.py`); hằng số trong `standing_approval.py`; `ActionPendingEvent.standing_payload()` thay cho hai đoạn tạo `standing` trùng nhau ở SSE và WebSocket.
+  - `mobile/`: entity, mapper, thẻ duyệt, khoá locale vi/en (sửa tay cả `locales.g.dart`).
+- **Validation (máy Windows):** backend ruff + mypy sạch, test mới qua (cả PostgreSQL), toàn bộ không DB 688 passed / 80 skipped; mobile analyze sạch, 504/504.
+- **Ghi chú:** `dart format` trên `locales.g.dart` (file sinh tự động, đã sửa) xếp lại vài dòng dài không liên quan; không đổi nội dung.
+- **Mẫu chạy lại:** làm ở phần 2 (mục trên).
+- **Chưa kiểm chứng:** điện thoại thật (checklist §4i).
+- **Chưa commit.**
+
+## 2026-11-13 — UDC-17 S17.4 phần Dart/backend: `ui.find`, `changes` sau mỗi thao tác, giữ `ref` khi thứ tự native xô lệch (`desktop/`, `backend/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** "làm S17.4 đi".
+- **Phạm vi:** phần Dart/backend. Phần `ref` theo định danh thật của hệ điều hành cần biên dịch native và chạy trên Mac (Q6), chưa làm. Cây chỉ phần tử tương tác (`interactiveOnly`) đã có từ UDC-8, không làm lại.
+- **Đã làm:**
+  - `desktop/packages/xuna_xtp`: `policy/ui_find.dart` (`findUiNodes`, `uiNodeSignature`, hằng số); validator `ui.find`; descriptor `ui.find` trong `buildComputerUseTools` (giờ 10 công cụ); `changes` trong output schema của `input.*`.
+  - `desktop/`: `ComputerUseSessionManager.findElements`, `_reconcileSnapshotAfterAction`, `_registerSnapshotNode`; `ComputerUseSessionState.nextElementNumber`; `UiFindTool`; `ui.find` vào làn đọc song song của dispatcher; `executeInputAction` trả `changes` và không gửi `surfaces` của cửa sổ ngoài phiên. Harness test có thêm `provider`, `startSession()`, `dispatchResult()`.
+  - `backend/`: `ui.find` trong `_PRIORITY_ORDER` (ngay sau `ui.inspect`) và `_UI_AUTOMATION_TOOLS`; prompt VI/EN hướng dẫn `ui__find`, `interactiveOnly` và `changes`; gợi ý `stale_ref` nhắc `ui__find`; tóm tắt `ui.find` VI/EN (không chứa chữ tìm); `Orchestrator` che mật khẩu và cập nhật bộ nhớ đệm nút cho `matches` và `changes`. Helper `_build` trong `test_udc17_preflight.py` nhận thêm `extra_tools`/`structured_for`.
+  - Docs: UDC-17 §13 + trạng thái, UDC-8 §4.2 (bảng công cụ, mô tả `changes`), ghi chú trong hợp đồng XTP, README device-control, checklist UDC-16 §4h, CHANGELOG; chuyển mục S17.6 bị ghi nhầm ở cuối PROCESS/CHANGELOG lên đúng chỗ.
+- **Quyết định tự chốt:**
+  - Tối đa 10 ứng viên mỗi lần `ui.find`, mặc định 5. Mỗi danh sách trong `changes` tối đa 15 mục.
+  - `ui.find` nhập vào snapshot hiện tại thay vì tạo snapshot mới. Advisor đề xuất tạo mới; tôi chọn nhập vào để `ref` cũ không hỏng, vì mọi `ref` vẫn bị kiểm lại với phần tử thật lúc dùng.
+  - Nút không tên hoặc trùng tên chỉ giữ `ref` khi cấu trúc cửa sổ không đổi chút nào.
+  - `changes.added` chỉ gửi trường cần để bấm tiếp (không `bounds`/`depth`…), để `changes` đầy vẫn vừa 6.144 byte (advisor phát hiện nguy cơ backend cắt cả kết quả về `{"truncated": true}`).
+  - Luật `duplicate_action`: chủ chọn phương án b ("làm theo ý bạn đi", 2026-11-13). Máy tính chỉ dừng phiên khi lặp đúng thao tác vừa trả `no_change`; bấm lại cùng nút sau khi màn hình đổi được chạy. `ComputerUseSessionRunner` ở backend giữ luật cũ.
+- **Lỗi tự gây ra và đã sửa trong phiên:** một lệnh `ruff format src tests` định dạng lại 29 file backend không liên quan và thêm phần định dạng vào 2 file test đã sửa từ trước. Đã khôi phục 29 file về HEAD và gỡ tay phần định dạng ở 2 file kia; `git diff --stat` khớp lại với trước lệnh. File chưa track của các phiên trước (`cu_session_store.py`, migration `0019`, `test_udc17_*.py`) không so được với bản gốc. `ruff format` không đổi file đã đúng định dạng, và phiên S17.6 ghi các file đó đã format.
+- **Validation (máy Windows):** `xuna_xtp` analyze sạch, 43/43; `desktop` analyze sạch, 89/89; kiểm đột biến cho luật giữ `ref` (2 và 1 test đỏ) và luật chặn lặp (2 test đỏ); `backend` `ruff check` + `mypy --strict` sạch, `pytest` PostgreSQL lần 1: 759 passed / 1 failed (`test_conversation_api.py::test_only_own_pet_and_nothing_is_stored`, qua 12/12 khi chạy riêng, không liên quan); lần 2: 760 passed; lần cuối (sau khi nới luật chặn lặp): **762 passed**. Test hội thoại kia chập chờn. Sau khi đổi prompt, một lần chạy không có DB báo 1 test đỏ mà không bắt được tên; 5 lần chạy lại (4 lần không DB, 1 lần PostgreSQL) đều qua hết.
+- **Chưa kiểm chứng (H8):** máy thật (checklist §4h), model thật.
+- **Thứ tự triển khai:** nên lên cùng lúc; lệch phiên bản vẫn an toàn (xem UDC-17 §13).
+- **Việc kế tiếp:** S17.5. Phần native của S17.2 (focus) và S17.4 (`nativeId`) làm trên Mac.
+- **Chưa commit** (chờ chủ yêu cầu).
+
+## 2026-11-13 — UDC-17 S17.6: kho phiên bền, heartbeat thật, sửa chặn nhầm "Quên mật khẩu", `url.open` chặn địa chỉ nội bộ, đo số lần hỏi
+
+- Chi tiết và kiểm chứng: [UDC-17 §12](docs/roadmap/device-control/UDC-17-smart-control-plan.md). Chưa commit; chưa chạy máy thật.
+- (Mục này trước đây bị ghi nhầm vào cuối file, dính vào dòng cuối; chuyển lên đây ngày 2026-11-13 trong phiên S17.4.)
+
+## 2026-11-13 — UDC-17 S17.3: thẻ phiên trực tiếp, dừng một phiên, mở rộng phạm vi, nút bật quyền (`mobile/`, `backend/`, `desktop/`, docs)
+
+- **Yêu cầu của chủ (2026-11-13):** "làm nốt phần còn dở 17.3". Phiên trước đã viết phần lớn code S17.3 ở cả ba repo nhưng dừng khi mobile chưa biên dịch được và chưa có test mobile.
+- **Đã có từ phiên trước (đã rà, chạy test):**
+  - `backend/`: `ComputerUseSessionEvent`, `build_session_event`/`session_event_payload`; sự kiện `cu_session` trên SSE và WebSocket giọng nói; `GET /v1/actions/cu-session`, `POST /v1/actions/cu-session/{id}/stop`; `Orchestrator.active_cu_session_event`, `stop_cu_session`, audit `host.cu_session_stopped`; `cu.session_extend` trong catalog, prompt, thẻ duyệt và cập nhật phạm vi theo danh sách máy tính trả về; `ActionResultEvent.error_code`/`host_id`; test `tests/unit/test_udc17_session_card.py`.
+  - `desktop/`: `ComputerUseSessionManager.extendSession`, `CuSessionExtendTool`, `maxCuSessionExtendItems = 3`, `maxCuSessionApps = 8`, `maxCuSessionDomains = 12`; test `test/session_extend_test.dart`.
+  - `mobile/`: `ComputerUseProgress` thêm trường thẻ; mapper bỏ mặc định `maxSteps = 12`; repository/use case đọc và dừng phiên; `HomeComputerUseProgressBanner` (thẻ đầy đủ, hai nút Dừng phiên / Dừng khẩn cấp); `actionFixFor` và nút trên chip lỗi; `HostsController` mở đúng máy theo route argument; lối tắt Dừng khẩn cấp gọi backend thật.
+- **Làm trong phiên này:**
+  - `mobile/`: thêm import `get_interface_ext.dart` còn thiếu ở `hosts_controller.dart`; bổ sung phương thức mới cho các fake trong `actions_test.dart`, `android_host_adapter_test.dart`, `ios_host_adapter_test.dart`; test banner cũ tách hai nút; test lối tắt Dừng khẩn cấp kiểm cả trường hợp không gọi được backend (không báo "đã dừng") lẫn có gọi; nhóm test mới "UDC-17 S17.3" (mapper, repository, làm mới/dừng thẻ, `actionFixFor`, thẻ hiện đủ chữ đã gõ, nút trên chip lỗi).
+  - **Lỗ được vá (do advisor tìm, test xác nhận):** thẻ duyệt `cu.session_extend` cắt mỗi mục ở 60 ký tự và cả câu ở 240, nên chủ có thể ký một tên miền dài mà chỉ thấy phần đầu (ví dụ `accounts.google.com.secure-login-…`). Giờ `ActionSummary.extend_scope_fits_card` kiểm trước khi hỏi: mục quá 60 ký tự hoặc câu quá 240 thì từ chối `extend_scope_too_long` (audit `host.tool_denied`, gợi ý cho LLM), không cắt. Test `test_extend_card_shows_long_items_in_full_or_refuses`.
+  - `desktop/`: test mới "a signed extension cannot add a domain session start refuses" (7 dạng tên miền xấu, đã ký vẫn bị từ chối): qua, không cần sửa code.
+  - Đã rà heartbeat: công tắc mất heartbeat 15 giây chỉ được kiểm trong `ComputerUseSessionRunner`; đường `Orchestrator` chưa bao giờ kiểm. Mobile gửi heartbeat suốt lúc thẻ hiện không làm phiên sống lâu hơn. Lỗ có sẵn từ UDC-8, ghi vào UDC-17 §11, chưa sửa.
+  - Đã rà: SSE và WS đều gửi `errorCode` + `hostId` và `cu_session`; hai `sample_frames.json` vẫn giống hệt nhau (`cu.session_extend` là `tools/call` bình thường, không cần frame mới); khoá ngôn ngữ mới có đủ vi/en.
+  - Docs: UDC-17 §11 + trạng thái, README device-control, ADR-0015, checklist UDC-16 §4f (và sửa §6), CHANGELOG.
+- **Quyết định tự chốt (phiên trước, ghi lại ở đây):** giới hạn mở rộng 3 mục/lần, 8 app và 12 tên miền/phiên; mỗi đoạn chữ đã gõ trên thẻ tối đa 500 ký tự; dừng phiên chờ máy tính tối đa 5 giây; thẻ không giữ cờ "đang chạy" của lượt chat.
+- **Validation (máy Windows):** `xuna_xtp` analyze sạch, 37/37; `desktop` analyze sạch, 73/73; `backend` `ruff check` + `mypy --strict` sạch, `pytest` 739 passed (PostgreSQL `xuna_test`), cả 19 file backend đã sửa đúng `ruff format`; `mobile` analyze sạch, `dart format` các file đã sửa, actions/home/hosts 264/264, toàn bộ `flutter test` 500 passed / 1 failed (chạy trước khi thêm phần vá). Test đỏ là `test/features/voice/data/repository/voice_repository_impl_test.dart` "the next sentence is preloaded while the current one plays", qua 3/3 lần khi chạy riêng: nghi chập chờn do tải, chưa điều tra.
+- **Chưa kiểm chứng (H8):** chưa chạy với điện thoại/máy tính thật (checklist §4f). Trang Máy tính tự mở đúng máy theo `hostId` chưa có test tự động.
+- **Giới hạn:** "còn N phút" chỉ cập nhật theo sự kiện hoặc khi app đọc lại; thẻ mất khi backend khởi động lại (P8); driver MCP ngoài có thể từ chối app vừa thêm (thất bại an toàn).
+- **Thứ tự triển khai:** backend, desktop và mobile lên cùng lúc.
+- **Việc kế tiếp:** S17.6 (dọn nợ mục E + đo lường); nên thêm kiểm heartbeat cho đường `Orchestrator`. Phần native của S17.2 chờ Q6.
+- **Chưa commit** (chờ chủ yêu cầu).
+
+## 2026-11-12 — UDC-17 S17.2: gõ nháp và bước chốt (`desktop/`, `backend/`, docs)
+
+- **Yêu cầu của chủ (2026-11-12):** "tiếp đi", tiếp phiên kế tiếp của UDC-17 (S17.2).
+- **Đã làm:**
+  - `desktop/packages/xuna_xtp`: `classifyInputStepRisk` nhận `focusedRole` và `draftCharsRemaining`; `draftTextRoles`, `isDraftTextTarget`; `maxCuSessionDraftChars = 2000`; validator cho `input.type_text`/`input.key` chỉ còn mức sàn R2; catalog `input.type_text` khai R2, mô tả `type_text`/`combo` viết lại cho khớp hành vi; `isPasswordUiNode` nhận `secure`/`subrole`/`inputType`.
+  - `desktop/`: `ActiveWindowObservation.focusedRole` (adapter native để `null`); `NativeHostChannelComputerUseProvider` quy `AXTextArea` trên Windows về `document`; `ComputerUseSessionState.draftCharsTyped`; preflight đọc, thực thi tiêu hạn mức nháp; harness test dùng chung `test/support/cu_gate_harness.dart`; bộ chống chèn lệnh `test/draft_and_activation_injection_test.dart`.
+  - `backend/`: `ComputerUseSessionState.typed_since_commit`; `ActionSummary.with_typed_text`; thẻ R3 của `input.click`/`input.key` hiện chữ đã gõ từ lần chốt trước; bỏ nâng phím kích hoạt trong `_declared_risk_floor`.
+  - Docs: hợp đồng XTP §4.2.8, ADR-0015 (trạng thái D1/D2 + ghi chú), UDC-17 §10, checklist §4e, README.
+- **Quyết định tự chốt:** hạn mức nháp 2.000 ký tự/phiên; nháp có xuống dòng hoặc gõ phím thật (`headed`) là R3; khi còn nháp chưa ký, bấm nút không tên là R3; backend coi `đăng` là bước chốt (trừ `đăng nhập`/`đăng ký`); danh sách vai trò ô văn bản đóng; `Document` Windows không phải ô văn bản; chỉ `Enter`/`Space` không phím bổ trợ mới được hạ; adapter native báo focus là `null` cho tới khi đọc được role + subrole (macOS) hoặc mã loại control (Windows); "phản chiếu lên điện thoại" ở D1 làm tối thiểu bằng cách nối chữ đã gõ vào thẻ chốt, thẻ phiên trực tiếp để S17.3.
+- **Validation (máy Windows):** `xuna_xtp` analyze sạch, 36/36; `desktop` analyze sạch, 69/69; `backend` `ruff check` + `mypy --strict` sạch, `pytest` 729 passed (PostgreSQL). Đột biến (mỗi lần gỡ một luật, test phải đỏ): chốt R3 ở `executeInputAction` → 4 đỏ; kiểm phím bổ trợ → 1; luật xuống dòng → 1; luật `headed` → 1; luật nút không tên → 1; gắn chữ vào thẻ chốt → 1; backend nâng `Enter` trở lại → 1. `ruff format --check` vẫn 33 file như trước.
+- **Chưa kiểm chứng (H8):** chưa chạy với máy tính/điện thoại thật (checklist §4e). D2 chưa có hiệu lực trên máy thật.
+- **Thứ tự triển khai:** backend và desktop phải lên **cùng lúc** (desktop S17.2 với backend S17.1 thì nháp chạy không ký mà thẻ chốt không hiện chữ đã gõ).
+- **Giới hạn:** thẻ chốt chỉ hiện ~150 ký tự đầu; danh sách chữ đã gõ mất khi backend khởi động lại (P8).
+- **Việc kế tiếp:** S17.3. Phần native của S17.2 chờ Q6.
+- **Chưa commit** (chờ chủ yêu cầu).
+
+## 2026-11-12 — UDC-17 S17.1: preflight, máy tính quyết mức rủi ro (`desktop/`, `backend/`, docs)
+
+- **Yêu cầu của chủ (2026-11-12):** "làm đi", tiếp phiên kế tiếp của UDC-17 (S17.1).
+- **Đã làm:**
+  - Hợp đồng XTP §4.2.8 `xuna/preflight` (backend hỏi host, host không thực thi gì); 3 frame mẫu thêm vào cả hai `sample_frames.json`.
+  - `desktop/packages/xuna_xtp`: `policy/input_step_risk.dart` (`classifyInputStepRisk`, làm sạch nhãn/vai trò); `verifyPhoneSignedApproval` trong `policy.dart`; `PreflightParams`, `XtpResponse.preflightResult` và kiểm tra kết quả trong `frames.dart`.
+  - `desktop/`: `ComputerUseSessionManager.preflightInputAction` (chỉ đọc) và `executeInputAction` dùng chung bộ phân loại; `ToolExecutionContext.hasVerifiedR3Approval`; `HostToolDispatcher.preflight`; `XtpSessionClient` và `LanOfflineServer` xử lý phương thức mới.
+  - `backend/`: `parse_preflight_result` (`hosts/application/xtp_frames.py`); `Orchestrator._host_preflight`, `_declared_risk_floor`, nhánh preflight trong `_handle_host_call`, hộp duyệt dùng nhãn thật.
+  - Docs: UDC-17 §9, ghi chú trạng thái ADR-0015 và hợp đồng XTP, checklist UDC-16 §4d.
+- **Quyết định tự chốt trong phiên:** host trả lời chậm quá 2 giây thì coi là R3. Cú bấm không tìm thấy phần tử trên cây thật là R3. Chỉ hỏi preflight với host Windows/macOS: Android chưa trả lời được phương thức lạ theo cách đã kiểm.
+- **Lỗi có sẵn được sửa:** máy tính trước đây bỏ qua chữ ký R3 khi mức R3 đến từ nhãn trên màn hình chứ không từ tham số, nên luồng kẹt `approval_required` sau khi chủ đã ký.
+- **Validation (máy Windows):** `xuna_xtp` analyze sạch, 35/35; `desktop` analyze sạch, 61/61 (thêm `test/preflight_test.dart`); `backend` `ruff check` + `mypy --strict` sạch, `pytest` 720 passed (PostgreSQL; thêm `tests/unit/test_udc17_preflight.py`). Kiểm test có bắt được lỗi: tắt preflight ở backend thì 5 test mới fail; đưa handler desktop về đọc mức suy từ tham số thì test "đã ký thì chạy" fail. `ruff format --check` vẫn báo 33 file như trước, không có file mới.
+- **Chưa kiểm chứng (H8):** chưa chạy với máy tính/điện thoại thật; độ trễ thêm của preflight chưa đo.
+- **Chưa đổi:** `mobile/`; `workflow.batch_steps` và `ComputerUseSessionRunner` chưa đi qua preflight.
+- **Thứ tự triển khai:** backend phải lên trước hoặc cùng lúc với desktop. Desktop mới chặt hơn: cú bấm không thấy phần tử trên màn hình là R3. Backend cũ không hỏi preflight nên không xin chủ ký, và luồng dừng ở `approval_required`. Như vậy vẫn an toàn nhưng bị kẹt.
+- **Việc kế tiếp:** S17.2 (gõ nháp + `Enter` theo ngữ cảnh). Còn mở: UDC-17 Q6.
+- **Chưa commit** (chờ chủ yêu cầu).
+
+## 2026-11-12 — Chủ duyệt gói quyền "Rộng tay" (ADR-0015, UDC-17); làm E1 và E2
+
+- **Quyết định của chủ (2026-11-12):** sau khi xem bảng đánh giá ảnh hưởng (UDC-17 §7), chủ chọn gói c "Rộng tay": "rộng tay luôn cho máu, không quá nguy hiểm là được". Ghi tại [ADR-0015](docs/decisions/ADR-0015-commit-gated-control-and-trusted-scopes.md) (Approved), sửa ADR-0012 quyết định 1 và ADR-0014 D2.1/D2.3. Nguyên tắc: chuẩn bị thì tự do trong phạm vi đã ký, chủ quyết ở điểm không quay lại được. E6 (tin cậy trình duyệt mọi tên miền) và E7 (tự lái hoàn toàn) bị loại.
+- **Đã làm:**
+  - **E1:** `maxCuSessionSteps = 40`, `maxCuSessionMinutes = 20` trong `xuna_xtp` `core_types.dart`, dùng ở validator, schema `cu.session_start`, `ComputerUseSessionManager` và `CuaDriverMap`; backend `MAX_SESSION_STEPS = 40`, `MAX_SESSION_MINUTES = 20`, `Orchestrator` kẹp ngân sách phiên của mình trong cùng giới hạn.
+  - **E2:** `HostGrantProfile.desktopControl` và công tắc mở mới R3 trong `HostsController.toggleFamilyGrant` dùng 30 ngày; thêm khoá locale `hosts_profileExpiryDays` (sửa tay `vi_VN.json`, `en_US.json` và `locales.g.dart` cùng lúc vì không chạy `get_cli`).
+  - Docs: ADR-0015, đăng ký UDC-17 trong README device-control, bảng quyết định, ghi chú sửa đổi trong ADR-0014 và UDC-8, checklist thiết bị.
+- **Validation (máy Windows):** `xuna_xtp` analyze sạch, 32/32; `desktop` analyze sạch, 54/54; `backend` `ruff check` + `mypy --strict` sạch, `pytest` 703 passed (PostgreSQL 16); `mobile` analyze sạch, `test/features/hosts/` 80/80.
+- **Chưa kiểm chứng (H8):** chưa chạy trên máy tính hay điện thoại thật; chưa chạy toàn bộ test mobile ngoài thư mục hosts.
+- **Chưa làm:** D1, D2, E3, E4, E5 của ADR-0015. Tất cả cần S17.1 (preflight) trước.
+- **Việc kế tiếp:** S17.1. Còn mở: UDC-17 Q6 (chủ có Mac, Windows hay cả hai để chạy phần native).
+- **Chưa commit** (chờ chủ yêu cầu).
+
+## 2026-11-12 — Sửa sau review đợt mở thông điều khiển máy tính (`desktop/`, `backend/`, `mobile/`)
+
+- **Yêu cầu của chủ (2026-11-12):** review code đẩy tối 2026-11-11, sửa các lỗi tìm được (được tự quyết), sau đó lên plan nâng cấp lớn cho điều khiển thiết bị để chủ duyệt.
+- **Quyết định đã tự chốt:** `Enter`/`Return`/`Space` trong `input.key` luôn là R3 (ký duyệt từng lần) vì cờ `inForm` do LLM tự khai không đáng tin. Đây là lựa chọn đóng-an-toàn tạm thời; việc suy ra từ phần tử đang focus để giảm số lần hỏi thuộc về plan nâng cấp.
+- **Đã làm:**
+  - `desktop/packages/xuna_xtp`: `isActivationKeyCombo` trong `core_types.dart`; `tool_arg_validators.dart` dùng nó cho `input.key`; mô tả schema `input.key` nói rõ `inForm` không đổi mức duyệt.
+  - `desktop/`: `AutoAppScanner.parseBundleIdFromInfoPlist` (XML + `bplist00` thật, không đoán); `migrateMissingDesktopFamilies` chỉ thêm `cu`/`screen`/`ui`/`input`; `startSession` tôn trọng cờ `allowZeroConfigAppDiscovery`.
+  - `backend/`: `is_activation_key_combo` dùng trong `Orchestrator._effective_tool_risk` và `ComputerUseSessionRunner`; từ chối do quyền trả `errorCode` cho LLM; hint mới cho `u5_consent_required` và `approval_required`; đóng phiên `cu` khi host báo phiên đã mất trên mọi công cụ `screen`/`ui`/`input`; lỗi đọc Consent U5 log `warning`.
+  - `mobile/`: `HostsController.toggleFamilyGrant` đặt hạn 1 ngày khi công tắc mở mới mức R3.
+- **Validation (máy Windows):** `xuna_xtp` 31/31; `desktop` 54/54, analyze sạch; `backend` `ruff check` + `mypy --strict` sạch, `pytest` 703 passed (PostgreSQL 16, `xuna_test`); `mobile` analyze sạch, hosts 80/80. Một test backend (`test_http_self_enroll_and_action_result_with_output`) fail một lần trong lần chạy toàn bộ rồi qua ở các lần sau: nghi chập chờn, chưa điều tra.
+- **Chưa kiểm chứng (H8):** macOS thật (bộ đọc plist binary chỉ test bằng dữ liệu dựng tay), phiên điều khiển thật với LLM và điện thoại, bản build mobile trên máy thật.
+- **Còn mở từ review (chưa sửa, đưa vào plan):** "public HTTPS" chỉ kiểm cú pháp tên miền; đối chiếu cửa sổ macOS theo tên hiển thị; 8 công cụ `cu`/`input` đẩy `notifications.*` khỏi top 20 khi chưa có lịch sử dùng; kiểm tra tên chứa "mật khẩu" chặn nhầm cả nút như "Quên mật khẩu".
+- **Plan nâng cấp:** [UDC-17-smart-control-plan.md](docs/roadmap/device-control/UDC-17-smart-control-plan.md), chủ đã duyệt cùng ngày (xem mục phía trên).
+- **Chưa commit** (chờ chủ yêu cầu).
 
 ## 2026-11-11 — Mở thông toàn bộ chốt chặn điều khiển máy tính cá nhân đầu-cuối (`desktop/`, `mobile/`, `backend/`)
 
@@ -8,7 +223,7 @@ Last updated: **2026-11-11** (Asia/Ho_Chi_Minh). Latest: **Mở thông toàn b�
   - **A1 (`urlDomains` trên Desktop):** Cho phép mở trực tiếp mọi tên miền `https://` công khai hợp lệ ở `url.open` và `cu.session_start` (vẫn chặn cứng `http://`, `localhost`, `.local`, `.localhost`, IP literal IPv4/IPv6, host 1 nhãn, TLD toàn số, `userinfo`), mỗi lần gọi vẫn qua duyệt `R2`/`R3` trên điện thoại; `workflow.batch_steps` vẫn giữ kiểm tra `host-policy.json` `urlDomains`. Cập nhật `desktop/AGENTS.md` §3.3.
   - **A2 (Consent `U5` `host_screen` trên Backend):** Nối kiểm tra `ConsentState.host_screen` thật từ `consent_repository` vào `load_tool_catalog_for_owner` và `ActionContext.host_screen_consent` trên cả SSE (`POST /v1/conversations/{pet_id}/turns`) và Voice WebSocket (`/v1/voice`), mặc định đóng (`False`) nếu lỗi đọc DB.
 - **Đã làm:**
-  - **`desktop/` & `xuna_xtp`:** `HostPolicyStore` mặc định bật `cu`, `screen`, `ui`, `input` và thêm `migrateMissingDesktopFamilies()` tự bổ sung family còn thiếu trên file `host-policy.json` cũ mà vẫn giữ nguyên mọi `block` chủ đã tắt tay; `evaluateInvocation` + `tool_arg_validators.dart` hỗ trợ zero-config app discovery cho `cu.session_start` và `allowPublicHttpsDomains` cho `url.open` / `cu.session_start`; `AutoAppScanner` đọc `CFBundleIdentifier` thật của `.app` macOS (cả plist XML lẫn binary qua `/usr/bin/plutil`) và kiểm tra denylist trên cả Bundle ID; `ComputerUseSessionManager` đối chiếu cửa sổ theo cả app slug lẫn Bundle ID macOS (khắc phục lệch tên tiếng Việt như `"Ghi chú"` vs `com.apple.Notes`) và nhận diện trình duyệt theo Bundle ID; `screen.capture` báo trung thực `permission: not_determined` khi chưa cấu hình driver chụp ngoài (**H6**).
+  - **`desktop/` & `xuna_xtp`:** `HostPolicyStore` mặc định bật `cu`, `screen`, `ui`, `input` và thêm `migrateMissingDesktopFamilies()` tự bổ sung family còn thiếu trên file `host-policy.json` cũ mà vẫn giữ nguyên mọi `block` chủ đã tắt tay; `evaluateInvocation` + `tool_arg_validators.dart` hỗ trợ zero-config app discovery cho `cu.session_start` và `allowPublicHttpsDomains` cho `url.open` / `cu.session_start`; `AutoAppScanner` đọc `CFBundleIdentifier` thật của `.app` macOS (plist XML; phần binary lúc đó là đoán chuỗi chứ không dùng `plutil`, đã thay bằng bộ đọc `bplist00` thật ngày 2026-11-12) và kiểm tra denylist trên cả Bundle ID; `ComputerUseSessionManager` đối chiếu cửa sổ theo cả app slug lẫn Bundle ID macOS (khắc phục lệch tên tiếng Việt như `"Ghi chú"` vs `com.apple.Notes`) và nhận diện trình duyệt theo Bundle ID; `screen.capture` báo trung thực `permission: not_determined` khi chưa cấu hình driver chụp ngoài (**H6**).
   - **`mobile/`:** Bổ sung `cu`, `ui`, `input` vào danh sách quyền trên `HostDetailSheet` cho host `macos`/`windows`; `Host.defaultRiskFor` đặt `cu` = `R3`, `input` = `R3`; `SetHostGrantsUseCase` cho phép `R3` cho `{ui, cu, input}` (từ chối cho các nhóm khác); `HostsController.toggleFamilyGrant` tự nâng mức trần lên `defaultRiskFor` nếu mức cũ thấp hơn; thêm gói quyền 1 chạm **"Điều khiển máy tính"** (`HostGrantProfile.desktopControl`: `media` R1, `window` R2, `app` R2, `url` R2, `cu` R3, `ui` R2, `input` R3 trong 1 ngày).
   - **`backend/`:** Đưa `cu.session_start`, `ui.inspect`, `input.click`, `input.type_text`, `input.key`, `input.scroll`, `cu.session_end`, `window.active_context` lên nhóm ưu tiên đầu `_PRIORITY_ORDER` trong `catalog.py`; bổ sung mô-đun prompt desktop không chứa tên app cứng (**H5**), `state_driven_hint` và hỗ trợ mảng `nodes` lớn trong `prompts.py`; bổ sung câu tóm tắt VI/EN trong `action_summary.py`; nối `InMemoryComputerUseSessionStore` vào `Orchestrator` để miễn hỏi duyệt lặp lại cho bước `R2` (`ui.inspect`, `input.click` thường, `input.key` thường, `input.scroll`) bên trong phiên `cu` đã ký duyệt `R3`, trong khi vẫn nâng lên `R3` (`ONCE` ký từ điện thoại) cho `cu.session_start`, `input.type_text`, `input.click` mang nhãn hệ trọng (kể cả tra ngược từ `cached_nodes` khi LLM bỏ trống `elementName`), `input.key(Enter, inForm=True)`, và chặn cứng ô mật khẩu trước khi hỏi duyệt.
 - **Validation:**
@@ -17,7 +232,7 @@ Last updated: **2026-11-11** (Asia/Ho_Chi_Minh). Latest: **Mở thông toàn b�
   - `mobile/`: chạy bằng `~/fvm/versions/3.32.8/bin/flutter --no-pub` (vì máy Mac hiện tại chạy macOS 12.6 `21G115`, trong khi Dart VM của Flutter `3.47.9` đòi macOS 14.0+; giữ nguyên `.fvmrc` = `3.47.9` và `pubspec.lock` không đổi): `flutter analyze --no-pub` **0 issues**, `flutter test --no-pub test/features/hosts/` **76/76 PASS**.
   - `backend/`: `ruff format --check` (9 file sửa) PASS, `ruff check src tests` PASS, `mypy --strict src` **0 issues (229 files)**, `pytest` **614 passed / 76 skipped** (`XUNA_TEST_DATABASE_URL` chưa đặt). Quét **H5** trên `prompts.py`, `catalog.py`, `orchestrator.py`: 0 tên ứng dụng cứng.
 - **Chưa kiểm chứng thực tế (**H8**):** Chưa chạy phiên điều khiển đầu-cuối thật với LLM thật + ứng dụng macOS/Windows thật + ký duyệt R3 trực tiếp trên điện thoại; `screen.capture` mặc định vẫn chưa có driver chụp ảnh native trên Desktop (luồng điều khiển dựa trên cây Accessibility `ui.inspect`).
-- **Chưa commit** (chờ chủ yêu cầu). Lưu ý có sẵn vài file dirty từ phiên trước không liên quan (`desktop/lib/core/channel/xuna_host_channel.dart`, `desktop/macos/Runner/XunaHostPlugin+AppsAndContext.swift`, `mobile/ios/XunaWidgetExtension/XunaWidget.swift`, `backend/tests/modules/consent/test_consent_api.py`, `firmware/lib/xuna_core/include/xuna/visual/SymbioticRoom.h`) được giữ nguyên không đụng tới.
+- **Đã commit tối 2026-11-11.** Đính chính 2026-11-12: các file dirty từ phiên trước liệt kê dưới đây đã nằm trong chính các commit đó, không phải "giữ nguyên" (`desktop/lib/core/channel/xuna_host_channel.dart`, `desktop/macos/Runner/XunaHostPlugin+AppsAndContext.swift`, `mobile/ios/XunaWidgetExtension/XunaWidget.swift`, `backend/tests/modules/consent/test_consent_api.py`, `firmware/lib/xuna_core/include/xuna/visual/SymbioticRoom.h`) được giữ nguyên không đụng tới.
 
 ## 2026-11-06 — Gia cố điều khiển UI desktop: chỉ đọc, hết đoán mục tiêu và dữ liệu bịa (`desktop/`)
 

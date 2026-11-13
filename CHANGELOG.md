@@ -1,6 +1,97 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-11** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-13** (Asia/Ho_Chi_Minh).
+
+## 2026-11-13 — Không lưu mẫu chạy lại không được; nút duyệt luôn với tới được (UDC-17 S17.5, bổ sung) (`backend/`, `mobile/`)
+
+- **Mẫu chạy lại:** nếu phiên vừa xong có quá nhiều app/tên miền để hiện đủ trên một thẻ duyệt, khung chat không mời lưu thành mẫu nữa mà nói rõ lý do. Trước đây mẫu đó lưu được nhưng chạy lại luôn bị từ chối.
+- **Khung chat trên màn nhỏ:** phần dưới khung chat (thẻ phiên, thẻ duyệt, nút dừng) giờ cuộn được khi thiếu chỗ, ví dụ khi bàn phím đang mở. Thẻ duyệt dài không còn đẩy nút Đồng ý/Từ chối ra khỏi màn hình. Khi có thẻ duyệt hoặc màn hình thấp, tiêu đề và hình XUNA ở đầu khung chat tạm ẩn.
+- **Kiểm chứng (máy Windows):** backend 811 passed (PostgreSQL), mobile 525/525; ruff/mypy/analyze sạch. Chưa chạy trên điện thoại thật; chưa commit.
+
+## 2026-11-13 — Thẻ duyệt mở phiên hiện đủ mọi app và tên miền (UDC-17 S17.5, bổ sung) (`backend/`, `mobile/`)
+
+- **Sửa:** khi XUNA xin mở phiên điều khiển máy tính, thẻ duyệt giờ liệt kê **mọi** app và **mọi** tên miền bạn sắp ký, cùng số bước, số phút và tên máy. Trước đây thẻ chỉ hiện 4 app đầu và không hiện tên miền.
+- **Không vừa thì không hỏi:** nếu phạm vi quá dài để hiện đủ trên một thẻ, XUNA không hỏi ký mà phải mở phiên nhỏ hơn rồi xin thêm sau. Mẫu chạy lại có phạm vi quá lớn sẽ được báo rõ là không chạy lại được.
+- **Sửa trên điện thoại:** hộp duyệt không còn cắt chữ sau 4 dòng (lỗi này ảnh hưởng cả thẻ "Thêm vào phiên điều khiển").
+- **Kiểm chứng (máy Windows):** backend 808 passed (PostgreSQL), mobile 521/521; ruff/mypy/analyze sạch. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-13 — Chạy lại mẫu không còn bị từ chối lần đầu (UDC-17 S17.5, bổ sung) (`backend/`)
+
+- Khi bạn bấm "Chạy lại", backend báo trước cho XUNA đúng máy, app, tên miền và giới hạn của mẫu, nên lần mở phiên đầu khớp luôn. Việc kiểm khớp vẫn giữ nguyên.
+- **Kiểm chứng (máy Windows):** backend 797 passed (PostgreSQL), ruff/mypy sạch. Chưa thử với model thật; chưa commit.
+
+## 2026-11-13 — Lưu một việc trên máy tính thành mẫu để chạy lại (UDC-17 S17.5, phần 2) (`backend/`, `mobile/`)
+
+- **Mới:** khi XUNA báo đã xong một việc trên máy tính, khung chat mời "Lưu thành mẫu". Bạn đặt tên, xem lại mục tiêu rồi lưu. Mẫu chỉ nằm trên điện thoại này, cho tài khoản đang đăng nhập.
+- **Chạy lại:** "Mẫu đã lưu" → "Chạy lại" gửi lại mục tiêu. Backend chỉ chấp nhận mở phiên trên đúng máy, đúng app và tên miền của mẫu, không quá số bước và số phút. Bạn vẫn phải ký trên điện thoại; thẻ duyệt ghi rõ đang chạy lại mẫu nào.
+- **Xoá** mẫu luôn hỏi xác nhận. "Chạy lại" bị tắt khi đang có phiên chạy.
+- **Triển khai:** backend phải lên trước app.
+- **Kiểm chứng (máy Windows):** backend test mới qua, mobile 520/520; analyze/ruff/mypy sạch. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-13 — Gợi ý "Luôn cho phép" cho việc bạn hay duyệt (UDC-17 S17.5, phần 1) (`backend/`, `mobile/`)
+
+- **Mới:** khi đúng một việc (cùng máy, cùng tham số) đã được duyệt từ 3 lần trong 30 ngày, thẻ duyệt nói rõ số lần và làm nổi nút "Luôn cho phép việc này (7 ngày)". Không tự bật gì; chỉ việc R2 đủ điều kiện duyệt trước mới có gợi ý.
+- **Kiểm chứng (máy Windows):** backend test mới qua (cả PostgreSQL), mobile 504/504; analyze/ruff/mypy sạch. Chưa chạy trên điện thoại thật; chưa commit.
+
+## 2026-11-13 — XUNA tìm nút nhanh hơn và biết màn hình đổi gì sau mỗi bước (UDC-17 S17.4, phần Dart/backend) (`desktop/`, `backend/`, docs)
+
+- **Mới, `ui.find`:** XUNA tìm phần tử theo tên hoặc loại (nút, ô nhập…) thay vì đọc cả cây giao diện. Nó trả vài ứng viên và không tự chọn hộ. Không tìm trong nội dung ô; ô mật khẩu luôn bị che.
+- **Mới, `changes`:** sau mỗi cú bấm/gõ/phím, kết quả cho biết phần tử nào mới xuất hiện (kèm mã để bấm tiếp), mã nào hết dùng được, nút nào vừa bật/tắt. XUNA không phải đọc lại cả cây.
+- **An toàn hơn khi màn hình xô lệch:** khi thứ tự phần tử thay đổi, mã của phần tử có tên vẫn trỏ đúng phần tử đó. Khi không chắc (nút không tên, nút trùng tên), mã bị huỷ để XUNA đọc lại, không bao giờ trỏ sang phần tử khác.
+- **Sửa:** sau một cú bấm mở app ngoài phạm vi phiên, kết quả không còn chứa tiêu đề hộp thoại của app đó.
+- **Đổi luật chặn lặp (chủ duyệt):** XUNA bấm lại được cùng một nút khi lần trước làm màn hình đổi (sang trang sau, nút "+"). Lặp đúng thao tác vừa không làm gì vẫn dừng phiên.
+- **Chưa làm:** mã theo định danh thật của hệ điều hành (cần chạy trên Mac).
+- **Kiểm chứng (máy Windows):** `xuna_xtp` 43/43, `desktop` 89/89, `backend` 762 passed (một lần chạy trước có 1 test hội thoại chập chờn, qua khi chạy lại); analyze/ruff/mypy sạch. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-13 — UDC-17 S17.6: kho phiên bền, heartbeat thật, sửa chặn nhầm "Quên mật khẩu", `url.open` chặn địa chỉ nội bộ, đo số lần hỏi
+
+- Chi tiết và kiểm chứng: [UDC-17 §12](docs/roadmap/device-control/UDC-17-smart-control-plan.md). Chưa commit; chưa chạy máy thật. (Mục này trước đây bị ghi nhầm vào cuối file; chuyển lên đây ngày 2026-11-13.)
+
+## 2026-11-13 — Thẻ phiên trực tiếp và nút dẫn tới chỗ bật quyền (UDC-17 S17.3) (`mobile/`, `backend/`, `desktop/`, docs)
+
+- **Thẻ phiên trên điện thoại:** trong khi XUNA điều khiển máy tính, khung chat hiện mục tiêu, tên máy, bước x/y, số phút còn lại, phạm vi app/tên miền và **toàn bộ chữ đang soạn**. Thẻ vẫn còn khi tắt mở app hay qua lượt chat khác, và tự biến mất khi phiên kết thúc.
+- **Dừng phiên:** nút mới chỉ dừng phiên đó (trên XUNA và trên máy tính), không khoá quyền như Dừng khẩn cấp. Nút Dừng khẩn cấp vẫn ở trên thẻ.
+- **Thêm app giữa phiên:** XUNA xin một chữ ký "Thêm vào phiên điều khiển: …" thay vì kết thúc và mở phiên mới. Số bước và thời gian không đổi; tối đa 8 app và 12 tên miền mỗi phiên. Hộp duyệt luôn hiện đủ từng tên; tên quá dài thì XUNA bị từ chối chứ không xin ký một tên bị cắt.
+- **Bị từ chối có nút sửa:** chip lỗi trong chat có nút "Bật quyền điều khiển màn hình" hoặc "Mở quyền của máy" (mở đúng máy). Thiếu quyền trên máy tính thì ghi rõ cần bật trên máy.
+- **Sửa:** lối tắt Dừng khẩn cấp trên màn hình chính trước đây báo "đã dừng" mà không gửi gì tới XUNA; giờ dừng thật và nói rõ khi chưa dừng được.
+- **Kiểm chứng (máy Windows):** `xuna_xtp` 37/37, `desktop` 73/73, `backend` 739 passed, `mobile` 500/501 (test đỏ là một test giọng nói chập chờn, qua khi chạy riêng); analyze/ruff/mypy sạch. Ba phần phải triển khai cùng lúc. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-12 — Gõ nháp không cần ký, chỉ ký ở bước gửi (UDC-17 S17.2) (`desktop/`, `backend/`, docs)
+
+- **Mới:** trong phiên điều khiển máy tính, XUNA gõ chữ vào ô văn bản thường mà không hỏi ký từng lần (tối đa 2.000 ký tự mỗi phiên). Ô mật khẩu vẫn bị chặn; gõ vào chỗ không phải ô văn bản, gõ nhiều dòng hoặc gõ bằng phím thật vẫn phải ký; khi còn bản nháp chưa gửi, bấm nút chỉ có icon cũng phải ký.
+- **Thẻ ký ở bước gửi cho thấy nội dung:** khi XUNA bấm Gửi hoặc `Enter`, hộp duyệt ghi thêm "Đã gõ: '…'" là chữ đã soạn từ lần gửi trước.
+- **`Enter`/`Space` theo ngữ cảnh:** logic đã có, nhưng chưa có hiệu lực trên máy thật vì máy tính chưa đọc được ô đang focus đủ chắc; hiện vẫn hỏi ký như trước.
+- **Ảnh hưởng tới quyền:** máy có quyền `input` chỉ tới R2 cũng gõ nháp được.
+- **Kiểm chứng (máy Windows):** `xuna_xtp` 36/36, `desktop` 69/69, `backend` 729 passed; analyze/ruff/mypy sạch. Backend và desktop phải triển khai cùng lúc. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-12 — Máy tính tự quyết mức rủi ro trước khi hỏi duyệt (UDC-17 S17.1) (`desktop/`, `backend/`, docs)
+
+- **Mới:** trước khi xin chủ duyệt một cú bấm, gõ chữ hay phím trên máy tính, backend hỏi máy tính (`xuna/preflight`) xem thao tác đó vào đúng phần tử nào và mức rủi ro bao nhiêu. Máy tính đọc màn hình thật để trả lời. Backend chỉ được nâng mức đó, không được hạ.
+- **Hộp duyệt ghi đúng chữ trên nút:** nếu LLM gọi nút "Gửi báo cáo" là "Mở", điện thoại vẫn hiện "Gửi báo cáo" và hỏi ký R3.
+- **Hết kẹt sau khi ký:** trước đây cú bấm bị nâng R3 vì nhãn trên màn hình vẫn bị máy tính từ chối dù chủ đã ký; nay máy tính kiểm chữ ký điện thoại trực tiếp.
+- **Hỏi ít hơn khi máy tính từ chối sẵn:** ô mật khẩu, phần tử đã cũ, phiên đã hết được báo cho LLM ngay, không hiện hộp duyệt vô ích.
+- **Tương thích:** máy tính bản cũ vẫn chạy như trước; trả lời chậm, sai định dạng hay mất kết nối đều coi là R3.
+- **Kiểm chứng (máy Windows):** `xuna_xtp` 35/35, `desktop` 61/61, `backend` 720 passed; analyze/ruff/mypy sạch. Chưa chạy trên máy thật; chưa commit.
+
+## 2026-11-12 — Chủ duyệt gói quyền "Rộng tay"; phiên dài hơn và quyền 30 ngày (`desktop/`, `backend/`, `mobile/`, docs)
+
+- **Quyết định:** chủ chọn gói "Rộng tay" của plan [UDC-17](docs/roadmap/device-control/UDC-17-smart-control-plan.md). Ghi tại [ADR-0015](docs/decisions/ADR-0015-commit-gated-control-and-trusted-scopes.md): gõ nháp tự do trong phiên, `Enter` theo ngữ cảnh, chế độ tin cậy cho việc R2, app tin cậy, đếm ngược thay cho ký với bước chốt nhẹ ở app chủ chọn. Thanh toán, đăng công khai, xoá tài khoản, gỡ cài đặt và mọi thứ không phân loại được vẫn ký từng lần. Không làm: tin cậy trình duyệt trên mọi tên miền, tự lái hoàn toàn.
+- **E1 đã làm:** phiên điều khiển tối đa 40 bước / 20 phút (trước 20 / 10) ở `xuna_xtp` (hằng `maxCuSessionSteps`, `maxCuSessionMinutes`), `desktop/` và `backend/`.
+- **E2 đã làm:** gói "Điều khiển máy tính" và công tắc mở mới mức R3 có hạn 30 ngày (trước 1 ngày) ở `mobile/`; thêm nhãn "hết hạn sau N ngày".
+- **Chưa làm:** mọi phần còn lại của ADR-0015 (cần bước preflight S17.1 trước).
+- **Kiểm chứng (máy Windows):** `xuna_xtp` 32/32; `desktop` 54/54, analyze sạch; `backend` `ruff check` + `mypy --strict` sạch, 703 passed (PostgreSQL); `mobile` analyze sạch, hosts 80/80. Chưa chạy trên máy tính/điện thoại thật; chưa commit.
+
+## 2026-11-12 — Sửa sau review đợt mở thông điều khiển máy tính (`desktop/`, `backend/`, `mobile/`)
+
+- **Bối cảnh:** review các commit 2026-11-11 tìm ra một lỗ hổng duyệt và vài chỗ code không khớp tài liệu.
+- **`Enter`/`Space` luôn cần ký duyệt R3 (`desktop/` `xuna_xtp`, `backend/`):** trước đây `input.key` chỉ lên R3 khi LLM tự khai `inForm=true`, nên trong phiên `cu` LLM có thể bấm `Enter` (gửi tin, submit biểu mẫu) mà không ai duyệt. Giờ mọi tổ hợp kết thúc bằng `Enter`/`Return`/`Space` là R3 ở cả hai phía (`isActivationKeyCombo` / `is_activation_key_combo`); `inForm` vẫn được nhận nhưng không còn ảnh hưởng tới mức duyệt. Phím điều hướng (`Tab`, `Esc`, mũi tên, `Cmd+F`…) vẫn R2 và chạy mượt trong phiên.
+- **Đọc `CFBundleIdentifier` thật (`desktop/`):** `AutoAppScanner` thay đoạn đoán chuỗi trong plist binary bằng bộ đọc `bplist00` tối thiểu (trailer → bảng offset → dictionary gốc → giá trị gắn với khoá). Thiếu khoá hoặc file hỏng trả `null`, không suy đoán. Không dùng `plutil`.
+- **Di trú policy đúng phạm vi (`desktop/`):** `migrateMissingDesktopFamilies` chỉ thêm `cu`, `screen`, `ui`, `input`. Các family khác vắng mặt vẫn bị chặn như trước.
+- **Cờ `allowZeroConfigAppDiscovery` có hiệu lực (`desktop/`):** `ComputerUseSessionManager.startSession` không còn tự bật zero-config chỉ vì có scanner.
+- **Lý do từ chối tới được LLM (`backend/`):** từ chối do quyền trả `errorCode` (`u5_consent_required` / `grant_denied`) trong kết quả công cụ; thêm `state_driven_hint` cho `u5_consent_required` và `approval_required`; lỗi đọc Consent U5 log ở mức `warning`.
+- **Phiên `cu` phía backend không treo (`backend/`):** khi host báo `cu_session_required` (hoặc hết ngân sách) trên bất kỳ công cụ `screen`/`ui`/`input` nào, backend đóng bản ghi phiên của mình.
+- **Công tắc R3 có hạn (`mobile/`):** bật công tắc mở mới mức R3 (`cu`, `input`) tự đặt hạn như gói "Điều khiển máy tính" (lúc sửa là 1 ngày, cùng ngày nâng lên 30 ngày theo ADR-0015 E2); quyền đã là R3 giữ nguyên hạn chủ đã chọn.
+- **Kiểm chứng (máy Windows):** `xuna_xtp` analyze sạch, 31/31 PASS; `desktop` analyze sạch, 54/54 PASS (Flutter 3.32.8); `backend` `ruff check` + `mypy --strict` sạch, `pytest` 703 passed với PostgreSQL (một lần chạy có `test_http_self_enroll_and_action_result_with_output` fail, chạy riêng 3 lần và chạy lại toàn bộ đều qua); `mobile` analyze sạch, `test/features/hosts/` 80/80 PASS (Flutter 3.47.9). `ruff format --check` toàn repo backend và `dart format` của `xuna_xtp` đã không sạch từ trước thay đổi này. **Chưa chạy** trên macOS thật (bộ đọc plist chỉ được test bằng dữ liệu dựng tay), chưa chạy phiên điều khiển thật, chưa commit.
 
 ## 2026-11-11 — Mở thông điều khiển máy tính cá nhân đầu-cuối (`desktop/`, `mobile/`, `backend/`)
 
@@ -8,14 +99,14 @@ Last updated: **2026-11-11** (Asia/Ho_Chi_Minh).
 - **Thay đổi trên `desktop/` & `xuna_xtp`:**
   - `HostPolicyStore` bật mặc định `cu`, `screen`, `ui`, `input` và tự di trú bổ sung các family desktop còn thiếu trên file `host-policy.json` cũ mà vẫn tôn trọng mọi family chủ đã tắt tay (`block`).
   - Cho phép `cu.session_start` dùng danh sách ứng dụng quét tự động (`allowZeroConfigAppDiscovery`) và mở mọi tên miền `https://` công khai hợp lệ cho `url.open` / `cu.session_start` (vẫn chặn cứng `http://`, `localhost`, `.local`, IP literal, `userinfo`; mỗi lần gọi vẫn qua duyệt trên điện thoại; `workflow.batch_steps` giữ nguyên kiểm tra `urlDomains`).
-  - `AutoAppScanner` đọc `CFBundleIdentifier` của `.app` trên macOS (cả plist XML và binary) và `ComputerUseSessionManager` đối chiếu cửa sổ theo cả slug lẫn Bundle ID để không trượt khi hệ điều hành hiển thị tên tiếng Việt; `screen.capture` báo `not_determined` trung thực khi chưa có driver chụp ngoài.
+  - `AutoAppScanner` đọc `CFBundleIdentifier` của `.app` trên macOS (plist XML; phần binary lúc đó là đoán chuỗi, đã thay bằng bộ đọc thật ngày 2026-11-12) và `ComputerUseSessionManager` đối chiếu cửa sổ theo cả slug lẫn Bundle ID để không trượt khi hệ điều hành hiển thị tên tiếng Việt; `screen.capture` báo `not_determined` trung thực khi chưa có driver chụp ngoài.
 - **Thay đổi trên `mobile/`:**
   - Hiển thị công tắc nhóm quyền `cu`, `ui`, `input` trên chi tiết máy tính (`macos`/`windows`), cho phép cấp trần `R3` cho `{ui, cu, input}`, và thêm gói quyền một chạm **"Điều khiển máy tính"** (`media` R1, `window` R2, `app` R2, `url` R2, `cu` R3, `ui` R2, `input` R3 trong 1 ngày).
 - **Thay đổi trên `backend/`:**
   - Đưa `cu.session_start`, `ui.inspect`, `input.click`, `input.type_text`, `input.key`, `input.scroll`, `cu.session_end`, `window.active_context` vào nhóm ưu tiên đầu `_PRIORITY_ORDER`; bổ sung câu duyệt VI/EN, gợi ý `state_driven_hint` và giữ tới 64 `nodes` UI trong giới hạn 6 KiB.
   - Nối kiểm tra Consent `U5` (`host_screen`) thật vào cả danh mục công cụ lẫn `Orchestrator` trên SSE và Voice WebSocket.
   - Nối `InMemoryComputerUseSessionStore` vào `Orchestrator`: khi chủ đã ký duyệt `R3` mở phiên `cu.session_start`, các bước điều hướng `R2` (`ui.inspect`, `input.click` thường, `input.key` thường, `input.scroll`) chạy mượt trong phiên không hỏi lặp lại; riêng `input.type_text`, nút hệ trọng (`Xóa`/`Gửi`/`Thanh toán`... kể cả tra ngược từ `cached_nodes`) và `Enter` trong biểu mẫu vẫn bắt buộc ký duyệt `R3` từng lần, còn ô mật khẩu bị chặn cứng ngay trước khi hỏi duyệt.
-- **Kiểm chứng:** `xuna_xtp` 30/30 PASS; `desktop` analyze sạch + 51/51 test PASS; `mobile` analyze sạch + `test/features/hosts/` 76/76 PASS (chạy trên Flutter 3.32.8 `--no-pub` do máy Mac chạy macOS 12.6, giữ nguyên `.fvmrc` 3.47.9 và `pubspec.lock`); `backend` `ruff check` + `mypy --strict src` sạch + `pytest` 614 passed / 76 skipped. **Chưa chạy** phiên điều khiển thật đầu-cuối với LLM thật và ký duyệt trực tiếp trên điện thoại; chưa commit.
+- **Kiểm chứng:** `xuna_xtp` 30/30 PASS; `desktop` analyze sạch + 51/51 test PASS; `mobile` analyze sạch + `test/features/hosts/` 76/76 PASS (chạy trên Flutter 3.32.8 `--no-pub` do máy Mac chạy macOS 12.6, giữ nguyên `.fvmrc` 3.47.9 và `pubspec.lock`); `backend` `ruff check` + `mypy --strict src` sạch + `pytest` 614 passed / 76 skipped. **Chưa chạy** phiên điều khiển thật đầu-cuối với LLM thật và ký duyệt trực tiếp trên điện thoại. (Đã commit tối 2026-11-11.)
 
 ## 2026-11-06 — Gia cố điều khiển UI trên máy tính: bỏ đoán mục tiêu và dữ liệu bịa (`desktop/`)
 
