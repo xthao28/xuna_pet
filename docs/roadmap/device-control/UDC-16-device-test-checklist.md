@@ -6,7 +6,7 @@ Dành cho chủ dự án. Tất cả mục dưới đây **đã qua test tự đ
 
 Điều khiển máy tính (§4c–§4k): dựng môi trường theo [UDC-17-test-setup.md](UDC-17-test-setup.md) (Mac chạy backend và app máy tính, điện thoại Android). iPhone hiện chưa build được (macOS 12.6 không chạy được Flutter 3.47.9).
 
-- [ ] **Làm đầu tiên:** chạy `alembic upgrade head` trên backend/DB thật (phải tới `0019_cu_sessions`; `0018` là duyệt trước, `0019` là kho phiên điều khiển) rồi **khởi động lại backend**. Thiếu `0018` thì các route `/v1/actions/standing-approvals` lỗi; thiếu `0019` thì phiên điều khiển máy tính lỗi.
+- [x] **Làm đầu tiên:** chạy `alembic upgrade head` trên backend/DB thật (phải tới `0019_cu_sessions`; `0018` là duyệt trước, `0019` là kho phiên điều khiển) rồi **khởi động lại backend**. Thiếu `0018` thì các route `/v1/actions/standing-approvals` lỗi; thiếu `0019` thì phiên điều khiển máy tính lỗi. *(Đã chạy 2026-11-13 trên Mac: DB `xuna_local` lên `0019 (head)`, `uvicorn` chạy tại `0.0.0.0:8000` `/readyz=ready`, IP LAN `192.168.2.11`, host `Xuans MacBook Pro` lên `active` với 72 công cụ).*
 
 - [ ] Máy Android thật (khuyến nghị) hoặc emulator Pixel có Play Store/launcher Pixel. LDPlayer **không** ghim được widget và không có menu Widgets, nên chỉ dùng để thử phần không liên quan widget.
 - [ ] Build bằng Flutter **3.32.8**, không dùng `fvm flutter` hay 3.47.9. Kiểm lại 2026-11-13: 3.47.9 build hỏng (Android Gradle Plugin 9 "new DSL") và tự sửa `android/gradle.properties`. Thêm `--dart-define=XUNA_API_BASE_URL=http://<IP backend>:8000` và đặt `android/app/google-services.json`, nếu không sẽ không đăng nhập được:
@@ -114,7 +114,7 @@ Hỏi XUNA trong chat để model gọi tool, ví dụ "mở app Cài đặt ghi
 - [ ] Chưa bật Consent điều khiển màn hình (U5) rồi nhờ XUNA thao tác trong app máy tính: XUNA nói rõ cần bật quyền, không im lặng hay thử lại.
 - [ ] Nhờ XUNA làm một việc dài (trên 20 bước hoặc trên 10 phút): phiên không bị cắt ở mốc cũ, và tự dừng ở 40 bước / 20 phút.
 - [ ] macOS: mở phiên với một app có tên hiển thị tiếng Việt (ví dụ Ghi chú): XUNA đọc được cửa sổ, không báo `target_outside_allowlist`.
-- [ ] Máy tính có `host-policy.json` cũ: sau khi cập nhật, chỉ `cu`/`screen`/`ui`/`input` được thêm; family nào trước đó không có trong file vẫn bị chặn.
+- [x] Máy tính có `host-policy.json` cũ: sau khi cập nhật, chỉ `cu`/`screen`/`ui`/`input` được thêm; family nào trước đó không có trong file vẫn bị chặn. *(Đã kiểm trên Mac 2026-11-13: `~/Library/Application Support/XUNA/host-policy.json` từ 2026-11-03 vốn có `media`/`app`/`url`/`workflow`, khi mở bản `26debd4` chỉ thêm đúng `cu`/`screen`/`ui`/`input`).*
 
 ## 4d. Máy tính tự quyết mức rủi ro (UDC-17 S17.1, thêm 2026-11-12)
 

@@ -2,10 +2,13 @@
 
 Ngày: 2026-11-13. Dành cho chủ dự án, trước khi làm checklist [UDC-16](UDC-16-device-test-checklist.md) (§4c–§4k).
 
-**Trạng thái:**
-- Chưa ai chạy luồng điều khiển máy tính đầu-cuối: backend thật, app máy tính thật, điện thoại thật, model thật.
-- Đã kiểm: build APK dev trên máy Windows bằng Flutter 3.32.8 (2026-11-13). Build thành công, `pubspec.lock` và các file được track không đổi.
-- Chưa kiểm: mọi bước trên Mac với bản hiện tại. App máy tính **chưa từng được build** thành app macOS (`flutter build macos` / `flutter run -d macos`).
+**Trạng thái (cập nhật kết quả chạy thật trên Mac tối 2026-11-13):**
+- **Đã chạy trên Mac (`macOS 12.6 Build 21G115 darwin-x64`, `Xcode 14.2 14C18`):**
+  - **Backend (`39e9b05`):** `Python 3.12.8`, `ruff check` + `mypy` sạch, `pytest` PostgreSQL `xuna_test` **811/811 PASS**. DB `xuna_local` đã `alembic upgrade head` từ `0018` lên **`0019 (head)`**. `uvicorn` đang chạy tại `0.0.0.0:8000` (với `.env.gemini` + `.env.groq`), `curl localhost:8000/readyz` trả `{"status":"ready"}`. IP LAN hiện tại của Mac (`en0`): **`192.168.2.11`**.
+  - **App máy tính (`26debd4`, Flutter `3.32.8`):** `packages/xuna_xtp` **43/43 PASS**, `desktop/` **89/89 PASS**, analyze sạch. `fvm flutter build macos --debug` thành công ngay không lỗi (`build/macos/Build/Products/Debug/xuna_desktop.app`, 0 file đổi; đính chính: máy Mac này đã từng có thư mục `build/macos` từ `2026-11-06`, đây là lần build đầu của bản UDC-17). App đã mở, tự di trú `host-policy.json` cũ thêm đúng `cu`/`screen`/`ui`/`input`, tự kết nối `ws://127.0.0.1:8000/v1/hosts/connect` và đăng ký **72 công cụ** (có `ui.find`, `cu.session_extend`) vào `host_manifests` cho `Xuans MacBook Pro` (`active`).
+  - **Board XUNA (`f385feb`, `xuna_t_display_s3`):** `pio test -e native` **423/423 PASS**, đã sao lưu NVS (`~/xuna_backups/2026-11-13-upload/`) và nạp thành công lên `/dev/cu.usbmodem14201` (`recover=Ok boot=118`, giữ nguyên `PetId`, `persona_restored` và `device_key`; đang chờ chủ kiểm màn hình LCD và 2 nút).
+- **Đã kiểm trên máy Windows (2026-11-13):** build APK dev bằng Flutter 3.32.8 thành công, `pubspec.lock` và các file được track không đổi.
+- **Chưa chạy:** cài APK có `google-services.json` lên điện thoại Android trỏ vào `http://192.168.2.11:8000` và chạy phiên điều khiển máy tính đầu-cuối với model thật (§4c–§4k).
 
 ## Vì sao Mac + Android
 
@@ -32,21 +35,28 @@ export XUNA_TEXT_API_KEY=...
 .venv/bin/uvicorn xuna_backend.main:app --host 0.0.0.0 --port 8000 --no-access-log
 ```
 
-- Kiểm: `curl localhost:8000/readyz` trả `{"status":"ready"}`.
-- Lấy IP của Mac trong mạng nhà: `ipconfig getifaddr en0`. Nếu tường lửa macOS hỏi, cho phép Python nhận kết nối.
+- Kiểm: `curl localhost:8000/readyz` trả `{"status":"ready"}`, và từ trình duyệt điện thoại vào `http://192.168.2.11:8000/readyz` cũng phải trả `{"status":"ready"}`.
+- Lấy IP của Mac trong mạng nhà: `ipconfig getifaddr en0` (`192.168.2.11`).
+- **Tường lửa macOS (đã gặp thật 2026-11-13):** `Python.app` của Homebrew 3.12 ký `adhoc` nên khi chạy `uvicorn` nền sẽ bị Firewall macOS âm thầm chặn gói tin từ mạng LAN vào cổng `8000` (dù `localhost` vẫn vào được). Mở bằng lệnh:
+  ```sh
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/Resources/Python.app
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /usr/local/Cellar/python@3.12/3.12.8/Frameworks/Python.framework/Versions/3.12/Resources/Python.app
+  ```
 - Để mặc định `XUNA_TEXT_PROVIDER=echo` thì XUNA chỉ nhại lại và **không bao giờ gọi công cụ**, nên không điều khiển được gì.
 
 ## 2. App máy tính trên Mac
 
 ```sh
 cd desktop
-fvm flutter run -d macos   # Flutter 3.32.8 theo desktop/.fvmrc; cần Xcode
+fvm flutter build macos --debug   # Flutter 3.32.8 theo desktop/.fvmrc; Xcode 14.2 vẫn build được
+open build/macos/Build/Products/Debug/xuna_desktop.app
+# Hoặc chạy trực tiếp từ CLI: fvm flutter run -d macos
 ```
 
-- App kết nối `ws://127.0.0.1:8000/v1/hosts/connect` (mặc định). Backend ở máy khác thì thêm `--dart-define=XUNA_WS_URL=ws://<IP>:8000/v1/hosts/connect`.
-- Cấp quyền cho app trong System Settings → Privacy & Security: **Accessibility** (Trợ năng) và **Screen Recording** (Ghi màn hình).
-- Ghép máy: tab "Ghép nối" của app máy tính. Trên điện thoại, vào trang Máy tính để xác nhận.
-- Nếu build lỗi: ghi lại lỗi và báo lại. Đây là lần build macOS đầu tiên.
+- App kết nối `ws://127.0.0.1:8000/v1/hosts/connect` (mặc định). Backend ở máy khác thì dùng `fvm flutter run -d macos --dart-define=XUNA_WS_URL=ws://<IP>:8000/v1/hosts/connect`.
+- Cấp quyền cho app: trên macOS 12.6 vào **System Preferences → Security & Privacy → tab Privacy** (trên macOS 13+ là System Settings → Privacy & Security), bật **Accessibility** (Trợ năng) và **Screen Recording** (Ghi màn hình) cho `xuna_desktop.app`.
+- **Lưu ý chữ ký ad-hoc:** kiểm tra bằng `codesign -dvv` cho thấy bản debug ký **`Signature=adhoc`** (`TeamIdentifier=not set`). Vì macOS gắn quyền TCC với CDHash của bản ad-hoc, sau mỗi lần build lại có thể mất quyền đã cấp — nếu gặp `needs_permission` dù ô vẫn tích, hãy bỏ chọn/xoá mục `xuna_desktop` cũ bằng nút `-` rồi thêm lại bản `.app` mới.
+- Ghép máy: máy `Xuans MacBook Pro` trên Mac này đã ghép sẵn và tự lên `active` (72 công cụ). Nếu ghép máy mới: vào tab "Ghép nối" của app máy tính, rồi trên điện thoại vào trang Máy tính để xác nhận.
 
 ## 3. App Android (build trên máy Windows)
 

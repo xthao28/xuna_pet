@@ -1,6 +1,20 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-13** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-15** (Asia/Ho_Chi_Minh).
+
+## 2026-11-15 — Nâng cấp điều khiển tự chủ UDC-18 Wave A & sửa tương thích R3 trên iPhone (`backend/`, `desktop/`, `mobile/`, docs)
+
+- **Sửa lỗi duyệt phiên R3 trên iPhone:** backend chuẩn hóa `action_pending.risk` về chữ thường (`r1`..`r3`) qua `ActionPendingEvent.wire_payload()`, giúp bản app hiện cài trên iPhone mở và tạo ghi chú trên Mac thành công đầu-cuối; app mobile bổ sung nhận cả chữ hoa/thường.
+- **Ít hỏi lại hơn trong một phiên điều khiển (`CU Session Trust Envelope`):** khi bạn đã ký `R3` mở phiên điều khiển, XUNA tự mở các app nằm trong phạm vi phiên, gõ văn bản nhiều dòng (`\n`) và bấm các phím tắt soạn thảo an toàn (`Cmd+N`, `Cmd+A`, `Cmd+C`, `Cmd+V`, phím mũi tên) mà không hỏi ký lại từng bước. Việc xoá, gửi đi, thanh toán hay nhảy sang app ngoài phạm vi vẫn bắt buộc hỏi `R3`.
+- **Nhớ phạm vi duyệt qua lần khởi động lại & tự nhận diện app cài sẵn:** lưu phạm vi cấp quyền xuống PostgreSQL (`0020_approval_scopes`); tích hợp `AutoAppScanner` với chế độ `Standard` để dùng được ngay các app thông thường mà vẫn chặn cứng 15 trình Terminal GUI.
+- **Ổn định vòng lặp AI nhiều bước:** giữ nguyên `thought_signature` khi chuyển giữa chat model và code model; gộp compact schema vào `tool_search`; tự che khóa API trong mọi log lỗi.
+- **Kiểm chứng:** `backend` **806 passed** (E2E Wave A **48/48**, PostgreSQL scope store **4/4**, `ruff` sạch), `xuna_xtp` **70/70**, `desktop` **96/96**, `mobile` `actions_test` **47/47**. Lộ trình Wave B–E được lưu tại [UDC-18-clawbot-upgrade-plan.md](docs/roadmap/device-control/UDC-18-clawbot-upgrade-plan.md).
+
+## 2026-11-13 — Nạp lại firmware cho board XUNA, build & chạy thật Desktop Agent và Backend trên Mac (docs)
+
+- **Board XUNA (`firmware` `f385feb`, `xuna_t_display_s3`):** kiểm thử native **423/423 PASS**, sao lưu NVS khớp 2 lần rồi nạp lên `/dev/cu.usbmodem14201`. Mạch khởi động sạch (`recover=Ok boot=118`, giữ nguyên `PetId`, tính cách, khoá thiết bị và kết nối BLE/HID, nhiệt độ chip `42.8 °C`); đang chờ chủ kiểm màn hình LCD và 2 nút.
+- **App máy tính trên Mac (`desktop` `26debd4`, Flutter `3.32.8` trên `macOS 12.6` / `Xcode 14.2`):** `xuna_xtp` **43/43**, `desktop` **89/89**, `flutter build macos --debug` thành công ngay lần chạy (ký ad-hoc, không đổi file code). Mở app tự di trú đúng `host-policy.json` cũ (thêm `cu`/`screen`/`ui`/`input`), tự kết nối Backend và đăng ký đủ **72 công cụ** (có `ui.find`, `cu.session_extend`).
+- **Backend trên Mac (`backend` `39e9b05`):** `ruff check` + `mypy` sạch, `pytest` PostgreSQL **811/811 PASS**, nâng DB `xuna_local` lên `0019` và chạy `uvicorn` cổng `8000` (`/readyz=ready`, IP LAN `192.168.2.11`). Chưa test từ điện thoại Android với model thật; chưa commit.
 
 ## 2026-11-13 — Không lưu mẫu chạy lại không được; nút duyệt luôn với tới được (UDC-17 S17.5, bổ sung) (`backend/`, `mobile/`)
 
