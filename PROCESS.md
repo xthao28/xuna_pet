@@ -38,9 +38,14 @@ Last updated: **2026-11-15** (Asia/Ho_Chi_Minh). Latest: **UDC-18 Clawbot Upgrad
     - Mypy static type checker (strict): **0 issues** trên 239 source files.
   - **Chưa kiểm chứng trên thiết bị thật (H8):** 92 test tích hợp PostgreSQL tự skip khi chưa cấu hình `XUNA_TEST_DATABASE_URL` trên máy Windows này; chưa nạp app lên iPhone/Android vật lý để thử nghiệm thao tác chạm sinh trắc P-256 qua FaceID/TouchID thật và kết nối BLE tới board ESP32 thật.
   - Workspace: `mobile/pubspec.lock`, `desktop/pubspec.lock`, `mobile/.fvmrc`, `desktop/.fvmrc` và toàn bộ thư mục `firmware/` sạch 100%. Đã commit cục bộ (`backend` `5afd6ee`, `desktop` `43da4e2`, `mobile` `a42ed83`; chưa push).
-- **Handoff sang máy tiếp theo (Next Actions):**
-  1. Tài liệu nghiệm thu chi tiết Wave E tại [UDC-18-wave-e-results-2026-11-15.md](docs/roadmap/device-control/UDC-18-wave-e-results-2026-11-15.md).
-  2. Kế hoạch nâng cấp UDC-18 Clawbot Upgrade đã hoàn tất toàn bộ 5/5 Wave (A–E).
+- **Handoff sang máy tiếp theo (Next Actions — Lộ trình ưu tiên sau khi hoàn tất 5/5 Wave UDC-18):**
+  1. **Tài liệu nghiệm thu:** Chi tiết Wave E tại [UDC-18-wave-e-results-2026-11-15.md](docs/roadmap/device-control/UDC-18-wave-e-results-2026-11-15.md); danh sách mã tác vụ kế tiếp tại [PLAN.md](PLAN.md) (`UDC18-LIVE-1`..`3`, `AI-TUNE-1`, `MAC-NAT-1`, `HW-BOARD-1`).
+  2. **Ưu tiên số 1 — Lên bản & Nghiệm thu thực chiến đầu-cuối (theo đúng thứ tự `Backend → Desktop → Mobile`):**
+     - **Bước 1a (`UDC18-LIVE-1` — Backend & PostgreSQL):** Kéo nhánh `dev` về máy Mac/server, chạy `alembic upgrade head` để áp dụng 2 migration mới (`0020_approval_scopes`, `0021_autonomous_jobs`), và chạy `pytest` kèm `XUNA_TEST_DATABASE_URL` để xác nhận trọn vẹn 92 bài test PostgreSQL đang `skipped` trên Windows.
+     - **Bước 1b (`UDC18-LIVE-2` — Desktop Agent):** Build & mở lại `desktop/`, kiểm tra đăng ký đầy đủ bộ công cụ mới (`native.*`, `web.*`, `ui.observe_hybrid`, `mcp.*`, `forge.*`) và đồng bộ `xuna/get_policy` / `xuna/set_policy` với `host-policy.json`.
+     - **Bước 1c (`UDC18-LIVE-3` — Mobile iPhone/Android & 4 kịch bản thực chiến):** Cài bản `mobile/` mới, kiểm tra khung Chat thoáng rộng (+250–320 px), sau đó chạy thật với LLM: (i) tạo/tìm Notes hoặc Calendar 1 bước qua `native.*`; (ii) điều hướng `web.*` + `ui.observe_hybrid` và xác nhận dừng xin chữ ký P-256 trước thao tác `R3`; (iii) giao `AutonomousJob` nhiều chặng, khóa màn hình điện thoại >15s để xác nhận job vẫn chạy nền giữ nhịp tim CU, rồi mở máy thử **Mission Card**, **Pause / Steer / Takeover**; (iv) đổi `Strict / Standard / Autopilot` và chặn thử 1 app (`denyApps`) ngay trong `HostDetailSheet`.
+  3. **Ưu tiên số 2 — Tinh chỉnh định tuyến công cụ LLM & Chốt AI Provider (`AI-TUNE-1` / `D11a`):** Ghi nhận thực tế cách model chọn giữa `native.*` / `web.*` / `ui.observe_hybrid` để tinh chỉnh prompt trong `orchestrator.py` nếu cần, và chạy `backend/scripts/text_benchmark.py` phục vụ quyết định nhà cung cấp AI chính thức (`D11a`).
+  4. **Ưu tiên số 3 — Hoàn thiện Native macOS & Kiểm tra mạch vật lý (`MAC-NAT-1` & `HW-BOARD-1`):** Trên Mac bổ sung đọc `focusedRole` thật và `nativeId` bền vững của phần tử AX (`UDC-17` S17.2 & S17.4); trên mạch `T-Display-S3` (`firmware` `f385feb`) kiểm tra màn hình LCD, duyệt nhanh `R2` bằng 2 nút vật lý (`UDC-12`) và theo dõi tiến hóa tính cách `PE-3`/`PE-4`.
 
 ## 2026-11-15 — UDC-18 Clawbot Upgrade: Hoàn tất Wave D ("Runtime tự hành dài hơi & Bộ não đa bước như Clawbot") (`backend/`, `desktop/`, docs)
 

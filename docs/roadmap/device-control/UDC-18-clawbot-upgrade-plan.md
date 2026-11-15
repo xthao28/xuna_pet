@@ -111,3 +111,17 @@ Nguyên tắc thực thi để **mạnh như Clawbot mà không mất an toàn**
    - Thu gọn `HomeChatComposer`: bỏ nút ảnh mờ `onComingSoon`; bỏ hàng mic khổng lồ `72x72` + hint khi idle; đưa nút mic 48px lên cùng hàng ngang với input và send; chỉ hiện thanh thu âm gọn khi active.
    - Dọn sạch panel đáy: chuyển "Mẫu đã lưu" (`HomeCuTemplatesCard`) vào `HomeChatMenuSheet` (chiếm 0 px khi chat); chống va chạm thanh dừng `HomeActionStopBar`.
    - **Giải phóng ~250–320px chiều dọc**, nhường trọn vẹn không gian thoáng rộng cho hội thoại.
+
+---
+
+## Lộ trình tiếp theo sau khi hoàn tất 5/5 Wave (Post-UDC-18 Rollout & Next Steps)
+
+1. **Triển khai & Nghiệm thu thực chiến đầu-cuối (thứ tự bắt buộc: `Backend → Desktop → Mobile`):**
+   - **Backend & PostgreSQL (`UDC18-LIVE-1`):** Chạy `alembic upgrade head` (`0020_approval_scopes`, `0021_autonomous_jobs`) và chạy bộ `pytest` với `XUNA_TEST_DATABASE_URL` để xác nhận đủ 92 bài test tích hợp PostgreSQL.
+   - **Desktop Agent (`UDC18-LIVE-2`):** Build & khởi chạy bản mới trên Mac/PC, xác nhận đăng ký đầy đủ catalog (`native.*`, `web.*`, `ui.observe_hybrid`, `mcp.*`, `forge.*`) và RPC `xuna/get_policy` / `xuna/set_policy`.
+   - **Mobile & 4 kịch bản thực địa (`UDC18-LIVE-3`):** Cài bản `mobile/` mới lên iPhone/Android, kiểm tra không gian Chat mở rộng (+250–320 px) và chạy thật với LLM: (a) tạo/tìm Notes hoặc Calendar 1 bước; (b) `web.*` + `ui.observe_hybrid` kèm cổng ký P-256 ở bước nhạy cảm `R3`; (c) `AutonomousJob` dài hơi vẫn sống khi khóa màn hình điện thoại >15s + duyệt 1 chạm **Mission Card** + **Pause / Steer / Takeover**; (d) chỉnh `Strict / Standard / Autopilot` và chặn thử app (`denyApps`) từ `HostDetailSheet`.
+2. **Tinh chỉnh định tuyến công cụ LLM & Chốt AI Provider (`AI-TUNE-1` / `D11a`):**
+   - Đo thực tế cách LLM chọn giữa `native.*`, `web.*` và `ui.observe_hybrid`, tinh chỉnh prompt điều phối nếu cần và chạy `backend/scripts/text_benchmark.py` để chốt nhà cung cấp AI chính thức (`D11a`).
+3. **Hoàn thiện Native macOS & Mạch vật lý (`MAC-NAT-1` & `HW-BOARD-1`):**
+   - Bổ sung đọc `focusedRole` thật và `nativeId` bền vững từ macOS Accessibility (`UDC-17` S17.2 & S17.4).
+   - Kiểm tra thực tế LCD, duyệt nhanh `R2` bằng 2 nút vật lý trên board `T-Display-S3` (`firmware` `f385feb`) và chu kỳ tính cách `PE-3`/`PE-4`.
