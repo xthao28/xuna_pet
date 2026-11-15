@@ -506,6 +506,49 @@ The method is in the `xuna/` namespace because MCP has no equivalent. It is a se
 
 The LAN offline server (UDC-7 S7.4) answers `-32601`: it executes only `media.*`.
 
+#### 4.2.9 `xuna/get_policy` and `xuna/set_policy` (Backend → Agent, Request)
+
+Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-results-2026-11-15.md) so the owner can inspect and update the desktop host's local trust preset and app/domain boundaries from the phone (`GET` / `PUT /v1/hosts/{host_id}/policy`). The LAN offline server refuses both with `-32601`.
+
+**`xuna/get_policy`** takes `{}` and returns:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 20,
+  "result": {
+    "schemaVersion": 1,
+    "trustPreset": "standard",
+    "allowApps": ["vscode", "notes"],
+    "denyApps": ["discord"],
+    "allowDomains": ["github.com"],
+    "denyDomains": ["evil.example.com"],
+    "discoveredApps": ["vscode", "notes", "chrome"]
+  }
+}
+```
+
+**`xuna/set_policy`** updates `host-policy.json` atomically via `HostPolicyStore`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 21,
+  "method": "xuna/set_policy",
+  "params": {
+    "schemaVersion": 1,
+    "trustPreset": "autopilot",
+    "allowApps": ["vscode"],
+    "denyApps": ["discord"],
+    "allowDomains": ["github.com"],
+    "denyDomains": ["evil.example.com"]
+  }
+}
+```
+
+- **Hard safety gates:** Any empty/whitespace entry or any of the 15 hard-denied Terminal GUIs (`isHardDeniedAppOrProcess`) in `allowApps` is rejected immediately with JSON-RPC `-32602` (`policy_blocked`). Entries in `denyApps` and `denyDomains` always override `allowApps` / zero-config app discovery / public HTTPS domains at runtime (`policy_blocked` / `domain_not_allowed`), and phone-signed single-use `R3` approvals remain mandatory even under `autopilot`.
+- **Success response:** `{"schemaVersion": 1, "status": "ok"}`.
+
 ---
 
 ## 5. Error Codes and Status Vocabulary

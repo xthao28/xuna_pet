@@ -1,6 +1,6 @@
 # UDC-18 — Kế hoạch nâng cấp lớn: Đưa XUNA lên tầm tự động hóa ngang Clawbot
 
-> **Trạng thái:** Wave A, Wave B, Wave C & Wave D đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md), [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md) & [UDC-18-wave-d-results-2026-11-15.md](UDC-18-wave-d-results-2026-11-15.md)); Wave E sẵn sàng triển khai tiếp.
+> **Trạng thái:** Toàn bộ 5/5 Wave (Wave A, Wave B, Wave C, Wave D & Wave E) đã triển khai & nghiệm thu Production 100% (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md), [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md), [UDC-18-wave-d-results-2026-11-15.md](UDC-18-wave-d-results-2026-11-15.md) & [UDC-18-wave-e-results-2026-11-15.md](UDC-18-wave-e-results-2026-11-15.md)). Siêu kế hoạch UDC-18 Clawbot Upgrade đã hoàn thành xuất sắc 100%!
 >
 > **Mục tiêu:** Biến XUNA từ mô hình điều khiển từng bước nhiều rào cản thành một **Autonomous Desktop Agent thực thụ** (mở & thao tác mượt trên mọi app, ít hỏi lại, tự lập kế hoạch, tự nhìn màn hình/DOM/API, chạy dài hơi ngay cả khi khóa màn hình iPhone), nhưng vẫn giữ nguyên ranh giới an toàn cốt lõi của XUNA (**device/owner authority, zero secret leakage, hard-deny vùng tài chính/mật khẩu/xóa hủy**).
 
@@ -93,9 +93,21 @@ Nguyên tắc thực thi để **mạnh như Clawbot mà không mất an toàn**
 
 ---
 
-### Wave E — "Nâng cấp Mobile Approval & Mission UX"
-> Triển khai và build khi làm việc trên máy có môi trường build mobile tương ứng (`macOS 14+` / `Xcode` mới cho iOS `Flutter 3.47.9`, hoặc Android).
+### Wave E — "Nâng cấp Mobile Approval & Mission UX + Tinh gọn Chat" (**ĐÃ HOÀN THÀNH — 2026-11-15**)
+> Kết quả kiểm định và bằng chứng nghiệm thu Production 100% PASS: [UDC-18-wave-e-results-2026-11-15.md](UDC-18-wave-e-results-2026-11-15.md).
 
-1. **Mission Card thay cho chuỗi Popup rời rạc:** Hiển thị kế hoạch tổng thể + phạm vi app/domain, ký P-256 1 lần.
-2. **Live Job Progress + Pause / Steer / Takeover:** Theo dõi chặng đang chạy từ `AutonomousJob`, tạm dừng hoặc đổi hướng ngay giữa chừng.
-3. **Quản lý Trust Preset (`Strict` / `Standard` / `Autopilot`) & App Policy trực tiếp trên điện thoại.**
+1. **Mảnh ghép E1 — Mission Card thay cho chuỗi Popup rời rạc (`backend/` wire additive + `mobile/`):**
+   - Backend bổ sung `missionEnvelope` (`goal`, `apps`, `domains`, `maxSteps`, `maxMinutes`, `planSteps`) vào `ActionPendingEvent.wire_payload()`.
+   - Mobile `PendingAction` mở rộng entity `MissionEnvelope` thuần Dart và widget `HomeMissionApprovalCard` trong `HomeActionApprovalSheet`: hiển thị kế hoạch tổng thể, chip apps và domains đầy đủ không cắt ellipsis (Quy tắc H7), không bịa chặng nếu backend không gửi (Quy tắc H2), ký xác thực P-256 1 lần duy nhất. Fallback mượt mà về thẻ duyệt đơn bước hiện hành khi không có `missionEnvelope`.
+2. **Mảnh ghép E2 — Live `AutonomousJob` Progress + Pause / Resume / Steer / Takeover (`mobile/`):**
+   - Clean Architecture trọn vẹn: Domain entity `AutonomousJob` (7 trạng thái: `queued`, `running`, `awaitingR3Checkpoint`, `paused`, `completed`, `failed`, `cancelled`), `AutonomousSubGoal`, 7 use case chuyên biệt; Data model/mapper nối thật 7 REST endpoint `/v1/actions/jobs/**` của Wave D.
+   - Presentation: `HomeAutonomousJobCard` với thanh tiến độ `stepsUsed / maxSteps`, danh sách chặng `subGoals` thu gọn/mở rộng, cảnh báo nổi bật khi dừng chờ ký `awaitingR3Checkpoint`, polling 3s thông minh (tự hủy timer khi job xong hoặc dispose) và cụm nút điều khiển trực tiếp Pause / Resume / Steer / Takeover.
+3. **Mảnh ghép E3 — Quản lý `Trust Preset` (`Strict` / `Standard` / `Autopilot`) & `App Policy` trực tiếp trên điện thoại:**
+   - Desktop Agent & `xuna_xtp`: RPC `xuna/get_policy` và `xuna/set_policy` lưu bền vững `HostPolicyStore`, chặn cứng 15 Terminal GUI (`policy_blocked`), giữ nguyên cổng ký R3 bắt buộc kể cả ở `Autopilot`.
+   - Backend: endpoint `GET` & `PUT /v1/hosts/{host_id}/policy`, kiểm tra chủ sở hữu, fail-closed khi host offline (`409 host_offline`), chuyển tiếp trung thực `policy_blocked`, ghi `AuditEvent`.
+   - Mobile: Clean Architecture hoàn chỉnh (`HostPolicy`, `HostTrustPreset`, use cases, model, mapper). Giao diện `HostTrustPolicyCard` trong `HostDetailSheet`: chuyển preset kèm hộp thoại xác nhận bắt buộc khi chọn `Autopilot` (`nav.showConfirmDialog`), quản lý app allow/deny từ `discoveredApps` hoặc thêm/xóa tùy chỉnh, xử lý lỗi trung thực khi máy tính offline.
+4. **Yêu cầu trực tiếp của Chủ dự án — Tinh gọn không gian màn hình Chat (`mobile/`):**
+   - Gỡ bỏ khối `_hero()` tĩnh (~140px) ở đầu `HomeChatTab`, chuyển sang header 1 dòng gọn gàng, placeholder nhẹ khi rỗng.
+   - Thu gọn `HomeChatComposer`: bỏ nút ảnh mờ `onComingSoon`; bỏ hàng mic khổng lồ `72x72` + hint khi idle; đưa nút mic 48px lên cùng hàng ngang với input và send; chỉ hiện thanh thu âm gọn khi active.
+   - Dọn sạch panel đáy: chuyển "Mẫu đã lưu" (`HomeCuTemplatesCard`) vào `HomeChatMenuSheet` (chiếm 0 px khi chat); chống va chạm thanh dừng `HomeActionStopBar`.
+   - **Giải phóng ~250–320px chiều dọc**, nhường trọn vẹn không gian thoáng rộng cho hội thoại.
