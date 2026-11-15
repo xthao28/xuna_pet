@@ -77,7 +77,7 @@ Every owner approval (`_meta["xuna/approval"]`) binds the invocation to `argsSha
 1. UTF-8 encoding, no BOM.
 2. Object keys sorted lexicographically by Unicode code point.
 3. No insignificant whitespace (`","` and `":"` separators).
-4. Integers formatted in base 10 without leading zeros or exponent; no floating-point numbers in MVP tool arguments.
+4. Integers formatted in base 10 without leading zeros or exponent; finite floating-point numbers (introduced in UDC-18 Wave C for `[0.0, 1.0]` normalized coordinates) follow RFC 8785 (JCS / ECMA-262) deterministic formatting (`-0.0`/`0.0` → `0`, `1.0` → `1`); `NaN` and `±Infinity` are rejected.
 5. The Host Agent recomputes `argsSha256` over `params.arguments` before executing any `R2+` tool; on mismatch it refuses execution with `_meta["xuna/status"] = "denied"` and `errorCode = "approval_mismatch"`.
 
 ---

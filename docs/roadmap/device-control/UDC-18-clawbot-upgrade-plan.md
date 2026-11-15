@@ -1,6 +1,6 @@
 # UDC-18 — Kế hoạch nâng cấp lớn: Đưa XUNA lên tầm tự động hóa ngang Clawbot
 
-> **Trạng thái:** Wave A & Wave B đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md)); Wave C–E sẵn sàng triển khai tiếp.
+> **Trạng thái:** Wave A, Wave B & Wave C đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md) & [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md)); Wave D–E sẵn sàng triển khai tiếp.
 >
 > **Mục tiêu:** Biến XUNA từ mô hình điều khiển từng bước nhiều rào cản thành một **Autonomous Desktop Agent thực thụ** (mở & thao tác mượt trên mọi app, ít hỏi lại, tự lập kế hoạch, tự nhìn màn hình/DOM/API, chạy dài hơi ngay cả khi khóa màn hình iPhone), nhưng vẫn giữ nguyên ranh giới an toàn cốt lõi của XUNA (**device/owner authority, zero secret leakage, hard-deny vùng tài chính/mật khẩu/xóa hủy**).
 
@@ -62,14 +62,17 @@ Nguyên tắc thực thi để **mạnh như Clawbot mà không mất an toàn**
 
 ---
 
-### Wave C — "Đôi mắt Vision + Điều khiển mọi app không cần AX chuẩn" (**TIẾP THEO — ƯU TIÊN SỐ 1**)
-> Mục tiêu: App nào hiện lên màn hình được là XUNA dùng được (kể cả Electron, Figma, App chat, UI tùy biến).
+### Wave C — "Đôi mắt Vision + Điều khiển mọi app không cần AX chuẩn" (**ĐÃ HOÀN THÀNH — 2026-11-15**)
+> Mục tiêu: App nào hiện lên màn hình được là XUNA dùng được (kể cả Electron, Figma, App chat, UI tùy biến). Kết quả kiểm định: [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md).
 
 1. **Hybrid Observe Engine (`ui.observe_hybrid` = AX Tree + Compressed Screenshot + Bounding Box):**
    - Desktop chụp vùng cửa sổ đích (nén JPEG ~1280px, không lưu đĩa/DB — giữ cam kết zero retention của U5), gắn nhãn phần tử từ AX Tree nếu có và gửi multimodal tới Vision LLM.
    - Hỗ trợ fallback click/drag theo tọa độ chuẩn hóa `(x_norm, y_norm)` tự quy đổi HiDPI Retina (`devicePixelRatio`).
 2. **UI Settle & Self-Healing Verification:**
    - Tự chờ UI ổn định ngắn (`<= 1.5s`) bằng diff nhẹ trên host trước khi trả kết quả để không tốn thêm vòng gọi LLM vô ích.
+3. **Reverse Hit-Test & Anti-Circumvention (ADR-0015):**
+   - Tự động đối soát tọa độ click/drag với cây AX đã cache: chặn ngay `password_field_forbidden` nếu chạm ô mật khẩu, nâng quyền `R3` yêu cầu chữ ký điện thoại nếu chạm nút thanh toán/xóa/hủy hoặc khi phiên có văn bản nháp chưa commit.
+   - Kiểm tra ranh giới tọa độ fail-closed (`[0.0, 1.0]`), bảo toàn payload tool JSON `<= 6144 B`, và đảm bảo 0 hardcoded app name (Rule H5).
 
 ---
 
