@@ -1,6 +1,6 @@
 # UDC-18 — Kế hoạch nâng cấp lớn: Đưa XUNA lên tầm tự động hóa ngang Clawbot
 
-> **Trạng thái:** Wave A, Wave B & Wave C đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md) & [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md)); Wave D–E sẵn sàng triển khai tiếp.
+> **Trạng thái:** Wave A, Wave B, Wave C & Wave D đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md), [UDC-18-wave-c-results-2026-11-15.md](UDC-18-wave-c-results-2026-11-15.md) & [UDC-18-wave-d-results-2026-11-15.md](UDC-18-wave-d-results-2026-11-15.md)); Wave E sẵn sàng triển khai tiếp.
 >
 > **Mục tiêu:** Biến XUNA từ mô hình điều khiển từng bước nhiều rào cản thành một **Autonomous Desktop Agent thực thụ** (mở & thao tác mượt trên mọi app, ít hỏi lại, tự lập kế hoạch, tự nhìn màn hình/DOM/API, chạy dài hơi ngay cả khi khóa màn hình iPhone), nhưng vẫn giữ nguyên ranh giới an toàn cốt lõi của XUNA (**device/owner authority, zero secret leakage, hard-deny vùng tài chính/mật khẩu/xóa hủy**).
 
@@ -76,16 +76,20 @@ Nguyên tắc thực thi để **mạnh như Clawbot mà không mất an toàn**
 
 ---
 
-### Wave D — "Runtime tự hành dài hơi & Bộ não đa bước như Clawbot"
-> Mục tiêu: Chạy được chuỗi 20–50 bước phức tạp, không đứt gánh khi người dùng khóa màn hình điện thoại.
+### Wave D — "Runtime tự hành dài hơi & Bộ não đa bước như Clawbot" (**ĐÃ HOÀN THÀNH — 2026-11-15**)
+> Mục tiêu: Chạy được chuỗi 20–50 bước phức tạp, không đứt gánh khi người dùng khóa màn hình điện thoại. Kết quả kiểm định: [UDC-18-wave-d-results-2026-11-15.md](UDC-18-wave-d-results-2026-11-15.md).
 
-1. **Async Autonomous Task Runner (`tasks.*` Job Queue trên PostgreSQL):**
-   - Tách vòng lặp thực thi dài ra khỏi HTTP SSE request đơn lẻ: lưu trạng thái `AutonomousJob` (`queued -> running -> awaiting_r3_checkpoint -> completed/failed`), hỗ trợ 40–50 bước mỗi job thay vì chạm trần `MAX_TOOL_ROUNDS = 12`.
-   - Khi điện thoại tắt màn hình: Job tiếp tục chạy các bước nằm trong `CU Session Trust Envelope` đã ký; chỉ tạm dừng (`awaiting_r3_checkpoint`) khi gặp hành động R3 cần chữ ký mới hoặc chạm giới hạn thời gian phiên.
+1. **Async Autonomous Task Runner (`AutonomousJob` Queue trên PostgreSQL `0021_autonomous_jobs.py`):**
+   - Đã tách vòng lặp thực thi dài ra khỏi HTTP SSE request đơn lẻ: lưu trạng thái `AutonomousJob` bền vững (`queued -> running -> awaiting_r3_checkpoint -> completed/failed`), hỗ trợ ngân sách 40–50 bước mỗi job.
+   - Khi điện thoại tắt màn hình: Job tiếp tục chạy các bước nằm trong `CU Session Trust Envelope` đã ký nhờ cơ chế chạm nhịp tim định kỳ (`touch_heartbeat`), không bị chết sau 15s mất kết nối UI.
+   - Tạm dừng an toàn (`awaiting_r3_checkpoint`) khi gặp hành động R3 cần chữ ký P-256 mới hoặc hết ngân sách phiên; tự động tiếp tục khi chủ nhân phê duyệt.
+   - Cung cấp đầy đủ REST API quản lý job (`/v1/actions/jobs`, `pause`, `resume`, `steer`, `cancel`).
 2. **Planner-Executor + Sub-goal Compaction:**
-   - Sinh Execution Plan ngắn (3–7 chặng), nén lịch sử các bước đã xong để tiết kiệm context window và quota LLM.
+   - Sinh Execution Plan có cấu trúc ngắn (3–7 chặng), thực thi Quy tắc H1 (chỉ đánh dấu xong khi công cụ trả về `status == "ok"` thật).
+   - Nén lịch sử các chặng đã xong thành bản tóm tắt gọn (>90% token saving), bảo toàn tuyệt đối `thought_signature` Wave A và triệt tiêu 100% ảnh base64 Vision (Consent U5 Zero-Retention).
 3. **Nâng cấp `Forge` Skill Library + `MCP` Client Hub:**
-   - Cho phép đóng gói chuỗi thao tác/script thành công thành `custom_skill` tái sử dụng 1 bước; hoàn thiện kết nối các MCP server chuẩn (`auto_mcp_bridge.dart`).
+   - `auto_mcp_bridge.dart`: JSON-RPC 2.0 stdio/HTTP chuẩn mực, bộ lọc Anti-SSRF 3 tầng (27 vector), fail-closed không canned text, giới hạn output `<= 6144` bytes.
+   - `ForgeRunSkillTool`: thực thi chuỗi bước tham số hóa thật qua `HostToolDispatcher`, loại bỏ hoàn toàn synthetic approvals (kiểm tra chữ ký P-256 tươi cho bước R3), chặn 15 Terminal GUI (`policy_blocked`), lan truyền lỗi chuẩn xác theo Quy tắc H4.
 
 ---
 
