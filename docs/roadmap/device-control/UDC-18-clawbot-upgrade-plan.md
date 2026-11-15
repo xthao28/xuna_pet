@@ -1,6 +1,6 @@
 # UDC-18 — Kế hoạch nâng cấp lớn: Đưa XUNA lên tầm tự động hóa ngang Clawbot
 
-> **Trạng thái:** Wave A đã triển khai & kiểm định tự động (**2026-11-15**); Wave B–E sẵn sàng triển khai tiếp.
+> **Trạng thái:** Wave A & Wave B đã triển khai & kiểm định tự động (**2026-11-15**, xem [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md)); Wave C–E sẵn sàng triển khai tiếp.
 >
 > **Mục tiêu:** Biến XUNA từ mô hình điều khiển từng bước nhiều rào cản thành một **Autonomous Desktop Agent thực thụ** (mở & thao tác mượt trên mọi app, ít hỏi lại, tự lập kế hoạch, tự nhìn màn hình/DOM/API, chạy dài hơi ngay cả khi khóa màn hình iPhone), nhưng vẫn giữ nguyên ranh giới an toàn cốt lõi của XUNA (**device/owner authority, zero secret leakage, hard-deny vùng tài chính/mật khẩu/xóa hủy**).
 
@@ -50,19 +50,19 @@ Nguyên tắc thực thi để **mạnh như Clawbot mà không mất an toàn**
 
 ---
 
-### Wave B — "Đôi tay bản địa macOS/OS & Trình duyệt thực thụ" (**TIẾP THEO — ƯU TIÊN SỐ 1**)
-> Mục tiêu: Thoát khỏi giới hạn app & sự chậm chạp của click chuột từng bước.
+### Wave B — "Đôi tay bản địa macOS/OS & Trình duyệt thực thụ" (**ĐÃ HOÀN THÀNH — 2026-11-15**)
+> Mục tiêu: Thoát khỏi giới hạn app & sự chậm chạp của click chuột từng bước. Kết quả kiểm định: [UDC-18-wave-b-results-2026-11-15.md](UDC-18-wave-b-results-2026-11-15.md).
 
 1. **OS Native App Bridge (`native.*` — JXA / AppleScript / Shortcuts trên macOS; PowerShell/COM có kiểm soát trên Windows):**
-   - Cung cấp bộ tool có cấu trúc: `notes.create`, `notes.append`, `notes.search`, `reminders.create`, `calendar.list_events`, `calendar.create_event`, `finder.reveal`, `shortcuts.run`, `mail.create_draft` (chỉ tạo nháp R2, không tự gửi R3 nếu chưa ký).
-   - Kết quả mục tiêu: *"mở Notes và tạo đơn xin nghỉ"* hoàn tất trong 1 tool call (~1–2 giây), định dạng tiêu đề + nội dung chuẩn xác, không phụ thuộc focus cửa sổ.
+   - Đã hiện thực bộ 9 tool có cấu trúc trên `desktop/packages/xuna_xtp`, `desktop/` và tích hợp điều phối tổng quát (tuân thủ H5) ở `backend/`: `notes.create`, `notes.append` (`missing_target` khi thiếu đích theo H3), `notes.search`, `reminders.create`, `calendar.list_events`, `calendar.create_event`, `finder.reveal`, `shortcuts.run`, `mail.create_draft` (chỉ tạo nháp R2, không tự gửi R3 nếu chưa ký).
+   - Chống command/script injection qua mảng `argv`, phân cách `--`, lọc null-byte/CRLF/CLI flags; fail-closed (`platform_unsupported`) theo H1.
 2. **Playwright / Chrome CDP Browser Engine (`web.*`):**
-   - Chạy browser context chuyên biệt cho XUNA (hoặc kết nối CDP có kiểm soát) với các primitive chuẩn: `web.navigate`, `web.snapshot` (DOM + ARIA ref gọn trong giới hạn `MAX_TOOL_OUTPUT_BYTES`), `web.click`, `web.fill`, `web.select`, `web.extract`, `web.wait_for`.
-   - Áp dụng cùng bộ lọc domain/SSRF (`url.open` chặn địa chỉ nội bộ) và yêu cầu xác nhận R3 trước các hành động submit thanh toán/xóa/gửi form nhạy cảm.
+   - Đã hiện thực bộ 7 primitive trình duyệt tổng quát: `web.navigate`, `web.snapshot` (DOM + ARIA ref gọn trong giới hạn `MAX_TOOL_OUTPUT_BYTES = 6144`, che mật khẩu/token), `web.click`, `web.fill`, `web.select`, `web.extract`, `web.wait_for`.
+   - Áp dụng đồng bộ bộ lọc SSRF đa tầng (chặn IP private/loopback/metadata/hex/Unicode smuggling/percent-encoded netloc) và tự động nâng quyền `R3` trước hành động thanh toán/xóa/submit/điền dữ liệu nhạy cảm.
 
 ---
 
-### Wave C — "Đôi mắt Vision + Điều khiển mọi app không cần AX chuẩn"
+### Wave C — "Đôi mắt Vision + Điều khiển mọi app không cần AX chuẩn" (**TIẾP THEO — ƯU TIÊN SỐ 1**)
 > Mục tiêu: App nào hiện lên màn hình được là XUNA dùng được (kể cả Electron, Figma, App chat, UI tùy biến).
 
 1. **Hybrid Observe Engine (`ui.observe_hybrid` = AX Tree + Compressed Screenshot + Bounding Box):**

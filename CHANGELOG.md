@@ -2,6 +2,12 @@
 
 Last updated: **2026-11-15** (Asia/Ho_Chi_Minh).
 
+## 2026-11-15 — Nâng cấp điều khiển tự chủ UDC-18 Wave B: OS Native App Bridge & Trình duyệt `web.*` (`backend/`, `desktop/`, docs)
+
+- **Đôi tay bản địa hệ điều hành (9 công cụ 1 bước):** bổ sung `notes.create`, `notes.append`, `notes.search`, `reminders.create`, `calendar.list_events`, `calendar.create_event`, `finder.reveal`, `shortcuts.run`, `mail.create_draft` (chỉ tạo bản nháp `R2`, không tự gửi khi chưa ký `R3`). Toàn bộ đối số đi qua mảng `argv` chống command/script injection, đóng an toàn (`platform_unsupported`) trên nền tảng chưa hỗ trợ, và giữ tầng điều phối `backend/` hoàn toàn tổng quát theo quy tắc `H5` (mọi app desktop khác vẫn đi qua `AutoAppScanner` + `cu.*`/`ui.*`/`input.*`).
+- **Động cơ trình duyệt `web.*` cho mọi Web App (7 công cụ):** bổ sung `web.navigate`, `web.snapshot` (cây DOM/ARIA thu gọn ≤ `6144` bytes, tự che mật khẩu/token), `web.click`, `web.fill`, `web.select`, `web.extract`, `web.wait_for`. Chặn SSRF đa tầng (IP nội bộ, metadata, hex/octal, Unicode full-width smuggling, percent-encoded netloc) và tự nâng lên cổng ký `R3` trước các thao tác thanh toán, xóa, đặt hàng, submit hoặc điền dữ liệu nhạy cảm.
+- **Kiểm chứng:** `xuna_xtp` **103/103 PASS**, `desktop` **136/136 PASS** (gồm 20 test E2E Wave B), `backend` **862 passed / 91 skipped / 0 failed** (gồm 58 test Wave B & kiến trúc, 41 test hồi quy Wave A), `ruff` + `mypy --strict` + `dart/flutter analyze` sạch hoàn toàn (`0` lỗi). Bảo toàn nguyên vẹn Wave A, wire schema mobile và `mobile/.fvmrc`; chưa chạy trên thiết bị/trình duyệt thật; chưa commit. Chi tiết tại [UDC-18-wave-b-results-2026-11-15.md](docs/roadmap/device-control/UDC-18-wave-b-results-2026-11-15.md).
+
 ## 2026-11-15 — Nâng cấp điều khiển tự chủ UDC-18 Wave A & sửa tương thích R3 trên iPhone (`backend/`, `desktop/`, `mobile/`, docs)
 
 - **Sửa lỗi duyệt phiên R3 trên iPhone:** backend chuẩn hóa `action_pending.risk` về chữ thường (`r1`..`r3`) qua `ActionPendingEvent.wire_payload()`, giúp bản app hiện cài trên iPhone mở và tạo ghi chú trên Mac thành công đầu-cuối; app mobile bổ sung nhận cả chữ hoa/thường.
