@@ -1,6 +1,12 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-21** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-22** (Asia/Ho_Chi_Minh).
+
+## 2026-11-22 — Mobile chat: màn trống, header trạng thái kết nối & sửa crash chip action (`mobile/`)
+
+- `HomeChatEmptyState` (avatar XUNA, lời chào, nút vẫy tay gửi lời chào như tin nhắn thường) và header chat có chấm trạng thái online/offline.
+- Sửa lỗi `Duplicate keys found` trong `HomeChatBubble`: một câu trả lời có `>= 2` chip action (hoặc nút sửa) làm cả bubble hiện khối đỏ ErrorWidget; mỗi chip/nút giờ được bọc `KeyedSubtree` theo vị trí. Thêm test hồi quy trong `actions_test.dart`.
+- Kiểm chứng: `flutter test test/features/actions test/features/home` **`194/194`**, `flutter analyze` 0 error/warning. Chưa xác nhận lại trên thiết bị thật sau khi sửa.
 
 ## 2026-11-21 — Spatial Device Mesh & Adaptive Multi-Host Control (M1–M6): Kiến trúc đa máy, HostTwin, Scorer R0–R3, Live Presence, Cross-Host Pipelines & Mobile Spatial UX (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
 
