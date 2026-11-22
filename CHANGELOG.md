@@ -2,6 +2,15 @@
 
 Last updated: **2026-11-22** (Asia/Ho_Chi_Minh).
 
+## 2026-11-22 — Nới lỏng quyền Autopilot (ADR-0015 Amendment) & Đặc tả Async Watch & Wake (`ADR-0017`) (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
+
+- **Autopilot Permission Relaxation ([ADR-0015](docs/decisions/ADR-0015-commit-gated-control-and-trusted-scopes.md) Amendment 2026-11-22):**
+  - `xuna_xtp` & `desktop/`: bổ sung phân loại `highImpactElementKeywords` (`isHighImpactElementName`, `isHighImpactBrowserTarget`) và cờ `autopilot` qua `ComputerUseSessionManager` / `HostToolDispatcher`; dưới `TrustPreset.autopilot`, thao tác UI/IDE thường và `cu.session_start`/`cu.session_extend` xuống `R2` trong khi giữ chặt `R3` cho gửi/đăng ra ngoài, tài chính/thanh toán/thẻ, xóa/gỡ/đăng xuất phá hủy, mật khẩu và hard-deny apps/domains.
+  - `backend/`: thêm `HostTwin.trust_preset` (RAM-only, đồng bộ qua `get_host_policy`/`set_host_policy`), `is_high_impact_element_name()` (`computer_use.py`) và module tập trung `autopilot_policy.py` nối vào `orchestrator.py` (`-32` net LOC) & `cross_host_pipelines.py` (`workflows.py` `0` diff), kèm `tests/unit/test_autopilot_permissions.py` và hỗ trợ `xuna/get_policy` trong `tests/e2e_mesh/xtp_sim.py`.
+  - Kiểm chứng: `xuna_xtp` **`158/158`**, `desktop` **`267/267`**, build + ký `/Users/xthao28/Applications/XUNA.app` (`NSD762MWV7`, `codesign --verify --deep --strict` PASS), `backend` `ruff` + `mypy` (`0/256`) + **`88/88`** targeted (`test_architecture.py`, `test_autopilot_permissions.py`, `test_scoped_catalog.py`, `test_actions_domain_and_orchestrator.py`, `test_hosts_policy_api.py`), `diff -r` fixtures `0`. Chưa chạy full `xuna_test` sau trích helper, `RunnerTests`, Windows MSVC và test live trên điện thoại (H8).
+- **Async Watch & Wake Specification ([XUNA_ASYNC_WATCH_AND_WAKE.md](docs/architecture/XUNA_ASYNC_WATCH_AND_WAKE.md), [ADR-0017](docs/decisions/ADR-0017-async-watch-and-wake.md)):**
+  - Đặc tả kiến trúc Event-Driven Desktop Local Sentinel (`xuna/watchRegister`, `xuna/watchCancel`, `xuna/watchEvent`), Multi-Signal Quiescence, `WAITING_WATCH` (migration `0023`), `yieldMs` auto-detach, `NO_ACTION` backoff, Mobile Wake Inbox và lộ trình `/teamwork` `AW-M1–AW-M6` (`Status: Proposed`).
+
 ## 2026-11-22 — Mobile chat: màn trống, header trạng thái kết nối & sửa crash chip action (`mobile/`)
 
 - `HomeChatEmptyState` (avatar XUNA, lời chào, nút vẫy tay gửi lời chào như tin nhắn thường) và header chat có chấm trạng thái online/offline.

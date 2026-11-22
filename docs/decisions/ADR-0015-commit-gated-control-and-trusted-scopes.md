@@ -74,3 +74,15 @@ For apps the owner explicitly enables, a commit that the host classifies as *lig
 
 - [ADR-0012](ADR-0012-host-actions.md), [ADR-0014](ADR-0014-standing-approvals-and-phone-sessions.md), [UDC-8 §4.2–§4.3](../roadmap/device-control/UDC-8-computer-use.md), [UDC-17 plan](../roadmap/device-control/UDC-17-smart-control-plan.md) §3, §7.
 - Owner decision 2026-11-12: "rộng tay luôn cho máu, không quá nguy hiểm là được" in answer to UDC-17 Q7 (packages a / b / c), after "cho nó nhiều quyền hơn chút được không". The same day the owner delegated the fixes and ordering ("bạn có thể tự quyết định nếu thấy nó ổn"); the session order of UDC-17 §4 and deferring Q5 follow that delegation and may be changed by the owner.
+
+## Amendment 2026-11-22 — Autopilot preset end-to-end enforcement & high-impact R3 boundary (owner-approved)
+
+- **Trigger:** The owner enabled `trustPreset: "autopilot"` on `Xuans MacBook Pro` (`host-policy.json`), yet Backend `Orchestrator` did not read `trustPreset` and still prompted on every `R2` tool (`app.launch`, etc.), every `cu.session_start`/`cu.session_extend`, and ordinary UI/IDE input steps (`Enter`/`Space`, headed typing, unlabeled clicks).
+- **Owner decision (2026-11-22):** Relax permissions under `trustPreset == "autopilot"` so XUNA executes ordinary work uninterrupted, while keeping `R3` phone-signed approval strictly enforced for **high-impact** actions **and** **external outbound send/publish**:
+  1. **Synced `HostTwin.trust_preset`:** Backend lazily fetches `xuna/get_policy` once per live desktop connection (fail-closed to `"standard"` on any error/timeout) and updates immediately on `GET/PUT /v1/hosts/{id}/policy`.
+  2. **Auto-run without prompt under `autopilot`:** all `R0–R2` host tools (including `app.launch`, `url.open`, native productivity/workspace/media/web tools), `cu.session_start`/`cu.session_extend` on non-hard-denied apps/domains, ordinary UI steps inside apps/IDEs (normal/coordinate clicks, typing including `headed` & newlines, `Enter`/`Space` prompt submission, drags, scrolls), and `R2` cross-host missions whose target hosts are all in `autopilot`.
+  3. **Still `R3` phone-signed (`scope = once`) even under `autopilot`:**
+     - **External outbound & public publish:** `mail.send`, UI/web targets matching `send`/`post`/`publish`/`gửi`/`đăng` (excluding `đăng nhập`/`đăng ký`)/`xuất bản`.
+     - **Financial / payment / cards:** `buy`, `pay`, `payment`, `checkout`, `purchase`, `transfer`, `wire`, `confirm payment`, `place order`, `mua`, `thanh toán`, `chuyển khoản`, `đặt hàng`, card/CVV/PIN tokens.
+     - **Destructive / account / system:** `delete`, `erase`, `empty trash`, `format`, `uninstall`, `sign out`, `log out`, `logout`, `xóa`/`xoá`, `gỡ cài đặt`, `hủy/xóa tài khoản`, `dọn sạch thùng rác`, `đăng xuất`.
+  4. **Hard refusals & presets unchanged:** `password` fields (`password_field_forbidden`), hard-denied apps (Terminals, Password Managers, Banking apps, System Settings), `shell.*`, `denyApps`/`denyDomains`, E-Stop (`stopped`), content-free audit logs, U5 zero-retention, and `standard`/`strict` preset behaviour remain 100% unchanged.
