@@ -1,7 +1,7 @@
 # XUNA Tool Protocol (XTP) v1 — Normative Wire Contract
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10), not Implemented.** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend and verified by unit tests only. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4); both are ordinary `tools/call` traffic, specified in [UDC-8 §4.2](../roadmap/device-control/UDC-8-computer-use.md), with no new frame.
-Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`.
+Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md), [ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
 
 ---
 
@@ -10,12 +10,12 @@ Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md)
 - **Endpoint:** `GET /v1/hosts/connect` (WebSocket over TLS, outbound from the Host Agent to the XUNA Brain). The host opens no inbound listening port in the MVP.
 - **Subprotocol:** `xtp/1` (negotiated in `Sec-WebSocket-Protocol: xtp/1` and verified in `xuna/hello.protocols`).
 - **Framing:** UTF-8 JSON text frames, one JSON-RPC 2.0 message per WebSocket frame. Binary frames are refused (`1002 unsupported_protocol`).
-- **Envelope:** [JSON-RPC 2.0](https://www.jsonrpc.org/specification) (`"jsonrpc": "2.0"`). Method names follow the [Model Context Protocol (MCP 2026-07-28)](https://modelcontextprotocol.io/specification/latest) where an MCP equivalent exists (`tools/list`, `tools/call`, `notifications/cancelled`, `notifications/progress`, `notifications/tools/list_changed`, `ping`), plus XUNA namespace methods (`xuna/*`) for enrollment, cryptographic session proof, and emergency stop.
+- **Envelope:** [JSON-RPC 2.0](https://www.jsonrpc.org/specification) (`"jsonrpc": "2.0"`). Method names follow the [Model Context Protocol (MCP 2026-07-28)](https://modelcontextprotocol.io/specification/latest) where an MCP equivalent exists (`tools/list`, `tools/call`, `notifications/cancelled`, `notifications/progress`, `notifications/tools/list_changed`, `ping`), plus XUNA namespace methods (`xuna/*`) for enrollment, cryptographic session proof, preflight, policy sync, LAN peer advertisement, spatial mesh telemetry, and emergency stop.
 - **Strict schemas:** unknown top-level fields, unknown methods, or unknown fields inside `params` / `result` are rejected (`-32600` / `-32601` / `-32602`, or session close during handshake).
 - **Size limits:**
-  - Maximum WebSocket frame size: **≤ 64 KiB** (`65,536` bytes UTF-8). Exceeding this closes the connection with `1009 frame_too_large`.
-  - Maximum `structuredContent` payload in `tools/call` results (UDC-3): **≤ 16 KiB** (`16,384` bytes UTF-8). (Screen/UI payloads are governed separately by UDC-8 under consent U5.)
-  - Forbidden tool names (`shell.*`, `powershell.*`, `osascript.*`, `eval.*`, `script.*`, `keyboard.*`, `pointer.*`, or any family outside `ToolFamily`) are rejected at manifest validation.
+  - Maximum WebSocket frame size: **≤ 512 KiB** (`524,288` bytes UTF-8). Exceeding this closes the connection with `1009 frame_too_large`.
+  - Maximum `structuredContent` payload in `tools/call` results: **≤ 16 KiB** (`16,384` bytes UTF-8) for ordinary tools; **≤ 448 KiB** (`458,752` bytes UTF-8, `maxMediaStructuredContentBytes`) for media/screenshot payloads (under consent U5), leaving framing headroom inside the 512 KiB frame limit.
+  - Forbidden tool names (`shell.*`, `powershell.*`, `osascript.*`, `eval.*`, `script.*`, `keyboard.*`, `pointer.*`, `cmd.*`, `bash.*`, or any family outside `ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`) are rejected at manifest validation.
 
 ---
 
@@ -87,6 +87,8 @@ Every owner approval (`_meta["xuna/approval"]`) binds the invocation to `argsSha
 ### 4.1 Handshake Messages (Before `xuna/ready`)
 
 #### 4.1.1 `xuna/hello` (Agent → Backend, Request)
+
+Allowed `platform` values: `"windows" | "macos" | "linux"` for enrollment (`enroll`); `"windows" | "macos" | "android" | "ios" | "linux"` for reconnect (`hostId`). *(Note: `xuna_xtp` already accepts `"linux"`; `backend` `xtp_frames.py` aligns `"linux"` in Mesh Milestone M2.)*
 
 **Mode A — Enrollment (`enroll` present, `hostId` omitted):**
 
@@ -282,9 +284,14 @@ Sent after a valid `purpose = 2` session proof. Transitions the connection to th
 }
 ```
 
-- `permission` is `"granted" | "denied" | "not_determined"`.
+- `permission` is `"granted" | "denied" | "not_determined"` (backend domain also models `"unsupported"` internally).
+- Optional `_meta["xuna/policy"]` fields:
+  - `idempotent` (`bool`, optional): when `false` (e.g., a media play/pause toggle), repeating a successful call changes state again; read by the backend orchestrator per [H5](XUNA_HONEST_CODE_RULES.md).
+  - `platform` (`HostPlatform`, optional, backend-internal descriptor metadata).
 
 #### 4.2.2 `tools/call` (Backend → Agent, Request)
+
+`_meta["xuna/approval"]` (required on `R2+` calls unless exempted by host policy/session): required keys `approvalId`, `argsSha256`, `expiresAt`; optional keys `scope` (`"once" | "conversation_15m"`), `signature` (base64 64-byte raw P-256 `r||s`, mandatory on `R3`), and `publicKey` (base64 65-byte uncompressed SEC1 P-256).
 
 ```json
 {
@@ -549,6 +556,92 @@ Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-resu
 - **Hard safety gates:** Any empty/whitespace entry or any of the 15 hard-denied Terminal GUIs (`isHardDeniedAppOrProcess`) in `allowApps` is rejected immediately with JSON-RPC `-32602` (`policy_blocked`). Entries in `denyApps` and `denyDomains` always override `allowApps` / zero-config app discovery / public HTTPS domains at runtime (`policy_blocked` / `domain_not_allowed`), and phone-signed single-use `R3` approvals remain mandatory even under `autopilot`.
 - **Success response:** `{"schemaVersion": 1, "status": "ok"}`.
 
+#### 4.2.10 `xuna/presence` (Agent → Backend, Notification — Proposed M1)
+
+Sent after `xuna/ready` on heartbeat / state delta (e.g. lock/unlock, media start/stop, active app change, or ≥ 30 s cadence) to populate the backend's ephemeral, RAM-only `HostTwin` ([XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md)). Strictly `additionalProperties: false`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/presence",
+  "params": {
+    "schemaVersion": 1,
+    "idleSeconds": 12,
+    "screenLocked": false,
+    "mediaPlaying": true,
+    "batteryPercent": 78,
+    "isCharging": true,
+    "subnetHash": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    "foregroundAppId": "vscode",
+    "updatedAt": "2026-11-20T16:00:00Z"
+  }
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, literal `1`. |
+| `idleSeconds` | Required, integer `>= 0`. Seconds since last local input event. |
+| `screenLocked` | Required, boolean. |
+| `mediaPlaying` | Required, boolean. Active OS media playback flag (fast non-blocking probe). |
+| `batteryPercent` | Optional (`int | null`, `0..100`). **Must be omitted or `null` on battery-less desktops or when unmeasurable** (H1/H2; never fabricated). |
+| `isCharging` | Optional (`bool | null`). **Must be omitted or `null` when no battery / unmeasurable**. |
+| `subnetHash` | Optional (`str | null`, `^[0-9a-f]{16,64}$`). Privacy-preserving truncated HMAC/SHA-256 of the active local subnet prefix (zero raw IP/SSID). |
+| `foregroundAppId` | Optional (`str | null`, `^[a-z0-9_.-]{1,64}$`). Normalized short app ID only — **zero window titles or file paths**. |
+| `updatedAt` | Required, ISO-8601 UTC timestamp string. |
+
+#### 4.2.11 `xuna/resources` (Agent → Backend, Notification — Proposed M1)
+
+Sent after `xuna/ready` (at session connect and when discovered apps/workspaces change) so the backend can match targets against real capabilities without hardcoding app lists (H5). Strictly `additionalProperties: false`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/resources",
+  "params": {
+    "schemaVersion": 1,
+    "installedApps": ["vscode", "obsidian"],
+    "workspaces": ["xuna_pet", "Notes_Vault"],
+    "capabilitiesVersion": "r1_0001"
+  }
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, literal `1`. |
+| `installedApps` | Required, `list[str]` (max 256 items), each `^[a-z0-9_.-]{1,64}$` (from `AutoAppScanner.normalizeId`, hard-denied apps filtered). |
+| `workspaces` | Required, `list[str]` (max 128 items), each `^[a-zA-Z0-9_.-]{1,64}$` (from `AutoWorkspaceIndexer.sanitizeAlias`). **Zero real filesystem paths** (`/` and `\` strictly forbidden). |
+| `capabilitiesVersion` | Optional, `str` (`^[a-zA-Z0-9_.-]{1,32}$`). |
+
+#### 4.2.12 `xuna/focusRequest` (Agent → Backend, Notification — Proposed M1)
+
+Sent after `xuna/ready` when the owner triggers the Desktop Agent's global focus hotkey or tray menu `"Gọi XUNA sang máy này"` / Follow Me toggle. Strictly `additionalProperties: false`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/focusRequest",
+  "params": {
+    "schemaVersion": 1,
+    "source": "hotkey",
+    "followMe": true
+  }
+}
+```
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, literal `1`. |
+| `source` | Required, `"hotkey" | "tray"`. |
+| `followMe` | Optional (`bool | null`). When present, sets Follow Me mode alongside focusing this `HostId`. |
+
+#### 4.2.13 `xuna/lanPeer` (Either Direction, Notification — Existing UDC-7)
+
+Bidirectional notification for local LAN offline media discovery (UDC-7 S7.4):
+- **Agent → Backend:** `{"enabled": bool, "port"?: int (1024..65535), "certFingerprint"?: str (16..96)}`.
+- **Backend → Agent:** `{"phonePublicKeys": list[str]}` (base64/base64url 65-byte SEC1 P-256 keys of owner phones).
+
 ---
 
 ## 5. Error Codes and Status Vocabulary
@@ -595,7 +688,7 @@ Application-level tool outcomes are always returned inside `result._meta["xuna/s
 | `1008` | `unauthorized` | Invalid signature, unknown/revoked `HostId`, expired challenge, or handshake step out of order. |
 | `1008` | `rate_limited` | Connection or challenge rate limit exceeded. |
 | `1002` | `unsupported_protocol` | Unsupported subprotocol, binary frame, or invalid JSON during handshake. |
-| `1009` | `frame_too_large` | Frame > 64 KiB. |
+| `1009` | `frame_too_large` | Frame > 512 KiB (`524,288` bytes UTF-8). |
 | `1001` | `idle_timeout` / `going_away` | Missed 2 heartbeats (60 s) or server shutdown. |
 | `4001` | `duplicate_session` | A second session authenticated for the same `HostId`; both sessions are closed and `host.rejected` (`duplicate_session`) is audited. |
 
@@ -603,7 +696,7 @@ Application-level tool outcomes are always returned inside `result._meta["xuna/s
 
 ## 6. Normative MVP Tool Schemas (`tools/list`)
 
-All input and output schemas enforce `"additionalProperties": false`. Tool names match `^[a-z]+\.[a-z_]+$` (`ToolFamily`: `media`, `app`, `url`, `workflow`, `host` in UDC-3; `screen`, `ui`, `input`, `files` reserved for UDC-8).
+All input and output schemas enforce `"additionalProperties": false`. Tool names match `^[a-z]+\.[a-z_]+$` (`ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`).
 
 | Tool name | Family | Default risk | `inputSchema` | `outputSchema` (`structuredContent`) |
 | --- | --- | --- | --- | --- |
@@ -628,5 +721,5 @@ Before passing a URL to the OS (`ShellExecuteExW` / `NSWorkspace`), the Host Age
 2. No `userinfo` (`user:pass@`) component is present.
 3. Hostname is converted from IDN to ASCII punycode before matching.
 4. IPv4 literals, IPv6 literals and `localhost` (`.local`, `.localhost`) are rejected.
-5. The ASCII hostname either equals an entry in `host-policy.json` `urlDomains` or is a subdomain of one (`.` boundary check). Otherwise return `denied` (`domain_not_allowed`).
+5. For direct `url.open`, any public HTTPS domain is permitted (after DNS non-private/loopback/link-local IP verification) unless listed in `host-policy.json` `denyDomains` (`allowPublicHttpsDomains: true`, UDC-18). For `workflow.batch_steps` or hosts with `allowPublicHttpsDomains: false`, the ASCII hostname must equal or be a subdomain of an entry in `host-policy.json` `urlDomains` (`.` boundary check); otherwise return `denied` (`domain_not_allowed`).
 

@@ -1,6 +1,27 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-20** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-21** (Asia/Ho_Chi_Minh).
+
+## 2026-11-21 — Spatial Device Mesh & Adaptive Multi-Host Control (M1–M6): Kiến trúc đa máy, HostTwin, Scorer R0–R3, Live Presence, Cross-Host Pipelines & Mobile Spatial UX (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
+
+- **M1 (Đặc tả hợp đồng & XTP Golden Fixtures):**
+  - Ban hành [XUNA_SPATIAL_DEVICE_MESH.md](docs/architecture/XUNA_SPATIAL_DEVICE_MESH.md) và [ADR-0016-spatial-device-mesh.md](docs/decisions/ADR-0016-spatial-device-mesh.md); đồng bộ [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) (trần `512 KiB`, platform `"linux"`, thông báo `xuna/presence`, `xuna/resources`, `xuna/focusRequest`), giữ cặp golden fixtures `backend/tests/fixtures/xtp` ↔ `desktop/packages/xuna_xtp/test/fixtures/xtp` khớp byte-identical (`diff -r` exit `0`).
+- **M2 (Brain Mesh Core — `backend/`):**
+  - Migration `0022_spatial_device_mesh.py`: bổ sung `host_kind`, `place`, `nicknames`, `alias_folded` (active unique index), `wol_mac` trên `hosts`; làn CU theo `(owner_id, host_id)` trên `cu_sessions`; bảng `host_routing_habits` (`γ = 0.85` + negative correction) và `host_defaults`.
+  - Tách module sạch (`host_twin.py`, `mesh_router.py`, `mesh_scoring.py`, `habit_learner.py`, `mesh_prober.py`, `mesh_routes.py`, `mesh_turn_helper.py`), giữ `orchestrator.py` `+3` net LOC và `workflows.py` `0` diff, pass `test_architecture.py` & `TestRuleH5GenericLayerCompliance`.
+  - `MeshPreRouter` tất định (`targetHostId` → `/may` & `/follow` → `@tag` → `PendingIntent` `120s` → `HostFocusState`, kiểm tra offline/WoL ở Priority 5 & bỏ pin khi có `>= 2` `@tag`), `job_runner.py` ghim cứng `pinned_host_id`, Per-Host Scoped Tool Catalog, bộ chấm điểm `R0–R3` (`no_host` → `host_offline` → `grant_denied` → `ask_target`), `MeshProber` (`2,000 ms`, `mesh__status`, `mesh__find_resource`, redaction đường dẫn `~/`, `./`, `../`), và HTTP/SSE/WS endpoints (`PATCH /v1/hosts/{host_id}`, `GET/DELETE /v1/actions/habits`, `POST /v1/actions/focus`, `POST /v1/actions/stop` optional `hostId`, `TurnBody`/WS `turn.commit`, chặn `schemaVersion: true`, `xuna/focusRequest` đọc alias mới).
+- **M3 (Live Presence, Resource Digest & Focus Hotkey — `xuna_xtp/`, `desktop/`):**
+  - `xuna_xtp` hỗ trợ `xuna/presence`, `xuna/resources`, `xuna/focusRequest`, `"linux"`.
+  - Probe hiện diện `<5ms` zero-AX trên macOS (`XunaHostPlugin+Presence.swift` + hard-deny `systemsettings`/`systempreferences`/`hyper` & `RunnerTests`) và parity C++ Windows (`xuna_win_presence.h` + `"system_settings"` + SMTC suy giảm an toàn `mediaPlaying = false` khi timeout/thiếu header).
+  - `SubnetHashCalculator` (timeout `500 ms`), `ResourceDigestBuilder` (chỉ ID chuẩn hóa, sort canonical trước hash `capabilitiesVersion`), `PresenceCoordinator`, phím nóng & tray `"Gọi XUNA sang máy này"` + `Follow Me` (reset `followMeEnabled` khi ngắt kết nối).
+- **M4 (Cross-Machine Superpowers — `backend/`, `desktop/`):**
+  - `cross_host_pipelines.py` + desktop handlers: Universal Clipboard (`AKIA`/`ASIA` redaction parity `backend` ↔ `xuna_xtp`, luôn phát `ActionResultEvent` nếu `selection.read` trả văn bản lỗi sau duyệt `R2`), Tab & Workspace Teleport (gỡ silent `'edge'` fallback, bỏ bias `'antigravity'`, báo trung thực `'ideLaunched'` ở `WorkspaceRestoreCapsuleTool`), Smart Fan-out (`smart_pause_media` fail-closed cho nhánh hỗn hợp `denied` + `offline`/`timeout`/`error`, `unsupported`, và `[idle, probe_failure]` kèm `MissionStep` nhất quán & `fleet_git_status` fail-closed `host_offline`/`no_host`/`probe_failed`), Wake-and-Run WoL deferred queue, Battery Advisor, và unified `MissionEnvelope`.
+- **M5 (Mobile Spatial Focus UX — `mobile/`):**
+  - Clean Architecture + `100%` bản địa hóa (`1010/1010` key `vi_VN`/`en_US` khớp): `HomeSpatialFocusService` (`_focusEpoch` + `_refreshEpoch` & fallback `loadHabits`), `HomeFocusBar`, chip 1 chạm `ask_target`, `HomeMissionApprovalCard` (`cardKey`, icon OS, `targetReason`, E-Stop 2 cấp), sửa metadata trên `HostDetailSheet`, `RoutingHabitsSheet`, `VoiceWebSocketDataSource` + `CloudTurnContext`, `LocalSubnetHashProviderImpl` (`500 ms` timeout).
+- **M6 (E2E Tiers 1–4, Tier 5 Hardening & Kiểm chứng tuần tự sau sửa đổi cuối):**
+  - **`128 / 128` `TEST_READY.md` E2E + L10n PASS (`100%`)** (`84/84` backend `e2e_mesh/`, `11/11` `xuna_xtp`, `17/17` `desktop`, `13/13` `mobile` + `3/3` `locales_sync_test.dart`, `diff -r` `0`).
+  - Toàn bộ bộ test sau sửa đổi cuối: `backend` `ruff` + `mypy` (`0/255`) + `test_architecture.py` + **`1,419 passed`** (`xuna_test`), `xuna_xtp` **`154/154`**, `desktop` **`266/266`** + macOS **`RunnerTests` `29/29`** (`0.857s`; ghi nhận H8 pre-existing `agent.lock` race khi `XUNA.app` đang chạy nền), `mobile` **`654/654`** (`3.32.8 --no-pub` trên `macOS 12.6`, `pubspec.lock`/`.fvmrc`/`firmware/` sạch 100%, `0 B` firmware delta, chưa commit/push).
+  - Ngoại lệ trung thực H8: `mobile` `3.47.9` (`macOS >= 14.0`), biên dịch/chạy Windows C++ thật (MSVC/WinRT), Linux host runtime và thử nghiệm đa thiết bị vật lý (Mac + Windows + iPhone/Android + LILYGO) chưa chạy trên môi trường `macOS 12.6` này.
 
 ## 2026-11-20 — Đại tu điều khiển macOS UDC-20 (M0–M5): Thang 4 tầng, ổn định native, ký Apple Development, Vision SoM, hardening & 6 Live Gates (`backend/`, `desktop/packages/xuna_xtp`, `desktop/`, docs)
 
