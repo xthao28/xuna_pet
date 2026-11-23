@@ -96,7 +96,7 @@ flowchart LR
 
 ## 3. Normative Wire Contracts (AW-M1 — Contract-First)
 
-### 3.1 XTP v1 Additions (`XUNA_XTP_V1_CONTRACT.md` §4.2.13–§4.2.15)
+### 3.1 XTP v1 Additions (`XUNA_XTP_V1_CONTRACT.md` §4.2.14–§4.2.16)
 
 All schemas are **additive**, `additionalProperties: false`, strictly content-free (no window titles, no raw OS paths, no screen text, no base64 images). Synchronized byte-identical fixture pair:
 - `backend/tests/fixtures/xtp/watch_frames.json`
@@ -368,7 +368,7 @@ Designed explicitly for `/teamwork` parallel workers using isolated `share` work
 
 ```mermaid
 flowchart LR
-  M1["AW-M1: Contract-First Spec<br/>XTP §4.2.13-15 · ADR-0017<br/>watch_frames.json Pair"]
+  M1["AW-M1: Contract-First Spec<br/>XTP §4.2.14-16 · ADR-0017<br/>watch_frames.json Pair"]
   M2["AW-M2: Backend Watch & Wake<br/>Migration 0023 · WatchCoordinator<br/>job__wait · yieldMs · WakeInbox"]
   M3["AW-M3: xuna_xtp & Desktop Sentinel<br/>Frames · WatchConvergence<br/>LocalWatchSentinel · E-Stop"]
   M4["AW-M4: Native OS & Protocol<br/>macOS Swift (AX/libproc/FSEvents)<br/>Windows C++ · CDP · Phase 3 MCP/ACP"]
@@ -406,7 +406,7 @@ flowchart LR
 | **H3 (Never guess target)** | Missing PID/window/workspace alias fails closed (`target_not_found` / `workspace_not_found`); never falls back to "first window" or "first workspace". |
 | **H4 (Errors end-to-end)** | Every Desktop watch error (`target_lost`, `needs_permission`, `policy_blocked`, `stopped`, `timeout`) propagates untouched via `xuna/watchEvent` → `WatchCoordinator` → `AutonomousJob` → `WakeInboxItem` → Mobile UI. |
 | **H5 (Zero hardcoding)** | Expand `TestRuleH5GenericLayerCompliance` to scan `watch.py`, `watch_coordinator.py`, `wake_inbox.py`, `yield_detach.py`, `watch_routes.py`, `local_watch_sentinel.dart`, `watch_convergence.dart` — zero hardcoded app names, IDE names, agent names, paths, or phrase tables. |
-| **H6 (Names/docs match code)** | `XUNA_XTP_V1_CONTRACT.md` §4.2.13–§4.2.15 + byte-identical `watch_frames.json` in both repos; docstrings accurately distinguish Phase 1/2/3 capabilities. |
+| **H6 (Names/docs match code)** | `XUNA_XTP_V1_CONTRACT.md` §4.2.14–§4.2.16 + byte-identical `watch_frames.json` in both repos; docstrings accurately distinguish Phase 1/2/3 capabilities. |
 | **H7 (Tests can fail)** | Every milestone includes negative fail-closed tests (timeout, target exit mid-watch, E-Stop mid-sleep, backend restart rehydration, R3 high-impact pause after auto-continue wake, sensitive path rejection in `fs_quiescence`). |
 | **H8 (Honest reporting)** | Explicitly report what was NOT run on macOS build host: Windows C++ MSVC build/runtime, Flutter `3.47.9` on `macOS >= 14.0`, physical iPhone/Android live push test, and ESP32 board BLE test. |
 | **H9 (Clean scope)** | `firmware/`, `mobile/.fvmrc`, `desktop/.fvmrc`, and all `pubspec.lock` files remain 100% untouched; `workflows.py` 0 diff; `orchestrator.py` < 50 net LOC. |

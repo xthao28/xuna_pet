@@ -370,6 +370,20 @@ Avoid: invented hardware benchmarks, unverified BOM/prices, fake AI learning cla
 
 Run its review checklist before reporting.
 
+### Operational lessons & anti-bloat guardrails (learned 2026-11-23)
+
+Apply in single-agent and `/teamwork` runs to prevent infinite remediation loops, code bloat, and flaky gates:
+
+1. **Cap challenger/remediation loops & module bloat:** Never spin more than **2–3 remediation rounds** on the same file or non-blocking edge-case group. If a helper/domain module (e.g., `redaction.py`, validators, parsers) grows past **~400–500 LOC** by stacking ad-hoc `if/elif` branches for synthetic nested fuzz strings, **stop patching**, replace with a clean general linear `O(n)` algorithm, or escalate to the owner to freeze scope. Challengers must separate **P0 real contract/security bugs** from **P2 synthetic fuzz edge cases** and must not block a milestone gate on P2 polish.
+2. **Avoid fragile wall-clock timing thresholds & parallel CPU contention:** Never assert tight absolute wall-clock limits (e.g., `< 0.20s`) while heavy suites run in parallel. Run final verification suites (`backend` PostgreSQL `pytest`, `desktop` Flutter, `xcodebuild RunnerTests`, `mobile` Flutter) **sequentially** so CPU contention does not cause false timing failures (e.g., `voice_repository_impl_test.dart` preload race or ReDoS budget jitter).
+3. **Slash-command syntax for Teamwork:** Use leading square brackets **`/teamwork [skip-interview]`** (not `--skip-interview`) when skipping the interactive task interview.
+4. **Repository-specific traps to avoid:**
+   - **Rule H5 scans docstrings too** (any non-`#` line in generic backend layers): never put sample OS paths (`C:\\...`, `/Users/...`, `/home/...`) or app names inside docstrings of generic modules (`actions/domain`, `actions/application`, `hosts/application`, `conversation/application`).
+   - **Unicode word boundaries in regex:** use `(?<!\w)` instead of `(?<![A-Za-z0-9_])` when matching Windows drive prefixes so Vietnamese words before a colon (e.g., `dẫn:/...`, `mục:/...`) are never misread as drive letters.
+   - **Backend LOC & handshake guardrails:** keep `workflows.py` at `0` diff and `orchestrator.py` at `< 50` net LOC by putting new logic in dedicated modules; never inject unsolicited server RPC frames during XTP WebSocket handshake (`test_hosts_api.py`).
+   - **macOS `RunnerTests` & `agent.lock`:** stop any running `xuna_desktop` (`XUNA.app`) before running `xcodebuild test -only-testing:RunnerTests` so `SingleInstanceGuard` does not exit early (`exit 65`).
+   - **Mobile tests on `macOS 12.6`:** when running via Flutter `3.32.8 --no-pub` (because pinned `3.47.9` needs `macOS >= 14.0`), **always** run `git -C mobile checkout -- pubspec.lock` unconditionally (even if tests fail) to preserve H9 clean scope.
+
 ## 11. Immediate M01 acceptance criteria
 
 With the existing **LILYGO T-Display-S3**, via **VS Code + PlatformIO**:

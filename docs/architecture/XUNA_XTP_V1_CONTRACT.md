@@ -1,7 +1,7 @@
 # XUNA Tool Protocol (XTP) v1 — Normative Wire Contract
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`.
-Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md), [ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`. **Proposed amendment 2026-11-22 ([ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) / [XUNA_ASYNC_WATCH_AND_WAKE.md](XUNA_ASYNC_WATCH_AND_WAKE.md) AW-M1):** §4.2.14 `xuna/watchRegister`, §4.2.15 `xuna/watchCancel`, and §4.2.16 `xuna/watchEvent`.
+Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md), [ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md), [ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
 
 ---
 
@@ -641,6 +641,211 @@ Sent after `xuna/ready` when the owner triggers the Desktop Agent's global focus
 Bidirectional notification for local LAN offline media discovery (UDC-7 S7.4):
 - **Agent → Backend:** `{"enabled": bool, "port"?: int (1024..65535), "certFingerprint"?: str (16..96)}`.
 - **Backend → Agent:** `{"phonePublicKeys": list[str]}` (base64/base64url 65-byte SEC1 P-256 keys of owner phones).
+
+#### 4.2.14 `xuna/watchRegister` (Backend → Agent, Request — Proposed AW-M1)
+
+Sent strictly after `xuna/ready` (never during the handshake or injected before initial `tools/list`; pre-ready usage is rejected with `-32600` / `1008 unauthorized`, and legacy agents returning `-32601 Method not found` are treated fail-closed by the backend as `watch_unsupported`). Strictly `additionalProperties: false` on `params`, `params.target`, and `result`. Strictly content-free (Consent U5: zero window titles, screen text, raw OS paths, or base64 blobs).
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 701,
+  "method": "xuna/watchRegister",
+  "params": {
+    "schemaVersion": 1,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "jobId": "a2222222-2222-4222-8222-222222222222",
+    "mode": "composite",
+    "signals": ["ui_quiescence", "process_idle"],
+    "target": {
+      "pid": 48210,
+      "windowId": 1042,
+      "appId": "editor",
+      "workspaceAlias": "xuna_pet"
+    },
+    "quiescenceSeconds": 8,
+    "minWaitSeconds": 3,
+    "maxWaitSeconds": 300,
+    "requireInitialChange": true,
+    "releaseFocus": true
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 701,
+  "result": {
+    "schemaVersion": 1,
+    "accepted": true,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "activeSignals": ["ui_quiescence", "process_idle"],
+    "eventDriven": true,
+    "fallbackUsed": false
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 701,
+  "result": {
+    "schemaVersion": 1,
+    "accepted": false,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "errorCode": "target_not_found"
+  }
+}
+```
+
+**`params` fields (`additionalProperties: false`):**
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, strict integer literal `1` (rejects `bool`, `float`, and `string`). |
+| `watchId` | Required, canonical non-zero UUID string (`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`). |
+| `jobId` | Required, canonical non-zero UUID string (same format). |
+| `mode` | Required, enum: `"ui_quiescence" \| "ui_change" \| "process_idle" \| "fs_quiescence" \| "cdp_idle" \| "composite" \| "timer" \| "protocol_async"`. |
+| `signals` | **Required iff `mode == "composite"`; strictly forbidden otherwise.** List of 2–3 distinct strings from `{"ui_quiescence", "process_idle", "fs_quiescence", "cdp_idle"}`. |
+| `target` | Required object (`additionalProperties: false`; `{}` for `mode == "timer"`). Non-`timer` modes missing required target identifiers fail closed on the Host with `accepted: false` (never guessing default windows or workspaces per Rule H3). Optional normalized subfields: `pid` (strict `int`, `1..2147483647`), `windowId` (strict `int`, `0..2147483647`), `appId` (`str`, `^[a-z0-9_.-]{1,64}$`; hard-denied apps fail closed with `accepted: false, errorCode: "policy_blocked"`), `workspaceAlias` (`str`, `^[a-zA-Z0-9_.-]{1,64}$`, rejecting `/`, `\`, `.`, `..`, and any `..` substring), `tabId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`), `mcpServerId` (`str`, `^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`). |
+| `quiescenceSeconds` | Required, strict `int`, `2..120`. |
+| `minWaitSeconds` | Required, strict `int`, `0..60`. |
+| `maxWaitSeconds` | Required, strict `int`, `5..900` (`minWaitSeconds <= maxWaitSeconds`; the LLM-facing `job__wait` tool enforces a stricter `10..900` subset). `quiescenceSeconds > maxWaitSeconds` is permitted on the wire for deterministic timeout behavior. |
+| `requireInitialChange` | Required, `bool`. |
+| `releaseFocus` | Required, `bool`. |
+
+**`result` fields (`additionalProperties: false`):**
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, strict integer literal `1`. |
+| `accepted` | Required, `bool`. |
+| `watchId` | Required, canonical non-zero UUID matching request `watchId`. |
+| `activeSignals` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** Non-empty `list[str]` (`1..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async"}`. |
+| `eventDriven` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** `bool`. |
+| `fallbackUsed` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** `bool`. |
+| `errorCode` | **Required when `accepted == false`; strictly forbidden when `accepted == true`.** Enum: `"watch_unsupported" \| "target_not_found" \| "workspace_not_found" \| "watch_limit_reached" \| "needs_permission" \| "policy_blocked" \| "stopped" \| "invalid_args"`. |
+
+- **Host capacity & fail-closed rules:** Maximum **4 concurrent active watches** per host (`watch_limit_reached` fail-closed). The host must never guess a missing or ambiguous target (Rule H3) and must never fabricate `accepted: true` when an observer, permission, or target is unavailable (Rule H1). Wire structural, type, or unknown-key violations return JSON-RPC `-32602 Invalid params`.
+
+#### 4.2.15 `xuna/watchCancel` (Backend → Agent, Request — Proposed AW-M1)
+
+Sent strictly after `xuna/ready`. Strictly `additionalProperties: false` on `params` and `result`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 710,
+  "method": "xuna/watchCancel",
+  "params": {
+    "schemaVersion": 1,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "jobId": "a2222222-2222-4222-8222-222222222222",
+    "reason": "owner_cancel"
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 712,
+  "method": "xuna/watchCancel",
+  "params": {
+    "schemaVersion": 1,
+    "reason": "estop"
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 710,
+  "result": {
+    "schemaVersion": 1,
+    "cancelledCount": 1
+  }
+}
+```
+
+**`params` fields (`additionalProperties: false`):**
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, strict integer literal `1`. |
+| `watchId` | Optional (`str \| null`, canonical non-zero UUID). |
+| `jobId` | Optional (`str \| null`, canonical non-zero UUID). |
+| `reason` | Required, enum: `"owner_cancel" \| "estop" \| "job_ended" \| "replaced" \| "expired"`. |
+
+- **Cross-field rule:** At least one of `watchId` or `jobId` MUST be present and non-null **except** when `reason == "estop"`, where both may be omitted to cancel all active watches on the host.
+
+**`result` fields (`additionalProperties: false`):**
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, strict integer literal `1`. |
+| `cancelledCount` | Required, strict `int >= 0`. |
+
+#### 4.2.16 `xuna/watchEvent` (Agent → Backend, Notification — Proposed AW-M1)
+
+Sent strictly after `xuna/ready` as a JSON-RPC 2.0 notification (MUST omit JSON-RPC `id`; rejected if `id` is present). Strictly `additionalProperties: false` on `params`. Strictly content-free (Consent U5: zero window titles, screen text, raw OS paths, or base64 blobs).
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/watchEvent",
+  "params": {
+    "schemaVersion": 1,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "jobId": "a2222222-2222-4222-8222-222222222222",
+    "kind": "settled",
+    "observedSignals": ["ui_quiescence", "process_idle"],
+    "elapsedSeconds": 47,
+    "changeCount": 14,
+    "digestChanged": true,
+    "occurredAt": "2026-11-22T12:45:00Z"
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/watchEvent",
+  "params": {
+    "schemaVersion": 1,
+    "watchId": "f1111111-1111-4111-8111-111111111111",
+    "jobId": "a2222222-2222-4222-8222-222222222222",
+    "kind": "error",
+    "observedSignals": [],
+    "elapsedSeconds": 5,
+    "changeCount": 0,
+    "digestChanged": false,
+    "occurredAt": "2026-11-22T12:45:05Z",
+    "errorCode": "needs_permission"
+  }
+}
+```
+
+**`params` fields (`additionalProperties: false`):**
+
+| Field | Rule |
+| --- | --- |
+| `schemaVersion` | Required, strict integer literal `1`. |
+| `watchId` | Required, canonical non-zero UUID. |
+| `jobId` | Required, canonical non-zero UUID. |
+| `kind` | Required, enum: `"settled" \| "changed" \| "timeout" \| "target_lost" \| "error"`. |
+| `observedSignals` | Required, `list[str]` (`0..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async"}`; MUST be non-empty when `kind` is `"settled"` or `"changed"`. |
+| `elapsedSeconds` | Required, strict `int >= 0`. |
+| `changeCount` | Required, strict `int >= 0`. |
+| `digestChanged` | Required, `bool`. |
+| `occurredAt` | Required, timezone-aware ISO-8601 UTC timestamp string (e.g. `"2026-11-22T12:45:00Z"`). |
+| `errorCode` | `str` (`^[a-z0-9_.-]{1,64}$`), **required iff `kind == "error"` and strictly forbidden when `kind != "error"`** (since `timeout` and `target_lost` are already first-class `kind` values). |
+
+- **Completion invariant:** `timeout`, `target_lost`, and `error` events NEVER mark an `AutonomousJob` or sub-goal `COMPLETED` (Rule H1).
 
 ---
 

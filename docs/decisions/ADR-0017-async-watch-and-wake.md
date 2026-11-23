@@ -23,7 +23,7 @@ Date: 2026-11-22. **Status: Proposed** (Extends [ADR-0012](ADR-0012-host-actions
 **Option D (Proposed — awaits owner kick-off / acceptance).**
 
 1. **Event-Driven Desktop Local Sentinel over XTP v1:**
-   - Add strictly bounded, content-free wire messages `xuna/watchRegister`, `xuna/watchCancel` (Backend → Host), and `xuna/watchEvent` (Host → Backend push notification) documented in `XUNA_XTP_V1_CONTRACT.md` §4.2.13–§4.2.15 with byte-identical fixture pair `watch_frames.json`.
+   - Add strictly bounded, content-free wire messages `xuna/watchRegister`, `xuna/watchCancel` (Backend → Host), and `xuna/watchEvent` (Host → Backend push notification) documented in `XUNA_XTP_V1_CONTRACT.md` §4.2.14–§4.2.16 with byte-identical fixture pair `watch_frames.json`.
    - Desktop watches target PID/window/workspace/tab in the background (`releaseFocus: true`) using multi-signal convergence (`ui_quiescence`, `ui_change`, `process_idle`, `fs_quiescence`, `cdp_idle`, `composite`, `timer`, and Phase 3 `protocol_async`), pushing `xuna/watchEvent` only when settled, changed, timed out, lost, or errored.
 2. **Durable Sleep & Wake Lifecycle (`AutonomousJobState.WAITING_WATCH`):**
    - Migration `0023_async_watch_and_wake.py` adds `job_watches` and `wake_inbox_items`.
@@ -43,7 +43,7 @@ Date: 2026-11-22. **Status: Proposed** (Extends [ADR-0012](ADR-0012-host-actions
 
 ## Consequences
 
-- **Contract & Fixtures:** `XUNA_XTP_V1_CONTRACT.md` §4.2.13–§4.2.15 + synchronized `watch_frames.json` in `backend/` and `desktop/packages/xuna_xtp/`.
+- **Contract & Fixtures:** `XUNA_XTP_V1_CONTRACT.md` §4.2.14–§4.2.16 + synchronized `watch_frames.json` in `backend/` and `desktop/packages/xuna_xtp/`.
 - **Backend:** Migration `0023`, `actions/domain/watch.py`, `actions/application/watch_coordinator.py`, `wake_inbox.py`, `yield_detach.py`, `actions/infrastructure/watch_repository.py`, `actions/api/watch_routes.py`, plus thin hooks in `job_runner.py`, `host_socket.py`, and `chat_turn.py` (`orchestrator.py` < 50 net LOC, `workflows.py` 0 diff).
 - **Desktop:** `LocalWatchSentinel` + `WatchConvergence` (Dart), `XunaHostPlugin+Watch.swift` (macOS `AXObserver`/`libproc`/`FSEvents`), `xuna_win_watch.h` (Windows C++ parity), CDP idle watch, and Phase 3 MCP/ACP async bridge.
 - **Mobile:** `AutonomousJobState.waitingWatch`/`waitingWake`, `HomeWakeInboxService`, Watch status card, non-intrusive Wake Inbox delivery, and 100% synced `locales.g.dart`.

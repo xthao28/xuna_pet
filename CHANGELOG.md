@@ -1,6 +1,16 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-22** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-23** (Asia/Ho_Chi_Minh).
+
+## 2026-11-23 — XUNA Async Watch & Wake — Wave 1 (`AW-M1–AW-M6`): Event-Driven Local Sentinel, Multi-Signal Quiescence, `yieldMs` Auto-Detach & Mobile Wake Inbox (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
+
+- **AW-M1 (Contract & Fixtures):** Cập nhật [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) (§4.2.14–§4.2.16) cho `xuna/watchRegister`, `xuna/watchCancel`, `xuna/watchEvent` và đồng bộ cặp fixture byte-identical `watch_frames.json` (`diff -r` exit `0`).
+- **AW-M2 (Backend Core):** Migration `0023_async_watch_and_wake.py` (`job_watches`, `wake_inbox_items`), `AutonomousJobState.WAITING_WATCH`, `watch.py`, `watch_coordinator.py`, `wake_inbox.py`, `yield_detach.py`, `watch_repository.py`, `watch_routes.py`, internal tool `job__wait`, hook mỏng trên `job_runner.py`/`host_socket.py`/`chat_turn.py`/`websocket.py` (`orchestrator.py` `+25` net LOC, `workflows.py` `0` diff), cùng `redaction.py` thuần `O(n)` cho Consent U5 (`sanitize_wake_text`).
+- **AW-M3 & AW-M4 (`xuna_xtp`, Desktop Sentinel, Native Watchers & CDP):** `WatchFrames`, `LocalWatchSentinel`, `WatchConvergence` (tối đa 4 watch, `releaseFocus: true`, E-Stop hủy sạch), macOS Swift `XunaHostPlugin+Watch.swift` (`AXObserver`/background AX/`libproc`/`FSEvents` + `RunnerWatchTests.swift`), Windows C++ parity `xuna_win_watch.h`, và Chrome CDP `CdpWatchSignalDriver` (`cdp_idle`).
+- **AW-M5 (Mobile Wake Inbox UX):** Clean Architecture cho `waitingWatch`/`waitingWake`, `HomeWakeInboxService`, non-intrusive Wake Inbox delivery + card 1 chạm (`Kiểm tra ngay` / `Chờ thêm` / `Dừng`), đồng bộ 100% `vi_VN.json`/`en_US.json`/`locales.g.dart`.
+- **AW-M6 (E2E Tiers 1–5 & Kiểm chứng tuần tự sau sửa đổi cuối):**
+  - `backend`: `ruff` + `mypy` (`0/262`) + **`1,481 passed, 0 failed`** PostgreSQL `xuna_test` (gồm `15/15` `tests/e2e_watch/` + `TestRuleH5GenericLayerCompliance`); `xuna_xtp` **`170/170`**; `desktop` **`299/299`** + macOS Debug build + **`RunnerTests` `36/36`**; `mobile` **`733/733`** (`3.32.8 --no-pub` trên `macOS 12.6`, `pubspec.lock`/`.fvmrc`/`firmware/` sạch 100%, chưa commit/push).
+  - Chưa chạy / tách bước sau (H8): Wave 2 (Phase 3 MCP/ACP async), Windows MSVC, Flutter `3.47.9` (`macOS >= 14.0`), và chạy thực địa trên thiết bị thật.
 
 ## 2026-11-22 — Nới lỏng quyền Autopilot (ADR-0015 Amendment) & Đặc tả Async Watch & Wake (`ADR-0017`) (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
 
