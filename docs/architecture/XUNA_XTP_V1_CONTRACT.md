@@ -553,7 +553,8 @@ Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-resu
 }
 ```
 
-- **Hard safety gates:** Any empty/whitespace entry or any of the 15 hard-denied Terminal GUIs (`isHardDeniedAppOrProcess`) in `allowApps` is rejected immediately with JSON-RPC `-32602` (`policy_blocked`). Entries in `denyApps` and `denyDomains` always override `allowApps` / zero-config app discovery / public HTTPS domains at runtime (`policy_blocked` / `domain_not_allowed`), and phone-signed single-use `R3` approvals remain mandatory even under `autopilot`.
+- **Hard safety gates:** Any empty/whitespace entry or any of the hard-denied Terminal GUIs (`isHardDeniedAppOrProcess`) in `allowApps` is rejected immediately with JSON-RPC `-32602` (`policy_blocked`). Entries in `denyApps` and `denyDomains` always override `allowApps` / zero-config app discovery / public HTTPS domains at runtime (`policy_blocked` / `domain_not_allowed`), and phone-signed single-use `R3` approvals remain mandatory even under `autopilot`.
+- **Local-only `protocolHarnesses` isolation (Wave 2, AW2-M1):** `host-policy.json` may declare an optional local-only `protocolHarnesses` list (`ProtocolHarnessConfig`: `id`, `name`, `protocol` in `{"mcp_stdio", "acp_stdio"}`, `executable`, `args`, `risk` in `{"R2", "R3"}`). Shells, script launchers, privilege-escalation binaries, and inline eval arguments (`-c`, `-e`, `--eval`, `/c`, `-Command`, `-EncodedCommand`, `-enc`) are rejected fail-closed (`isForbiddenProtocolHarnessExecutable`, `hasForbiddenHarnessInlineEvalArg`). `protocolHarnesses` is strictly local-file-only: `xuna/set_policy` rejects `protocolHarnesses` with `-32602 Invalid params`, desktop policy updates preserve local `protocolHarnesses`, and `xuna/get_policy` / `mcp.list_servers` never expose `executable`, `args`, `workingDir`, or `env`.
 - **Success response:** `{"schemaVersion": 1, "status": "ok"}`.
 
 #### 4.2.10 `xuna/presence` (Agent → Backend, Notification — Proposed M1)
@@ -729,6 +730,7 @@ Sent strictly after `xuna/ready` (never during the handshake or injected before 
 | `errorCode` | **Required when `accepted == false`; strictly forbidden when `accepted == true`.** Enum: `"watch_unsupported" \| "target_not_found" \| "workspace_not_found" \| "watch_limit_reached" \| "needs_permission" \| "policy_blocked" \| "stopped" \| "invalid_args"`. |
 
 - **Host capacity & fail-closed rules:** Maximum **4 concurrent active watches** per host (`watch_limit_reached` fail-closed). The host must never guess a missing or ambiguous target (Rule H3) and must never fabricate `accepted: true` when an observer, permission, or target is unavailable (Rule H1). Wire structural, type, or unknown-key violations return JSON-RPC `-32602 Invalid params`.
+- **`protocol_async` runtime semantics (Wave 2, AW2-M1):** Requires both `target.mcpServerId` and `target.protocolTaskId` (else `accepted: false, errorCode: "watch_unsupported"` / `"target_not_found"`). Missing task in the host's RAM-only `ProtocolTaskRegistry` fails closed with `accepted: false, errorCode: "target_not_found"`. If the task has already terminated before `xuna/watchRegister` attaches, the host accepts and emits the terminal `xuna/watchEvent` (`settled`, `target_lost`, or `error`) without losing completion. While running, progress ticks (`notifications/progress` / `session/update`) keep the watch active without premature quiescence and never carry raw stdout/stderr/paths onto `xuna/watchEvent`. Unexpected stdio child termination emits `kind: "target_lost"`. Live registrations use `requireInitialChange: false`.
 
 #### 4.2.15 `xuna/watchCancel` (Backend → Agent, Request — Proposed AW-M1)
 
@@ -927,4 +929,17 @@ Before passing a URL to the OS (`ShellExecuteExW` / `NSWorkspace`), the Host Age
 3. Hostname is converted from IDN to ASCII punycode before matching.
 4. IPv4 literals, IPv6 literals and `localhost` (`.local`, `.localhost`) are rejected.
 5. For direct `url.open`, any public HTTPS domain is permitted (after DNS non-private/loopback/link-local IP verification) unless listed in `host-policy.json` `denyDomains` (`allowPublicHttpsDomains: true`, UDC-18). For `workflow.batch_steps` or hosts with `allowPublicHttpsDomains: false`, the ASCII hostname must equal or be a subdomain of an entry in `host-policy.json` `urlDomains` (`.` boundary check); otherwise return `denied` (`domain_not_allowed`).
+
+---
+
+## 7. Protocol-First Async MCP & ACP Tool Contracts (Wave 2, AW2-M1)
+
+All protocol tool schemas enforce `"additionalProperties": false` and `ToolFamily` `app`. Local harness `executable`, `args`, `workingDir`, and `env` never cross XTP.
+
+| Tool name | Risk | Flags | `inputSchema` highlights | `outputSchema` (`structuredContent`) |
+| --- | --- | --- | --- | --- |
+| `mcp.list_servers` | `R1` | `observes: false`, `reversible: true` | `{}` | `{"servers": [{"id", "transport" ("stdio"\|"http"\|"acp_stdio"), "source", "supportsAsync"?}]}` (never includes `executable`, `command`, `args`, `url`, `env`) |
+| `mcp.call` | `R2` floor (`R3` if harness `risk == R3`) | `observes: false`, `reversible: false` | Required: `server`, `tool`; optional: `payloadJson` (`<= 1000`), `asyncMode` (`bool`), `yieldMs` (`int`, `500..15000`) | Required: `server`, `tool`, `summary` (`maxLength: 6144`); optional async handle: `status` (`"completed"\|"running"`), `mcpServerId`, `protocolTaskId` |
+| `mcp.task_result` | `R1` | `observes: true` (Consent U5), `reversible: true` | Required: `server` (`^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`^[a-zA-Z0-9_.-]{1,128}$`) | Required: `server`, `protocolTaskId`, `status` (`"running"\|"completed"\|"failed"\|"cancelled"`), `summary` (`maxLength: 6144`, U5 redacted); optional: `progressPercent` (`0..100`), `errorCode` |
+| `mcp.task_cancel` | `R1` | `observes: false`, `reversible: true` | Required: `server` (`^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`^[a-zA-Z0-9_.-]{1,128}$`) | Required: `server`, `protocolTaskId`, `cancelled` (`bool`) |
 

@@ -417,6 +417,6 @@ flowchart LR
 ## 9. Recommended Execution Order for `/teamwork`
 
 1. **Wave 1 (Fastest Real-World Value — Phase 1 + Phase 2 macOS):** Run `AW-M1 → (AW-M2 || AW-M3) → AW-M4 (macOS + CDP) → AW-M5 → AW-M6` first so XUNA immediately gains durable Event-Driven Watch, Multi-Signal Quiescence (`AXObserver` + background PID digest + `libproc` CPU/children + `FSEvents` + CDP), `yieldMs` auto-detach, and Mobile Wake Inbox on Mac + Phone.
-2. **Wave 2 (Phase 3 Protocol-First):** Follow with opt-in `MCP` async progress/completion bridging and `ACP` harness adapter (`protocol_async`) once Wave 1 passes live Mac + Phone testing.
+2. **Wave 2 (Phase 3 Protocol-First):** Follow with opt-in `MCP` async progress/completion bridging and `ACP` harness adapter (`protocol_async`) — full contract specification & teamwork plan (`AW2-M1–AW2-M5`) in [XUNA_ASYNC_WATCH_WAVE2_PROTOCOL.md](XUNA_ASYNC_WATCH_WAVE2_PROTOCOL.md).
 3. **Note on Windows:** Implement C++ parity (`xuna_win_watch.h`) in `AW-M4`, and schedule a dedicated Windows MSVC compile + runtime verification pass afterward (Rule H8).
 

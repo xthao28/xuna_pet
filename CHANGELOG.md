@@ -1,6 +1,25 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-23** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-24** (Asia/Ho_Chi_Minh).
+
+## 2026-11-24 — Kiểm thử thực địa macOS Wave 2, Cải thiện chat tự nhiên điều khiển IDE & Vá lỗi `resolveTargetApplication` tự bật app (`backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
+
+- **Phân giải IDE & App Allowlist (`xuna_xtp`, `desktop/`):** Ưu tiên `Antigravity IDE.app` / `antigravity-ide` trước `Antigravity.app` trong `AutoAppScanner` và `AutoWorkspaceIndexer.resolveMacIdeAppName`; bổ sung `HostPolicy.findConfiguredAppFuzzy` ưu tiên app đã allowlist duy nhất (trả `null` nếu nhập nhằng theo Rule H3) cho `AppLaunchTool` và `ComputerUseSessionManager`.
+- **Minh bạch deliverables & Planner gọn (`xuna_xtp`, `desktop/`, `backend/`):** Mở rộng `workspace.git_summary` với `changedFiles` (tối đa 25 đường dẫn tương đối đã lọc/redact), cập nhật wake prompt hậu thức dậy (`watch_coordinator.py`) yêu cầu đối chiếu đầu ra thực tế với `doneCriteria` (Rule H1), và rút gọn `JobPlannerExecutor` xuống 3 pha khi `max_steps <= 15` hoặc dùng `job__wait`.
+- **Gửi prompt IDE native CGEvent/AX & Vá lỗi tự mở PyCharm (`desktop/`, `desktop/macos/`):**
+  - `WorkspaceCodingAgentTool.deliverMacIdePromptNative` gửi prompt qua native CGEvent/AX (không phụ thuộc AppleScript `System Events`), đọc cả `label`/`refId` lẫn `name`/`id`, quy đổi `bounds` sang tọa độ màn hình tuyệt đối đa màn hình, ưu tiên `invoke_ref` cho `Toggle Agent (⌥⌘B)`, và kiểm tra focus cửa sổ đích trước từng thao tác nhập.
+  - Gỡ bỏ cơ chế tự gọi `/usr/bin/open -a` & `discoverInstalledAppBundleURL` khỏi `resolveTargetApplication` (`XunaHostPlugin+UiTreeScanner.swift`) vốn làm chuỗi `"physical-ai-venture"` khớp nhầm token `"ai"` vào `com.jetbrains.pycharm` và tự bật PyCharm; thay bằng `matchRunningAppCandidate` chỉ khớp app đang chạy và fail-closed `TARGET_WINDOW_NOT_FOUND` trong `XunaHostPlugin+UiActionExecutor.swift`.
+- **Kiểm chứng:** Xác nhận thực địa Wave 2 (MCP/ACP thật, E-Stop `205.5ms`, `FSEvents`) và luồng 1 câu tiếng Việt tự nhiên tạo xong `docs/supply_chain.md` với `0` PyCharm; `xuna_xtp` **`175/175`**, `desktop` **`313/313`** + macOS Debug build + **`RunnerTests` `37/37`**, `backend` `ruff`/`mypy` (`0/262`) + `136` targeted pytest, `diff -r` fixtures `0`. Chưa chạy lại toàn bộ 1,490+ backend pytest sau tinh chỉnh nhỏ planner/wake prompt, Windows MSVC, thiết bị thật và Flutter `3.47.9` (H8).
+
+## 2026-11-23 — XUNA Async Watch & Wake — Wave 2 (`AW2-M1–AW2-M5`): Protocol-First Async Watch (Streaming MCP & Opt-In ACP Harness Bridge) (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
+
+- **AW2-M1 (Contract, Policy & Schemas):** Cập nhật [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) và cặp fixture byte-identical `watch_frames.json` (`diff -r` exit `0`); thêm `HostPolicy.protocolHarnesses` local-only (cấm ghi qua `xuna/set_policy`, chặn shell/interpreter & inline eval), mở rộng `mcp.list_servers`/`mcp.call` (`asyncMode`/`yieldMs`), và thêm `mcp.task_result`/`mcp.task_cancel`.
+- **AW2-M2 (Desktop Protocol Runtime):** Thêm `ProtocolTaskRegistry` (`296 <= 300` LOC, tối đa 4 task, E-Stop cancel + kill), streaming `notifications/progress` & `yieldMs` detach (`McpStdioClient`, `AutoMcpBridge`), `AcpHarnessAdapter` (`350 <= 350` LOC, JSON-RPC 2.0 stdio), `ProtocolAsyncWatchDriver` (`186 <= 200` LOC), và handler `mcp.task_result`/`mcp.task_cancel`.
+- **AW2-M3 (Backend Integration):** Mở rộng `JOB_WAIT_SCHEMA` (`mcpServerId`, `protocolTaskId`), cập nhật `WatchCoordinator` (`protocol_async` binding, `requireInitialChange=false`, wake prompt gọi `mcp__task_result`), `catalog.py` giữ `MAX_CATALOG_TOOLS = 36`, `planner_executor.py` lưu `last_window`; giữ **`0` diff** ở `redaction.py`, `workflows.py`, `orchestrator.py` và **`0` migration mới**.
+- **AW2-M4 & AW2-M5 (E2E Tier 6, Audit H1–H10 & Kiểm chứng tuần tự):**
+  - Bổ sung `protocol_policy_test.dart` (`409` LOC), `protocol_async_watch_driver_test.dart` (`447` LOC), `protocol_runtime_unit_test.dart` (`449` LOC), `test_async_watch_protocol_wave2.py` (`441` LOC), `test_tier6_protocol_async_mcp_and_acp.py` (`441` LOC), `xtp_sim.py` và mở rộng `TestRuleH5GenericLayerCompliance`.
+  - Kiểm chứng tuần tự sau sửa đổi cuối: `diff -r` fixtures `0`; `backend` `ruff` + `mypy` (`0/262`) + **`1,490 passed, 0 failed`** PostgreSQL `xuna_test` (`509.25s`); `xuna_xtp` **`175/175`**; `desktop` **`311/311`** + macOS Debug build + **`RunnerTests` `36/36`** (`3.950s`); `mobile/`, `firmware/`, `redaction.py`, `workflows.py`, `orchestrator.py`, `.fvmrc`, `pubspec.lock` sạch `100%`, mọi file mới `<= 450 LOC`, chưa `git commit`/`push`.
+  - Chưa chạy / tách bước sau (H8): Windows MSVC, thiết bị vật lý (iPhone/Android, LILYGO ESP32), Flutter `3.47.9` (`macOS >= 14.0`), và thử nghiệm live với binary ACP/MCP thật ngoài test giả lập stream.
 
 ## 2026-11-23 — XUNA Async Watch & Wake — Wave 1 (`AW-M1–AW-M6`): Event-Driven Local Sentinel, Multi-Signal Quiescence, `yieldMs` Auto-Detach & Mobile Wake Inbox (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
 
