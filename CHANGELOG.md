@@ -1,6 +1,11 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-24** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-25** (Asia/Ho_Chi_Minh).
+
+## 2026-11-25 — Đặc tả Wave 3: Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency (`ADR-0018`) (`docs/`)
+
+- **Quyết định kiến trúc ([ADR-0018](docs/decisions/ADR-0018-power-user-shell-and-direct-fs.md), cập nhật [docs/decisions/README.md](docs/decisions/README.md)):** Phê duyệt bàn giao triển khai Wave 3 sửa đổi có phạm vi `ADR-0012`/`ADR-0015` và mở rộng `ADR-0017`: giữ nguyên cấm các tiền tố thô cũ (`shell.*`, `powershell.*`, `osascript.*`...), bổ sung `fs.*` (`ToolFamily.files`) và `exec.*` (`ToolFamily.exec`) theo cơ chế **Local-Only Opt-In** (`HostPolicy.shellControl.enabled = false` mặc định, chặn ghi từ xa `422`), phân tầng rủi ro bắt buộc qua `xuna/preflight` (`Hard-Deny` / `R3` / `R2` / `R1`), cô lập biến môi trường & process-group E-Stop.
+- **Đặc tả kỹ thuật ([XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md](docs/architecture/XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md)):** Quy định đầy đủ hợp đồng XTP v1, `ExecCommandClassifier` / `FsPathGuard`, `exec_async` watch 0-token, `mcp.list_servers` `tools/list` introspection, `FallbackTextGenerator` Multi-Model Auto-Failover, cân đối `catalog.py`/`prompts.py`, đồng bộ `HostToolFamily.exec` trên `mobile/`, ma trận kiểm thử bảo mật đối kháng và lộ trình `W3-M0–W3-M5` (`0` DB migration, `0 B` diff `firmware/`). Trạng thái: chưa triển khai code Wave 3.
 
 ## 2026-11-24 — Kiểm thử thực địa macOS Wave 2, Cải thiện chat tự nhiên điều khiển IDE & Vá lỗi `resolveTargetApplication` tự bật app (`backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
 
