@@ -1,6 +1,6 @@
 # ADR-0018 — Opt-In Local Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency
 
-Date: 2026-11-25. **Status: Approved for specification & implementation handoff (owner 2026-11-25); Not Implemented / Not Validated.** Amends [ADR-0012](ADR-0012-host-actions.md) and [ADR-0015](ADR-0015-commit-gated-control-and-trusted-scopes.md) (including the 2026-11-22 Autopilot amendment) strictly for the newly scoped `exec.*` and `fs.*` tool namespaces; extends [ADR-0017](ADR-0017-async-watch-and-wake.md) (`LocalWatchSentinel` + `WAITING_WATCH`). Authoritative engineering specification: [XUNA Wave 3 — Power-User Shell, Direct File I/O & Brain Fluency](../architecture/XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md).
+Date: 2026-11-25. **Status: Approved (owner 2026-11-25); Implemented W3-M0–W3-M4 (2026-11-25); W3-M5 live macOS verification pending — Not Validated.** Amends [ADR-0012](ADR-0012-host-actions.md) and [ADR-0015](ADR-0015-commit-gated-control-and-trusted-scopes.md) (including the 2026-11-22 Autopilot amendment) strictly for the newly scoped `exec.*` and `fs.*` tool namespaces; extends [ADR-0017](ADR-0017-async-watch-and-wake.md) (`LocalWatchSentinel` + `WAITING_WATCH`). Authoritative engineering specification: [XUNA Wave 3 — Power-User Shell, Direct File I/O & Brain Fluency](../architecture/XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md).
 
 ## Context
 

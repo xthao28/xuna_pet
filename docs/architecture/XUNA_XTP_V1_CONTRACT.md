@@ -1,6 +1,6 @@
 # XUNA Tool Protocol (XTP) v1 — Normative Wire Contract
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`. **Proposed amendment 2026-11-22 ([ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) / [XUNA_ASYNC_WATCH_AND_WAKE.md](XUNA_ASYNC_WATCH_AND_WAKE.md) AW-M1):** §4.2.14 `xuna/watchRegister`, §4.2.15 `xuna/watchCancel`, and §4.2.16 `xuna/watchEvent`.
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`. **Proposed amendment 2026-11-22 ([ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) / [XUNA_ASYNC_WATCH_AND_WAKE.md](XUNA_ASYNC_WATCH_AND_WAKE.md) AW-M1):** §4.2.14 `xuna/watchRegister`, §4.2.15 `xuna/watchCancel`, and §4.2.16 `xuna/watchEvent`. **Amendment 2026-11-25 ([ADR-0018](../decisions/ADR-0018-power-user-shell-and-direct-fs.md) / [XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md](XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md) W3-M0, implemented W3-M0–W3-M4, live macOS validation pending W3-M5):** `ToolFamily` `exec`, the `fs.*` and `exec.*` tools (§8), mandatory host preflight for `exec.run` / `exec.write_stdin` / `fs.write_file` / `fs.patch_file` (§4.2.8), local-only `shellControl` and `shellEnabled` (§4.2.9), watch mode/signal `exec_async` with `target.execTaskId` (§4.2.14–§4.2.16), and `mcp.list_servers` `includeTools` / `serverId` (§7). Golden frames: `exec_fs_frames.json`, `policy_frames.json`, and the `exec_async` entries of `watch_frames.json`.
 Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md), [ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md), [ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
 
 ---
@@ -15,7 +15,7 @@ Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md)
 - **Size limits:**
   - Maximum WebSocket frame size: **≤ 512 KiB** (`524,288` bytes UTF-8). Exceeding this closes the connection with `1009 frame_too_large`.
   - Maximum `structuredContent` payload in `tools/call` results: **≤ 16 KiB** (`16,384` bytes UTF-8) for ordinary tools; **≤ 448 KiB** (`458,752` bytes UTF-8, `maxMediaStructuredContentBytes`) for media/screenshot payloads (under consent U5), leaving framing headroom inside the 512 KiB frame limit.
-  - Forbidden tool names (`shell.*`, `powershell.*`, `osascript.*`, `eval.*`, `script.*`, `keyboard.*`, `pointer.*`, `cmd.*`, `bash.*`, or any family outside `ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`) are rejected at manifest validation.
+  - Forbidden tool names (`shell.*`, `powershell.*`, `osascript.*`, `eval.*`, `script.*`, `keyboard.*`, `pointer.*`, `cmd.*`, `bash.*`, or any family outside `ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`, `exec`) are rejected at manifest validation. The prefix `fs` maps to family `files`; `exec` is its own family (ADR-0018). Command execution exists only as the schema-validated, host-preflighted `exec.*` tools (§8); the raw-shell prefixes above stay forbidden.
 
 ---
 
@@ -513,6 +513,11 @@ The method is in the `xuna/` namespace because MCP has no equivalent. It is a se
 
 The LAN offline server (UDC-7 S7.4) answers `-32601`: it executes only `media.*`.
 
+**Wave 3 (ADR-0018): mandatory preflight for `exec.run`, `exec.write_stdin`, `fs.write_file`, `fs.patch_file`.**
+1. The host classifies the call with the same evaluator it runs again at `tools/call` (`ExecCommandClassifier`, `FsPathGuard` in `xuna_xtp`), after resolving symlinks of every path it can resolve. A refusal is `status: "denied"` with `errorCode` `shell_not_enabled`, `exec_hard_denied`, `exec_env_dump_forbidden`, `fs_path_forbidden`, `fs_secret_file_forbidden` or `pty_not_allowed`; `invalid_args` carries `schema_mismatch`, `path_not_absolute`, `line_window_invalid` or `timeout_exceeds_policy`.
+2. `ok` carries `effectiveRisk` `R1`–`R3` and a `reasonCode` from: `local_command`, `workspace_write`, `workspace`, `read`, `observe`, `stdin`, `network_command`, `destructive_command`, `unclassified_command`, `inline_code`, `pipe_to_interpreter`, `dynamic_subshell`, `dynamic_executable`, `dynamic_execution`, `dynamic_write_target`, `package_install`, `unparseable`, `outside_workspace`, `dotfile_target`, `system_target`, `secret_file`, `parent_task_r3`, `policy`.
+3. The backend sends these four tools only after a preflight answer. A host that answers `-32601`, a platform other than `windows`/`macos`, and the in-process self host are refused with `preflight_required`; the backend never substitutes its own estimate and never lowers the host's risk.
+
 #### 4.2.9 `xuna/get_policy` and `xuna/set_policy` (Backend → Agent, Request)
 
 Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-results-2026-11-15.md) so the owner can inspect and update the desktop host's local trust preset and app/domain boundaries from the phone (`GET` / `PUT /v1/hosts/{host_id}/policy`). The LAN offline server refuses both with `-32601`.
@@ -530,10 +535,13 @@ Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-resu
     "denyApps": ["discord"],
     "allowDomains": ["github.com"],
     "denyDomains": ["evil.example.com"],
-    "discoveredApps": ["vscode", "notes", "chrome"]
+    "discoveredApps": ["vscode", "notes", "chrome"],
+    "shellEnabled": false
   }
 }
 ```
+
+`shellEnabled` (optional `bool`, Wave 3) is the only part of the local `shellControl` section that leaves the host.
 
 **`xuna/set_policy`** updates `host-policy.json` atomically via `HostPolicyStore`:
 
@@ -555,6 +563,7 @@ Added 2026-11-15 by [UDC-18 Wave E](../roadmap/device-control/UDC-18-wave-e-resu
 
 - **Hard safety gates:** Any empty/whitespace entry or any of the hard-denied Terminal GUIs (`isHardDeniedAppOrProcess`) in `allowApps` is rejected immediately with JSON-RPC `-32602` (`policy_blocked`). Entries in `denyApps` and `denyDomains` always override `allowApps` / zero-config app discovery / public HTTPS domains at runtime (`policy_blocked` / `domain_not_allowed`), and phone-signed single-use `R3` approvals remain mandatory even under `autopilot`.
 - **Local-only `protocolHarnesses` isolation (Wave 2, AW2-M1):** `host-policy.json` may declare an optional local-only `protocolHarnesses` list (`ProtocolHarnessConfig`: `id`, `name`, `protocol` in `{"mcp_stdio", "acp_stdio"}`, `executable`, `args`, `risk` in `{"R2", "R3"}`). Shells, script launchers, privilege-escalation binaries, and inline eval arguments (`-c`, `-e`, `--eval`, `/c`, `-Command`, `-EncodedCommand`, `-enc`) are rejected fail-closed (`isForbiddenProtocolHarnessExecutable`, `hasForbiddenHarnessInlineEvalArg`). `protocolHarnesses` is strictly local-file-only: `xuna/set_policy` rejects `protocolHarnesses` with `-32602 Invalid params`, desktop policy updates preserve local `protocolHarnesses`, and `xuna/get_policy` / `mcp.list_servers` never expose `executable`, `args`, `workingDir`, or `env`.
+- **Local-only `shellControl` (Wave 3, ADR-0018):** `host-policy.json` may declare `shellControl` (`enabled` default `false`, `allowPty` default `true`, `defaultTimeoutSeconds` 5–120 default 30, `maxTimeoutSeconds` 30–900 default 300 and `>= defaultTimeoutSeconds`, `maxConcurrentTasks` 1–4 default 4, `workspaceRoots` up to 16 absolute local paths; unknown keys make the policy invalid). Only the desktop UI or a local file edit changes it. `xuna/set_policy` rejects `shellControl`, `shell_control` and `shellEnabled` with `-32602`; the backend `PUT /v1/hosts/{host_id}/policy` rejects them with HTTP `422` before contacting the host; a desktop policy update keeps the local `shellControl` verbatim. `workspaceRoots` and paths never leave the host.
 - **Success response:** `{"schemaVersion": 1, "status": "ok"}`.
 
 #### 4.2.10 `xuna/presence` (Agent → Backend, Notification — Proposed M1)
@@ -708,9 +717,9 @@ Sent strictly after `xuna/ready` (never during the handshake or injected before 
 | `schemaVersion` | Required, strict integer literal `1` (rejects `bool`, `float`, and `string`). |
 | `watchId` | Required, canonical non-zero UUID string (`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`). |
 | `jobId` | Required, canonical non-zero UUID string (same format). |
-| `mode` | Required, enum: `"ui_quiescence" \| "ui_change" \| "process_idle" \| "fs_quiescence" \| "cdp_idle" \| "composite" \| "timer" \| "protocol_async"`. |
+| `mode` | Required, enum: `"ui_quiescence" \| "ui_change" \| "process_idle" \| "fs_quiescence" \| "cdp_idle" \| "composite" \| "timer" \| "protocol_async" \| "exec_async"`. |
 | `signals` | **Required iff `mode == "composite"`; strictly forbidden otherwise.** List of 2–3 distinct strings from `{"ui_quiescence", "process_idle", "fs_quiescence", "cdp_idle"}`. |
-| `target` | Required object (`additionalProperties: false`; `{}` for `mode == "timer"`). Non-`timer` modes missing required target identifiers fail closed on the Host with `accepted: false` (never guessing default windows or workspaces per Rule H3). Optional normalized subfields: `pid` (strict `int`, `1..2147483647`), `windowId` (strict `int`, `0..2147483647`), `appId` (`str`, `^[a-z0-9_.-]{1,64}$`; hard-denied apps fail closed with `accepted: false, errorCode: "policy_blocked"`), `workspaceAlias` (`str`, `^[a-zA-Z0-9_.-]{1,64}$`, rejecting `/`, `\`, `.`, `..`, and any `..` substring), `tabId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`), `mcpServerId` (`str`, `^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`). |
+| `target` | Required object (`additionalProperties: false`; `{}` for `mode == "timer"`). Non-`timer` modes missing required target identifiers fail closed on the Host with `accepted: false` (never guessing default windows or workspaces per Rule H3). Optional normalized subfields: `pid` (strict `int`, `1..2147483647`), `windowId` (strict `int`, `0..2147483647`), `appId` (`str`, `^[a-z0-9_.-]{1,64}$`; hard-denied apps fail closed with `accepted: false, errorCode: "policy_blocked"`), `workspaceAlias` (`str`, `^[a-zA-Z0-9_.-]{1,64}$`, rejecting `/`, `\`, `.`, `..`, and any `..` substring), `tabId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`), `mcpServerId` (`str`, `^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`str`, `1..128` chars, rejecting ASCII control chars `[\x00-\x1f\x7f]`), `execTaskId` (`str`, `^exec_[a-zA-Z0-9_-]{1,64}$`, Wave 3). |
 | `quiescenceSeconds` | Required, strict `int`, `2..120`. |
 | `minWaitSeconds` | Required, strict `int`, `0..60`. |
 | `maxWaitSeconds` | Required, strict `int`, `5..900` (`minWaitSeconds <= maxWaitSeconds`; the LLM-facing `job__wait` tool enforces a stricter `10..900` subset). `quiescenceSeconds > maxWaitSeconds` is permitted on the wire for deterministic timeout behavior. |
@@ -724,13 +733,14 @@ Sent strictly after `xuna/ready` (never during the handshake or injected before 
 | `schemaVersion` | Required, strict integer literal `1`. |
 | `accepted` | Required, `bool`. |
 | `watchId` | Required, canonical non-zero UUID matching request `watchId`. |
-| `activeSignals` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** Non-empty `list[str]` (`1..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async"}`. |
+| `activeSignals` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** Non-empty `list[str]` (`1..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async", "exec_async"}`. |
 | `eventDriven` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** `bool`. |
 | `fallbackUsed` | **Required when `accepted == true`; strictly forbidden when `accepted == false`.** `bool`. |
 | `errorCode` | **Required when `accepted == false`; strictly forbidden when `accepted == true`.** Enum: `"watch_unsupported" \| "target_not_found" \| "workspace_not_found" \| "watch_limit_reached" \| "needs_permission" \| "policy_blocked" \| "stopped" \| "invalid_args"`. |
 
 - **Host capacity & fail-closed rules:** Maximum **4 concurrent active watches** per host (`watch_limit_reached` fail-closed). The host must never guess a missing or ambiguous target (Rule H3) and must never fabricate `accepted: true` when an observer, permission, or target is unavailable (Rule H1). Wire structural, type, or unknown-key violations return JSON-RPC `-32602 Invalid params`.
 - **`protocol_async` runtime semantics (Wave 2, AW2-M1):** Requires both `target.mcpServerId` and `target.protocolTaskId` (else `accepted: false, errorCode: "watch_unsupported"` / `"target_not_found"`). Missing task in the host's RAM-only `ProtocolTaskRegistry` fails closed with `accepted: false, errorCode: "target_not_found"`. If the task has already terminated before `xuna/watchRegister` attaches, the host accepts and emits the terminal `xuna/watchEvent` (`settled`, `target_lost`, or `error`) without losing completion. While running, progress ticks (`notifications/progress` / `session/update`) keep the watch active without premature quiescence and never carry raw stdout/stderr/paths onto `xuna/watchEvent`. Unexpected stdio child termination emits `kind: "target_lost"`. Live registrations use `requireInitialChange: false`.
+- **`exec_async` runtime semantics (Wave 3, ADR-0018):** Requires `target.execTaskId` from a detached `exec.run` (`watch_unsupported` when absent; `target_not_found` when the host's RAM-only `ExecProcessRegistry` does not know it). An exit with any code emits `changed` then `settled` (`observedSignals: ["exec_async"]`); a timeout or cancel, including E-Stop, emits `kind: "error"` with `exec_timed_out` / `exec_cancelled`. The event never carries output, command, path or exit code: the waking model reads them with `exec.status` (Rule H1). `exec_async` is not a composite signal; registrations use `requireInitialChange: false`.
 
 #### 4.2.15 `xuna/watchCancel` (Backend → Agent, Request — Proposed AW-M1)
 
@@ -840,7 +850,7 @@ Sent strictly after `xuna/ready` as a JSON-RPC 2.0 notification (MUST omit JSON-
 | `watchId` | Required, canonical non-zero UUID. |
 | `jobId` | Required, canonical non-zero UUID. |
 | `kind` | Required, enum: `"settled" \| "changed" \| "timeout" \| "target_lost" \| "error"`. |
-| `observedSignals` | Required, `list[str]` (`0..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async"}`; MUST be non-empty when `kind` is `"settled"` or `"changed"`. |
+| `observedSignals` | Required, `list[str]` (`0..3` distinct items) from `{"ui_quiescence", "ui_change", "process_idle", "fs_quiescence", "cdp_idle", "timer", "protocol_async", "exec_async"}`; MUST be non-empty when `kind` is `"settled"` or `"changed"`. |
 | `elapsedSeconds` | Required, strict `int >= 0`. |
 | `changeCount` | Required, strict `int >= 0`. |
 | `digestChanged` | Required, `bool`. |
@@ -903,7 +913,7 @@ Application-level tool outcomes are always returned inside `result._meta["xuna/s
 
 ## 6. Normative MVP Tool Schemas (`tools/list`)
 
-All input and output schemas enforce `"additionalProperties": false`. Tool names match `^[a-z]+\.[a-z_]+$` (`ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`).
+All input and output schemas enforce `"additionalProperties": false`. Tool names match `^[a-z]+\.[a-z_]+$` (`ToolFamily`: `media`, `app`, `url`, `workflow`, `host`, `cu`, `screen`, `ui`, `input`, `files`, `exec`).
 
 | Tool name | Family | Default risk | `inputSchema` | `outputSchema` (`structuredContent`) |
 | --- | --- | --- | --- | --- |
@@ -938,8 +948,32 @@ All protocol tool schemas enforce `"additionalProperties": false` and `ToolFamil
 
 | Tool name | Risk | Flags | `inputSchema` highlights | `outputSchema` (`structuredContent`) |
 | --- | --- | --- | --- | --- |
-| `mcp.list_servers` | `R1` | `observes: false`, `reversible: true` | `{}` | `{"servers": [{"id", "transport" ("stdio"\|"http"\|"acp_stdio"), "source", "supportsAsync"?}]}` (never includes `executable`, `command`, `args`, `url`, `env`) |
+| `mcp.list_servers` | `R1` | `observes: false`, `reversible: true` | Optional: `includeTools` (`bool`, default `true`), `serverId` (`^[a-z0-9_.-]{1,64}$`; unknown → `invalid_args` / `unknown_id`) | `{"servers": [{"id", "transport" ("stdio"\|"http"\|"acp_stdio"), "source", "supportsAsync"?, "tools"?: [{"name" (≤128), "description" (≤160, U5-redacted), "requiredArgs", "optionalArgs"}], "toolsTruncated"?: bool, "toolsError"?: "timeout"\|"spawn_failed"\|"protocol_error"\|"unsupported_transport"}]}` (never includes `executable`, `command`, `args`, `url`, `env`). Wave 3: real MCP `tools/list` per server, `2 s` timeout, `60 s` RAM cache keyed by id and launch fingerprint, whole response ≤ 16 KiB. |
 | `mcp.call` | `R2` floor (`R3` if harness `risk == R3`) | `observes: false`, `reversible: false` | Required: `server`, `tool`; optional: `payloadJson` (`<= 1000`), `asyncMode` (`bool`), `yieldMs` (`int`, `500..15000`) | Required: `server`, `tool`, `summary` (`maxLength: 6144`); optional async handle: `status` (`"completed"\|"running"`), `mcpServerId`, `protocolTaskId` |
 | `mcp.task_result` | `R1` | `observes: true` (Consent U5), `reversible: true` | Required: `server` (`^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`^[a-zA-Z0-9_.-]{1,128}$`) | Required: `server`, `protocolTaskId`, `status` (`"running"\|"completed"\|"failed"\|"cancelled"`), `summary` (`maxLength: 6144`, U5 redacted); optional: `progressPercent` (`0..100`), `errorCode` |
 | `mcp.task_cancel` | `R1` | `observes: false`, `reversible: true` | Required: `server` (`^[a-z0-9_.-]{1,64}$`), `protocolTaskId` (`^[a-zA-Z0-9_.-]{1,128}$`) | Required: `server`, `protocolTaskId`, `cancelled` (`bool`) |
 
+---
+
+## 8. Power-User Shell (`exec.*`) & Direct File I/O (`fs.*`) Tool Contracts (Wave 3, ADR-0018)
+
+All schemas enforce `"additionalProperties": false`. `fs.*` belongs to family `files`; `exec.*` to family `exec`. Every path argument is absolute (`/…`, `~/…`, `X:\…`); relative paths fail with `invalid_args` / `path_not_absolute` (Rule H3). Outputs pass U5 secret redaction and are bounded to 16 KiB per call. Descriptors byte-match `exec_fs_frames.json` (`toolsListExecFsResponse`).
+
+| Tool | Risk (manifest → host preflight) | `inputSchema` (exact keys) | `outputSchema` (`structuredContent`) |
+| --- | --- | --- | --- |
+| `fs.list_files` | `R1`, `observes: true` | `path` (req, 1..512), `glob?` (1..128), `maxDepth?` (1..6, default 3), `maxEntries?` (1..200, default 100) | `entries` (`[{path, kind: "file"\|"dir", sizeBytes?}]`, paths relative to `path`), `truncated`, `totalReturned` |
+| `fs.read_file` | `R1`, `observes: true` | `path` (req), `startLine?` (≥1), `endLine?` (window ≤ 400 lines) | `content`, `startLine`, `endLine`, `totalLines`, `truncated` |
+| `fs.grep` | `R1`, `observes: true` | `path` (req), `pattern` (req, 1..256), `isRegex?`, `glob?`, `maxMatches?` (1..100, default 50) | `matches` (`[{path, line, text}]`), `truncated`, `totalReturned` |
+| `fs.write_file` | `R2` → `R3` outside `workspaceRoots`, dotfiles in home, system locations, secret files | `path` (req), `content` (req, ≤ 262,144 B UTF-8), `createParents?` (default `true`), `overwrite?` (default `true`) | `bytesWritten`, `created`, `sha256` |
+| `fs.patch_file` | same as `fs.write_file` | `path` (req), `target` (req, 1..65,536), `replacement` (req, 0..65,536), `replaceAll?` | `replacements`, `bytesWritten`, `sha256` |
+| `exec.run` | `R2` → `R3` / refused (classifier) | `command` (req, 1..4096), `cwd?` (default: home), `timeoutMs?` (1000..300000, ≤ `maxTimeoutSeconds`), `yieldMs?` (500..60000, default 10000, detaches before the call deadline), `pty?` | `status` (`completed`\|`running`\|`failed`\|`timed_out`\|`cancelled`), `execTaskId?` (when `running`), `exitCode?`, `output`, `truncated`, `durationMs` |
+| `exec.status` | `R1`, `observes: true` | `taskId` (req, `^exec_[a-zA-Z0-9_-]{1,64}$`), `tailBytes?` (256..16384, default 8192) | `taskId`, `status`, `exitCode?`, `output`, `truncated`, `elapsedMs` |
+| `exec.write_stdin` | `R2` → `R3` when the task was started at `R3` | `taskId` (req), `input` (req, 0..2048), `appendNewline?`, `eof?` | `taskId`, `status`, `bytesWritten` |
+| `exec.cancel` | `R1` | `taskId` (req) | `taskId`, `status` (`cancelled`\|`already_finished`), `signalSent` |
+
+**Host rules (Desktop Agent).**
+1. `exec.*` is refused with `denied` / `shell_not_enabled` and advertised `permission: "denied"` while the local `shellControl.enabled` is `false`; the `families` map cannot enable `exec`. The backend additionally needs an active `exec` grant covering the effective risk (`exec` is never granted by default).
+2. Hard-Deny (unapprovable, also under `autopilot`): privilege escalation (`sudo`, `su`, `doas`, `pkexec`, `runas`, `osascript … administrator privileges`, setuid modes, root ownership), credential stores (`security find-*-password`/`dump-keychain`/`export`, password-manager CLIs), paths inside `.ssh`, `.gnupg`, `.aws`, `.kube`, `.password-store`, `Keychains`, password-manager data, `.netrc`, `.git-credentials`, `.docker/config.json`, `.git/config`, `/etc/shadow`, `/etc/sudoers*`, Windows `System32\config\*`; secret file names (`.env`, `.env.*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `id_rsa*`, `id_ed25519*`, `id_ecdsa*`, `id_dsa*`, `.npmrc`, `.pypirc`, `.pgpass`, `.htpasswd`) for reads and inside commands; environment dumps (`env`, `printenv`, `export -p`, bare `set`/`declare`); catastrophic commands (recursive delete of `/`, `~`, `$HOME`, the home directory or a drive root, `mkfs*`, `dd of=/dev/…`, `diskutil erase*`, `shutdown`/`reboot`/`halt`/`poweroff`/`format`, fork bombs). Symlinks are resolved and both the written and the real path are checked.
+3. `R2` is a positive allowlist of local inspection/build/test commands; everything else, including network clients, destructive or system commands, package installs, inline interpreter code (`-c`, `-e`), pipes into a shell or interpreter, command substitution and writes outside `workspaceRoots`, is `R3` and needs a phone-signed `once` approval even under `autopilot`.
+4. Children start with an environment allowlist (no `XUNA_*`, `GEMINI_*`, `OPENAI_*`, `GROQ_*`, `AWS_*`, `ANTHROPIC_*`, `FIREBASE_*`, `GOOGLE_*`, `AZURE_*`, `GITHUB_TOKEN`, `GH_TOKEN`, `NPM_TOKEN`, `BASH_ENV`, `ENV`, `ZDOTDIR`) in their own process group (macOS: `posix_spawn` + `POSIX_SPAWN_SETPGROUP`, shell `/bin/zsh -f`; Windows: `cmd.exe /d /s /c`, tree kill `taskkill /T /F`; other platforms `unsupported`). At most 4 run at once (`exec_task_limit_reached`); output stays in RAM (64 KiB rolling buffer, finished tasks kept 5 minutes, at most 16). E-Stop sends SIGTERM to every group, SIGKILL after 500 ms, and marks the tasks `cancelled`.
+5. `fs.write_file` / `fs.patch_file` write a sibling temporary file and rename it; `fs.patch_file` fails with `patch_target_not_found` (0 matches) or `patch_target_ambiguous` (> 1 match without `replaceAll`). Other stable codes: `fs_not_found`, `fs_not_a_file`, `fs_not_a_directory`, `fs_file_too_large`, `fs_binary_file`, `fs_exists`, `fs_parent_missing`, `fs_write_failed`, `line_out_of_range`, `pattern_invalid`, `cwd_not_found`, `exec_spawn_failed`, `exec_task_not_found`, `exec_task_finished`, `exec_stdin_closed`, `pty_unsupported_on_platform`, `platform_unsupported`.

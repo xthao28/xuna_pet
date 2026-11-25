@@ -204,6 +204,15 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] Chạy lại một mẫu có phạm vi rất lớn (ví dụ mẫu lưu sau vài lần mở rộng): không hỏi ký; XUNA nói phạm vi của mẫu không vừa một thẻ duyệt và **không** thử lại vòng vòng (`templatePinned`).
 - [ ] Chạy lại mẫu bình thường: thẻ vẫn có "Chạy lại mẫu '…':" ở đầu khi còn chỗ. Khi thẻ đã gần đủ 240 ký tự thì không có tiền tố, nhưng phạm vi vẫn đủ.
 
+## 4l. Nhóm quyền "Dòng lệnh" (`exec`, Wave 3 ADR-0018, thêm 2026-11-25; cần backend, desktop và app bản mới)
+
+- [ ] Trang chi tiết máy tính (macOS/Windows) có thêm công tắc **"Dòng lệnh"** kèm mô tả tiếng Việt; máy Android/iOS **không** có công tắc này. Danh sách quyền mở ra không báo lỗi (trước đây nhóm lạ làm app ném `FormatException`).
+- [ ] Trang chi tiết máy tính cũng có công tắc **"Tệp tin"** (`files`, cho `fs.*`). Bật lên chỉ cấp tối đa **R2**: XUNA đọc/sửa tệp trong thư mục dự án (`workspaceRoots`) được; ghi ra ngoài thư mục dự án hoặc vào tệp ẩn ở thư mục nhà bị từ chối (`risk_above_grant`), không hiện thẻ duyệt.
+- [ ] Bật công tắc: nhóm `exec` được cấp mức **R3 trong 30 ngày** (giống "Điều khiển máy tính"). Tắt rồi bật lại vẫn giữ đúng mức; chọn thời hạn khác vẫn được.
+- [ ] Khi trên máy tính **chưa** bật "Dòng lệnh & tệp (exec.*)" trong tab Chính sách: nhờ XUNA chạy một lệnh kiểm thử → XUNA báo không chạy được (`shell_not_enabled`), **không** hiện thẻ duyệt.
+- [ ] Bật trên máy tính rồi nhờ chạy lệnh có xóa tệp hoặc tải mạng: thẻ duyệt hiện **đúng câu lệnh và thư mục** (dài thì có "…"), là **R3** và cần ký trên điện thoại kể cả khi gói tin cậy là Tự động.
+- [ ] Đổi gói tin cậy (Nghiêm/Chuẩn/Tự động) trên điện thoại sau khi đã bật "Dòng lệnh & tệp" ở máy tính: công tắc trên máy tính **vẫn bật** (điện thoại không thể bật/tắt nó từ xa).
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.

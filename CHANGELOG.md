@@ -2,6 +2,15 @@
 
 Last updated: **2026-11-25** (Asia/Ho_Chi_Minh).
 
+## 2026-11-25 — Wave 3 `W3-M0–W3-M4`: Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency (`ADR-0018`) — Implemented; `W3-M5` pending (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
+
+- **Hợp đồng & fixtures:** cập nhật XTP v1 (§4.2.8, §4.2.9, §4.2.14–16, §7, §8 mới), `exec_fs_frames.json`, `policy_frames.json`, `exec_async` trong `watch_frames.json` (byte-identical, `diff -r` 0).
+- **`xuna_xtp`:** `ToolFamily.exec`, `ShellControlPolicy`, `ExecCommandClassifier` + lexer, `FsPathGuard`, lọc env, 9 descriptor/validator, `execAsync`.
+- **Desktop:** `ExecProcessRegistry`, launcher Windows/macOS (`XunaHostPlugin+Exec.swift` + `RunnerExecTests.swift`, đã thêm vào `project.pbxproj`), `fs.*`/`exec.*` handler, `ExecAsyncWatchDriver`, `mcp.list_servers` `tools/list`, công tắc local-only.
+- **Backend:** `ToolFamily.EXEC`, preflight bắt buộc fail-closed, chặn `shellControl` từ xa (422), `exec_async`, catalog/prompt, thẻ duyệt hiện lệnh, `FallbackTextGenerator`.
+- **Mobile:** `HostToolFamily.exec` + L10n + công tắc trên máy tính desktop.
+- **Kiểm chứng (Windows):** `xuna_xtp` 245/245; desktop 344 pass + 2 fail có sẵn; mobile 734/734; backend ruff/mypy sạch + pytest **`1,537 passed, 0 failed`** (`501.8 s`; một lượt trước đó có 2 test timing flaky — `test_http_self_enroll_and_action_result_with_output` tái hiện cả trên code gốc 1/6 lần, `test_consent_u5_linear_redos_guards…` pass khi chạy riêng). **Chưa chạy:** build/ký macOS, Swift, `RunnerTests`, live `W3-M5`.
+
 ## 2026-11-25 — Đặc tả Wave 3: Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency (`ADR-0018`) (`docs/`)
 
 - **Quyết định kiến trúc ([ADR-0018](docs/decisions/ADR-0018-power-user-shell-and-direct-fs.md), cập nhật [docs/decisions/README.md](docs/decisions/README.md)):** Phê duyệt bàn giao triển khai Wave 3 sửa đổi có phạm vi `ADR-0012`/`ADR-0015` và mở rộng `ADR-0017`: giữ nguyên cấm các tiền tố thô cũ (`shell.*`, `powershell.*`, `osascript.*`...), bổ sung `fs.*` (`ToolFamily.files`) và `exec.*` (`ToolFamily.exec`) theo cơ chế **Local-Only Opt-In** (`HostPolicy.shellControl.enabled = false` mặc định, chặn ghi từ xa `422`), phân tầng rủi ro bắt buộc qua `xuna/preflight` (`Hard-Deny` / `R3` / `R2` / `R1`), cô lập biến môi trường & process-group E-Stop.

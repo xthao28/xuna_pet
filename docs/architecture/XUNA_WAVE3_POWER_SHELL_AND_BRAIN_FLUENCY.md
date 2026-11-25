@@ -1,6 +1,6 @@
 # XUNA Wave 3 — Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency
 
-Date: 2026-11-25. **Status: Approved for implementation handoff (owner 2026-11-25); Not Implemented / Not Validated.**
+Date: 2026-11-25. **Status: Approved (owner 2026-11-25); W3-M0–W3-M4 Implemented 2026-11-25 (automated suites on Windows; see PROCESS.md); W3-M5 live macOS verification pending — Not Validated.**
 
 Companion documents:
 [ADR-0018 (Power-User Shell & Direct File I/O)](../decisions/ADR-0018-power-user-shell-and-direct-fs.md) ·
