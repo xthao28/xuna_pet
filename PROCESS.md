@@ -7,7 +7,12 @@ Last updated: **2026-11-25** (Asia/Ho_Chi_Minh). Latest: **XUNA Wave 3 Specifica
 - **Tài liệu đã ban hành & đẩy lên `origin/dev` để bàn giao triển khai:**
   - [ADR-0018-power-user-shell-and-direct-fs.md](docs/decisions/ADR-0018-power-user-shell-and-direct-fs.md) (đăng ký tại [docs/decisions/README.md](docs/decisions/README.md)): chốt 3 quyết định chủ dự án `2026-11-25` (Full Power-User Shell + Direct File I/O, Local-Only Opt-In `shellControl.enabled = false` mặc định, Gói 2 + Gói 1).
   - [XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md](docs/architecture/XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md): đặc tả wire schema chuẩn (`fs.*`, `exec.*`, `HostPolicy.shellControl`, `mcp.list_servers` `includeTools`, `exec_async` watch), bộ phân loại `ExecCommandClassifier` / `FsPathGuard` + lọc biến môi trường, `FallbackTextGenerator`, ma trận kiểm thử bảo mật đối kháng và lộ trình `W3-M0–W3-M5`.
-- **Ghi chú bàn giao (Rule H8/H9):** Đợt này chỉ commit/push tài liệu kế hoạch & ADR trên root `xuna_pet` (chưa triển khai code Wave 3). Trên máy dev vẫn còn 4 file vá độ ổn định `backend/` từ phiên test sâu 3-bước-trong-1-lượt-chat (`planner_executor.py`, `job_runner.py`, `openai_compatible.py`, `test_planner_compactor.py`; đã pass `150` targeted pytest + `ruff`/`mypy` 0 lỗi) đang giữ uncommitted cục bộ cho đến khi chủ dự án yêu cầu commit/push riêng.
+- **Bản vá độ ổn định `backend/` từ test sâu 1-lượt-3-bước (`backend` `64e7524` trên `origin/dev`):**
+  - `planner_executor.py`: tách bước đánh số/nhãn viết liền dòng (`1) ... 2) ... 3) ...`, `Bước 1: ...`) không cắt nhầm `v2.0` hay `0%/25%/45%`.
+  - `job_runner.py`: bổ sung hướng dẫn phạm vi sub-goal + `job__wait` (`continuationMode="auto_continue"`) và backoff cho lỗi 429 RPM/503 tạm thời (fail-fast với `401`/`per day`/`cooldown active`).
+  - `openai_compatible.py`: ưu tiên `_MINUTE_QUOTA_MARKERS` trước `"billing"` trong `_parse_quota_cooldown_s` để lỗi 429 RPM của Gemini đặt cooldown 15s thay vì 600s.
+  - `test_planner_compactor.py`: thêm 4 unit test hồi quy; kiểm chứng `ruff` + `mypy` (`0/262`) + **`150` targeted pytest** (`0 failed`); chưa chạy lại toàn bộ 1,490+ full backend pytest (Rule H8).
+- **Ghi chú bàn giao (Rule H8/H9):** Đã đồng bộ submodule `backend` (`64e7524`) cùng tài liệu đặc tả Wave 3 trên `xuna_pet` `origin/dev` (chưa triển khai code Wave 3).
 
 ## 2026-11-24 — Live macOS Wave 2 Verification, Natural-Chat IDE Delivery & `resolveTargetApplication` Security Fix (`backend/`, `desktop/packages/xuna_xtp`, `desktop/`)
 
