@@ -213,6 +213,18 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] Bật trên máy tính rồi nhờ chạy lệnh có xóa tệp hoặc tải mạng: thẻ duyệt hiện **đúng câu lệnh và thư mục** (dài thì có "…"), là **R3** và cần ký trên điện thoại kể cả khi gói tin cậy là Tự động.
 - [ ] Đổi gói tin cậy (Nghiêm/Chuẩn/Tự động) trên điện thoại sau khi đã bật "Dòng lệnh & tệp" ở máy tính: công tắc trên máy tính **vẫn bật** (điện thoại không thể bật/tắt nó từ xa).
 
+## 4m. App desktop Windows thật (Wave 3, thêm 2026-11-26; bản Debug build trên máy Windows của chủ dự án)
+
+Đã chạy live 2026-11-26 với backend thật + điện thoại giả lập (xem PROCESS.md). Còn lại phần cần người và điện thoại thật:
+
+- [ ] Máy Windows **mới cài** (chưa có `%APPDATA%\XUNA`): app hiện "Cấu hình lỗi", mọi lệnh bị từ chối (`policy_invalid`) cho tới khi bấm **"Khôi phục mặc định"** ở tab Chính sách. Đây là đúng thiết kế, nhưng ghi lại nếu thấy khó hiểu.
+- [ ] Sau "Khôi phục mặc định" + bật **"Dòng lệnh & tệp (exec.*)"**: `exec.*` chạy được, nhưng `fs.*` (đọc/sửa tệp) **vẫn bị chặn** (`policy_blocked`) vì chính sách mặc định không có nhóm `files` và giao diện chưa có công tắc cho nó (lỗi đã biết, chưa sửa). Báo lại nếu đã sửa mà vẫn bị.
+- [ ] Mọi lệnh ghi tệp đều cần ký trên điện thoại (`outside_workspace`) khi chưa có thư mục dự án (`workspaceRoots`); giao diện chưa có chỗ đặt thư mục này (lỗi đã biết).
+- [ ] Quét QR ghép nối bằng **iPhone thật** và bấm "Khớp": mã 6 số trên điện thoại trùng với máy tính.
+- [ ] Bấm `Ctrl+Alt+Shift+X` bằng tay khi XUNA đang chạy một lệnh dài: lệnh dừng ngay, điện thoại báo máy tính đã bị tạm dừng.
+- [ ] Nhờ XUNA chạy `echo xin chào` trên Windows: hiện tại chữ có dấu bị lỗi font (`xin ch�o`); script `node`/`python` in tiếng Việt thì vẫn đúng.
+- [ ] Thẻ duyệt R3 cho một lệnh xóa tệp trên Windows hiện trên **iPhone thật**, ký xong lệnh mới chạy.
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
