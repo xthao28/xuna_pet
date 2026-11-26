@@ -572,3 +572,7 @@ Plan & wave records: [UDC-18-clawbot-upgrade-plan.md](docs/roadmap/device-contro
 
 
 
+
+## Trust & Fluency upgrade plan (Proposed) — 2026-11-26
+
+Proposed, not approved: [XUNA_UPGRADE_PLAN_2026-11-26.md](docs/roadmap/XUNA_UPGRADE_PLAN_2026-11-26.md). P0 Wave 3 debt → P1 cheap honesty wins (U3–U5) → P2 Wave 4 draft workspace and effect-bound approval (F1, ADR-0019) → P3 cryptographic pet approval (F3) → P4 declarative capability adapters and manifest-only Foundry → P5 personal eval lab. Owner decisions D1–D10 are listed there. "Current priority" above is unchanged until the owner approves.
