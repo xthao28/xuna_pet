@@ -283,6 +283,14 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] **Manifest Foundry trong bản nháp (`P4.4` / F2):** kiểm thử ứng viên manifest mới trong `DraftWorkspace` giữ nguyên 0 byte đổi ở workspace gốc; khi chưa có xác nhận chủ hoặc khi kiểm thử bản nháp fail thì không được cài vào thư mục capabilities.
 - [ ] **Kiểm chứng trên Mac:** chạy lại 4 mục trên trên macOS.
 
+## 4t. Pet đồng ký mật mã (`Approve`) & E-Stop có ký (`Stop`) (`P3` `F3-M0`–`F3-M3`, `ADR-0020`, thêm 2026-11-26; cần nạp board ESP32-S3 thật + điện thoại thật)
+
+Đã qua kiểm thử phần mềm, golden vector 3 phía (C++11 / Python / Dart) và thử đột biến trên Windows (`firmware` native `427/427`, `mobile` `752/752`, `backend` `1,630/1,630`), **CHƯA nạp firmware lên board thật (`HW-BOARD-1`) và CHƯA chạy live board + điện thoại**:
+
+- [ ] **`F3-M0` kiểm chứng hành vi hiện có trên board thật:** duyệt R2 bằng nút `GPIO0`/`GPIO14` và bấm E-Stop trên mạch → ghi nhận thực tế E-Stop từ mạch có treo grant `R2+` trên toàn bộ máy tính đang online hay không (lưu ý giới hạn kiến trúc: E-Stop từ mạch yêu cầu app điện thoại đang kết nối BLE).
+- [ ] **`F3-M1` / `F3-M2` đồng ký chống ký mù (`ProofPurpose::Approve = 4`):** bật một nhóm R3 qua `PUT /v1/actions/cosign-policy` (mặc định TẮT theo D6) → kích hoạt thao tác R3 đó → điện thoại hiện thẻ **"Cần pet đồng ký"** cùng mã 6 số khớp 100% với mã 6 số trên màn hình mạch XUNA; trước khi bấm `GPIO0` trên mạch thì không thể ký mù; bấm `GPIO14` từ chối lộ 0 chữ ký; bấm `GPIO0` ký P-256 thành công và gửi kèm chữ ký điện thoại.
+- [ ] **`F3-M3` E-Stop có ký (`ProofPurpose::Stop = 5`):** bật `requireSignedBoardStop: true` → E-Stop không chữ ký với `reason: "owner_board"` bị từ chối (`pet_stop_proof_required`); bấm dừng trên mạch tạo chữ ký `Stop` hợp lệ dừng máy ngay, audit ghi `petSigned: true`, và phát lại nonce cũ bị chặn (`pet_stop_proof_replayed`).
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.

@@ -88,10 +88,10 @@ Ghi chú: E-Stop không treo grant `media` (R1) **khớp** desktop AGENTS §3.5 
 
 | Milestone | Nội dung | Cổng kiểm chứng |
 | --- | --- | --- |
-| F3-M0 | Live-verify phần đã có trên board thật: duyệt R2 bằng nút, E-Stop bằng nút; xác minh E-Stop từ pet có **treo grant mọi máy** hay chỉ dừng hành động đang chờ | Board + điện thoại; ghi rõ hành vi thật |
-| F3-M1 | ADR-0020 + mục đích proof mới (vd. `Approve`) trong firmware: pet ký `nonce ‖ effectSha256/argsSha256 ‖ mã ngắn` sau khi chủ bấm nút; **màn hình pet hiện mã ngắn trùng với điện thoại** (không có bước này thì pet chỉ ký mù cái điện thoại chuyển tới) | Unit test firmware + golden vector; upload board cần chủ xác nhận |
-| F3-M2 | Backend: chính sách "cần đồng ký" cho nhóm thao tác chủ chọn (D6); điện thoại chuyển tiếp chữ ký pet; host/backend xác minh cả hai | Test: thiếu chữ ký pet → từ chối; pet ký mã khác → từ chối |
-| F3-M3 | E-Stop có ký (pet ký sự kiện dừng → chống giả mạo BLE); ghi rõ giới hạn: E-Stop từ pet cần app điện thoại đang kết nối | Live board + điện thoại |
+| F3-M0 | Live-verify phần đã có trên board thật: duyệt R2 bằng nút, E-Stop bằng nút; xác minh E-Stop từ pet có **treo grant mọi máy** hay chỉ dừng hành động đang chờ — **Pending (`HW-BOARD-1`, cần board thật + điện thoại thật; không nạp mạch khi chưa có xác nhận)** | Board + điện thoại; ghi rõ hành vi thật |
+| F3-M1 | ADR-0020 + mục đích proof mới (`Approve = 4`, `Stop = 5`) trong firmware: pet tính & hiện mã ngắn 6 số trùng điện thoại (`xuna.cosign.code.v1\0`), trạng thái `AwaitingConfirm (7)` chặn ký mù cho tới khi bấm nút (`confirmApprove()`), từ chối `Rejected (8)` lộ 0 chữ ký — **Implemented (software/native C++11 verified `427/427`, golden vectors 3 phía & thử đột biến pass; chưa nạp board thật)** | Unit test firmware + golden vector; upload board cần chủ xác nhận |
+| F3-M2 | Backend: chính sách opt-in mặc định TẮT theo nhóm (`GET/PUT /v1/actions/cosign-policy`, D6); `action_pending` mang `requiresPetCosign`/`cosignShortCode`/`cosignNonceHex`; mobile tự tính lại mã 6 số fail-closed và hiển thị trên thẻ duyệt + chuyển tiếp `petProof`; backend xác minh song song chữ ký điện thoại + chữ ký pet + chặn replay nonce — **Implemented (Windows verified, thử đột biến pass; chưa chạy live board+điện thoại)** | Test: thiếu chữ ký pet → từ chối; pet ký mã khác → từ chối |
+| F3-M3 | E-Stop có ký (`ProofPurpose::Stop = 5`, payload `xuna.estop.v1`): pet ký sự kiện dừng chống giả mạo BLE, `POST /v1/actions/stop` xác minh & chặn replay khi có `petProof` hoặc bật `requireSignedBoardStop`, ghi `petSigned` vào audit; ghi rõ giới hạn: E-Stop từ pet cần app điện thoại đang kết nối — **Implemented (software verified; live board + điện thoại pending)** | Live board + điện thoại |
 
 ---
 
@@ -120,8 +120,8 @@ Ghi chú: E-Stop không treo grant `media` (R1) **khớp** desktop AGENTS §3.5 
 
 | ID | Việc | Ghi chú | Cỡ |
 | --- | --- | --- | --- |
-| P5.1 | Bộ kịch bản **được chủ duyệt** (không tự ghi), xây trên `backend/scripts/eval_host_control.py`; chạy lại khi đổi model/prompt/`FallbackTextGenerator`; báo tỉ lệ thành công theo loại việc | Không đụng §3.6 | M |
-| P5.2 | (Tùy chọn) Ghi nhiệm vụ thật thành kịch bản phát lại | **Xung đột desktop AGENTS §3.6** (cấm ghi tham số/URL/đường dẫn vào log/audit) → chỉ làm nếu có ADR: kho riêng, opt-in, mã hóa cục bộ, chủ đồng ý | M + ADR |
+| P5.1 | Bộ kịch bản **được chủ duyệt** (`backend/scripts/eval_scenarios_curated.json`, không tự ghi), xây trên `backend/scripts/eval_host_control.py` (`--curated-suite`, `--offline-replay`, `--baseline`, báo cáo theo `byCategory`, cổng hồi quy `detect_regression` bắt `falseSuccess > 0` và tụt tỉ lệ, chặn rò rỉ đường dẫn/bí mật §3.6) — **Implemented (Windows verified + CLI offline-replay 8/8 `falseSuccess=0` + thử đột biến pass; chưa chạy live so sánh model)** | Không đụng §3.6 | M |
+| P5.2 | (Tùy chọn) Ghi nhiệm vụ thật thành kịch bản phát lại — **Deferred (theo quyết định D8: dùng P5.1 kịch bản chủ duyệt trước, tránh xung đột desktop AGENTS §3.6)** | **Xung đột desktop AGENTS §3.6** (cấm ghi tham số/URL/đường dẫn vào log/audit) → chỉ làm nếu có ADR: kho riêng, opt-in, mã hóa cục bộ, chủ đồng ý | M + ADR |
 
 ---
 
@@ -134,11 +134,11 @@ Ghi chú: E-Stop không treo grant `media` (R1) **khớp** desktop AGENTS §3.5 
 | D3 | `workspaceRoots` lấy từ đâu | Chọn thư mục trong tab Chính sách / tự lấy từ workspace đã quét | **Chọn tay** (chủ quyết, local-only) |
 | D4 | Phạm vi chữ ký hậu quả (F1) | Chỉ tệp trong workspace / cố chặn mạng (spike) | **Đã duyệt (2026-11-26, Option A):** chỉ workspace, mạng giữ R3 từng lệnh |
 | D5 | Cơ chế bản nháp | Sau spike W4-M0 | **Đã duyệt (2026-11-26, Option A):** sao chép vật lý có lọc (Windows/Linux) + APFS `clonefile` trên Mac sau khi đo |
-| D6 | Thao tác nào cần pet đồng ký | R3 ngoài workspace + xóa hàng loạt + đẩy mã / chỉ khi chủ bật | **Chủ bật theo nhóm**, mặc định tắt |
-| D7 | Cho phép Foundry sinh adapter (F2)? | Chỉ sinh **manifest** theo lược đồ (sau P4.1 + P2, có ADR) / cho sinh cả mã / không | **Chỉ manifest**, sau P4.1 + P2 |
-| D10 | Hình thức adapter | Manifest khai báo + engine chung / tool viết tay cho từng việc | **Manifest + engine chung** (không hard-code app) |
-| D8 | Dữ liệu cho phòng thí nghiệm (F4) | Kịch bản chủ duyệt / ghi tự động mã hóa | **Kịch bản chủ duyệt** trước |
-| D9 | CLI-Anything | Không dùng hub/plugin; spike LibreOffice bỏ (thay bằng P4.1) | **Đồng ý** |
+| D6 | Thao tác nào cần pet đồng ký | R3 ngoài workspace + xóa hàng loạt + đẩy mã / chỉ khi chủ bật | **Đã duyệt (ủy quyền 2026-11-26, ADR-0020):** chủ bật theo nhóm, mặc định tắt |
+| D7 | Cho phép Foundry sinh adapter (F2)? | Chỉ sinh **manifest** theo lược đồ (sau P4.1 + P2, có ADR) / cho sinh cả mã / không | **Đã duyệt (ủy quyền 2026-11-26, ADR-0021):** chỉ manifest, sau P4.1 + P2 |
+| D10 | Hình thức adapter | Manifest khai báo + engine chung / tool viết tay cho từng việc | **Đã duyệt (ủy quyền 2026-11-26, ADR-0021):** manifest + engine chung (không hard-code app) |
+| D8 | Dữ liệu cho phòng thí nghiệm (F4) | Kịch bản chủ duyệt / ghi tự động mã hóa | **Đã duyệt (ủy quyền 2026-11-26):** P5.1 kịch bản chủ duyệt; P5.2 hoãn |
+| D9 | CLI-Anything | Không dùng hub/plugin; spike LibreOffice bỏ (thay bằng P4.1) | **Đã duyệt (ủy quyền 2026-11-26, ADR-0021):** không dùng hub/plugin, thay spike bằng P4.1/P4.2 |
 
 ## 9. Không làm
 

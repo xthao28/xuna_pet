@@ -252,6 +252,10 @@ abstract final class BleProtocolConstants {
   // ---------------------------------------------------------------------------
 
   static const proofPurposeBind = 1;
+  static const proofPurposeProjection = 2;
+  static const proofPurposeSession = 3;
+  static const proofPurposeApprove = 4;
+  static const proofPurposeStop = 5;
   static const proofStatusIdle = 0;
   static const proofStatusPending = 1;
   static const proofStatusOk = 2;
@@ -259,6 +263,8 @@ abstract final class BleProtocolConstants {
   static const proofStatusUnsupportedPurpose = 4;
   static const proofStatusNotReady = 5;
   static const proofStatusFailed = 6;
+  static const proofStatusAwaitingConfirm = 7;
+  static const proofStatusRejected = 8;
 
   static const maxRequestId = 0xffffffff;
   static const maxMemoryEpisodes = 8;
