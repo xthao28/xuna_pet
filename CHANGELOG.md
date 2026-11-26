@@ -2,7 +2,15 @@
 
 Last updated: **2026-11-26** (Asia/Ho_Chi_Minh).
 
-## 2026-11-26 — Kế hoạch nâng cấp P0: phần code (`desktop/`, chưa commit)
+## 2026-11-26 — Kế hoạch nâng cấp P1.1 (U3): `exec.run` `expectFiles` (`docs/`, `desktop/packages/xuna_xtp`, `desktop/` `1a7aafa`, `backend/` `1d7ba21`)
+
+- **Hợp đồng XTP:** §8 quy tắc 6 + §5.1 — `expectFiles: [{path, minBytes?, magic?, sha256?}]`; exit 0 mà tệp thiếu/nhỏ/sai → `status: failed` + `xuna/status: failed` + `expected_output_missing|expected_output_mismatch`, giữ `output` và `artifacts[{path, exists, sizeBytes?, sha256?, magicOk?, problem?}]` (định dạng F1 dùng lại). Fixture `exec_fs_frames.json` 2 nơi byte-identical.
+- **`xuna_xtp`:** parse/quyết định thuần Dart; đường dẫn `expectFiles` qua `FsPathGuard` ở preflight.
+- **Desktop:** kiểm tra trên đĩa khi exit 0 (cả tác vụ chạy nền), resolve lại symlink trước khi đọc, băm ≤ 64 MiB; lỗi trả về không làm mất dữ kiện.
+- **Backend:** `SchemaValidator` nhận object phẳng làm `items` của array (thiếu thì `exec.run` bị loại khỏi catalog; chỉ `exec.run` đổi trên 99 descriptor); thẻ duyệt "kiểm tra N tệp đầu ra"; prompt + hướng dẫn thức dậy: thành công = `status: completed`.
+- **Kiểm chứng (Windows):** `xuna_xtp` **269/269**, desktop **393/393** (đột biến registry → 4 fail), analyze 0; backend: ruff/mypy sạch, pytest **1562 passed**. **Chưa:** live, macOS.
+
+## 2026-11-26 — Kế hoạch nâng cấp P0: phần code (`desktop/`, đã commit `f4c04ee`, gốc `25614fc`)
 
 - **P0.3:** `skill.markdown_bridge` không còn lấy kỹ năng đầu tiên khi id sai (`skill_not_found` + ứng viên); `securityVerified` của export = quét tĩnh thật; câu báo import trung thực.
 - **P0.4:** `_gitRule` hiểu option toàn cục (`git --no-pager log` R2; `-c`/`--git-dir`/`--work-tree`/`--help`/lạ vẫn R3).

@@ -54,6 +54,8 @@ Ghi chú: E-Stop không treo grant `media` (R1) **khớp** desktop AGENTS §3.5 
 | P1.2 (U4) | **Máy tự khai báo toolchain + gợi ý sửa** | Resource digest thêm `toolchains: [{id, version}]` do host dò (node/python/git/… — danh sách nằm trong host adapter, không ở backend/prompt, H5); lỗi thiếu phụ thuộc mang `remediation` do host khai báo; mobile hiện thẻ "sửa 1 chạm" (chỉ hiển thị lệnh, không tự chạy) | Hợp đồng XTP (`xuna/resources`) + fixtures; test digest không chứa đường dẫn; backend đọc trường chung, không gắn tên công cụ | M |
 | P1.3 (U5) | **Test chống lệch prompt ↔ catalog** | Test backend: mọi tên tool/tiền tố được nhắc trong `prompts.py` phải tồn tại trong catalog/descriptor; ví dụ tham số trong prompt phải qua schema validator | `pytest` fail khi đổi tên tool mà quên prompt (thử đột biến) | S |
 
+**Tiến độ 2026-11-26 (đã commit desktop `1a7aafa`, backend `1d7ba21`; xem PROCESS.md):** P1.1 — code + unit/E2E test xong trên Windows (hợp đồng §5.1/§8 quy tắc 6, fixture 2 nơi `diff -r` 0, `xuna_xtp`, desktop, backend); chủ dự án chọn: kiểm tra cả khi tác vụ chạy nền, exit ≠ 0 không kiểm tra tệp, băm tối đa 64 MiB. Chưa: live, macOS. P1.2, P1.3 chưa bắt đầu.
+
 ---
 
 ## 4. P2 — Wave 4: Bản nháp & "Ký đúng cái bạn thấy" (F1) — ADR-0019

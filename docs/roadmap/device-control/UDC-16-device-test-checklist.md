@@ -225,6 +225,16 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] Nhờ XUNA chạy `echo xin chào` trên Windows: hiện tại chữ có dấu bị lỗi font (`xin ch�o`); script `node`/`python` in tiếng Việt thì vẫn đúng.
 - [ ] Thẻ duyệt R3 cho một lệnh xóa tệp trên Windows hiện trên **iPhone thật**, ký xong lệnh mới chạy.
 
+## 4n. Kiểm tra tệp đầu ra của lệnh (`expectFiles`, kế hoạch nâng cấp P1.1, thêm 2026-11-26; cần backend + desktop bản mới, Windows và Mac)
+
+Đã có unit test (desktop + `xuna_xtp` + backend), **chưa chạy live**:
+
+- [ ] Nhờ XUNA "build và tạo tệp X" bằng một lệnh chạy xong (exit 0) nhưng **không** tạo tệp: XUNA phải báo **chưa xong** (`expected_output_missing`), không được báo thành công.
+- [ ] Lệnh tạo đúng tệp: XUNA báo xong, kèm kích thước/sha256 của tệp; sha256 khớp với `Get-FileHash` (Windows) / `shasum -a 256` (Mac).
+- [ ] Lệnh chạy lâu (XUNA chờ nền rồi mới thức): khi lệnh xong mà thiếu tệp, lần đọc kết quả sau đó vẫn báo `expected_output_missing`.
+- [ ] Thẻ duyệt R3 của lệnh có `expectFiles` ghi thêm "kiểm tra N tệp đầu ra".
+- [ ] Chạy lại 3 mục trên trên **Mac** (code dùng chung, chưa chạy trên Mac).
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
