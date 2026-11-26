@@ -1,7 +1,7 @@
 # W4-M0 Spike Report — Draft Workspace, Non-Elevated Network Isolation & Crash-Safe Multi-File Apply on Windows
 
 - **Date:** 2026-11-26 (Asia/Ho_Chi_Minh)
-- **Status:** Measured on Windows 11 (not yet measured on macOS APFS — see §5 H8 disclosures)
+- **Status:** Measured on Windows 11 NTFS **and** macOS 12.6 APFS (see §1b below)
 - **Environment:** `Windows-11-10.0.22631-SP0`, Python `3.12.10` (`backend/.venv`), non-elevated user session (`IsUserAnAdmin() == False`), volume `C:\` (`NTFS`). All measurements ran inside an isolated temporary directory (`%LOCALAPPDATA%\Temp\xuna_w4m0_spike_*`) that was completely deleted on teardown (`0` repository code changes, `0` residual OS profiles or temp files).
 - **Related:** [XUNA_UPGRADE_PLAN_2026-11-26.md](../roadmap/XUNA_UPGRADE_PLAN_2026-11-26.md) §4 (`W4-M0`, D4, D5), [ADR-0019](../decisions/ADR-0019-draft-workspace-and-effect-bound-approval.md).
 
@@ -27,8 +27,20 @@ What non-elevated copy mechanism can isolate a workspace draft on Windows withou
 
 ### Recommendation for D5
 - **Windows (and non-APFS filesystems):** Use **bounded filtered physical copy** (`maxFiles` / `maxBytes` cap, excluding heavy cache directories and all Hard-Deny/secret files) so both Git and non-Git workspaces work uniformly, uncommitted/untracked work is preserved, and the live workspace cannot lose a single byte during draft execution.
-- **macOS (APFS — pending Mac verification):** Prefer APFS `clonefile` (skipping excluded/secret entries) when the source and draft temp dir are on the same APFS volume, falling back to filtered physical copy otherwise.
+- **macOS (APFS — measured 2026-11-26 below):** Both filtered physical copy and per-file `clonefile(2)` are safe and fast (`117.7–377.7 ms` for `521–1,500` files); because `DraftWorkspaceManager` computes baseline SHA-256 digests on every file for TOCTOU protection, per-file `clonefile(2)` yields essentially identical end-to-end latency (`166.7 ms` vs `167.0 ms` on `521` files; `598.7 ms` vs `536.4 ms` on `1,500` files) while saving physical disk blocks via CoW. Never use unfiltered `cp -cR` (copies `.git`/`node_modules`/`.env`).
 - **Never use hardlinks** for mutable draft files.
+
+## 1b. macOS APFS `clonefile(2)` Addendum (Measured 2026-11-26)
+
+- **Environment:** `macOS 12.6 (21G115, x86_64)`, volume `/dev/disk1s1` (`APFS`), Python `3.10.3` (`libc.dylib` `clonefile(2)` + `cp -cR`), 5-trial medians in temporary directories under `/tmp` (deleted on teardown).
+
+| Workload | Filtered physical copy | Per-file APFS `clonefile(2)` | Physical + baseline SHA-256 | `clonefile(2)` + baseline SHA-256 | Unfiltered `cp -cR` | CoW isolation & filtering |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Repo A** (`521` files, `5.58 MB` + `.git`/`node_modules`/`.env`) | `151.64 ms` | **`117.66 ms`** (`-22%`) | `166.99 ms` | **`166.67 ms`** | `410.54 ms` *(leaks `.git`/`node_modules`/`.env`)* | `r+b` in-place write left original `0` bytes changed; untracked & dirty edits preserved; `.env`/`.git`/`node_modules`/symlinks excluded |
+| **Folder B** (`200` non-Git files, `2.15 MB`) | `60.73 ms` | **`52.26 ms`** (`-14%`) | `69.80 ms` | **`68.09 ms`** | `48.20 ms` | Non-Git supported uniformly |
+| **Folder C** (`1,500` files, `16.13 MB`) | `437.97 ms` | **`377.65 ms`** (`-14%`) | **`536.44 ms`** | `598.69 ms` | — | CoW saves disk space; SHA-256 read dominates total wall time |
+
+**Takeaway:** The current filtered physical copy in `DraftWorkspaceManager` already runs in `< 170 ms` for typical `500`-file repos on macOS APFS and preserves full cross-platform simplicity; adding an optional per-file `clonefile(2)` FFI fast path is worthwhile mainly to save disk blocks on large files (not raw wall-clock speed while synchronous TOCTOU SHA-256 hashing is required).
 
 ---
 
@@ -78,6 +90,6 @@ Because multi-file replacement on Windows NTFS is not natively atomic (and legac
 
 ## 4. Honest Gaps & Pending Measurements (Rule H8)
 
-- **macOS APFS `clonefile`:** Not measured in this spike (host is Windows 11). Must be benchmarked on macOS before `W4-M3` enables the APFS fast path; until then, filtered physical copy is the verified baseline.
-- **Large repositories (`> 10,000` files / `> 200 MB`):** Not benchmarked in this spike; `W4-M3` must enforce hard `maxFiles` / `maxBytes` limits and fail closed (`draft_workspace_too_large`) rather than hanging or filling disk.
+- **macOS APFS `clonefile`:** Measured on 2026-11-26 (§1b above); `DraftWorkspaceManager` currently uses filtered physical copy on all platforms (per-file `clonefile(2)` FFI remains optional future space optimization).
+- **Large repositories (`> 10,000` files / `> 200 MB`):** Not benchmarked in this spike; `W4-M3` enforces hard `maxFiles` (`2,000`) / `maxBytes` (`100 MiB`) limits and fails closed (`draft_workspace_too_large`) rather than hanging or filling disk.
 - **Real Antivirus real-time scan interference during multi-file apply:** Only simulated handle lock (`FILE_SHARE_READ`) was tested; real live validation stays in `W4-M5`.
