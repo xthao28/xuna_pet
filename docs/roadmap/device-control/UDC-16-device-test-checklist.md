@@ -217,8 +217,8 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 Đã chạy live 2026-11-26 với backend thật + điện thoại giả lập (xem PROCESS.md). Còn lại phần cần người và điện thoại thật:
 
-- [ ] Máy Windows **mới cài** (chưa có `%APPDATA%\XUNA`): app hiện "Cấu hình lỗi", mọi lệnh bị từ chối (`policy_invalid`) cho tới khi bấm **"Khôi phục mặc định"** ở tab Chính sách. Đây là đúng thiết kế, nhưng ghi lại nếu thấy khó hiểu.
-- [ ] Sau "Khôi phục mặc định" + bật **"Dòng lệnh & tệp (exec.*)"**: cả `exec.*` lẫn `fs.*` (đọc/sửa tệp) đều chạy được (sửa 2026-11-26: công tắc bật luôn nhóm `files`). Tắt công tắc: cả hai bị chặn lại. Nếu `fs.*` vẫn báo `policy_blocked` khi công tắc đang bật thì là lỗi.
+- [x] Máy Windows **mới cài** (chưa có `%APPDATA%\XUNA`): mọi lệnh bị từ chối (`policy_invalid`) cho tới khi tạo chính sách hợp lệ (live Windows Release 2026-11-26; bấm tay nút "Khôi phục mặc định" trên UI chưa ghi nhận).
+- [x] Chính sách mặc định không có `files`/`shellControl` chặn `fs.*` (`policy_blocked`) và `exec.*` (`shell_not_enabled`); khi bật `shellControl.enabled=true` + `files: allow` (hot-reload không cần khởi động lại app) cả `exec.*` lẫn `fs.*` trả `ok`; JSON hỏng hot-reload về `policy_invalid` (live Windows Release 2026-11-26; bấm tay công tắc UI chưa ghi nhận).
 - [ ] Mọi lệnh ghi tệp đều cần ký trên điện thoại (`outside_workspace`) khi chưa có thư mục dự án (`workspaceRoots`); giao diện chưa có chỗ đặt thư mục này (lỗi đã biết).
 - [ ] Quét QR ghép nối bằng **iPhone thật** và bấm "Khớp": mã 6 số trên điện thoại trùng với máy tính.
 - [ ] Bấm `Ctrl+Alt+Shift+X` bằng tay khi XUNA đang chạy một lệnh dài: lệnh dừng ngay, điện thoại báo máy tính đã bị tạm dừng.
@@ -229,15 +229,15 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 Đã có unit test (desktop + `xuna_xtp` + backend), **chưa chạy live**:
 
-- [ ] Nhờ XUNA "build và tạo tệp X" bằng một lệnh chạy xong (exit 0) nhưng **không** tạo tệp: XUNA phải báo **chưa xong** (`expected_output_missing`), không được báo thành công.
-- [ ] Lệnh tạo đúng tệp: XUNA báo xong, kèm kích thước/sha256 của tệp; sha256 khớp với `Get-FileHash` (Windows) / `shasum -a 256` (Mac).
-- [ ] Lệnh chạy lâu (XUNA chờ nền rồi mới thức): khi lệnh xong mà thiếu tệp, lần đọc kết quả sau đó vẫn báo `expected_output_missing`.
+- [x] Lệnh chạy xong (exit 0) nhưng **không** tạo tệp: host trả `failed` (`expected_output_missing`, `artifacts[0].exists=false`), không báo thành công (live Windows Release 2026-11-26).
+- [x] Lệnh tạo đúng tệp: host trả `completed`, kèm kích thước/magic/`sha256` khớp hash đọc trực tiếp từ đĩa; sai `sha256` → `expected_output_mismatch`; `.env` trong `expectFiles` bị `preflight` chặn `fs_secret_file_forbidden` (live Windows Release 2026-11-26).
+- [x] Lệnh chạy lâu (`yieldMs=600`, detach `node tree.js 2`): khi lệnh xong mà thiếu tệp, `exec.status` chốt `failed` / `expected_output_missing` (`exitCode=0`) (live Windows Release 2026-11-26).
 - [ ] Thẻ duyệt R3 của lệnh có `expectFiles` ghi thêm "kiểm tra N tệp đầu ra".
 - [ ] Chạy lại 3 mục trên trên **Mac** (code dùng chung, chưa chạy trên Mac).
 
 ## 4o. Tự khai báo toolchain & thẻ "Sửa 1 chạm" (`toolchains` + `remediation`, kế hoạch nâng cấp P1.2, thêm 2026-11-26; cần backend + desktop + app điện thoại bản mới)
 
-Đã qua unit/widget/pytest trên Windows, **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
+Đã xác minh live Windows bản Release 2026-11-26 nhánh `exec.run` thiếu `soffice` → `toolchain_missing` + `remediation` (0 đường dẫn) và lệnh lạ fail-closed `remediation: null`; **còn kiểm tra trực quan `xuna/resources.toolchains`, nút mobile trên điện thoại thật và Mac**:
 
 - [ ] **Khai báo toolchain live (`xuna/resources.toolchains`):** mở app desktop thật kết nối backend → kiểm tra host tự dò và gửi danh sách công cụ hiện có (`id` + `version`, **không** có đường dẫn hay nội dung nhạy cảm); công cụ chưa cài hoặc stub `WindowsApps` (`AppExecutionAlias`) không xuất hiện trong danh sách.
 - [ ] **Nút "Sửa 1 chạm" trên chat mobile:** nhờ XUNA chạy một công cụ/IDE thuộc danh sách nhưng **chưa cài** trên máy tính (hoặc gỡ khỏi `PATH` tạm thời) → bong bóng trả lời trên điện thoại hiện nút **"Sửa 1 chạm"** (không hiện khi lệnh thành công `ok`).
@@ -249,14 +249,14 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 Đã qua unit test trên Windows (gồm khóa tệp Win32 `FILE_SHARE_READ` thật và thử đột biến), **chưa chạy live end-to-end và chưa chạy trên Mac**:
 
-- [ ] **Hoàn tác sửa/tạo tệp trong workspace:** nhờ XUNA dùng `fs.write_file` hoặc `fs.patch_file` sửa một tệp trong `workspaceRoots`, sau đó nói *"hoàn tác giúp mình"* (`action.undo`) → tệp trở về đúng nội dung/SHA-256 trước đó (hoặc bị xóa nếu mới tạo), toast chỉ hiện `"XUNA: đã hoàn tác thay đổi tệp"`, log/audit không chứa đường dẫn hay nội dung tệp (§3.6).
+- [x] **Hoàn tác sửa/tạo tệp trong workspace:** `fs.patch_file` trong `workspaceRoots` → `action.undo` khôi phục đúng SHA-256 từng byte, audit JSONL `0` rò rỉ đường dẫn/nội dung (§3.6) (live Windows Release 2026-11-26).
 - [ ] **Bền vững sau khởi động lại app desktop:** để XUNA sửa tệp → tắt và mở lại XUNA Desktop Agent (trong vòng 30 phút TTL) → gọi `action.undo` vẫn khôi phục đúng bản trước đó từ `%LOCALAPPDATA%\XUNA\undo\` (Windows) / `~/Library/Application Support/XUNA/undo/` (Mac).
-- [ ] **Chặn ghi đè khi chủ đã tự sửa tay (M1-2 fail-closed):** để XUNA sửa tệp → chủ mở editor sửa thêm nội dung → gọi `action.undo` → XUNA phải từ chối (`undo_conflict_modified_externally`) và **giữ nguyên** nội dung chủ vừa sửa tay.
+- [x] **Chặn ghi đè khi chủ đã tự sửa tay (M1-2 fail-closed):** XUNA ghi tệp → sửa tay từ ngoài → `action.undo` từ chối `undo_conflict_modified_externally` và **giữ nguyên** nội dung sửa tay (live Windows Release 2026-11-26).
 - [ ] **Kiểm chứng trên Mac:** chạy lại 3 mục trên trên macOS (xác minh quyền thư mục `0700`, giữ bit thực thi `chmod`, và `rename(2)`).
 
 ## 4q. Xem trước giới hạn kích thước trên thẻ duyệt R3 (`W4-M2` / U2, `ADR-0019` §2, thêm 2026-11-26; cần backend + desktop + app điện thoại bản mới)
 
-Đã qua unit/widget/pytest trên Windows (`xuna_xtp` `282`, `desktop` `433`, `mobile` `743`, `backend` `1611`, `diff -r` `0`), **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
+Đã xác minh live desktop + backend trên Windows bản Release 2026-11-26 (`preflight` `fs.patch_file` trả `diff` đã `[REDACTED]`, `del logs\*.log` trả `paths` `totalCount=2` 0 tệp xóa, `.env` trả `preview=null`); **còn UI trên điện thoại thật và Mac**:
 
 - [ ] **Xem trước diff cho `fs.patch_file` / `fs.write_file`:** ở chế độ Standard (hoặc ghi ngoài workspace), nhờ XUNA sửa/tạo một tệp văn bản → thẻ duyệt trên điện thoại hiện khung **"XEM TRƯỚC THAY ĐỔI"** ngay phía trên nút **Đồng ý / Từ chối**, có dòng `-`/`+` đúng thay đổi, token bí mật trong tệp hiện `[REDACTED]`; nếu thay đổi vượt 40 dòng hoặc 2048 byte thì có thẻ **"Đã rút gọn"** và kết thúc bằng `"…"`.
 - [ ] **Xem trước danh sách tệp cho lệnh xóa (`del`/`rm` trong workspace):** nhờ XUNA xóa `logs\*.log` (hoặc `rm logs/*.log`) trong thư mục dự án → thẻ duyệt R3 hiện khung **"TỆP SẼ BỊ TÁC ĐỘNG"** kèm số tổng tệp (`@count tệp`) và tối đa 20 đường dẫn tương đối (có `"…"` khi > 20); khi chưa bấm Đồng ý thì 0 tệp nào bị xóa.
@@ -267,8 +267,8 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 Đã qua unit/widget/pytest & thử đột biến trên Windows (`xuna_xtp` `288/288`, `desktop` `436/436`, `mobile` `746/746`, `backend` `1616`, `diff -r` `0`), **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
 
-- [ ] **Thử nghiệm trong bản nháp (`draft.create` → `fs.*`/`exec.run` R2 → `draft.manifest`):** sửa 2–3 tệp + chạy kiểm thử trong bản nháp → xác minh thư mục gốc trên đĩa **không đổi byte nào** trước khi bấm Đồng ý; `draft.manifest` trả đúng danh sách tệp thay đổi, `scope: "workspace_files_only"`, `networkIsolated: false` và `effectSha256`.
-- [ ] **Chặn lệnh R3 trong bản nháp:** gọi lệnh mạng (vd. `curl`) hoặc ghi tệp ngoài workspace với `draftId` → bị từ chối fail-closed (`draft_r3_forbidden`).
+- [x] **Thử nghiệm trong bản nháp (`draft.create` → `fs.*`/`exec.run` R2 → `draft.manifest`):** sửa 2 tệp + chạy `node -v` R2 trong bản nháp → thư mục gốc trên đĩa **không đổi byte nào**; `draft.manifest` trả `changeCount=2`, `scope: "workspace_files_only"`, `networkIsolated: false`, `checks=1/True` và `effectSha256` 64 hex (live Windows Release 2026-11-26).
+- [x] **Chặn lệnh R3 trong bản nháp:** gọi `del` với `draftId` → bị từ chối fail-closed (`draft_r3_forbidden`); `draft.apply` với chữ ký v1 bị từ chối `approval_version_mismatch` (live Windows Release 2026-11-26).
 - [ ] **Thẻ duyệt R3 gắn hiệu ứng (`xuna.approval.v2`):** khi gọi `draft.apply`, thẻ duyệt trên điện thoại hiện nhãn **"Ký theo hiệu ứng"** (`"Effect-bound"`) cùng khung xem trước danh sách tệp bị tác động; bấm Đồng ý ký sinh trắc học → máy tính áp dụng toàn bộ thay đổi một lượt, sau đó nói *"hoàn tác giúp mình"* (`action.undo`) khôi phục trọn bộ các tệp về đúng SHA-256 ban đầu trong 1 bước.
 - [ ] **Chống TOCTOU & E-Stop:** (a) mở editor sửa tay 1 tệp trong workspace gốc giữa lúc thẻ duyệt đang hiện và lúc bấm Đồng ý → máy tính từ chối `toctou_mismatch` và **0 tệp nào bị ghi đè**; (b) bấm E-Stop khi đang mở bản nháp → thư mục bản nháp dưới `%LOCALAPPDATA%\XUNA\drafts\` (Windows) / `Application Support/XUNA/drafts/` (Mac) bị xóa ngay lập tức.
 - [ ] **Kiểm chứng trên Mac & điện thoại thật:** đo tốc độ APFS `clonefile` trên macOS và chạy lại 4 mục trên với **desktop Mac** và **iPhone/Android thật**.
@@ -277,7 +277,7 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 Đã qua kiểm thử đơn vị, đối kháng, quét H5 và thử đột biến trên Windows (`xuna_xtp` `292/292`, `desktop` `441/441`, `backend` `1,620` pass, `diff -r` `0`), **chưa chạy live với binary văn phòng headless thật và chưa chạy trên Mac**:
 
-- [ ] **Quảng bá fail-closed (`capability.list`):** trên máy chưa cài bộ office headless, `capability.list` **không** hiện adapter `seed_document_convert` (và gọi `capability.run` trả `toolchain_missing` kèm thẻ `remediation` chỉ hiển thị lệnh theo P1.2); sau khi cài binary và đặt tệp manifest seed vào thư mục capabilities, `capability.list` tự quảng bá năng lực mà không sửa mã engine.
+- [x] **Quảng bá fail-closed (`capability.list`) & `remediation` từ manifest seed đóng gói:** máy không có `soffice` → `capability.list` ẩn `seed_document_convert`, `capability.run("seed_document_convert")` trả `failed` / `toolchain_missing` + `remediation` (`winget install TheDocumentFoundation.LibreOffice`); thả manifest JSON đã duyệt (`live_py_tag_copy`, ghim `manifestSha256` + `binarySha256`) vào `%LOCALAPPDATA%\XUNA\capabilities\` → tự quảng bá, thực thi không qua shell khớp `magic` + `sha256`, giả mạo `manifestSha256`/`binarySha256` bị từ chối fail-closed, xóa JSON → biến mất ngay (live Windows Release 2026-11-26; còn test chuyển PDF thật với `soffice` cài trên máy).
 - [ ] **Chuyển đổi thật + hậu điều kiện `verifyFiles` (`P4.2` / U7):** gọi `capability.run` với `seed_document_convert` để đổi một tệp mẫu sang PDF → tệp đầu ra tồn tại, magic `%PDF` khớp, SHA-256 trả về khớp đĩa; xóa manifest seed → adapter biến mất ngay.
 - [ ] **Kỹ năng kiểm chứng (`P4.3` / U6):** kỹ năng nhập từ `SKILL.md` hoặc chỉ có pipeline không qua tự-test thật ở `SandboxedToolRunner` giữ trạng thái `draft` và không xuất hiện trong `tools/list`; chỉ sau khi tự-test thật pass mới chuyển `verified`.
 - [ ] **Manifest Foundry trong bản nháp (`P4.4` / F2):** kiểm thử ứng viên manifest mới trong `DraftWorkspace` giữ nguyên 0 byte đổi ở workspace gốc; khi chưa có xác nhận chủ hoặc khi kiểm thử bản nháp fail thì không được cài vào thư mục capabilities.
@@ -285,7 +285,7 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 
 ## 4t. Pet đồng ký mật mã (`Approve`) & E-Stop có ký (`Stop`) (`P3` `F3-M0`–`F3-M3`, `ADR-0020`, thêm 2026-11-26; cần nạp board ESP32-S3 thật + điện thoại thật)
 
-Đã qua kiểm thử phần mềm, golden vector 3 phía (C++11 / Python / Dart) và thử đột biến trên Windows (`firmware` native `427/427`, `mobile` `752/752`, `backend` `1,630/1,630`), **CHƯA nạp firmware lên board thật (`HW-BOARD-1`) và CHƯA chạy live board + điện thoại**:
+Đã qua kiểm thử phần mềm (`firmware` `427/427`, `mobile` `752/752`, `backend` `1,630/1,630`) và live HTTP + PostgreSQL `xuna_w3_win_live` 2026-11-26 (`cosign-policy`, bind pet P-256 giả lập, `POST /v1/actions/stop` `ProofPurpose.STOP = 5` hợp lệ/chặn thiếu chữ ký/chặn replay/chặn sửa chữ ký), **CHƯA nạp firmware lên board thật (`HW-BOARD-1`) và CHƯA chạy live board + điện thoại**:
 
 - [ ] **`F3-M0` kiểm chứng hành vi hiện có trên board thật:** duyệt R2 bằng nút `GPIO0`/`GPIO14` và bấm E-Stop trên mạch → ghi nhận thực tế E-Stop từ mạch có treo grant `R2+` trên toàn bộ máy tính đang online hay không (lưu ý giới hạn kiến trúc: E-Stop từ mạch yêu cầu app điện thoại đang kết nối BLE).
 - [ ] **`F3-M1` / `F3-M2` đồng ký chống ký mù (`ProofPurpose::Approve = 4`):** bật một nhóm R3 qua `PUT /v1/actions/cosign-policy` (mặc định TẮT theo D6) → kích hoạt thao tác R3 đó → điện thoại hiện thẻ **"Cần pet đồng ký"** cùng mã 6 số khớp 100% với mã 6 số trên màn hình mạch XUNA; trước khi bấm `GPIO0` trên mạch thì không thể ký mù; bấm `GPIO14` từ chối lộ 0 chữ ký; bấm `GPIO0` ký P-256 thành công và gửi kèm chữ ký điện thoại.
