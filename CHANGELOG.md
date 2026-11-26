@@ -2,6 +2,13 @@
 
 Last updated: **2026-11-26** (Asia/Ho_Chi_Minh).
 
+## 2026-11-26 — Kế hoạch nâng cấp P4 (`P4.1`–`P4.4` / `U7`, `U6`, `F2`): Engine Capability Adapter khai báo, Kỹ năng kiểm chứng & Manifest Foundry (`ADR-0021`, `docs/`, `desktop/`, `backend/`)
+
+- **Hợp đồng & Fixtures:** [ADR-0021](docs/decisions/ADR-0021-declarative-capability-adapters-and-foundry.md) (`Approved`, D7/D9/D10), [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) §8 quy tắc 8 (`capability.list` / `capability.run`, 2 slot cố định), đồng bộ byte-identical `exec_fs_frames.json` (`diff -r` exit `0`).
+- **`xuna_xtp` & `desktop/`:** `CapabilityManifest` fail-closed (chặn shell/eval/metacharacter/placeholder không kiểu, `FsPathGuard` + sàn `ExecCommandClassifier`, hậu điều kiện P1.1), `CapabilityDetector`/`CapabilityEngine` không hardcode app (Rule H5, chạy không qua shell, ghim `manifestSha256`/`binarySha256`, E-Stop, `remediation`), adapter seed thuần JSON `assets/capabilities/seed_document_convert.json` (`P4.2`), kỹ năng `draft -> verified` chỉ sau tự-test thật không giả lập trong `SandboxedToolRunner` (`P4.3`), và `CapabilityFoundryService` sinh manifest & kiểm thử cô lập trong `DraftWorkspace` (`P4.4`).
+- **`backend/`:** ánh xạ `capability.list`/`capability.run`, bắt buộc `xuna/preflight` trên `capability.run`, catalog + tóm tắt VI/EN trung lập (Rule H5), `workflows.py` & `orchestrator.py` `0` diff.
+- **Kiểm chứng (Windows):** `diff -r` `0`, `xuna_xtp` **`292/292`**, `desktop` **`441/441`**, `backend` `ruff`/`mypy` (`0/268`)/`alembic` OK + **`1,620` pass** (`1,619` full + re-run sạch 1 flake timer tick Windows có sẵn tại `test_async_watch_yield_inbox_and_api.py:1692`), kèm thử đột biến `capability_manifest.dart` & `omniforge_service.dart`. **Chưa:** live binary văn phòng headless thật, macOS (`UDC-16 §4s`).
+
 ## 2026-11-26 — Kế hoạch nâng cấp P2 / W4-M3 + W4-M4: Bản nháp workspace, `EffectManifest` & chữ ký `xuna.approval.v2` (`docs/`, `desktop/` `a482b44`, `backend/` `cec584d`, `mobile/` `d3ce457`)
 
 - **Hợp đồng XTP & Fixtures:** [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) §3.4 (`xuna.approval.v2` gắn `effectSha256`, song song với `v1`), §4.2.8 (`preflight.effectSha256`), §8 quy tắc 7 (`draft.*` & `draftId`). Đồng bộ byte-identical `golden_vectors.json` (`approvalV2`) & `exec_fs_frames.json` (`toolsListDraftResponse`, `preflightDraftApplyResponse`, `toolsCallDraftApplyV2Request`, `draftId` trên `fs.*`/`exec.run`; `diff -r` exit `0`).

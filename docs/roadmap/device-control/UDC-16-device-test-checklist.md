@@ -273,6 +273,16 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] **Chống TOCTOU & E-Stop:** (a) mở editor sửa tay 1 tệp trong workspace gốc giữa lúc thẻ duyệt đang hiện và lúc bấm Đồng ý → máy tính từ chối `toctou_mismatch` và **0 tệp nào bị ghi đè**; (b) bấm E-Stop khi đang mở bản nháp → thư mục bản nháp dưới `%LOCALAPPDATA%\XUNA\drafts\` (Windows) / `Application Support/XUNA/drafts/` (Mac) bị xóa ngay lập tức.
 - [ ] **Kiểm chứng trên Mac & điện thoại thật:** đo tốc độ APFS `clonefile` trên macOS và chạy lại 4 mục trên với **desktop Mac** và **iPhone/Android thật**.
 
+## 4s. Engine Capability Adapter khai báo, Kỹ năng kiểm chứng & Manifest Foundry (`P4.1`–`P4.4`, `ADR-0021`, thêm 2026-11-26; cần backend + desktop bản mới)
+
+Đã qua kiểm thử đơn vị, đối kháng, quét H5 và thử đột biến trên Windows (`xuna_xtp` `292/292`, `desktop` `441/441`, `backend` `1,620` pass, `diff -r` `0`), **chưa chạy live với binary văn phòng headless thật và chưa chạy trên Mac**:
+
+- [ ] **Quảng bá fail-closed (`capability.list`):** trên máy chưa cài bộ office headless, `capability.list` **không** hiện adapter `seed_document_convert` (và gọi `capability.run` trả `toolchain_missing` kèm thẻ `remediation` chỉ hiển thị lệnh theo P1.2); sau khi cài binary và đặt tệp manifest seed vào thư mục capabilities, `capability.list` tự quảng bá năng lực mà không sửa mã engine.
+- [ ] **Chuyển đổi thật + hậu điều kiện `verifyFiles` (`P4.2` / U7):** gọi `capability.run` với `seed_document_convert` để đổi một tệp mẫu sang PDF → tệp đầu ra tồn tại, magic `%PDF` khớp, SHA-256 trả về khớp đĩa; xóa manifest seed → adapter biến mất ngay.
+- [ ] **Kỹ năng kiểm chứng (`P4.3` / U6):** kỹ năng nhập từ `SKILL.md` hoặc chỉ có pipeline không qua tự-test thật ở `SandboxedToolRunner` giữ trạng thái `draft` và không xuất hiện trong `tools/list`; chỉ sau khi tự-test thật pass mới chuyển `verified`.
+- [ ] **Manifest Foundry trong bản nháp (`P4.4` / F2):** kiểm thử ứng viên manifest mới trong `DraftWorkspace` giữ nguyên 0 byte đổi ở workspace gốc; khi chưa có xác nhận chủ hoặc khi kiểm thử bản nháp fail thì không được cài vào thư mục capabilities.
+- [ ] **Kiểm chứng trên Mac:** chạy lại 4 mục trên trên macOS.
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
