@@ -2,6 +2,18 @@
 
 Last updated: **2026-11-26** (Asia/Ho_Chi_Minh).
 
+## 2026-11-26 — Kế hoạch nâng cấp P0: phần code (`desktop/`, chưa commit)
+
+- **P0.3:** `skill.markdown_bridge` không còn lấy kỹ năng đầu tiên khi id sai (`skill_not_found` + ứng viên); `securityVerified` của export = quét tĩnh thật; câu báo import trung thực.
+- **P0.4:** `_gitRule` hiểu option toàn cục (`git --no-pager log` R2; `-c`/`--git-dir`/`--work-tree`/`--help`/lạ vẫn R3).
+- **P0.6:** tự nạp lại `host-policy.json` khi tệp đổi (debounce, fail-closed).
+- **P0.7:** thẻ "Thư mục dự án (workspaceRoots)" + kiểm tra (quá rộng/Hard-Deny/trùng/16 mục).
+- **P0.8:** sửa lỗi khác nền tảng của `resolveHomeOpenTarget` (độ sâu quét) + tên thư mục test hợp lệ trên Windows.
+- **P0.9:** công tắc opt-in "Khởi động cùng máy" (Windows, `HKCU Run` có bọc nháy, báo trạng thái thật; macOS "chưa hỗ trợ").
+- **Gia cố:** `cmd.exe` tạo `CREATE_SUSPENDED`, gắn Job Object trước khi chạy.
+- **P0.5:** hoãn — `chcp` và `AttachConsole` lên tiến trình suspended đều không được (lỗi 6); cần ConPTY.
+- **Kiểm chứng (Windows):** desktop **385/385**, `xuna_xtp` **261/261**, analyze 0; build Release OK (trước thay đổi P0.9). **Chưa:** live P0.1/P0.2/P0.7, đóng gói P0.9.
+
 ## 2026-11-26 — Build app desktop Windows thật lần đầu, kiểm chứng live Wave 3 trên Windows & công tắc "Dòng lệnh & tệp" bật cả `files` (`desktop/`)
 
 - **Windows runner (`1877cc1`):** sửa build lần đầu (`AddPropertyChangedEventHandlerNativeArray`) và crash cppwinrt `check_sta_blocking_wait` (chờ WinRT SMTC chuyển sang thread MTA qua `RunOnMtaWorker`).

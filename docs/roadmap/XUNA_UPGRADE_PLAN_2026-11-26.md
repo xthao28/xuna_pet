@@ -40,6 +40,8 @@ Phụ thuộc: P0 → P1 → P2; P3 song song được với P2 khi có board + 
 | P0.9 | Bản Release Windows + đóng gói + khởi động cùng máy (`HKCU Run`) | `desktop/windows` | `flutter build windows --release`, cài trên máy sạch, chạy từ Explorer, không elevated | M |
 | P0.10 | Mục UDC-16 §4m cần iPhone thật | `mobile` | Theo checklist khi có iPhone | — |
 
+**Tiến độ 2026-11-26 (chưa commit, xem PROCESS.md):** P0.3, P0.4, P0.6, P0.7, P0.8 — code + unit test xong (desktop 380/380, `xuna_xtp` 261/261); P0.1, P0.2, P0.7 — chờ phiên live; P0.5 — **hoãn, cần ConPTY** (`chcp` không tác dụng; `AttachConsole` lên tiến trình suspended lỗi 6) → thêm hạng mục **"ConPTY launcher cho Windows"** (sửa font cmd + mở `pty: true`); P0.9 — công tắc opt-in "Khởi động cùng máy" (`HKCU Run` có bọc nháy) xong, còn đóng gói trình cài (chủ chọn MSIX/Inno/zip); thêm: `cmd.exe` tạo `CREATE_SUSPENDED` + gắn Job Object trước khi chạy; P0.10 — chờ iPhone.
+
 Ghi chú: E-Stop không treo grant `media` (R1) **khớp** desktop AGENTS §3.5 ("suspends new R2+ tool calls") — không phải lỗi; đổi hay không là quyết định D2.
 
 ---
