@@ -1,6 +1,13 @@
 # XUNA — Change and Session History
 
-Last updated: **2026-11-25** (Asia/Ho_Chi_Minh).
+Last updated: **2026-11-26** (Asia/Ho_Chi_Minh).
+
+## 2026-11-26 — Build app desktop Windows thật lần đầu, kiểm chứng live Wave 3 trên Windows & công tắc "Dòng lệnh & tệp" bật cả `files` (`desktop/`)
+
+- **Windows runner (`1877cc1`):** sửa build lần đầu (`AddPropertyChangedEventHandlerNativeArray`) và crash cppwinrt `check_sta_blocking_wait` (chờ WinRT SMTC chuyển sang thread MTA qua `RunOnMtaWorker`).
+- **Live Windows (app thật + backend thật, `false_success = 0`):** P0 `^""`, P1-a dấu `"`, P1-b shim npm `.cmd` đều hết; Hard-Deny 12/12, R3 ký P-256 thật, `fs.*`, task/cancel/Job Object, E-Stop phím nóng ≤204 ms, khóa host TPM. Chi tiết và phần chưa test: PROCESS.md.
+- **Công tắc "Dòng lệnh & tệp" (sửa P1):** bật = `shellControl.enabled` + `families.files: allow`; tắt = bỏ `files` (mặc định bị chặn). Máy đã bật `shellControl` trước đó được bổ sung `files: allow` lúc khởi động (`migrateShellFilesFamily`), không ghi đè `files: block`. Test mới `desktop/test/policy/shell_files_switch_test.dart` (7/7).
+- **Kiểm chứng (Windows):** `fvm flutter analyze` 0 issues; desktop `364 pass, 2 fail có sẵn` (mesh tên thư mục đặc biệt trên Windows, `resolveHomeOpenTarget` macOS — fail y hệt khi bỏ thay đổi).
 
 ## 2026-11-25 — Wave 3 `W3-M0–W3-M4`: Power-User Shell (`exec.*`), Direct File I/O (`fs.*`) & Brain Fluency (`ADR-0018`) — Implemented; `W3-M5` pending (`docs/`, `backend/`, `desktop/packages/xuna_xtp`, `desktop/`, `mobile/`)
 

@@ -218,7 +218,7 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 Đã chạy live 2026-11-26 với backend thật + điện thoại giả lập (xem PROCESS.md). Còn lại phần cần người và điện thoại thật:
 
 - [ ] Máy Windows **mới cài** (chưa có `%APPDATA%\XUNA`): app hiện "Cấu hình lỗi", mọi lệnh bị từ chối (`policy_invalid`) cho tới khi bấm **"Khôi phục mặc định"** ở tab Chính sách. Đây là đúng thiết kế, nhưng ghi lại nếu thấy khó hiểu.
-- [ ] Sau "Khôi phục mặc định" + bật **"Dòng lệnh & tệp (exec.*)"**: `exec.*` chạy được, nhưng `fs.*` (đọc/sửa tệp) **vẫn bị chặn** (`policy_blocked`) vì chính sách mặc định không có nhóm `files` và giao diện chưa có công tắc cho nó (lỗi đã biết, chưa sửa). Báo lại nếu đã sửa mà vẫn bị.
+- [ ] Sau "Khôi phục mặc định" + bật **"Dòng lệnh & tệp (exec.*)"**: cả `exec.*` lẫn `fs.*` (đọc/sửa tệp) đều chạy được (sửa 2026-11-26: công tắc bật luôn nhóm `files`). Tắt công tắc: cả hai bị chặn lại. Nếu `fs.*` vẫn báo `policy_blocked` khi công tắc đang bật thì là lỗi.
 - [ ] Mọi lệnh ghi tệp đều cần ký trên điện thoại (`outside_workspace`) khi chưa có thư mục dự án (`workspaceRoots`); giao diện chưa có chỗ đặt thư mục này (lỗi đã biết).
 - [ ] Quét QR ghép nối bằng **iPhone thật** và bấm "Khớp": mã 6 số trên điện thoại trùng với máy tính.
 - [ ] Bấm `Ctrl+Alt+Shift+X` bằng tay khi XUNA đang chạy một lệnh dài: lệnh dừng ngay, điện thoại báo máy tính đã bị tạm dừng.

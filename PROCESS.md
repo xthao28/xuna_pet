@@ -1,6 +1,15 @@
 # XUNA — Process and Session Handoff
 
-Last updated: **2026-11-26** (Asia/Ho_Chi_Minh). Latest: **First real Windows desktop build + Wave 3 live Windows verification (`desktop/windows/runner`: 2 native fixes, uncommitted; `CreateProcessW`/Job Object, `PATHEXT` `.cmd` shim, TPM host key, E-Stop hotkey Live Verified, `false_success = 0`; 3 product gaps open).** Previous: **Wave 3 P0/P1-a/P1-b + macOS POSIX/zsh hardening + macOS PATH `.zshrc`/`nvm` fix Implemented & `W3-M5` Live macOS Verified.**
+Last updated: **2026-11-26** (Asia/Ho_Chi_Minh). Latest: **"Dòng lệnh & tệp" switch now also controls the `files` family (P1 fix, `desktop/`, unit-tested; not re-run live).** Previous: **First real Windows desktop build + Wave 3 live Windows verification (`desktop/windows/runner` 2 native fixes, committed `1877cc1`; `CreateProcessW`/Job Object, `PATHEXT` `.cmd` shim, TPM host key, E-Stop hotkey Live Verified, `false_success = 0`).**
+
+## 2026-11-26 — Sửa P1: công tắc "Dòng lệnh & tệp" bật cả nhóm `files` (`desktop/`)
+
+- **Quyết định chủ dự án:** cách 1 — công tắc local-only "Dòng lệnh & tệp (exec.\*)" điều khiển cả `exec.*` lẫn `files` (`fs.*`, `finder.*`), khớp nhãn. `PUT /policy` từ xa vẫn không đổi được `families`/`shellControl` (ADR-0018).
+- **Code:** `HostPolicyStore.applyShellAndFilesSwitch` (bật → `shellControl.enabled=true` + `files: allow`; tắt → `enabled=false` + bỏ `files`), `HostPolicyStore.migrateShellFilesFamily` (policy khoẻ, `shellControl` đang bật, thiếu `files` → thêm `allow`; giữ `files: block`; không làm gì khi tắt hoặc policy lỗi), `DesktopAgentController.setShellControlEnabled` dùng hàm mới, `initializeAgent` gọi migrate sau `migrateMissingDesktopFamilies`.
+- **Kiểm chứng (Windows):** `desktop/test/policy/shell_files_switch_test.dart` 7/7 (gồm ca fail-closed: policy mặc định → `fs.*` `policy_blocked`, `exec.run` `shell_not_enabled`; policy lỗi → `policy_invalid`, file không bị ghi); thử đột biến bỏ dòng `files: allow` → test fail. `fvm dart format` sạch, `fvm flutter analyze` 0 issues, toàn bộ desktop `364 pass, 2 fail có sẵn` (`mesh_discovery_and_tools_e2e_test` tên thư mục đặc biệt trên Windows; `wave_c_desktop_test` `resolveHomeOpenTarget` macOS) — 2 test này fail y hệt khi stash thay đổi.
+- **Chưa chạy (H8):** chưa build lại app Windows và bấm công tắc thật để xem `fs.*` chạy live; chưa chạy trên Mac.
+- **Việc tiếp theo:** build lại app Windows, trên máy mới cài bấm "Khôi phục mặc định" → bật công tắc → `fs.list_files` phải `ok` (checklist UDC-16 §4m).
+ Previous: **Wave 3 P0/P1-a/P1-b + macOS POSIX/zsh hardening + macOS PATH `.zshrc`/`nvm` fix Implemented & `W3-M5` Live macOS Verified.**
 
 ## 2026-11-26 — Build app desktop Windows thật lần đầu & kiểm chứng live Wave 3 trên Windows (`desktop/windows/runner`)
 
@@ -20,7 +29,7 @@ Last updated: **2026-11-26** (Asia/Ho_Chi_Minh). Latest: **First real Windows de
   - **P1-b đã hết:** `mcp.list_servers` tự phát hiện `context7` (2 tool) và `ruflo` (40 tool) từ cấu hình Claude Code, cả hai là shim npm `.cmd` (`%APPDATA%\npm\*.cmd`): cold 1047 ms, cached 313 ms; `mcp.call context7 resolve-library-id` trả kết quả thật, 0 tiến trình con sót.
   - **E-Stop phím nóng hệ thống** `Ctrl+Alt+Shift+X` (gửi bằng `keybd_event`): 6/6 PID của 2 cây task chết trong ≤204 ms (gồm overhead polling); backend `stop reason=owner_host`, treo grant, lệnh kế tiếp `grant_denied`.
 - **Phát hiện chưa sửa:**
-  - **P1 (sản phẩm):** máy mới cài không có cách nào bật `fs.*`: chính sách mặc định ("Khôi phục mặc định") thiếu nhóm `files`, tab Chính sách chỉ có công tắc `media/app/url/workflow` + `shellControl`, còn `PUT /v1/hosts/{id}/policy` không nhận `families` (`422 body.families`). Nhãn "Dòng lệnh & tệp" gây hiểu là bật cả tệp. Test đã thêm `"files": "allow"` bằng tay vào `host-policy.json`.
+  - **P1 (sản phẩm) — đã sửa cùng ngày (mục trên):** máy mới cài không có cách nào bật `fs.*`: chính sách mặc định ("Khôi phục mặc định") thiếu nhóm `files`, tab Chính sách chỉ có công tắc `media/app/url/workflow` + `shellControl`, còn `PUT /v1/hosts/{id}/policy` không nhận `families` (`422 body.families`). Nhãn "Dòng lệnh & tệp" gây hiểu là bật cả tệp. Test đã thêm `"files": "allow"` bằng tay vào `host-policy.json`.
   - **P2:** không có UI đặt `shellControl.workspaceRoots` → mọi `fs.write_file`/`patch_file` là R3 `outside_workspace` (test đặt bằng tay `C:\Users\Thao\w3ws`). App không tự nạp lại `host-policy.json` khi file đổi (phải khởi động lại).
   - **P2:** builtin `cmd.exe` (`echo xin chào Việt Nam`) trả `xin ch�o Vi?t Nam` (code page OEM của pipe); output UTF-8 của `node` đúng.
   - **P2:** `_gitRule` coi option toàn cục trước subcommand (`--no-pager`, `--version`) là subcommand lạ → R3 `destructive_command` (`git log -1 --format="%h %s"` không có `--no-pager` → R2 đúng).
