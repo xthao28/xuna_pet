@@ -263,6 +263,16 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] **Fail-closed với tệp mật / ngoài workspace:** nhờ XUNA ghi `.env` hoặc chạy lệnh xóa trỏ ra ngoài workspace / khớp `.env` → thẻ duyệt R3 vẫn xuất hiện bình thường nhưng **không** hiện khung xem trước và **không** lộ nội dung hay tên tệp mật; kiểm tra log/audit trên desktop & DB backend không chứa nội dung preview.
 - [ ] **Kiểm chứng trên Mac & điện thoại thật:** chạy lại 3 mục trên với **desktop Mac** và **iPhone/Android thật**.
 
+## 4r. Bản nháp workspace & chữ ký hậu quả `xuna.approval.v2` (`W4-M3` / `W4-M4`, `ADR-0019` §3–§4, thêm 2026-11-26; cần backend + desktop + app điện thoại bản mới)
+
+Đã qua unit/widget/pytest & thử đột biến trên Windows (`xuna_xtp` `288/288`, `desktop` `436/436`, `mobile` `746/746`, `backend` `1616`, `diff -r` `0`), **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
+
+- [ ] **Thử nghiệm trong bản nháp (`draft.create` → `fs.*`/`exec.run` R2 → `draft.manifest`):** sửa 2–3 tệp + chạy kiểm thử trong bản nháp → xác minh thư mục gốc trên đĩa **không đổi byte nào** trước khi bấm Đồng ý; `draft.manifest` trả đúng danh sách tệp thay đổi, `scope: "workspace_files_only"`, `networkIsolated: false` và `effectSha256`.
+- [ ] **Chặn lệnh R3 trong bản nháp:** gọi lệnh mạng (vd. `curl`) hoặc ghi tệp ngoài workspace với `draftId` → bị từ chối fail-closed (`draft_r3_forbidden`).
+- [ ] **Thẻ duyệt R3 gắn hiệu ứng (`xuna.approval.v2`):** khi gọi `draft.apply`, thẻ duyệt trên điện thoại hiện nhãn **"Ký theo hiệu ứng"** (`"Effect-bound"`) cùng khung xem trước danh sách tệp bị tác động; bấm Đồng ý ký sinh trắc học → máy tính áp dụng toàn bộ thay đổi một lượt, sau đó nói *"hoàn tác giúp mình"* (`action.undo`) khôi phục trọn bộ các tệp về đúng SHA-256 ban đầu trong 1 bước.
+- [ ] **Chống TOCTOU & E-Stop:** (a) mở editor sửa tay 1 tệp trong workspace gốc giữa lúc thẻ duyệt đang hiện và lúc bấm Đồng ý → máy tính từ chối `toctou_mismatch` và **0 tệp nào bị ghi đè**; (b) bấm E-Stop khi đang mở bản nháp → thư mục bản nháp dưới `%LOCALAPPDATA%\XUNA\drafts\` (Windows) / `Application Support/XUNA/drafts/` (Mac) bị xóa ngay lập tức.
+- [ ] **Kiểm chứng trên Mac & điện thoại thật:** đo tốc độ APFS `clonefile` trên macOS và chạy lại 4 mục trên với **desktop Mac** và **iPhone/Android thật**.
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
