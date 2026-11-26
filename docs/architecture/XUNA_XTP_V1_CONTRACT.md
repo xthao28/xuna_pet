@@ -1,6 +1,6 @@
 # XUNA Tool Protocol (XTP) v1 — Normative Wire Contract
 
-Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`. **Proposed amendment 2026-11-22 ([ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) / [XUNA_ASYNC_WATCH_AND_WAKE.md](XUNA_ASYNC_WATCH_AND_WAKE.md) AW-M1):** §4.2.14 `xuna/watchRegister`, §4.2.15 `xuna/watchCancel`, and §4.2.16 `xuna/watchEvent`. **Amendment 2026-11-25 ([ADR-0018](../decisions/ADR-0018-power-user-shell-and-direct-fs.md) / [XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md](XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md) W3-M0, implemented W3-M0–W3-M4, live macOS validation pending W3-M5):** `ToolFamily` `exec`, the `fs.*` and `exec.*` tools (§8), mandatory host preflight for `exec.run` / `exec.write_stdin` / `fs.write_file` / `fs.patch_file` (§4.2.8), local-only `shellControl` and `shellEnabled` (§4.2.9), watch mode/signal `exec_async` with `target.execTaskId` (§4.2.14–§4.2.16), and `mcp.list_servers` `includeTools` / `serverId` (§7). Golden frames: `exec_fs_frames.json`, `policy_frames.json`, and the `exec_async` entries of `watch_frames.json`.
+Date: 2026-10-30. **Status: Approved (owner 2026-10-30, R3/R4/UDC-D10).** Amended 2026-11-12: `xuna/preflight` (§4.2.8, ADR-0015 / UDC-17 S17.1), implemented in `xuna_xtp`, the Desktop Agent and the backend. Amended 2026-11-13: tool `ui.find` and the `changes` field of `input.*` results (UDC-17 S17.4). Amended 2026-11-15: `xuna/get_policy` and `xuna/set_policy` (§4.2.9, UDC-18 Wave E), `512 KiB` frame ceiling / `448 KiB` media payload ceiling (UDC-20 M4), `ToolFamily` `cu`, `xuna/lanPeer`, optional `xuna/policy.idempotent` & `xuna/approval.{scope,signature,publicKey}`. **Proposed amendment 2026-11-20 ([ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md) / [XUNA_SPATIAL_DEVICE_MESH.md](XUNA_SPATIAL_DEVICE_MESH.md) M1):** `"linux"` in `xuna/hello.platform`, plus §4.2.10 `xuna/presence`, §4.2.11 `xuna/resources`, and §4.2.12 `xuna/focusRequest`. **Proposed amendment 2026-11-22 ([ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) / [XUNA_ASYNC_WATCH_AND_WAKE.md](XUNA_ASYNC_WATCH_AND_WAKE.md) AW-M1):** §4.2.14 `xuna/watchRegister`, §4.2.15 `xuna/watchCancel`, and §4.2.16 `xuna/watchEvent`. **Amendment 2026-11-25 ([ADR-0018](../decisions/ADR-0018-power-user-shell-and-direct-fs.md) / [XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md](XUNA_WAVE3_POWER_SHELL_AND_BRAIN_FLUENCY.md) W3-M0, implemented W3-M0–W3-M4, live macOS validation pending W3-M5):** `ToolFamily` `exec`, the `fs.*` and `exec.*` tools (§8), mandatory host preflight for `exec.run` / `exec.write_stdin` / `fs.write_file` / `fs.patch_file` (§4.2.8), local-only `shellControl` and `shellEnabled` (§4.2.9), watch mode/signal `exec_async` with `target.execTaskId` (§4.2.14–§4.2.16), and `mcp.list_servers` `includeTools` / `serverId` (§7). Golden frames: `exec_fs_frames.json`, `policy_frames.json`, and the `exec_async` entries of `watch_frames.json`. **Amendment 2026-11-26 ([XUNA_UPGRADE_PLAN_2026-11-26.md](../roadmap/XUNA_UPGRADE_PLAN_2026-11-26.md) §3 P1.1 & P1.2):** `exec.run` `expectFiles` output postconditions (§8 rule 6), optional `toolchains` in `xuna/resources` (§4.2.11), and optional `structuredContent.remediation` on tool errors (§5.1).
 Normative contract for [UDC-3](../roadmap/device-control/UDC-3-desktop-agent.md) onward; referenced by [ADR-0012](../decisions/ADR-0012-host-actions.md), [ADR-0013](../decisions/ADR-0013-host-identity-and-sessions.md), [ADR-0016](../decisions/ADR-0016-spatial-device-mesh.md), [ADR-0017](../decisions/ADR-0017-async-watch-and-wake.md) and [XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md](XUNA_UNIVERSAL_DEVICE_CONTROL_ARCHITECTURE.md) §5.
 
 ---
@@ -600,9 +600,9 @@ Sent after `xuna/ready` on heartbeat / state delta (e.g. lock/unlock, media star
 | `foregroundAppId` | Optional (`str | null`, `^[a-z0-9_.-]{1,64}$`). Normalized short app ID only — **zero window titles or file paths**. |
 | `updatedAt` | Required, ISO-8601 UTC timestamp string. |
 
-#### 4.2.11 `xuna/resources` (Agent → Backend, Notification — Proposed M1)
+#### 4.2.11 `xuna/resources` (Agent → Backend, Notification — Proposed M1, Amended P1.2)
 
-Sent after `xuna/ready` (at session connect and when discovered apps/workspaces change) so the backend can match targets against real capabilities without hardcoding app lists (H5). Strictly `additionalProperties: false`.
+Sent after `xuna/ready` (at session connect and when discovered apps, workspaces, or probed host toolchains change) so the backend can match targets against real capabilities without hardcoding app or toolchain lists (H5). Strictly `additionalProperties: false`.
 
 ```json
 {
@@ -617,12 +617,36 @@ Sent after `xuna/ready` (at session connect and when discovered apps/workspaces 
 }
 ```
 
+With optional `toolchains` (upgrade plan P1.2 / U4; golden frame `resourcesWithToolchainsNotification` in `mesh_frames.json`):
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "xuna/resources",
+  "params": {
+    "schemaVersion": 1,
+    "installedApps": ["vscode", "obsidian"],
+    "workspaces": ["xuna_pet", "Notes_Vault"],
+    "capabilitiesVersion": "r1_0002",
+    "toolchains": [
+      { "id": "git", "version": "2.47.1" },
+      { "id": "node", "version": "22.11.0" }
+    ]
+  }
+}
+```
+
 | Field | Rule |
 | --- | --- |
 | `schemaVersion` | Required, literal `1`. |
 | `installedApps` | Required, `list[str]` (max 256 items), each `^[a-z0-9_.-]{1,64}$` (from `AutoAppScanner.normalizeId`, hard-denied apps filtered). |
 | `workspaces` | Required, `list[str]` (max 128 items), each `^[a-zA-Z0-9_.-]{1,64}$` (from `AutoWorkspaceIndexer.sanitizeAlias`). **Zero real filesystem paths** (`/` and `\` strictly forbidden). |
 | `capabilitiesVersion` | Optional, `str` (`^[a-zA-Z0-9_.-]{1,32}$`). |
+| `toolchains` | Optional, `list[object]` (backward compatible when omitted; max 64 items; unique `id`). Each item enforces `additionalProperties: false` with required `id` and `version`:<br>- `id`: required `str`, `^[a-z0-9_.-]{1,32}$` (rejects `/`, `\`, `.`, `..`, whitespace, and ASCII control chars `[\x00-\x1f\x7f]`).<br>- `version`: required `str`, length `1..32`, `^[a-zA-Z0-9][a-zA-Z0-9._+-]{0,31}$` (trimmed, printable non-path/non-whitespace, explicitly rejecting `/`, `\`, `..`, `\n`, `\r`, and ASCII control chars). |
+
+- **Zero paths / zero file contents:** `xuna/resources` never carries executable paths, working directories, or raw probe stdout/stderr.
+- **Host-adapter ownership (Rule H5):** The list of toolchains to probe lives solely in the Desktop Host Agent adapter (never hardcoded in backend generic layers or LLM prompts).
+- **Fail-closed probing (Rules H1/H2):** Missing/uninstalled binaries, non-zero exits, timed-out probes, or OS store execution aliases are omitted from `toolchains` and never fabricated.
 
 #### 4.2.12 `xuna/focusRequest` (Agent → Backend, Notification — Proposed M1)
 
@@ -865,7 +889,7 @@ Sent strictly after `xuna/ready` as a JSON-RPC 2.0 notification (MUST omit JSON-
 
 ### 5.1 Tool Execution Status (`_meta["xuna/status"]`)
 
-Application-level tool outcomes are always returned inside `result._meta["xuna/status"]` (never as JSON-RPC protocol errors):
+Application-level tool outcomes are always returned inside `result._meta["xuna/status"]` (never as JSON-RPC protocol errors). `result._meta` strictly allows only the 3 keys `xuna/status`, `xuna/errorCode`, and `xuna/durationMs` (`additionalProperties: false`):
 
 | `xuna/status` | `isError` | Meaning | Optional `_meta["xuna/errorCode"]` |
 | --- | --- | --- | --- |
@@ -873,10 +897,46 @@ Application-level tool outcomes are always returned inside `result._meta["xuna/s
 | `denied` | `true` | Blocked by local `host-policy.json`, missing/expired approval, or `approval_mismatch`. | `"policy_blocked"`, `"approval_required"`, `"approval_expired"`, `"approval_mismatch"`, `"stopped"` |
 | `needs_permission` | `true` | Required OS permission not granted on the host. | `"accessibility"`, `"automation"`, `"screen_recording"`, `"notification_listener"` |
 | `invalid_args` | `true` | Arguments failed schema or URL/domain validation on the host. | `"schema_mismatch"`, `"url_invalid"`, `"domain_not_allowed"`, `"unknown_id"` |
-| `unsupported` | `true` | Capability not supported on this OS/configuration. | `"platform_unsupported"` |
-| `failed` | `true` | Native provider call failed at runtime, or an `exec` task exited 0 but its `expectFiles` did not match (§8 rule 6; `structuredContent` is kept). | `"provider_error"`, `"target_not_found"`, `"expected_output_missing"`, `"expected_output_mismatch"` |
+| `unsupported` | `true` | Capability not supported on this OS/configuration. | `"platform_unsupported"`, `"ide_not_found"`, `"coding_agent_not_found"` |
+| `failed` | `true` | Native provider call failed at runtime, dependency/toolchain missing, or an `exec` task exited 0 but its `expectFiles` did not match (§8 rule 6; `structuredContent` is kept). | `"provider_error"`, `"target_not_found"`, `"toolchain_missing"`, `"exec_spawn_failed"`, `"expected_output_missing"`, `"expected_output_mismatch"` |
 | `timeout` | `true` | Execution exceeded `xuna/deadlineMs`. | `"deadline_exceeded"` |
 | `cancelled` | `true` | Aborted by `notifications/cancelled` or `xuna/stop`. | `"cancelled"`, `"stopped"` |
+
+#### Optional `structuredContent.remediation` (P1.2 / U4)
+
+On non-`ok` tool results (`xuna/status` such as `failed` or `unsupported`, typically paired with an `errorCode` like `toolchain_missing`, `ide_not_found`, `coding_agent_not_found`, or `exec_spawn_failed`), the Host Agent may include an optional `structuredContent.remediation` object (`additionalProperties: false`) while keeping `_meta` strictly at its 3 keys (`xuna/status`, `xuna/errorCode`, `xuna/durationMs`). Forbidden when `xuna/status == "ok"`.
+
+| Field | Rule |
+| --- | --- |
+| `summary` | Required `str` (`1..240` chars, trimmed single-line — zero `\n`, `\r`, or ASCII control chars, zero host filesystem paths or secrets). |
+| `command` | Optional `str` (`1..240` chars, trimmed single-line — zero `\n`, `\r`, or ASCII control chars, zero host filesystem paths or secrets). **Display-only:** never auto-executed by the backend or mobile app. |
+| `kind` | Required enum: `"install" \| "config" \| "manual"`. |
+
+Golden frame (`toolsCallToolchainMissingRemediationResponse` in `exec_fs_frames.json`):
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 818,
+  "result": {
+    "content": [{ "type": "text", "text": "toolchain_missing: node" }],
+    "structuredContent": {
+      "errorCode": "toolchain_missing",
+      "remediation": {
+        "summary": "Node.js runtime is required to run this command.",
+        "command": "winget install OpenJS.NodeJS.LTS",
+        "kind": "install"
+      }
+    },
+    "isError": true,
+    "_meta": {
+      "xuna/status": "failed",
+      "xuna/errorCode": "toolchain_missing",
+      "xuna/durationMs": 8
+    }
+  }
+}
+```
 
 ### 5.2 JSON-RPC Protocol Errors (Protocol Faults Only)
 
@@ -976,5 +1036,5 @@ All schemas enforce `"additionalProperties": false`. `fs.*` belongs to family `f
 2. Hard-Deny (unapprovable, also under `autopilot`): privilege escalation (`sudo`, `su`, `doas`, `pkexec`, `runas`, `osascript … administrator privileges`, setuid modes, root ownership), credential stores (`security find-*-password`/`dump-keychain`/`export`, password-manager CLIs), paths inside `.ssh`, `.gnupg`, `.aws`, `.kube`, `.password-store`, `Keychains`, password-manager data, `.netrc`, `.git-credentials`, `.docker/config.json`, `.git/config`, `/etc/shadow`, `/etc/sudoers*`, Windows `System32\config\*`; secret file names (`.env`, `.env.*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `id_rsa*`, `id_ed25519*`, `id_ecdsa*`, `id_dsa*`, `.npmrc`, `.pypirc`, `.pgpass`, `.htpasswd`) for reads and inside commands; environment dumps (`env`, `printenv`, `export -p`, bare `set`/`declare`); catastrophic commands (recursive delete of `/`, `~`, `$HOME`, the home directory or a drive root, `mkfs*`, `dd of=/dev/…`, `diskutil erase*`, `shutdown`/`reboot`/`halt`/`poweroff`/`format`, fork bombs). Symlinks are resolved and both the written and the real path are checked.
 3. `R2` is a positive allowlist of local inspection/build/test commands; everything else, including network clients, destructive or system commands, package installs, inline interpreter code (`-c`, `-e`), pipes into a shell or interpreter, command substitution and writes outside `workspaceRoots`, is `R3` and needs a phone-signed `once` approval even under `autopilot`.
 4. Children start with an environment allowlist (no `XUNA_*`, `GEMINI_*`, `OPENAI_*`, `GROQ_*`, `AWS_*`, `ANTHROPIC_*`, `FIREBASE_*`, `GOOGLE_*`, `AZURE_*`, `GITHUB_TOKEN`, `GH_TOKEN`, `NPM_TOKEN`, `BASH_ENV`, `ENV`, `ZDOTDIR`) in their own process group (macOS: `posix_spawn` + `POSIX_SPAWN_SETPGROUP`, shell `/bin/zsh -f`; Windows: `cmd.exe /d /s /c`, tree kill `taskkill /T /F`; other platforms `unsupported`). At most 4 run at once (`exec_task_limit_reached`); output stays in RAM (64 KiB rolling buffer, finished tasks kept 5 minutes, at most 16). E-Stop sends SIGTERM to every group, SIGKILL after 500 ms, and marks the tasks `cancelled`.
-5. `fs.write_file` / `fs.patch_file` write a sibling temporary file and rename it; `fs.patch_file` fails with `patch_target_not_found` (0 matches) or `patch_target_ambiguous` (> 1 match without `replaceAll`). Other stable codes: `fs_not_found`, `fs_not_a_file`, `fs_not_a_directory`, `fs_file_too_large`, `fs_binary_file`, `fs_exists`, `fs_parent_missing`, `fs_write_failed`, `line_out_of_range`, `pattern_invalid`, `cwd_not_found`, `exec_spawn_failed`, `exec_task_not_found`, `exec_task_finished`, `exec_stdin_closed`, `pty_unsupported_on_platform`, `platform_unsupported`.
+5. `fs.write_file` / `fs.patch_file` write a sibling temporary file and rename it; `fs.patch_file` fails with `patch_target_not_found` (0 matches) or `patch_target_ambiguous` (> 1 match without `replaceAll`). Other stable codes: `fs_not_found`, `fs_not_a_file`, `fs_not_a_directory`, `fs_file_too_large`, `fs_binary_file`, `fs_exists`, `fs_parent_missing`, `fs_write_failed`, `line_out_of_range`, `pattern_invalid`, `cwd_not_found`, `toolchain_missing`, `exec_spawn_failed`, `exec_task_not_found`, `exec_task_finished`, `exec_stdin_closed`, `pty_unsupported_on_platform`, `platform_unsupported`. When `exec.run` (or another tool) fails with a missing dependency/toolchain (`toolchain_missing`, `exec_spawn_failed`), the host may return `xuna/status: "failed"` (keeping `structuredContent`) with optional `structuredContent.remediation` (§5.1; `toolsCallToolchainMissingRemediationResponse` in `exec_fs_frames.json`).
 6. **Output postconditions (`expectFiles`, upgrade plan P1.1 / U3, 2026-11-26).** Every `expectFiles[].path` passes `FsPathGuard` at preflight as a read: relative → `invalid_args` / `path_not_absolute`, Hard-Deny → `denied` / `fs_path_forbidden`, secret file → `denied` / `fs_secret_file_forbidden`; a malformed list → `invalid_args` / `schema_mismatch`. Naming expected files never raises the command's risk, and `expectFiles` is part of the arguments bound by `argsSha256`. Only when the process exits with code 0 does the host check each file (also for a task that detached, when it exits): it re-resolves the real path, stats it, reads up to 16 header bytes and hashes files up to 64 MiB. All match → `status: "completed"`, `xuna/status: "ok"`. Otherwise `status: "failed"`, `exitCode: 0`, `errorCode` set, and the `tools/call` result carries `xuna/status: "failed"` + `xuna/errorCode` with the same `structuredContent` (output and `artifacts` kept). `expected_output_missing` wins when any file is absent, not a regular file or smaller than `minBytes`; `expected_output_mismatch` covers a wrong `magic`/`sha256`, a `sha256` expectation on a file > 64 MiB, an unreadable file, a real path that now resolves into a Hard-Deny location or secret file, and a check that could not run. A non-zero exit, `timed_out` or `cancelled` is reported as before, without checking files. `artifacts[]` (one per entry, in order; **the shape the draft-workspace effect manifest (F1) reuses**): `path` (as sent), `exists`, `sizeBytes?`, `sha256?` (lowercase hex of the file on disk), `magicOk?` (only when `magic` was given), `problem?` (`missing`\|`not_a_file`\|`too_small`\|`magic_mismatch`\|`sha256_mismatch`\|`too_large_to_hash`\|`unreadable`\|`forbidden`); a `forbidden` entry reports no size, hash or magic. Frames: `toolsCallExecRunExpectFilesRequest`, `toolsCallExecRunExpectFilesCompletedResponse`, `toolsCallExecRunExpectedOutputMissingResponse`, `preflightExecRunExpectFilesSecretResponse` in `exec_fs_frames.json`. The backend schema subset accepts flat objects of scalar properties as array `items` for this (`actions.domain.schema_validator`).

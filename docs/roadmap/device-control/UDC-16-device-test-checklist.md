@@ -235,6 +235,16 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] Thẻ duyệt R3 của lệnh có `expectFiles` ghi thêm "kiểm tra N tệp đầu ra".
 - [ ] Chạy lại 3 mục trên trên **Mac** (code dùng chung, chưa chạy trên Mac).
 
+## 4o. Tự khai báo toolchain & thẻ "Sửa 1 chạm" (`toolchains` + `remediation`, kế hoạch nâng cấp P1.2, thêm 2026-11-26; cần backend + desktop + app điện thoại bản mới)
+
+Đã qua unit/widget/pytest trên Windows, **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
+
+- [ ] **Khai báo toolchain live (`xuna/resources.toolchains`):** mở app desktop thật kết nối backend → kiểm tra host tự dò và gửi danh sách công cụ hiện có (`id` + `version`, **không** có đường dẫn hay nội dung nhạy cảm); công cụ chưa cài hoặc stub `WindowsApps` (`AppExecutionAlias`) không xuất hiện trong danh sách.
+- [ ] **Nút "Sửa 1 chạm" trên chat mobile:** nhờ XUNA chạy một công cụ/IDE thuộc danh sách nhưng **chưa cài** trên máy tính (hoặc gỡ khỏi `PATH` tạm thời) → bong bóng trả lời trên điện thoại hiện nút **"Sửa 1 chạm"** (không hiện khi lệnh thành công `ok`).
+- [ ] **`HomeRemediationSheet` chỉ hiển thị & sao chép (1-tap copy, không tự chạy):** bấm **"Sửa 1 chạm"** → mở sheet hiển thị tên máy đích, loại gợi ý (`install`/`config`/`manual`), mô tả, khung lệnh monospace (nếu có) và dòng lưu ý chỉ hiển thị/sao chép; bấm **"Sao chép lệnh"** → hiện thông báo `"Đã sao chép lệnh."`, dán ra ngoài thấy khớp nguyên văn lệnh, và **tuyệt đối không có lệnh nào tự chạy trên máy tính**. Nếu gợi ý không có `command` thì nút sao chép không hiện.
+- [ ] **Tự làm mới toolchain sau khi cài / lỗi thiếu công cụ:** sau khi cài công cụ thiếu (hoặc chạy lệnh cài gói qua `exec.run`), host tự dò lại danh sách toolchain mà không cần khởi động lại app desktop.
+- [ ] **Kiểm chứng trên Mac & iPhone/Android thật:** chạy lại 4 mục trên với **desktop Mac** (nhánh dò binary & gợi ý `brew` trên macOS chưa từng chạy thật) và **điện thoại thật** (kiểm tra hiển thị & clipboard trên iOS/Android).
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
