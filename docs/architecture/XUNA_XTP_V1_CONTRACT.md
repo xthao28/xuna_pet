@@ -496,6 +496,7 @@ The method is in the `xuna/` namespace because MCP has no equivalent. It is a se
 | `reasonCode` | Optional, `^[a-z0-9_.-]{1,64}$`. Desktop values: `policy`, `navigation_target`, `consequential_target`, `unclassified_target`, `draft_text`, `draft_budget_exceeded`, `activation_key`, `search_submit`, `text_space`, `navigation_key`, `scroll`. |
 | `errorCode` | Required when `status` is not `ok`, absent otherwise. The same code the `tools/call` would return, for example `cu_session_required`, `stale_ref`, `ambiguous_target`, `password_field_forbidden`, `target_outside_allowlist`, `stopped`. |
 | `element` | Optional, only with `ok`. Exactly `{role, name}`: `role` matches `^[a-z0-9_.-]{1,64}$`; `name` is the live label of the target, 1–80 characters, no control characters. Never sent for a password field. |
+| `preview` | Optional, only with `ok` (Wave 4 `ADR-0019` §2, `W4-M2`). Bounded read-only approval preview (`kind: "diff" \| "paths"`, `summary`, `truncated`, plus kind-specific fields below). Absent on refused preflight and never generated for secret or Hard-Deny paths. Strictly ephemeral: never logged, audited, or persisted in PostgreSQL (`desktop/AGENTS.md` §3.6, Consent U5). |
 
 **Host rules (Desktop Agent).**
 1. Evaluate the local policy without an approval. `approval_required` means "allowed at this risk once approved"; any other refusal is returned as a refusal.
@@ -517,6 +518,15 @@ The LAN offline server (UDC-7 S7.4) answers `-32601`: it executes only `media.*`
 1. The host classifies the call with the same evaluator it runs again at `tools/call` (`ExecCommandClassifier`, `FsPathGuard` in `xuna_xtp`), after resolving symlinks of every path it can resolve. A refusal is `status: "denied"` with `errorCode` `shell_not_enabled`, `exec_hard_denied`, `exec_env_dump_forbidden`, `fs_path_forbidden`, `fs_secret_file_forbidden` or `pty_not_allowed`; `invalid_args` carries `schema_mismatch`, `path_not_absolute`, `line_window_invalid` or `timeout_exceeds_policy`.
 2. `ok` carries `effectiveRisk` `R1`–`R3` and a `reasonCode` from: `local_command`, `workspace_write`, `workspace`, `read`, `observe`, `stdin`, `network_command`, `destructive_command`, `unclassified_command`, `inline_code`, `pipe_to_interpreter`, `dynamic_subshell`, `dynamic_executable`, `dynamic_execution`, `dynamic_write_target`, `package_install`, `unparseable`, `outside_workspace`, `dotfile_target`, `system_target`, `secret_file`, `parent_task_r3`, `policy`.
 3. The backend sends these four tools only after a preflight answer. A host that answers `-32601`, a platform other than `windows`/`macos`, and the in-process self host are refused with `preflight_required`; the backend never substitutes its own estimate and never lowers the host's risk.
+
+**Wave 4 (`ADR-0019` §2, `W4-M2`): bounded read-only `preview` on `ok` preflight.**
+1. `preview` is strictly optional, permitted only when `status == "ok"`, and carries no extra keys:
+   - `kind`: `"diff"` or `"paths"`.
+   - `summary`: required single-line printable string (`1..160` characters, no ASCII control characters, secrets redacted).
+   - `truncated`: required boolean.
+   - When `kind == "diff"` (e.g., `fs.patch_file`, `fs.write_file`): requires `snippet` (`1..2048` UTF-8 bytes, at most `40` lines; `\n` and `\t` allowed, no other control characters; redacted for sensitive tokens; when `truncated == true`, `snippet` must end with `"…"`). `paths` and `totalCount` must be absent. Never generated for secret files (`.env*`, `*.pem`, `*.key`, etc.), Hard-Deny paths, home dotfiles, system paths, binary files, or files exceeding `2 MiB`.
+   - When `kind == "paths"` (e.g., destructive file-deletion `exec.run` with globs inside `workspaceRoots`): requires `paths` (`0..20` workspace-relative strings, `1..260` characters each, single-line printable, no leading `/`/`\`/`~`/drive prefix, no `..` traversal segment, no secret or Hard-Deny path) and `totalCount` (integer `>= paths.length`). `snippet` must be absent. Fail-closed: if the command cannot be cleanly parsed as a single workspace-scoped deletion segment or any target/match touches outside `workspaceRoots`, Hard-Deny, or a secret file, the host omits `preview` (`null`) while preserving the normal `R3` preflight classification.
+2. Backend forwards `preview` ephemerally on `action_pending` (SSE / Voice WS) without persisting it in `ApprovalRequest` or `AuditLog`; mobile displays `preview` above the approve/sign button on the approval card. The signature still binds `argsSha256` (`xuna.approval.v1`).
 
 #### 4.2.9 `xuna/get_policy` and `xuna/set_policy` (Backend → Agent, Request)
 

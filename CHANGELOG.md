@@ -2,6 +2,28 @@
 
 Last updated: **2026-11-26** (Asia/Ho_Chi_Minh).
 
+## 2026-11-26 — Kế hoạch nâng cấp P2 / W4-M2 (U2): Xem trước giới hạn kích thước trên thẻ duyệt R3 (`docs/`, `desktop/packages/xuna_xtp`, `desktop/`, `backend/`, `mobile/`, chưa commit)
+
+- **Hợp đồng XTP & Fixtures:** [XUNA_XTP_V1_CONTRACT.md](docs/architecture/XUNA_XTP_V1_CONTRACT.md) §4.2.8 thêm `preview` tùy chọn trên `ok` `xuna/preflight` (`kind: "diff" | "paths"`, trần `2048 B` / `40` dòng / `"…"` / `20` đường dẫn tương đối); đồng bộ byte-identical 2 thư mục fixture `exec_fs_frames.json` (`preflightFsPatchPreviewResponse`, `preflightExecDeletePreviewResponse`, `diff -r` exit `0`).
+- **`xuna_xtp` & `desktop/`:** `XtpPreflightPreview` thuần Dart (`frames.dart`); `buildPreflightPreview` (`desktop/lib/features/exec/preflight_preview_builder.dart`) chỉ-đọc nối vào `HostToolDispatcher.preflight()` — unified diff đã redact cho `fs.patch_file`/`fs.write_file`, mở rộng glob giới hạn trong `workspaceRoots` cho lệnh xóa (`rm`/`del`/`erase`/`rmdir`/`rd`, kể cả `del /s` và `rm -rf`), fail-closed `null` với tệp mật/Hard-Deny/ngoài workspace, 0 rò rỉ vào log/audit §3.6.
+- **`backend/`:** `PreflightPreviewModel` (`xtp_frames.py`, quy tắc tổng quát tuân thủ Rule H5), `sanitize_preflight_preview` stdlib-only (`actions/domain/preflight_preview.py`), truyền tạm thời qua `ActionPendingEvent.wire_payload()` trên SSE & Voice WS (`0` migration DB, không lưu vào `ApprovalRequest` hay `AuditLog`, `orchestrator.py` `+8` net LOC, `workflows.py` `0` diff).
+- **`mobile/`:** `ActionPreview` (`action_preview.dart`), `PendingAction.preview`, `ActionEventMapper._parsePreview` fail-safe, `HomeActionPreviewBox` hiển thị ngay trên nút duyệt trong `HomeActionApprovalSheet`, đồng bộ 5 khóa L10n (`vi_VN.json`/`en_US.json`/`locales.g.dart`), `pubspec.yaml`/`pubspec.lock` `0` diff.
+- **Kiểm chứng (Windows):** `diff -r` `0`, `xuna_xtp` **`282/282`**, `desktop` **`433/433`**, `mobile` **`743/743`**, `backend` `ruff`/`mypy` (`0/268`)/`alembic` OK + full `pytest` **`1611/1611` passed** (`548.39 s`), kèm thử đột biến ở `backend` và `desktop`. **Chưa:** macOS, iPhone/Android thật, live E2E (`UDC-16 §4q`).
+
+## 2026-11-26 — Kế hoạch nâng cấp P2 / W4-M1 (U1): Nhật ký hoàn tác cục bộ cho `fs.*` (`desktop/`, `docs/`, chưa commit)
+
+- **Phê duyệt [ADR-0019](docs/decisions/ADR-0019-draft-workspace-and-effect-bound-approval.md):** chủ dự án duyệt `D4=A`, `D5=A`, `M1-1=A` (`32 MiB` / `2 MiB`/tệp / `20` tx / TTL `30 phút`), `M1-2=A` (`undo_conflict_modified_externally`), `M1-3=A` (giữ wire schema `fs.*` hiện tại ở M1).
+- **Desktop (`desktop/`):**
+  - Thêm `MoveFileExW` (`REPLACE_EXISTING | WRITE_THROUGH`) & `GetLastError` vào `WinKernel32` FFI (`windows_kernel32_ffi.dart`), và `AgentPaths.undoDir` (`%LOCALAPPDATA%\XUNA\undo\` / `Application Support/XUNA/undo/`, tách biệt khỏi `audit/`).
+  - Thêm `FsUndoJournal` (`desktop/lib/features/exec/fs_undo_journal.dart`): WAL `preparing` → `applying` → `committed`/`rolled_back`, tái sử dụng được cho `draft.apply`; chặn tệp mật/Hard-Deny/symlink/ngoài workspace; TOCTOU `expectedPreSha256`; rollback bỏ qua tệp chưa chạm (chịu Win32 lock error `5`/`32`); `recoverAndPruneOnStartup()` thu hồi giao dịch `applying` dở dang lúc khởi động (`DesktopAgentController.initializeAgent`).
+  - Bọc `fs.write_file` & `fs.patch_file` qua `FsUndoJournal` (fallback ghi nguyên tử không backup cho tệp > `2 MiB` hoặc R3 ngoài workspace/tệp mật); mở rộng `action.undo` hợp nhất `ReversibleActionLedger` + `FsUndoJournal` theo LIFO bền vững sau restart (0 rò rỉ đường dẫn/nội dung §3.6); vá lỗi `HostToolDispatcher.executeSubStep` từng ghi ngược bước hoàn tác `media.volume_set` trở lại `actionLedger`.
+- **Kiểm chứng (Windows):** `dart format --set-exit-if-changed` (8 tệp) exit `0`, `fvm flutter analyze` 0 lỗi, `fvm flutter test --no-pub` **`426/426` passed** (`+14` test mới trong `fs_undo_journal_test.dart`, gồm khóa tệp Win32 `FILE_SHARE_READ` thật), thử đột biến 2 bất biến chính (`3` test fail rồi khôi phục). Không đụng `xuna_xtp`, `backend/`, `mobile/`. **Chưa:** macOS, live (`UDC-16 §4p`).
+
+## 2026-11-26 — Kế hoạch nâng cấp P2 / W4-M0: Báo cáo 3 spike Windows & dự thảo ADR-0019 (`docs/`, chưa commit)
+
+- **Báo cáo spike ([W4-M0-draft-workspace-spikes-2026-11-26.md](docs/research/W4-M0-draft-workspace-spikes-2026-11-26.md)):** đo thực tế không quyền Admin trên Windows 11 NTFS (`FSCTL_DUPLICATE_EXTENTS_TO_FILE` lỗi `1` không hỗ trợ; `git worktree` mất untracked/dirty và lỗi non-Git; hardlink làm hỏng bản gốc khi ghi tại chỗ; sao chép có lọc `266.9 ms` / `521` tệp; `AppContainer` 0-capability làm `python` thoát `106`, `node` lỗi `0xC0000142`; WAL + `MoveFileExW` apply 3 tệp `26.7 ms`, bắt Win32 error `5` khi khóa tệp và rollback 100% SHA-256).
+- **Dự thảo [ADR-0019](docs/decisions/ADR-0019-draft-workspace-and-effect-bound-approval.md) (`Proposed`):** chốt đề xuất D4 (chỉ cô lập tệp workspace, không tuyên bố chặn mạng OS), D5 (sao chép vật lý có lọc + APFS `clonefile` trên Mac sau khi đo), `W4-M1` nhật ký hoàn tác cục bộ cho `fs.*` (§3.6), `W4-M2` preview R3, `W4-M3` bản nháp + `EffectManifest`, `W4-M4` `xuna.approval.v2` (`effectSha256`) song song với `v1`. Đã cập nhật `docs/decisions/README.md`, `PROCESS.md`, `XUNA_UPGRADE_PLAN_2026-11-26.md`; `0` thay đổi mã nguồn.
+
 ## 2026-11-26 — Kế hoạch nâng cấp P1.3 (U5): Test chống lệch prompt ↔ catalog & sửa lỗi `mode='window_idle'` (`backend/` `b0c9f78`, `docs/`)
 
 - **Sửa lỗi lệch thật (`backend/`):** `job_runner.py` (`wait_guidance`) đổi `mode='window_idle'` (không có trong `WatchMode` / `JOB_WAIT_SCHEMA`) sang `mode='ui_quiescence'`.

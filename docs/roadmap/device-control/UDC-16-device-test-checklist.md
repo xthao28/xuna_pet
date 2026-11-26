@@ -245,6 +245,24 @@ Cần backend, desktop và app điện thoại bản mới cùng lúc.
 - [ ] **Tự làm mới toolchain sau khi cài / lỗi thiếu công cụ:** sau khi cài công cụ thiếu (hoặc chạy lệnh cài gói qua `exec.run`), host tự dò lại danh sách toolchain mà không cần khởi động lại app desktop.
 - [ ] **Kiểm chứng trên Mac & iPhone/Android thật:** chạy lại 4 mục trên với **desktop Mac** (nhánh dò binary & gợi ý `brew` trên macOS chưa từng chạy thật) và **điện thoại thật** (kiểm tra hiển thị & clipboard trên iOS/Android).
 
+## 4p. Nhật ký hoàn tác cục bộ cho `fs.*` (`W4-M1` / U1, `ADR-0019`, thêm 2026-11-26; cần app desktop bản mới)
+
+Đã qua unit test trên Windows (gồm khóa tệp Win32 `FILE_SHARE_READ` thật và thử đột biến), **chưa chạy live end-to-end và chưa chạy trên Mac**:
+
+- [ ] **Hoàn tác sửa/tạo tệp trong workspace:** nhờ XUNA dùng `fs.write_file` hoặc `fs.patch_file` sửa một tệp trong `workspaceRoots`, sau đó nói *"hoàn tác giúp mình"* (`action.undo`) → tệp trở về đúng nội dung/SHA-256 trước đó (hoặc bị xóa nếu mới tạo), toast chỉ hiện `"XUNA: đã hoàn tác thay đổi tệp"`, log/audit không chứa đường dẫn hay nội dung tệp (§3.6).
+- [ ] **Bền vững sau khởi động lại app desktop:** để XUNA sửa tệp → tắt và mở lại XUNA Desktop Agent (trong vòng 30 phút TTL) → gọi `action.undo` vẫn khôi phục đúng bản trước đó từ `%LOCALAPPDATA%\XUNA\undo\` (Windows) / `~/Library/Application Support/XUNA/undo/` (Mac).
+- [ ] **Chặn ghi đè khi chủ đã tự sửa tay (M1-2 fail-closed):** để XUNA sửa tệp → chủ mở editor sửa thêm nội dung → gọi `action.undo` → XUNA phải từ chối (`undo_conflict_modified_externally`) và **giữ nguyên** nội dung chủ vừa sửa tay.
+- [ ] **Kiểm chứng trên Mac:** chạy lại 3 mục trên trên macOS (xác minh quyền thư mục `0700`, giữ bit thực thi `chmod`, và `rename(2)`).
+
+## 4q. Xem trước giới hạn kích thước trên thẻ duyệt R3 (`W4-M2` / U2, `ADR-0019` §2, thêm 2026-11-26; cần backend + desktop + app điện thoại bản mới)
+
+Đã qua unit/widget/pytest trên Windows (`xuna_xtp` `282`, `desktop` `433`, `mobile` `743`, `backend` `1611`, `diff -r` `0`), **chưa chạy live trên máy + điện thoại thật và chưa chạy trên Mac**:
+
+- [ ] **Xem trước diff cho `fs.patch_file` / `fs.write_file`:** ở chế độ Standard (hoặc ghi ngoài workspace), nhờ XUNA sửa/tạo một tệp văn bản → thẻ duyệt trên điện thoại hiện khung **"XEM TRƯỚC THAY ĐỔI"** ngay phía trên nút **Đồng ý / Từ chối**, có dòng `-`/`+` đúng thay đổi, token bí mật trong tệp hiện `[REDACTED]`; nếu thay đổi vượt 40 dòng hoặc 2048 byte thì có thẻ **"Đã rút gọn"** và kết thúc bằng `"…"`.
+- [ ] **Xem trước danh sách tệp cho lệnh xóa (`del`/`rm` trong workspace):** nhờ XUNA xóa `logs\*.log` (hoặc `rm logs/*.log`) trong thư mục dự án → thẻ duyệt R3 hiện khung **"TỆP SẼ BỊ TÁC ĐỘNG"** kèm số tổng tệp (`@count tệp`) và tối đa 20 đường dẫn tương đối (có `"…"` khi > 20); khi chưa bấm Đồng ý thì 0 tệp nào bị xóa.
+- [ ] **Fail-closed với tệp mật / ngoài workspace:** nhờ XUNA ghi `.env` hoặc chạy lệnh xóa trỏ ra ngoài workspace / khớp `.env` → thẻ duyệt R3 vẫn xuất hiện bình thường nhưng **không** hiện khung xem trước và **không** lộ nội dung hay tên tệp mật; kiểm tra log/audit trên desktop & DB backend không chứa nội dung preview.
+- [ ] **Kiểm chứng trên Mac & điện thoại thật:** chạy lại 3 mục trên với **desktop Mac** và **iPhone/Android thật**.
+
 ## 5. Số lần bị hỏi (để quyết định D1/D2)
 
 - [ ] Làm một việc 5 bước (ví dụ: mở app → tìm kiếm → chạm kết quả) và **đếm số lần hiện hộp duyệt**. Dự kiến khoảng 6 lần (observe R2 + mỗi `act` R3). Con số thực tế quyết định có cần phiên điều khiển (UDC-16 phần D) hay không.
